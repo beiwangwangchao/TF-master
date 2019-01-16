@@ -62,7 +62,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.MessageReceiver" >
     <selectKey resultType="java.lang.Long" keyProperty="receiverId" order="BEFORE" >
-      select SYS_MESSAGE_RECEIVER_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MESSAGE_RECEIVER (RECEIVER_ID, MESSAGE_ID, MESSAGE_TYPE, 
       MESSAGE_ADDRESS, OBJECT_VERSION_NUMBER, REQUEST_ID, 
@@ -85,7 +85,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.MessageReceiver" >
     <selectKey resultType="java.lang.Long" keyProperty="receiverId" order="BEFORE" >
-      select SYS_MESSAGE_RECEIVER_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MESSAGE_RECEIVER
     <trim prefix="(" suffix=")" suffixOverrides="," >

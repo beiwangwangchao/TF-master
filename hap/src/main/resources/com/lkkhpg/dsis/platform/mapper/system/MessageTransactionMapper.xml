@@ -70,7 +70,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.MessageTransaction" >
     <selectKey resultType="java.lang.Long" keyProperty="transactionId" order="BEFORE" >
-      select SYS_MESSAGE_TRANSACTION_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MESSAGE_TRANSACTION (TRANSACTION_ID, MESSAGE_ID, 
       TRANSACTION_STATUS, OBJECT_VERSION_NUMBER, REQUEST_ID, 
@@ -95,7 +95,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.MessageTransaction" >
     <selectKey resultType="java.lang.Long" keyProperty="transactionId" order="BEFORE" >
-      select SYS_MESSAGE_TRANSACTION_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MESSAGE_TRANSACTION
     <trim prefix="(" suffix=")" suffixOverrides="," >

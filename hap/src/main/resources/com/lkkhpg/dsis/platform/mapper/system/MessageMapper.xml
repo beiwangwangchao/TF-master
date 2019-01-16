@@ -142,7 +142,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.Message" >
     <selectKey resultType="java.lang.Long" keyProperty="messageId" order="BEFORE" >
-      select SYS_MESSAGE_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MESSAGE (MESSAGE_ID, MESSAGE_TYPE, 
       MESSAGE_HOST, MESSAGE_FROM, SUBJECT, PRIORITY_LEVEL, 
@@ -170,7 +170,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.Message" >
     <selectKey resultType="java.lang.Long" keyProperty="messageId" order="BEFORE" >
-      select SYS_MESSAGE_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MESSAGE
     <trim prefix="(" suffix=")" suffixOverrides="," >

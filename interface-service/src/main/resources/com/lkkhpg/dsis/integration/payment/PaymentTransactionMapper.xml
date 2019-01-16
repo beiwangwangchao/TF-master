@@ -5,8 +5,7 @@
 
     <insert id="insert" parameterType="com.lkkhpg.dsis.integration.payment.dto.PaymentTransactionModel">
         <selectKey resultType="java.lang.Long" keyProperty="transactionId" order="BEFORE">
-        select
-        om_payment_transaction_s.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
        </selectKey>
         insert into OM_PAYMENT_TRANSACTION (TRANSACTION_ID, SOURCE_TYPE, SOURCE_KEY1,
         SOURCE_KEY2,SOURCE_KEY3,SOURCE_KEY4,SOURCE_KEY5,

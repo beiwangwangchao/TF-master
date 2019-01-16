@@ -81,7 +81,7 @@
     <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.Profile"
             useGeneratedKeys="false" keyProperty="profileId">
         <selectKey resultType="long" keyProperty="profileId" order="BEFORE">
-            select sys_profile_s.nextVal as profileId from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into SYS_PROFILE (PROFILE_ID, PROFILE_NAME, DESCRIPTION,
         REQUEST_ID, PROGRAM_ID,

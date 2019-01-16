@@ -14,7 +14,7 @@
 
    <insert id="insertUnit" parameterType="com.lkkhpg.dsis.integration.payment.dto.PaymentConfig">
        <selectKey resultType="java.lang.String" keyProperty="configID" order="BEFORE" >
-           select SYS_PAYMENT_CONFIG_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
        </selectKey>
        insert into SYS_PAYMENT_CONFIG (CONFIG_ID,PAYMENT_TYPE,KEY,VALUE)
        values (#{configID, jdbcType=VARCHAR},#{paymentType, jdbcType=VARCHAR},

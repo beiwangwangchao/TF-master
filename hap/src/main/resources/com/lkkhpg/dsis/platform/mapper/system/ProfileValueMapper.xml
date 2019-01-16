@@ -156,7 +156,7 @@ select 'GLOBAL' level_Name,'GLOBAL' level_Value, '10' level_Id from DUAL
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.ProfileValue">
     <selectKey keyProperty="profileValueId" order="BEFORE" resultType="long">
-      select SYS_PROFILE_VALUE_s.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_PROFILE_VALUE (PROFILE_VALUE_ID, PROFILE_ID, LEVEL_ID, 
       LEVEL_VALUE, PROFILE_VALUE, 
@@ -181,7 +181,7 @@ select 'GLOBAL' level_Name,'GLOBAL' level_Value, '10' level_Id from DUAL
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.ProfileValue">
     <selectKey keyProperty="profileValueId" order="BEFORE" resultType="long">
-      select SYS_PROFILE_VALUE_s.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_PROFILE_VALUE
     <trim prefix="(" suffix=")" suffixOverrides=",">

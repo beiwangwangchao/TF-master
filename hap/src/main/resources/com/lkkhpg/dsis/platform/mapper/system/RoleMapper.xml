@@ -83,7 +83,7 @@
     
     <insert id="insert" useGeneratedKeys="false" parameterType="com.lkkhpg.dsis.platform.dto.system.Role">
         <selectKey resultType="long" keyProperty="roleId" order="BEFORE">
-            select sys_role_b_s.nextVal as roldId from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into SYS_ROLE_B (ROLE_ID, ROLE_CODE, ROLE_NAME,
         ROLE_DESCRIPTION, AREA_CODE,
@@ -111,7 +111,7 @@
     </insert>
     <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.Role">
         <selectKey resultType="java.lang.Integer" keyProperty="roleId" order="BEFORE">
-            select sys_role_b_s.nextVal from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into SYS_ROLE_B
         <trim prefix="(" suffix=")" suffixOverrides=",">

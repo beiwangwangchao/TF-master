@@ -92,8 +92,7 @@
     </delete>
     <insert id="insert" parameterType="com.lkkhpg.dsis.platform.job.dto.JobRunningInfoDto">
         <selectKey resultType="java.lang.Long" keyProperty="jobRunningInfoId" order="BEFORE">
-            select
-            SYS_JOB_RUNNING_INFO_s.nextval from dual
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into SYS_JOB_RUNNING_INFO (JOB_RUNNING_INFO_ID, JOB_NAME, JOB_GROUP,EXECUTION_SUMMARY,
         JOB_RESULT,

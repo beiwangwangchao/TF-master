@@ -102,7 +102,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.MessageAccount" >
     <selectKey resultType="java.math.BigDecimal" keyProperty="accountId" order="BEFORE" >
-      select SYS_MESSAGE_ACCOUNT_s.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MESSAGE_ACCOUNT (ACCOUNT_ID, ACCOUNT_TYPE, ACCOUNT_CODE, 
       USER_NAME, PASSWORD, OBJECT_VERSION_NUMBER, 
@@ -127,7 +127,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.MessageAccount" >
     <selectKey resultType="java.math.BigDecimal" keyProperty="accountId" order="BEFORE" >
-      select SYS_MESSAGE_ACCOUNT_s.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MESSAGE_ACCOUNT
     <trim prefix="(" suffix=")" suffixOverrides="," >

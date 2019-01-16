@@ -60,7 +60,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.MessageAttachment" >
     <selectKey resultType="java.lang.Long" keyProperty="attachmentId" order="BEFORE" >
-      select SYS_MESSAGE_ATTACHMENT_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MESSAGE_ATTACHMENT (ATTACHMENT_ID, MESSAGE_ID, FILE_ID, 
       OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
@@ -83,7 +83,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.MessageAttachment" >
     <selectKey resultType="java.lang.Long" keyProperty="attachmentId" order="BEFORE" >
-      select SYS_MESSAGE_ATTACHMENT_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MESSAGE_ATTACHMENT
     <trim prefix="(" suffix=")" suffixOverrides="," >
