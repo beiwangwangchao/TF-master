@@ -41,7 +41,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemRank" >
     <selectKey resultType="java.lang.Long" keyProperty="rankId" order="BEFORE" >
-      select MM_MEM_RANK_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into MM_MEM_RANK (RANK_ID, MEMBER_ID, RANK, 
       MONTH_TO_TERMINATE, BONUS_LOCAL, BONUS_INTERNATIONAL, 
@@ -72,7 +72,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemRank" >
     <selectKey resultType="java.lang.Long" keyProperty="rankId" order="BEFORE" >
-      select MM_MEM_RANK_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into MM_MEM_RANK
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -514,7 +514,7 @@
   <!-- 插入会员等级信息 -->
   <insert id="insertMemRank" parameterType="com.lkkhpg.dsis.common.member.dto.MemRank">
       <selectKey resultType="java.lang.Long" keyProperty="rankId" order="BEFORE" >
-      select MM_MEM_RANK_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into MM_MEM_RANK
     <trim prefix="(" suffix=")" suffixOverrides="," >

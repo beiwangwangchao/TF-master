@@ -79,7 +79,7 @@
     <insert id="insert" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLot">
         <selectKey resultType="java.lang.Long" keyProperty="deliveryLotId"
             order="BEFORE">
-            select DM_ORDER_DELIVERY_LOT_S.nextval from dual
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into DM_ORDER_DELIVERY_LOT (DELIVERY_LOT_ID, DELIVERY_LINE_ID,
         DELIVERY_ID,
@@ -115,7 +115,7 @@
     <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLot">
         <selectKey resultType="java.lang.Long" keyProperty="deliveryLotId"
             order="BEFORE">
-            select DM_ORDER_DELIVERY_LOT_S.nextval from dual
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into DM_ORDER_DELIVERY_LOT
         <trim prefix="(" suffix=")" suffixOverrides=",">

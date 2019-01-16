@@ -51,7 +51,7 @@
     </delete>
     <insert id="insert" parameterType="com.lkkhpg.dsis.common.dashboard.dto.FunctionShortcut">
         <selectKey resultType="java.lang.Long" keyProperty="shortcutId" order="BEFORE">
-            select SYS_FUNCTION_SHORTCUT_s.nextval from dual
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into SYS_FUNCTION_SHORTCUT (SHORTCUT_ID, USER_ID, ROLE_ID,
         FUNCTION_ID, SORT_NUMBER,
@@ -76,7 +76,7 @@
     </insert>
     <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.dashboard.dto.FunctionShortcut">
         <selectKey resultType="java.lang.Long" keyProperty="shortcutId" order="BEFORE">
-            select SYS_FUNCTION_SHORTCUT_s.nextval from dual
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into SYS_FUNCTION_SHORTCUT
         <trim prefix="(" suffix=")" suffixOverrides=",">

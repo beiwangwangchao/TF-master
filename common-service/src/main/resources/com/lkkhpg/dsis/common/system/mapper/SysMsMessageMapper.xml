@@ -71,7 +71,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.system.dto.SysMsMessage" >
     <selectKey resultType="java.lang.Long" keyProperty="msMessageId" order="BEFORE" >
-      select SYS_MS_MESSAGE_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MS_MESSAGE (MS_MESSAGE_ID, MARKET_ID, MESSAGE_NAME, 
       MESSAGE_TYPE, MESSAGE_STATUS, PUBLISH_CHANNEL, 
@@ -100,7 +100,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.system.dto.SysMsMessage" >
     <selectKey resultType="java.lang.Long" keyProperty="msMessageId" order="BEFORE" >
-      select MS_MESSAGE_ID.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_MS_MESSAGE
     <trim prefix="(" suffix=")" suffixOverrides="," >

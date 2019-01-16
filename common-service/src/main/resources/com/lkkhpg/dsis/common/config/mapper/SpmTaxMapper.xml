@@ -59,7 +59,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmTax" >
     <selectKey resultType="java.lang.Long" keyProperty="taxId" order="BEFORE" >
-      select SPM_TAX_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_TAX (TAX_ID, TAX_CODE, TAX_NAME, 
       DESCRIPTION, REGISTRATION_NUMBER, TAX_TYPE, 
@@ -90,7 +90,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmTax" >
     <selectKey resultType="java.lang.Long" keyProperty="taxId" order="BEFORE" >
-      select SPM_TAX_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_TAX
     <trim prefix="(" suffix=")" suffixOverrides="," >

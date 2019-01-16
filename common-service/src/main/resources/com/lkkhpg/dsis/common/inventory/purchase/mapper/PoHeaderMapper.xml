@@ -68,7 +68,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.purchase.dto.PoHeader" >
     <selectKey resultType="java.lang.Long" keyProperty="poHeaderId" order="BEFORE" >
-      select PO_HEADER_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into PO_HEADER (PO_HEADER_ID, PO_NUMBER, MARKET_ID, 
       ORDER_DATE, PO_TO, VENDOR_NAME, 
@@ -100,7 +100,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.inventory.purchase.dto.PoHeader" >
     <selectKey resultType="java.lang.Long" keyProperty="poHeaderId" order="BEFORE" >
-      select PO_HEADER_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into PO_HEADER
     <trim prefix="(" suffix=")" suffixOverrides="," >

@@ -62,7 +62,7 @@
   </select>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany" >
     <selectKey resultType="java.lang.Long" keyProperty="companyId" order="BEFORE" >
-      SELECT SPM_COMPANY_B_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_COMPANY_B
     <trim prefix="(" suffix=")" suffixOverrides="," >

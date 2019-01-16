@@ -64,7 +64,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusAdjust">
     <selectKey keyProperty="adjId" order="BEFORE" resultType="java.lang.Long">
-      select BM_BONUS_ADJ_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into BM_BONUS_ADJ (ADJ_ID, ADJ_CODE, MEMBER_ID, 
       PERIOD_ID, ADJ_STATUS, ADJ_TYPE, 
@@ -96,7 +96,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusAdjust">
     <selectKey keyProperty="adjId" order="BEFORE" resultType="java.lang.Long">
-      select BM_BONUS_ADJ_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into BM_BONUS_ADJ
     <trim prefix="(" suffix=")" suffixOverrides="," >

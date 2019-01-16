@@ -55,7 +55,7 @@
  
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.SalesVoucher" >
     <selectKey resultType="java.lang.Long" keyProperty="voucherApplyId" order="BEFORE" >
-      select OM_SALES_VOUCHER_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into OM_SALES_VOUCHER (VOUCHER_APPLY_ID, HEADER_ID, SALES_ORG_ID, 
       VOUCHER_ID, OBJECT_VERSION_NUMBER, REQUEST_ID, 
@@ -80,7 +80,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesVoucher" >
     <selectKey resultType="java.lang.Long" keyProperty="voucherApplyId" order="BEFORE" >
-      select OM_SALES_VOUCHER_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into OM_SALES_VOUCHER
     <trim prefix="(" suffix=")" suffixOverrides="," >

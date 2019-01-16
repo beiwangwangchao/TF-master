@@ -24,7 +24,7 @@
   </sql>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemApplyRole" >
     <selectKey resultType="java.lang.Long" keyProperty="applyId" order="BEFORE" >
-      select MM_MEM_APPLY_ROLE_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into MM_MEM_APPLY_ROLE (<include refid="Base_Column_List"></include>)
     values (#{applyId,jdbcType=DECIMAL}, #{applyNumber,jdbcType=VARCHAR}, #{applyDate,jdbcType=TIMESTAMP}, 

@@ -40,7 +40,7 @@
   
   <insert id="insertPick" parameterType="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickHead">
         <selectKey resultType="java.lang.Long" keyProperty="pickReleaseId" order="BEFORE">
-            select dm_pick_release_s.nextval from dual
+          select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
             insert into DM_PICK_RELEASE (PICK_RELEASE_ID, ORDER_ID, REMARK, 
               OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 

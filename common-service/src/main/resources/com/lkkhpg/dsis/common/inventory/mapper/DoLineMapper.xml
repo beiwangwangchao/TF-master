@@ -57,7 +57,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.lading.dto.DoLine" >
     <selectKey resultType="java.lang.Long" keyProperty="doLineId" order="BEFORE" >
-      select DO_LINE_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into DO_LINE (DO_LINE_ID, DO_HEADER_ID, ITEM_ID, 
       UOM_CODE, PACKAGE_QUANTITY, MIN_QUANTITY, 
@@ -86,7 +86,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.inventory.lading.dto.DoLine" >
     <selectKey resultType="java.lang.Long" keyProperty="doLineId" order="BEFORE" >
-      select DO_LINE_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into DO_LINE
     <trim prefix="(" suffix=")" suffixOverrides="," >

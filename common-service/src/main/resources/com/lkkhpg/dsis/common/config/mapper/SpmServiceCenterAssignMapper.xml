@@ -55,7 +55,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenterAssign" >
     <selectKey resultType="java.lang.Long" keyProperty="assignId" order="BEFORE" >
-      select SPM_SERVICE_CENTER_ASSIGN_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_SERVICE_CENTER_ASSIGN (ASSIGN_ID, SERVICE_CENTER_ID, MEMBER_ID, 
       OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
@@ -80,7 +80,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenterAssign" >
     <selectKey resultType="java.lang.Long" keyProperty="assignId" order="BEFORE" >
-      select SPM_SERVICE_CENTER_ASSIGN_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_SERVICE_CENTER_ASSIGN
     <trim prefix="(" suffix=")" suffixOverrides="," >

@@ -62,7 +62,7 @@
   </delete>
     <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSalesOrganization">
         <selectKey resultType="java.lang.Long" keyProperty="salesOrgId" order="BEFORE">
-            select SPM_SALES_ORGANIZATION_S.nextval from dual
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into SPM_SALES_ORGANIZATION_B (SALES_ORG_ID, CODE, NAME,
         DESCRIPTION, PARENT_ORG_ID, MARKET_ID,
@@ -93,7 +93,7 @@
     </insert>
     <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSalesOrganization">
         <selectKey resultType="java.lang.Long" keyProperty="salesOrgId" order="BEFORE">
-            select SPM_SALES_ORGANIZATION_S.nextval from dual
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into SPM_SALES_ORGANIZATION_B
         <trim prefix="(" suffix=")" suffixOverrides=",">

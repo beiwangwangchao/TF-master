@@ -60,7 +60,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
     <selectKey resultType="java.lang.Long" keyProperty="periodId" order="BEFORE" >
-      select SPM_PERIOD_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_PERIOD (PERIOD_ID, PERIOD_TYPE, PERIOD_NAME, 
       START_DATE, END_DATE, CLOSING_STATUS, 
@@ -176,7 +176,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
     <selectKey resultType="java.lang.Long" keyProperty="periodId" order="BEFORE" >
-      select SPM_PERIOD_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_PERIOD
     <trim prefix="(" suffix=")" suffixOverrides="," >

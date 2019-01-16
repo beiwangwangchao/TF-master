@@ -94,7 +94,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusFinal" >
     <selectKey resultType="java.lang.Long" keyProperty="bonusId" order="BEFORE" >
-      select BM_BONUS_FINAL_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into BM_BONUS_FINAL (BONUS_ID, PERIOD_ID, 
       MEMBER_ID, CURRENCY_CODE, 
@@ -143,7 +143,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusFinal" >
     <selectKey resultType="java.lang.Long" keyProperty="bonusId" order="BEFORE" >
-      select BM_BONUS_FINAL_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into BM_BONUS_FINAL
     <trim prefix="(" suffix=")" suffixOverrides="," >

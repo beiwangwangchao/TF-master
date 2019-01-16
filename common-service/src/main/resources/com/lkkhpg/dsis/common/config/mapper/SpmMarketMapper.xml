@@ -94,7 +94,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
     <selectKey resultType="java.lang.Long" keyProperty="marketId" order="BEFORE" >
-      SELECT SPM_MARKET_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_MARKET_B (MARKET_ID, CODE, NAME, 
       DESCRIPTION, COMPANY_ID, LOCATION_ID, 
@@ -123,7 +123,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
     <selectKey resultType="java.lang.Long" keyProperty="marketId" order="BEFORE" >
-      SELECT SPM_MARKET_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_MARKET_B
     <trim prefix="(" suffix=")" suffixOverrides="," >

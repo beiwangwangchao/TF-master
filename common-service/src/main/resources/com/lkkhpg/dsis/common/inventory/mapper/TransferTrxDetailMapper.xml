@@ -126,8 +126,7 @@
     </delete>
     <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.dto.TransferTrxDetail">
         <selectKey resultType="java.lang.Long" keyProperty="trxDetailId" order="BEFORE">
-            select
-            INV_TRANSFER_TRX_DETAIL_S.nextval from dual
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into INV_TRANSFER_TRX_DETAIL (TRX_DETAIL_ID, TRX_ID,
         STATUS,ORGANIZATION_ID,
@@ -173,8 +172,7 @@
     </insert>
     <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.inventory.dto.TransferTrxDetail">
         <selectKey resultType="java.lang.Long" keyProperty="trxDetailId" order="BEFORE">
-            select
-            INV_TRANSFER_TRX_DETAIL_S.nextval from dual
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into INV_TRANSFER_TRX_DETAIL
         <trim prefix="(" suffix=")" suffixOverrides=",">

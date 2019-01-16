@@ -71,7 +71,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.lading.dto.DoHeader" >
     <selectKey resultType="java.lang.Long" keyProperty="doHeaderId" order="BEFORE" >
-      select DO_HEADER_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into DO_HEADER (DO_HEADER_ID, DO_NUMBER, MARKET_ID, 
       ORDER_DATE, DO_TO, VENDOR_NAME, 
@@ -105,7 +105,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.inventory.lading.dto.DoHeader" >
     <selectKey resultType="java.lang.Long" keyProperty="doHeaderId" order="BEFORE" >
-      select DO_HEADER_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into DO_HEADER
     <trim prefix="(" suffix=")" suffixOverrides="," >

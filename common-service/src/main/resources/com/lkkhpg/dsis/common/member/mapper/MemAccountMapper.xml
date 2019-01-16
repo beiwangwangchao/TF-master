@@ -52,7 +52,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemAccount" >
     <selectKey resultType="java.lang.Long" keyProperty="accountId" order="BEFORE" >
-      select MM_MEM_ACCOUNT_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into MM_MEM_ACCOUNT (ACCOUNT_ID, MEMBER_ID, BANK_ID, 
       ACCOUNT_NUMBER, ACCOUNT_HOLDER, OBJECT_VERSION_NUMBER, 
@@ -79,7 +79,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemAccount" >
     <selectKey resultType="java.lang.Long" keyProperty="accountId" order="BEFORE" >
-      select MM_MEM_ACCOUNT_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into MM_MEM_ACCOUNT
     <trim prefix="(" suffix=")" suffixOverrides="," >

@@ -79,7 +79,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.dto.RepackTrx" >
     <selectKey resultType="java.lang.Long" keyProperty="trxId" order="BEFORE" >
-      select INV_REPACK_TRX_NUMBER_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into INV_REPACK_TRX (TRX_ID, ORGANIZATION_ID, TRX_NUMBER, 
       PACKAGE_ITEM_ID, REPACK_QTY, TRX_DATE, 
@@ -106,7 +106,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.inventory.dto.RepackTrx" >
     <selectKey resultType="java.lang.Long" keyProperty="trxId" order="BEFORE" >
-      select INV_REPACK_TRX_NUMBER_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into INV_REPACK_TRX
     <trim prefix="(" suffix=")" suffixOverrides="," >

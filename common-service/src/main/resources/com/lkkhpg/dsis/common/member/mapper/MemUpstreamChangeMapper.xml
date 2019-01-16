@@ -105,7 +105,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemUpstreamChange" >
     <selectKey resultType="java.lang.Long" keyProperty="changeId" order="BEFORE" >
-      select MM_MEM_UPSTREAM_CHANGE_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into MM_MEM_UPSTREAM_CHANGE (CHANGE_ID, MEMBER_ID, FROM_UP_MEMBER_ID, 
       TO_UP_MEMBER_ID, APPLY_DATE, APPROVAL_STATUS, 
@@ -136,7 +136,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemUpstreamChange" useGeneratedKeys="true" >
     <selectKey resultType="java.lang.Long" keyProperty="changeId" order="BEFORE" >
-      select MM_MEM_UPSTREAM_CHANGE_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into MM_MEM_UPSTREAM_CHANGE
     <trim prefix="(" suffix=")" suffixOverrides="," >

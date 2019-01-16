@@ -59,7 +59,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.promotion.dto.VoucherTransaction" >
     <selectKey resultType="java.lang.Long" keyProperty="transactionId" order="BEFORE" >
-      select PDM_VOUCHER_TRANSACTION_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into PDM_VOUCHER_TRANSACTION (TRANSACTION_ID, MARKET_ID, SALES_ORG_ID, 
       MEMBER_ID, TRX_SOURCE_TYPE, TRX_SOURCE_KEY, 
@@ -88,7 +88,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.promotion.dto.VoucherTransaction" >
     <selectKey resultType="java.lang.Long" keyProperty="transactionId" order="BEFORE" >
-      select PDM_VOUCHER_TRANSACTION_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into PDM_VOUCHER_TRANSACTION
     <trim prefix="(" suffix=")" suffixOverrides="," >

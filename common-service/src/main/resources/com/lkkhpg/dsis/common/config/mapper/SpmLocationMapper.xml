@@ -82,7 +82,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLocation" >
     <selectKey resultType="java.lang.Long" keyProperty="locationId" order="BEFORE" >
-      select SPM_LOCATION_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_LOCATION (LOCATION_ID, CITY_CODE, STATE_CODE,
     COUNTRY_CODE, LOCATION_CODE, NAME,
@@ -138,7 +138,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLocation" >
     <selectKey resultType="java.lang.Long" keyProperty="locationId" order="BEFORE" >
-      select SPM_LOCATION_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_LOCATION
     <trim prefix="(" suffix=")" suffixOverrides="," >

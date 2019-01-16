@@ -190,7 +190,7 @@ ON s.assign_type = b.org_type AND s.assign_value = b.org_id
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.system.dto.SysUserRoleAssign">
     <selectKey resultType="long" keyProperty="userRoleAssignId" order="BEFORE">
-            select sys_user_role_assign_s.nextVal as userRoleAssignId from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_USER_ROLE_ASSIGN
     <trim prefix="(" suffix=")" suffixOverrides=",">

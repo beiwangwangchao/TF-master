@@ -70,8 +70,7 @@
     </delete>
     <insert id="insert" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierDtl">
         <selectKey resultType="java.lang.Long" keyProperty="tierDtlId" order="BEFORE">
-            SELECT
-            DM_SHIPPING_TIER_DTL_S.NEXTVAL FROM DUAL
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into DM_SHIPPING_TIER_DTL (TIER_DTL_ID, SHIPPING_TIER_ID, CURRENCY_CODE,
         INV_AMOUNT_FROM, INV_AMOUNT_TO,

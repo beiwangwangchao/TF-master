@@ -78,7 +78,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.promotion.dto.Voucher" >
     <selectKey resultType="java.lang.Long" keyProperty="voucherId" order="BEFORE" >
-      select PDM_VOUCHER_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into PDM_VOUCHER (VOUCHER_ID, MARKET_ID, SALES_ORG_ID, 
       VOUCHER_CODE, NAME, DESCRIPTION, 
@@ -117,7 +117,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.promotion.dto.Voucher" >
     <selectKey resultType="java.lang.Long" keyProperty="voucherId" order="BEFORE" >
-      select PDM_VOUCHER_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into PDM_VOUCHER
     <trim prefix="(" suffix=")" suffixOverrides="," >

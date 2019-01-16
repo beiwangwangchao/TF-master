@@ -98,7 +98,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.system.dto.SysEvent" >
     <selectKey resultType="java.lang.Long" keyProperty="eventId" order="BEFORE" >
-      select SYS_EVENT_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_EVENT
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -525,7 +525,7 @@
 </select>
   
   <select id="getEventId" resultType = "java.lang.Long">
-     select SYS_EVENT_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
   </select>
   
   <update id="closeEvent" parameterType="java.lang.Long">

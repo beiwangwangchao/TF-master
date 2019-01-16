@@ -65,7 +65,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.OmMwsOrderPayment" >
     <selectKey resultType="java.lang.Long" keyProperty="paymentId" order="BEFORE" >
-      select OM_MWS_ORDER_PAYMENT_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into OM_MWS_ORDER_PAYMENT (PAYMENT_ID, ORDER_HEADER_ID, SALES_ORG_ID, 
       PAYMENT_METHOD, PAYMENT_METHOD_INFO, PAYMENT_AMOUNT, 
@@ -98,7 +98,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.OmMwsOrderPayment" >
     <selectKey resultType="java.lang.Long" keyProperty="paymentId" order="BEFORE" >
-      select OM_MWS_ORDER_PAYMENT_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into OM_MWS_ORDER_PAYMENT
     <trim prefix="(" suffix=")" suffixOverrides="," >

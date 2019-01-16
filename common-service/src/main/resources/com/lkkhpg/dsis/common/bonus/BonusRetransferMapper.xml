@@ -65,7 +65,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusRetransfer" >
     <selectKey resultType="java.lang.Long" keyProperty="retransId" order="BEFORE" >
-      select BM_BONUS_RETRANSFER_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into BM_BONUS_RETRANSFER (RETRANS_ID, RETRANS_CODE, BONUS_ID, 
       FINAL_BONUS_ID, MEMBER_ID, PERIOD_ID, 
@@ -94,7 +94,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusRetransfer" >
     <selectKey resultType="java.lang.Long" keyProperty="retransId" order="BEFORE" >
-      select BM_BONUS_RETRANSFER_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into BM_BONUS_RETRANSFER
     <trim prefix="(" suffix=")" suffixOverrides="," >

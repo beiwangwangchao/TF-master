@@ -59,7 +59,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmOperatingUnit" >
     <selectKey resultType="java.lang.Long" keyProperty="operatingUnitId" order="BEFORE" >
-      select SPM_OPERATING_UNIT_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_OPERATING_UNIT_B (OPERATING_UNIT_ID, CODE, NAME, 
       DESCRIPTION, COMPANY_ID, LOCATION_ID, 
@@ -89,7 +89,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmOperatingUnit" >
     <selectKey resultType="java.lang.Long" keyProperty="operatingUnitId" order="BEFORE" >
-      select SPM_OPERATING_UNIT_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_OPERATING_UNIT_B
     <trim prefix="(" suffix=")" suffixOverrides="," >

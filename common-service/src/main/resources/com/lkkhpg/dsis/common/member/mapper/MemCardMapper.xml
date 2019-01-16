@@ -50,7 +50,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemCard" >
     <selectKey resultType="java.lang.Long" keyProperty="cardId" order="BEFORE" >
-      select MM_MEM_CARD_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into MM_MEM_CARD (CARD_ID, MEMBER_ID, CARD_NUMBER, 
       EXPIRY_DATE, DEFAULT_FLAG, STATUS, 
@@ -79,7 +79,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemCard" >
     <selectKey resultType="java.lang.Long" keyProperty="cardId" order="BEFORE" >
-      select MM_MEM_CARD_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into MM_MEM_CARD
     <trim prefix="(" suffix=")" suffixOverrides="," >

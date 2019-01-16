@@ -56,7 +56,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.system.dto.SysEventAssign" >
     <selectKey resultType="java.lang.Long" keyProperty="eventAssignId" order="BEFORE" >
-      select SYS_EVENT_ASSIGN_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_EVENT_ASSIGN (EVENT_ASSIGN_ID, EVENT_ID, ASSIGN_TYPE, 
       ASSIGN_VALUE, ATTENDANCE, OBJECT_VERSION_NUMBER, 
@@ -81,7 +81,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.system.dto.SysEventAssign" >
     <selectKey resultType="java.lang.Long" keyProperty="eventAssignId" order="BEFORE" >
-      select SYS_EVENT_ASSIGN_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SYS_EVENT_ASSIGN
     <trim prefix="(" suffix=")" suffixOverrides="," >

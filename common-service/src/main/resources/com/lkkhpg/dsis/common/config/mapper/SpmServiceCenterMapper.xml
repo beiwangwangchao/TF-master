@@ -109,7 +109,7 @@
 	<insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
 		<selectKey resultType="java.lang.Long" keyProperty="serviceCenterId"
 			order="BEFORE">
-			select SPM_SERVICE_CENTER_S.nextval from dual
+			select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
 		</selectKey>
 		insert into SPM_SERVICE_CENTER (SERVICE_CENTER_ID, MARKET_ID, CODE,
 		NAME, STATUS, PHONE,
@@ -145,7 +145,7 @@
 	</insert>
 	<insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
 		<selectKey resultType="java.lang.Long" keyProperty="serviceCenterId" order="BEFORE">
-			select SPM_SERVICE_CENTER_S.nextval from dual
+			select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
 		</selectKey>
 		insert into SPM_SERVICE_CENTER
 		<trim prefix="(" suffix=")" suffixOverrides=",">

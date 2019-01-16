@@ -90,7 +90,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply">
     <selectKey resultType="java.lang.Long" keyProperty="supplyId" order="BEFORE" >
-      SELECT SPM_SUPPLY_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_SUPPLY
     <trim prefix="(" suffix=")" suffixOverrides=",">

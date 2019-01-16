@@ -76,7 +76,7 @@
     </delete>
     <insert id="insert" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTier" >
     <selectKey resultType="java.lang.Long" keyProperty="shippingTierId" order="BEFORE" >
-      SELECT DM_SHIPPING_TIER_S.NEXTVAL FROM DUAL
+        select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into DM_SHIPPING_TIER (SHIPPING_TIER_ID, SHIPPING_TIER_CODE, 
       SHIPPING_TIER_NAME, DESCRIPTION, ENABLED_FLAG, 
@@ -293,7 +293,7 @@
 
 <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTier" >
     <selectKey resultType="java.lang.Short" keyProperty="shippingTierId" order="BEFORE" >
-      SELECT DM_SHIPPING_TIER_S.NEXTVAL FROM DUAL
+        select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into DM_SHIPPING_TIER
     <trim prefix="(" suffix=")" suffixOverrides="," >

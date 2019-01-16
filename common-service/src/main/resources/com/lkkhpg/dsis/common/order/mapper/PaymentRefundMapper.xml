@@ -59,7 +59,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.PaymentRefund" >
     <selectKey keyProperty="refundId" order="BEFORE" resultType="java.lang.Long">
-      select OM_PAYMENT_REFUND_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into OM_PAYMENT_REFUND (REFUND_ID, SOURCE_TYPE, SOURCE_ID, 
       SALES_ORG_ID, PAYMENT_METHOD, PAYMENT_METHOD_INFO, 
@@ -90,7 +90,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.PaymentRefund" >
     <selectKey keyProperty="refundId" order="BEFORE" resultType="java.lang.Long">
-      select OM_PAYMENT_REFUND_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into OM_PAYMENT_REFUND
     <trim prefix="(" suffix=")" suffixOverrides="," >

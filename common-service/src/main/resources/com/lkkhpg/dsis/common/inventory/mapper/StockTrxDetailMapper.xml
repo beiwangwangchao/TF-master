@@ -75,7 +75,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.dto.StockTrxDetail" >
     <selectKey resultType="java.lang.Long" keyProperty="trxDetailId" order="BEFORE" >
-      select inv_stock_trx_detail_s.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into INV_STOCK_TRX_DETAIL (TRX_DETAIL_ID, TRX_ID, ORGANIZATION_ID, 
       SUBINVENTORY_ID, LOCATOR_ID, ITEM_ID, 
@@ -111,7 +111,7 @@
   <!-- 创建出入库事务明细行 -->
   <insert id="insertStockTrxDetail" parameterType="com.lkkhpg.dsis.common.inventory.dto.StockTrxDetail" useGeneratedKeys="true">
     <selectKey resultType="java.lang.Long" keyProperty="trxDetailId" order="BEFORE" >
-      select inv_stock_trx_detail_s.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into INV_STOCK_TRX_DETAIL
     <trim prefix="(" suffix=")" suffixOverrides="," >

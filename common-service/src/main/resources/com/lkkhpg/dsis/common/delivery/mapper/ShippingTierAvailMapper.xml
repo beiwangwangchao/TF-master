@@ -48,7 +48,7 @@
     </sql>
 	<insert id="insert" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierAvail">
 		<selectKey resultType="java.lang.Long" keyProperty="availabilityId" order="BEFORE">
-			SELECT DM_SHIPPING_TIER_AVAIL_S.NEXTVAL FROM DUAL
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
 		</selectKey>
 		insert into DM_SHIPPING_TIER_AVAIL (AVAILABILITY_ID,
         SHIPPING_TIER_ID, FUNCTION_AREA, ENABLED_FLAG,

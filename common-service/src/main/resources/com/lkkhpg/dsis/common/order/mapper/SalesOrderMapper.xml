@@ -157,7 +157,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" >
     <selectKey resultType="java.lang.Long" keyProperty="headerId" order="BEFORE" >
-      SELECT OM_SALES_ORDER_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into OM_SALES_ORDER (HEADER_ID, SALES_ORG_ID, ORDER_NUMBER, 
       INVOICE_NUMBER, ORDER_STATUS, ORDER_DATE, 
@@ -206,7 +206,7 @@
     </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" >
     <selectKey resultType="java.lang.Long" keyProperty="headerId" order="BEFORE" >
-      SELECT OM_SALES_ORDER_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into OM_SALES_ORDER
     <trim prefix="(" suffix=")" suffixOverrides="," >

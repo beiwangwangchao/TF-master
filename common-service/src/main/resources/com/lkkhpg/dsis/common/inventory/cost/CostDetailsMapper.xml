@@ -62,7 +62,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostDetails" >
     <selectKey resultType="java.lang.Long" keyProperty="costDetailId" order="BEFORE" >
-      select INV_COST_DETAILS_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into INV_COST_DETAILS (COST_DETAIL_ID, TRX_TYPE, INV_ORG_ID, 
       ITEM_ID, LOT_NUMBER, EXPIRY_DATE, 
@@ -94,7 +94,7 @@
   
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostDetails" >
     <selectKey resultType="java.lang.Long" keyProperty="costDetailId" order="BEFORE" >
-      select INV_COST_DETAILS_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into INV_COST_DETAILS
     <trim prefix="(" suffix=")" suffixOverrides="," >

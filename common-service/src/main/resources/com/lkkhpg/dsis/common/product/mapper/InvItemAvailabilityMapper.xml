@@ -62,7 +62,7 @@
     </delete>
     <insert id="insert" parameterType="com.lkkhpg.dsis.common.product.dto.InvItemAvailability">
         <selectKey resultType="java.lang.Short" keyProperty="availabilityId" order="BEFORE">
-            select inv_item_availability.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into INV_ITEM_AVAILABILITY (ITEM_ID, FUNCTION_AREA, AVAILABILITY_ID,
         ENABLED_FLAG, OBJECT_VERSION_NUMBER, REQUEST_ID,
@@ -87,7 +87,7 @@
     </insert>
     <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.product.dto.InvItemAvailability">
         <selectKey resultType="java.lang.Long" keyProperty="availabilityId" order="BEFORE">
-            select inv_item_availability_s.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into INV_ITEM_AVAILABILITY
         <trim prefix="(" suffix=")" suffixOverrides=",">

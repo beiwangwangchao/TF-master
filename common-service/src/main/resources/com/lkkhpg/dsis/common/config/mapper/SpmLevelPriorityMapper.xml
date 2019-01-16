@@ -45,7 +45,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLevelPriority" >
     <selectKey resultType="java.lang.Short" keyProperty="lvlPriorityId" order="BEFORE" >
-      SELECT SPM_LEVEL_PRIORITY_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_LEVEL_PRIORITY (LVL_PRIORITY_ID, PRIORITY_TYPE, LEVEL_ID, 
       PRIORITY, REMARK, OBJECT_VERSION_NUMBER, 
@@ -70,7 +70,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLevelPriority" >
     <selectKey resultType="java.lang.Short" keyProperty="lvlPriorityId" order="BEFORE" >
-      SELECT SPM_LEVEL_PRIORITY_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_LEVEL_PRIORITY
     <trim prefix="(" suffix=")" suffixOverrides="," >

@@ -69,7 +69,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmBankCharges" >
     <selectKey resultType="java.lang.Long" keyProperty="bankChargesId" order="BEFORE" >
-     SELECT SPM_BANK_CHARGES_S.nextval from dual
+        select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_BANK_CHARGES (BANK_CHARGES_ID, BANK_ID, MARKET_ID, 
       BONUS_FROM, BONUS_TO, CHARGES, 
@@ -96,7 +96,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmBankCharges" >
     <selectKey resultType="java.lang.Long" keyProperty="bankChargesId" order="BEFORE" >
-     SELECT SPM_BANK_CHARGES_S.nextval from dual
+        select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_BANK_CHARGES
     <trim prefix="(" suffix=")" suffixOverrides="," >

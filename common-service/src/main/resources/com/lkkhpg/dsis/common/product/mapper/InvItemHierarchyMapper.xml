@@ -98,7 +98,7 @@
 
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.product.dto.InvItemHierarchy" >
     <selectKey resultType="java.lang.Short" keyProperty="hierarchyId" order="BEFORE" >
-      select inv_item_hierarchy.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into INV_ITEM_HIERARCHY (HIERARCHY_ID, ITEM_ID, PARENT_ITEM_ID, 
       UOM_CODE, QUANTITY, OBJECT_VERSION_NUMBER, 
@@ -123,7 +123,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.product.dto.InvItemHierarchy" >
     <selectKey resultType="java.lang.Long" keyProperty="hierarchyId" order="BEFORE" >
-      select inv_item_hierarchy_s.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into INV_ITEM_HIERARCHY 
     <trim prefix="(" suffix=")" suffixOverrides="," >

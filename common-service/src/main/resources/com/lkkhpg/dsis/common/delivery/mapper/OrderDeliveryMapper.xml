@@ -148,7 +148,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDelivery" >
     <selectKey resultType="java.lang.Long" keyProperty="deliveryId" order="BEFORE">
-            select DM_ORDER_DELIVERY_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into DM_ORDER_DELIVERY (DELIVERY_ID, INV_ORG_ID, ORDER_HEADER_ID, 
       DELIVERY_NUMBER, DELIVERY_TYPE, DELIVERY_STATUS, 
@@ -193,7 +193,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDelivery" >
     <selectKey resultType="java.lang.Long" keyProperty="deliveryId" order="BEFORE">
-            select DM_ORDER_DELIVERY_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into DM_ORDER_DELIVERY
     <trim prefix="(" suffix=")" suffixOverrides="," >

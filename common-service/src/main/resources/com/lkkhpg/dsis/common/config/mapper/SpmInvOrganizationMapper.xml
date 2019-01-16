@@ -103,7 +103,7 @@
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
     <selectKey resultType="java.lang.Long" keyProperty="invOrgId" order="BEFORE" >
-      select SPM_INV_ORGANIZATION_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_INV_ORGANIZATION_B (INV_ORG_ID, NAME, CODE, 
       DESCRIPTION, LOCATION_ID, DEFAULT_FLAG, 
@@ -132,7 +132,7 @@
   </insert>
   <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
     <selectKey resultType="java.lang.Long" keyProperty="invOrgId" order="BEFORE" >
-      select SPM_INV_ORGANIZATION_S.nextval from dual
+      select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
     </selectKey>
     insert into SPM_INV_ORGANIZATION_B
     <trim prefix="(" suffix=")" suffixOverrides="," >

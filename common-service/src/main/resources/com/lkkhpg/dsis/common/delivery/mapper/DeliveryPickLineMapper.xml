@@ -57,7 +57,7 @@
 
     <insert id="insertPickLine" parameterType="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickLine">
         <selectKey resultType="java.lang.Long" keyProperty="pickReleaseLineId" order="BEFORE">
-            select dm_pick_release_line_s.nextval from dual
+            select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into dm_pick_release_line(
         pick_release_line_id,

@@ -116,7 +116,7 @@
   </delete>
     <insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.SalesLine">
         <selectKey resultType="java.lang.Long" keyProperty="lineId" order="BEFORE">
-            SELECT OM_SALES_LINE_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into OM_SALES_LINE (LINE_ID, HEADER_ID, ITEM_ID,
         UNIT_ORIG_PRICE, UNIT_DISCOUNT_PRICE, UNIT_SELLING_PRICE,
@@ -152,7 +152,7 @@
     </insert>
     <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesLine">
         <selectKey resultType="java.lang.Long" keyProperty="lineId" order="BEFORE">
-            SELECT OM_SALES_LINE_S.nextval from dual
+select UNIX_TIMESTAMP()*1000+floor(rand()*1000) from dual
         </selectKey>
         insert into OM_SALES_LINE
         <trim prefix="(" suffix=")" suffixOverrides=",">
