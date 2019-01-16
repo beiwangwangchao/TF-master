@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.integration.payment.mapper.TianFuPaymentResultMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.integration.payment.dto.TianFuPaymentResult">
+
+        <result column="OUT_TRADE_NO" property="out_trade_no" jdbcType="VARCHAR" />
+        <result column="NOTIFY_ID" property="notify_id" jdbcType="VARCHAR" />
+        <result column="TRANSACTION_ID" property="transaction_id" jdbcType="VARCHAR" />
+        <result column="RETURN_SER_NO" property="returnSerNo" jdbcType="VARCHAR" />
+        <result column="RET_CODE" property="retcode" jdbcType="VARCHAR" />
+        <result column="PARTNER" property="partner" jdbcType="VARCHAR" />
+        <result column="PRODUCT_FEE" property="product_fee" jdbcType="DECIMAL" />
+        <result column="TOTAL_FEE" property="total_fee" jdbcType="DECIMAL" />
+        <result column="FEE_TYPE" property="fee_type" jdbcType="DECIMAL" />
+        <result column="TRADE_STATE" property="trade_status" jdbcType="DECIMAL" />
+        <result column="TIME_END" property="time_end" jdbcType="VARCHAR" />
+        <result column="PAY_DATE" property="payDate" jdbcType="DATE" />
+        <result column="TRANS_CHANNNEL" property="trans_channel" jdbcType="VARCHAR" />
+        <result column="SIGN" property="sign" jdbcType="VARCHAR" />
+        <result column="TOTAL_SUM" property="totalSum" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lkkhpg.dsis.integration.payment.dto.TianFuPaymentResult">
+
+        INSERT INTO  TF_PAY_TRANSACTION_RESULT(OUT_TRADE_NO,NOTIFY_ID,TRANSACTION_ID,RETURN_SER_NO,RET_CODE, PARTNER ,
+        PRODUCT_FEE, TOTAL_FEE, FEE_TYPE,TRADE_STATE,TIME_END,PAY_DATE,TRANS_CHANNNEL,SIGN)
+        VALUES ( #{out_trade_no,jdbcType=VARCHAR},#{notify_id,jdbcType=VARCHAR},#{transaction_id,jdbcType=VARCHAR},
+        #{returnSerNo,jdbcType=VARCHAR},#{retcode,jdbcType=VARCHAR},#{partner,jdbcType=VARCHAR},
+        #{product_fee,jdbcType=DECIMAL},#{total_fee,jdbcType=DECIMAL},#{fee_type,jdbcType=DECIMAL},
+        #{trade_status,jdbcType=DECIMAL},#{time_end,jdbcType=VARCHAR},#{payDate,jdbcType=DATE},#{trans_channel,jdbcType=VARCHAR},#{sign,jdbcType=VARCHAR})
+
+    </insert>
+
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap"  parameterType="java.lang.String">
+        SELECT tptr.* ,tptr.TOTAL_FEE AS TOTAL_SUM
+        FROM TF_PAY_TRANSACTION_RESULT tptr
+        <where>
+            tptr.OUT_TRADE_NO=#{outTradeNo,jdbcType=VARCHAR}
+        </where>
+    </select>
+
+    <select id="selectUnit"  resultMap="BaseResultMap"  parameterType="java.lang.String">
+       SELECT  t.TRANSACTION_ID,t.TRANS_CHANNNEL,t.TOTAL_FEE,t.OUT_TRADE_NO
+       FROM TF_PAY_TRANSACTION_RESULT t
+        <where>
+            t.OUT_TRADE_NO=#{out_trade_no,jdbcType=VARCHAR}
+        </where>
+    </select>
+
+    <!--<delete id="deleteRefund"  parameterType="java.lang.String">-->
+     <!--delete from TF_PAY_TRANSACTION_RESULT-->
+     <!--where OUT_TRADE_NO=#{out_trade_no,jdbcType=VARCHAR}-->
+    <!--</delete>-->
+</mapper>

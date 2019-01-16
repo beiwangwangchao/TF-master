@@ -1,0 +1,208 @@
+<#include "./admin/include/head.html">
+<body class="padding: 10px;">
+<form id="dappForm"></form>
+<script>
+    $(function () {
+        var methods = [
+            {"methodName": "verifyDistributor", "type": "GET"},
+            {"methodName": "getDistributors", "type": "GET"},
+            {"methodName": "getDistributor", "type": "GET"},
+            {"methodName": "addDistributor", "type": "POST"},
+            {"methodName": "updateDistributor", "type": "POST"},
+            {"methodName": "getProductCategories", "type": "GET"},
+            {"methodName": "getProducts", "type": "GET"},
+            {"methodName": "addOrder", "type": "POST"},
+            {"methodName": "addOrders", "type": "POST"},
+            {"methodName": "getOrder", "type": "GET"},
+            {"methodName": "getOrders", "type": "GET"},
+            {"methodName": "cancelOrder", "type": "POST"},
+            {"methodName": "settleOrder", "type": "POST"},
+            {"methodName": "getAddress", "type": "GET"},
+            {"methodName": "getCoupons", "type": "GET"},
+            {"methodName": "getVipPV", "type": "GET"},
+            {"methodName": "getVipPurchaseAmt", "type": "GET"},
+            {"methodName": "verifyCoupons", "type": "POST"},
+            {"methodName": "lockCoupons", "type": "POST"},
+            {"methodName": "releaseCoupons", "type": "POST"},
+            {"methodName": "verifySponsor", "type": "GET"},
+            {"methodName": "distributors/{id}/balance", "type": "GET"},
+            {"methodName": "distributors/{id}/team", "type": "GET"},
+            {"methodName": "distributors/{id}/team/balance", "type": "GET"},
+            {"methodName": "distributors/{id}/team/balance/months/{month}", "type": "GET"},
+            {"methodName": "distributors/{id}/team/months/{month}", "type": "GET"},
+            {"methodName": "distributors/{id}/downline", "type": "GET"},
+            {"methodName": "getCoupons", "type": "GET"},
+            {"methodName": "distributors/{id}/months/{month}", "type": "GET"},
+            {"methodName": "distributors/{id}/months/{month}/balance", "type": "GET"},
+        ];
+
+        var last_id = "";
+        var last_month = "";
+        
+        window['dappForm'] = $("#dappForm").ligerForm({
+            fields : [
+                {
+                    label   : 'methodName',
+                    name    : "methodName",
+                    type    : 'select',
+                    width   : '400',
+                    newline : false,
+                    validate: {
+                        required: true
+                    },
+                    options : {
+                        data      : methods,
+                        valueField: 'methodName',
+                        textField : 'methodName',
+                        onSelected : function(newKey, newValue) {
+                            $.ligerui.get('url').setValue('${base.contextPath}/restful/dapp/api/v1/' + newKey);
+                            for (i in methods) {
+                                if (methods[i].methodName == newKey) {
+                                    $.ligerui.get('methodType').setValue(methods[i].type);
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    label   : 'methodType',
+                    name    : "methodType",
+                    type    : 'text',
+                    width   : '300',
+                    readonly : true,
+                    newline : false
+                },
+                {
+                    label   : 'url',
+                    name    : "url",
+                    type    : 'text',
+                    width   : '500',
+                    readonly : true,
+                    newline : true
+                },
+                {
+                    label   : '{id}',
+                    labelWidth : '40',
+                    name    : "idValue",
+                    type    : 'text',
+                    width   : '100',
+                    readonly : false,
+                    newline : false,
+                    options:{
+                        onChangeValue:function(value){
+                            manager = $.ligerui.get('url');
+                            if(manager.getValue().indexOf("{id}")>0){
+                            	manager.setValue(manager.getValue().replace('{id}', value));
+                            }else{
+                            	manager.setValue(manager.getValue().replace('distributors/'+last_id, 'distributors/'+value));
+                            }
+                            last_id = value;
+                        }
+                    }
+                },
+                {
+                    label   : '{month}',
+                    labelWidth : '50',
+                    name    : "monthValue",
+                    type    : 'text',
+                    width   : '60',
+                    readonly : false,
+                    newline : false,
+                    options:{
+                        onChangeValue:function(value){
+                            manager = $.ligerui.get('url');
+                            if(manager.getValue().indexOf("{month}")>0){
+                            	manager.setValue(manager.getValue().replace('{month}', value));
+                            }else{
+                            	manager.setValue(manager.getValue().replace('months/'+last_month, 'months/'+value));
+                            }
+                            last_month = value;
+                        }
+                    }
+                },
+                {
+                    label   : 'Request Parameters',
+                    name    : 'requestParameters',
+                    type    : 'textarea',
+                    width   : '800',
+                    newline : true
+                },
+                {
+                    label   : 'Response',
+                    name    : 'response',
+                    type    : 'textarea',
+                    width   : '800',
+                    newline : true,
+                    readonly : true
+                }
+            ],
+            buttons: [{
+                text    : 'Submit',
+                disabled: false,
+                width   : 60,
+                click   : function () {
+                    if (!dappForm.valid()) {
+                        return;
+                    }
+                    var manager = $.ligerDialog.waitting('<@spring.message "sys.hand.tip.processing"/>');
+                    
+                    //var methodName = $.ligerui.get('methodName').getValue();
+                    //var requestParameters = $.ligerui.get('requestParameters').getValue();
+                    var dappFormData = dappForm.getData();
+                    
+                    
+                    
+                    if (dappFormData.methodType == 'GET') {
+                        //GET
+                        var url = $.ligerui.get('url').getValue();
+                        $.ajax({
+                            type    : dappFormData.methodType,
+                            url     : url + '?' + dappFormData.requestParameters,
+                            //data    : JSON2.stringify(JSON2.parse(dappFormData.requestParameters)),
+                            success : function (args) {
+                            	dappFormData.response = JSON2.stringify(args);
+                                dappForm.setData(dappFormData);
+                            },
+                            error   : function (args) {
+                                $.ligerDialog.error(args.responseText);
+                            },
+                            complete: function () {
+                                manager.close();
+                            }
+                        });
+                    } else {
+                        //POST
+                        //console.log("requestParameters: " + JSON2.parse(dappFormData.requestParameters));
+                        try{
+                            JSON2.parse(dappFormData.requestParameters)
+                        }catch(e){Hap.showError("Json parse error")}
+                    
+                        $.ajax({
+                            type    : dappFormData.methodType,
+                            dataType : "json",
+                            contentType : "application/json",
+                            url     : '${base.contextPath}/restful/dapp/api/v1/' + dappFormData.methodName,
+                            data    : dappFormData.requestParameters,
+                            success : function (args) {
+                                dappFormData.response = JSON2.stringify(args);
+                                dappForm.setData(dappFormData);
+                                manager.close();
+                            },
+                            error   : function (args) {
+                                $.ligerDialog.error(args.responseText);
+                                manager.close();
+                            },
+                            complete: function () {
+                                manager.close();
+                            }
+                        });
+                    }
+                }
+            }]
+        });
+        
+        
+    });
+</script>
+</body>
+</html>

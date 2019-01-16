@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+
+    <bean id="defaultPageManager" class="com.lkkhpg.dsis.platform.security.DefaultConfiguration">
+        <property name="pageLogin" value="/welcome.html"/>
+        <property name="defaultViewPath" value=""/>
+    </bean>
+
+    <bean class="com.lkkhpg.dsis.platform.core.impl.RequestHelper">
+        <property name="requestListener">
+            <bean class="com.lkkhpg.dsis.admin.system.DsisRequestListener"/>
+        </property>
+    </bean>
+
+    <bean id="cookieHttpSessionStrategy" class="org.springframework.session.web.http.CookieHttpSessionStrategy"/>
+
+    <bean class="com.lkkhpg.dsis.platform.security.captcha.impl.DefaultCaptchaManager"/>
+
+    <bean class="com.lkkhpg.dsis.integration.gds.service.impl.GdsSwitch"/>
+
+
+</beans>

@@ -1,0 +1,141 @@
+<#--
+ * description: 参数分配页面
+ * version: 1.0
+ * author: huangjiajing
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+
+<body style="padding: 10px;">
+    <script src="${base.contextPath}/common/code?module=SPM.MODULE&yes_no=SYS.YES_NO" type="text/javascript"></script>
+
+    <div id="spm_def_grid" style="margin: 0; padding: 0"></div>
+    
+    <script type="text/javascript">
+    $(function(){
+            window['spm_def_grid'] = $("#spm_def_grid").ligerGrid({
+                columns: [ { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.lovitem.opts"/>', 
+                	name: 'paramName', align: 'left', width: '150'
+                  },{ 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.function.module"/>', 
+                	name: 'category', align: 'left', width: '150',
+                	editor : {                      
+                        type : 'select',
+                        data : module,
+                        valueField : 'value',
+                        textField : 'meaning'
+                    },
+                    render : function(item) {
+                        for (var i = 0; i < module.length; i++) {
+                            if (module[i]['value'] == item.category)
+                                return module[i]['meaning']
+                        }
+                        return item.category;
+                    },
+                    validate : {
+                        required : true
+                    }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.marketid"/>', 
+                	name: 'marketFlag', align: 'left', width: '150',
+                	editor : {                      
+                        type : 'select',
+                        data : yes_no,
+                        valueField : 'value',
+                        textField : 'meaning'
+                    },
+                    render : function(item) {
+                        for (var i = 0; i < yes_no.length; i++) {
+                            if (yes_no[i]['value'] == item.marketFlag)
+                                return yes_no[i]['meaning']
+                        }
+                        return item.marketFlag;
+                    },
+                    validate : {
+                        required : true
+                    }
+                  }, { 
+                      display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.operationunitid"/>', 
+                      name: 'ouFlag', align: 'left', width: '150',
+                      editor : {                      
+                          type : 'select',
+                          data : yes_no,
+                          valueField : 'value',
+                          textField : 'meaning'
+                      },
+                      render : function(item) {
+                          for (var i = 0; i < yes_no.length; i++) {
+                              if (yes_no[i]['value'] == item.ouFlag)
+                                  return yes_no[i]['meaning']
+                          }
+                          return item.ouFlag;
+                      },
+                      validate : {
+                          required : true
+                      }
+                  }, { 
+                      display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.salesorg"/>', 
+                      name: 'salesFlag', align: 'left', width: '150',
+                      editor : {                      
+                          type : 'select',
+                          data : yes_no,
+                          valueField : 'value',
+                          textField : 'meaning'
+                      },
+                      render : function(item) {
+                          for (var i = 0; i < yes_no.length; i++) {
+                              if (yes_no[i]['value'] == item.salesFlag)
+                                  return yes_no[i]['meaning']
+                          }
+                          return item.salesFlag;
+                      },
+                      validate : {
+                          required : true
+                      }
+                  }, { 
+                      display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.invorg"/>', 
+                      name: 'invFlag', align: 'left', width: '150',
+                      editor : {                      
+                          type : 'select',
+                          data : yes_no,
+                          valueField : 'value',
+                          textField : 'meaning'
+                      },
+                      render : function(item) {
+                          for (var i = 0; i < yes_no.length; i++) {
+                              if (yes_no[i]['value'] == item.invFlag)
+                                  return yes_no[i]['meaning']
+                          }
+                          return item.invFlag;
+                      },
+                      validate : {
+                          required : true
+                      }
+                  }
+                ], 
+                url:'${base.contextPath}/spm/orgParamDef/query',
+                toolbar: {
+                	items: [
+                                   { 
+                                	   text: '<@spring.message "sys.hand.btn.save"/>',
+                                	   click: function(){
+                                		   Hap.gridSave({
+                                               grid:spm_def_grid,
+                                               url:'${base.contextPath}/spm/orgParamDef/save'
+                                           })
+                                	   },
+                                		   icon: 'save' 
+                                	}
+                     ]
+                },
+                enabledEdit: true,
+                width: '99%', 
+                height: '98%'
+            }); 
+           
+    	});//$function
+    </script>
+</body>
+</html>

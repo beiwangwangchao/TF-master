@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                           http://www.springframework.org/schema/mvc
+                           http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+                           
+    <!-- 引入dbconfig.properties属性文件 -->
+    <context:property-placeholder location="classpath:config.properties"/>
+
+    <bean id="jacksonObjectMapper" class="com.lkkhpg.dsis.platform.json.JacksonMapper"></bean>
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="jacksonObjectMapper" />
+        <property name="targetMethod" value="configure" />
+        <property name="arguments">
+            <list>
+                <value type="com.fasterxml.jackson.databind.DeserializationFeature">FAIL_ON_UNKNOWN_PROPERTIES</value>
+                <value>false</value>
+            </list>
+        </property>
+    </bean>
+
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean
+                class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper">
+                    <ref bean="jacksonObjectMapper" />
+                </property>
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+
+    <bean id="validator" class="com.lkkhpg.dsis.platform.validator.ComplexCommonValidator" />
+
+    <mvc:resources mapping="/lib/**" location="/lib/" />
+    <mvc:resources mapping="/resources/**" location="/resources/" />
+    <mvc:resources mapping="/js/**" location="/js/" />
+    <mvc:resources mapping="/css/**" location="/css/" />
+    <mvc:resources mapping="/img/**" location="/img/" />
+    <mvc:resources mapping="/fonts/**" location="/fonts/" />
+    <mvc:view-controller path="/login.html" view-name="/login" />
+    <mvc:view-controller path="/loginHJF.html" view-name="/loginHJF" />
+    <mvc:view-controller path="/index" view-name="redirect:/index.html" />
+    
+
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPaths">
+            <list>
+                <value>/WEB-INF/view</value>
+            </list>
+        </property>
+        <property name="defaultEncoding" value="UTF-8" />
+        <property name="freemarkerSettings">
+            <props>
+                <prop key="auto_import">spring.ftl as spring</prop>
+                <prop key="template_update_delay">2</prop><!-- 模板更新检查时间(秒) -->
+                <prop key="number_format">#</prop>
+                <prop key="date_format">yyyy-MM-dd</prop>
+                <prop key="time_format">HH:mm:ss</prop>
+                <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+                <!-- <prop key="classic_compatible">true</prop> -->
+            </props>
+        </property>
+        <!-- freemarkerVariables -->
+        <property name="freemarkerVariables">
+            <map>
+                <entry key="resource_suffix" value="${resource.subfix}"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean
+        class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="viewClass" value="com.lkkhpg.dsis.mws.web.MWSFreemarkerView" />
+        <property name="cache" value="false" />
+        <property name="suffix" value=".html" />
+        <property name="contentType" value="text/html;charset=UTF-8" />
+        <property name="requestContextAttribute" value="base" />
+        <property name="exposeRequestAttributes" value="true" />
+        <property name="exposeSessionAttributes" value="true" />
+        <property name="exposeSpringMacroHelpers" value="true" />
+        <property name="allowSessionOverride" value="true" />
+        <property name="allowRequestOverride" value="true" />
+    </bean>
+
+    <bean
+        class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <bean
+                    class="org.springframework.http.converter.StringHttpMessageConverter">
+                    <property name="supportedMediaTypes">
+                        <list>
+                            <value>text/html;charset=UTF-8</value>
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="messageSource" class="com.lkkhpg.dsis.platform.i18n.CacheMessageSource"></bean>
+
+    <bean id="themeSource" class="org.springframework.ui.context.support.ResourceBundleThemeSource">
+        <property name="basenamePrefix" value="theme." />
+    </bean>
+
+    <!-- Theme Change Interceptor and Resolver definition -->
+    <bean id="themeResolver" class="org.springframework.web.servlet.theme.CookieThemeResolver">
+        <property name="defaultThemeName" value="default" />
+        <property name="cookieName" value="myAppThemeCookie" />
+        <property name="cookieMaxAge" value="2592000" />
+    </bean>
+
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+        <!--<property name="defaultLocale" value="en_GB" />-->
+        <property name="defaultLocale" value="zh_CN" />
+        <property name="cookieName" value="mwsLocaleCookie" />
+        <property name="cookieMaxAge" value="2592000" />
+    </bean>
+
+    <mvc:interceptors>
+        <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+            <property name="paramName" value="lang" />
+        </bean>
+        <bean class="org.springframework.web.servlet.theme.ThemeChangeInterceptor">
+            <property name="paramName" value="theme" />
+        </bean>
+        <mvc:interceptor>
+            <mvc:mapping path="/**" />
+            <mvc:exclude-mapping path="/resources/**" />
+            <mvc:exclude-mapping path="/lib/**" />
+            <mvc:exclude-mapping path="/login" />
+            <mvc:exclude-mapping path="/loginHJF" />
+            <mvc:exclude-mapping path="/login.html" />
+            <mvc:exclude-mapping path="/loginHJF.html" />
+            <mvc:exclude-mapping path="/user/retrieve_password_before.html" />
+            <mvc:exclude-mapping path="/user/reg.html" />
+            <mvc:exclude-mapping path="/user/reg01.html" />
+            <mvc:exclude-mapping path="/user/retrieve_password_way.html" />
+            <mvc:exclude-mapping path="/user/retrieve_user.html" />
+            <mvc:exclude-mapping path="/user/update_password.html" />
+            <mvc:exclude-mapping path="/user/update_password_succee.html" />
+            <mvc:exclude-mapping path="/account/isExistsMember" />
+            <mvc:exclude-mapping path="/account/getMemberInfo" />
+            <mvc:exclude-mapping path="/account/sendCaptcha" />
+            <mvc:exclude-mapping path="/account/sendCheckCode" />
+            <mvc:exclude-mapping path="/account/selectMarket" />
+            <mvc:exclude-mapping path="/register/salesOrganization/query" />
+            <mvc:exclude-mapping path="/account/sendMessageByEmail" />
+            <mvc:exclude-mapping path="/account/sendMessageByPhone" />
+            <mvc:exclude-mapping path="/account/checkCaptcha" />
+            <mvc:exclude-mapping path="/account/updatePassword" />
+            <mvc:exclude-mapping path="/register/sendCheckCode" />
+            <mvc:exclude-mapping path="/register/sendMessageByPhone" />
+            <mvc:exclude-mapping path="/register/sendDetectionName" />
+            <mvc:exclude-mapping path="/403.html" />
+            <mvc:exclude-mapping path="/404.html" />
+            <mvc:exclude-mapping path="/500.html" />
+            <mvc:exclude-mapping path="/verifiCode" />
+            <mvc:exclude-mapping path="/common/{resource}" />
+            <mvc:exclude-mapping path="/payment/pay/callback/**" />
+            <bean class="com.lkkhpg.dsis.platform.security.interceptor.SessionInterceptor" />
+        </mvc:interceptor>
+        <bean class="com.lkkhpg.dsis.platform.security.interceptor.MonitorInterceptor" />
+        <bean class="com.lkkhpg.dsis.mws.interceptor.LanguageInterceptor" />
+    </mvc:interceptors>
+    <import resource="controllers.xml" />
+
+</beans>

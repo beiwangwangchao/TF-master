@@ -1,0 +1,777 @@
+<#--
+ * description: 会员状态变更申请界面
+ * version: 1.0
+ * author: yuchuan.zeng@hand-china.com
+ * .
+ *
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+	<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+    <script
+        src="${base.contextPath}/common/code?operationTypes=MM.MEMBER_STATUS_CHANGE_TYPE&reviewStatus=SYS.REVIEW_STATUS&memberStatus=MM.MEMBER_STATUS&feedBackStatus=ITM.FEEDBACK_STATUS"
+        type="text/javascript"></script>
+    <script src="${base.contextPath}/resources/js/mm/mm.min.js"
+        type="text/javascript"></script>
+        <script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+    <form id="status_change_query_form"></form>
+    <div id="status_change_grid" style="margin-left: 8px;"></div>
+
+    <script type="text/javascript">
+    var proData = [];
+    var memberId_send = 0;
+    var markets = [];
+    function queryMarkets(){
+    	$.ajax({
+ 			url: '${base.contextPath}/spm/market/queryMarketsByRole',
+ 			type:"POST",
+ 			dataType:"json",
+ 			contentType : "application/json",
+             data : '',
+             async: false,
+             success : function(json) {
+                 if(json.success){
+                	 $(json.rows).each(function(i,o){
+                		 markets.push({"id":o.marketId,"text":o.name})
+                	 })
+                 }
+             },
+             error : function() {
+             }
+ 		})
+    	 
+    }
+    queryMarkets();
+    
+    var openTime = 1;
+    <#assign marketId = (RequestParameters._marketId ! ) />
+    <#if marketId != ''>
+	currentMarket = ${RequestParameters._marketId};
+	</#if>
+	<#if marketId == ''>
+	currentMarket = _marketId;
+	</#if>
+    /* 变更状态form */
+    window['status_change_query_form'] = $("#status_change_query_form").ligerForm({
+        fields: [
+		{ type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>', newline:false, name: 'marketId',valueField : 'text',
+			options : {		
+		    	value: currentMarket,
+				data:markets,
+				onSelected:function(o){
+					if(openTime == 1){
+						$.ligerDialog.confirm('<@spring.message "dsis.lkkhpg.tip.refresh_page"/>',$l('sys.hand.tip.info'),
+		                          function(yes) {
+		                              if(yes){
+		                            	  	var tabid = window.top.tab.selectedTabId;
+			              			    	var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+			              			    	window.top.f_removeTab(tabid);
+			              					window.top.f_addTab(tabid, tabname, "mm/mm_statuschange_query.html?_marketId="+o);
+		                              }else{
+		                            	  	openTime = openTime + 1;
+		                            		liger.get('marketId').setValue(currentMarket);
+		                              }
+		                          });
+					}else{
+						openTime = 1;
+					}
+					
+				}
+		    },
+		    validate : {
+		    	required: true
+				}
+		},    
+                 {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.upstreamchange.memberid"/>',
+            name: "memberCode",
+            type: "popup",
+            labelwidth: 60,
+            newline: false,
+            validate: {
+                digits: true,
+                maxlength: 10
+            },
+            textField: 'memberCode',
+            options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+                 onLoadData: function(){
+                    this.setParm('marketId', liger.get('marketId').selectedValue)
+                } ,
+                  onChangeValue: function(){
+                    this.setParm('marketId', liger.get('marketId').selectedValue)
+                }  
+            })
+        },
+        {
+            type: 'date',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.upstreamchange.beforedate"/>',
+            name: 'beginDate',
+            format: 'yyyy-MM-dd',
+            //space: 10,
+            validate: {
+                maxlength: 50
+            }
+        },
+
+        {
+            type: 'date',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.upstreamchange.afterdate"/>',
+            name: 'endDate',
+            format: 'yyyy-MM-dd',
+            labelwidth: 60,
+            validate: {
+                maxlength: 50
+            },
+            newline: false
+        }],
+        buttons : [ {
+            text : '<@spring.message "sys.hand.btn.query"/>',
+            disabled : false,
+            width : 60,
+            /* 变更组织树查询按钮事件 */
+            click : function() {
+                Hap.gridQuery({
+                    form : liger.get("status_change_query_form"),
+                    grid : liger.get('status_change_grid')
+                })
+            }
+        },{
+            text : '<@spring.message "sys.hand.btn.apply"/>',
+            disabled : false,
+            <#if accessService.access("SC_APPLY_ENABLE") == false>
+                disabled:true,
+            </#if>
+            width : 60,
+            click : function() {
+                b_open();
+            }
+        },{
+            text : '<@spring.message "sys.hand.btn.syn"/>',
+            disabled : true,
+            id:'synBtn',
+            width : 60,
+            click : function() {
+                if (status_change_grid.getSelecteds().length == 0) {
+                    $.ligerui.get('synBtn').set('disabled', true);
+                    return;
+                }
+                SynToGds();
+            }
+        }]
+    });
+    $.extend(liger.get('memberCode').options,{parms:{"marketId":liger.get('marketId').selectedValue}})
+    
+    /* 变更状态记录grid */
+    window['status_change_grid'] = $("#status_change_grid").ligerGrid({
+        columns: [{
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.upstreamchange.changeid"/>',
+            name: 'appNo',
+            width: '120'
+        },{
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.memberid"/>',
+            name: 'memberCode',
+            align: 'center',
+            width: 120,
+            isAllowHide: false,
+            render: function(item) {
+                var data = item.memberId;
+                return html = '<a href="javascript:toDetailsHtml('+data+')">'+ item.memberCode +'</a>';
+            }
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.membername"/>',
+            name: 'memberName',
+            align: 'center',
+            width: 120
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.marketname"/>',
+            name: 'marketName',
+            align: 'center',
+            width: 120
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.operationtype"/>',
+            name: 'operationType',
+            align: 'center',
+            width: 120,
+            render:function(item){
+                for(var i=0;i<operationTypes.length;i++){
+                    if(item.operationType==operationTypes[i].value){
+                        return operationTypes[i].meaning;
+                    }
+                }
+            }
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.applydate"/>',
+            name: 'applyDate',
+            align: 'center',
+            width: 120,
+            format: "MM/dd/yyyy",
+            isSort:true
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.approvalstatus"/>',
+            name: 'approvalStatus',
+            align: 'center',
+            width: 120,
+            render:function(item){
+                for(var i=0;i<reviewStatus.length;i++){
+                    if(item.approvalStatus==reviewStatus[i].value){
+                        return reviewStatus[i].meaning;
+                    }
+                }
+            }
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.approvaldate"/>',
+            name: 'approvalDate',
+            align: 'center',
+            width: 120,
+            format: "MM/dd/yyyy"
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.remark"/>',
+            name: 'remark',
+            align: 'left'
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.upstreamchange.gdsstatus"/>',
+            name: 'synStatus',
+            width: 80,
+            align: 'left',
+            render: function(item) {
+                return getCodeDesc(feedBackStatus, item.synStatus);
+            }
+        }],
+        url: '${base.contextPath}/mm/statusChange/query',
+        toolbar: { items: [
+							{ line: true },
+                           {                	
+                               text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                               menu:{ width: 120, items:
+       	                            [
+       		                 			{                	
+       		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+       		                 			    click:   function (){exportSelected("status_change_query_form","status_change_grid",{'operationType':operationTypes,'approvalStatus':reviewStatus,'synStatus':feedBackStatus},_basePath);}
+       		                 			},
+       		                 			{ line: true },
+       		                 			{                	
+       		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+       		                 			    click: function (){exportDirectAll("status_change_query_form","status_change_grid",{'operationType':operationTypes,'approvalStatus':reviewStatus,'synStatus':feedBackStatus},_basePath);}
+       		                 			    
+       		                 			}
+       	                          ]
+                            	}                        
+                           }
+                 
+        ] },
+        width : '99%',
+        height : '99%',
+        delayLoad: true,
+        checkbox: true,
+        isChecked: f_isChecked,
+        onCheckRow: f_onCheckRow
+         
+        //             onCheckAllRow: f_onCheckAllRow
+    });
+    
+    function formValid(){
+        if(apply_form.getEditor('memberCode').getText()!=""&&apply_form.getEditor('operationType').getValue()!=""&&apply_form.getEditor('remark').inputText.val()!=""){
+        	if(apply_form.getEditor('operationType').getValue()=="TERM"&&apply_form.getEditor('terminateDate').getValue()!=""){
+        	    return true;
+        	} else if(apply_form.getEditor('operationType').getValue()!="TERM"){
+        		return true;
+        	} else {
+        		return false;
+        	}
+        }else{
+            return false;
+        }
+    }
+    /* 申请弹出框 */
+    function b_open() {
+        var tp=typeof(apply_form);
+        if (tp=="undefined") {
+            initApplyForm();
+            /*状态变更申请弹出框*/
+            $.ligerDialog.open({
+                target: $("#apply_div_form"),
+                width: 650,
+                isResize: true,
+                id: "apply_dialog",
+                buttons: [{
+                    attr:{
+                        id:'btn_ok'
+                   },
+                    class:'l-button-disabled',
+                    text: '<@spring.message "sys.hand.btn.ok"/>',
+                    onclick: function(item, dialog) {
+                        if (formValid()) {
+                            if (memberId_send == 0) {
+                                $.ligerDialog.alert("memberCode is incorrect");
+                                apply_form.getEditor('memberCode').clear();
+                                return;
+                            }
+                           /*  当会员有一条状态为“审核中”的终止或者自动终止记录，则不允许他再申请一条终止记录 */
+                           var para = {
+					            'memberId': memberId_send,
+					            'operationType':apply_form.getEditor('operationType').getValue() ,
+					            'remark': apply_form.getEditor('remark').inputText.val(),
+					            'terminateDate': apply_form.getEditor('terminateDate').getValue()==""?new Date():apply_form.getEditor('terminateDate').getValue()
+					        };
+					    	$.ajax({
+					            url: '${base.contextPath}/mm/statusChange/validRecord',
+					            type: "GET",
+					            dataType: "json",
+					            contentType: "application/json",
+					            data: para,
+					            success: function(json) {
+					                if(json.rows[0].isSuccess==false){
+					                	$.ligerDialog.error('<@spring.message "msg.error.member.status.valid_record"/>');
+					                	return;
+					                }else{
+					                	 $.ligerDialog.confirm('<@spring.message "msg.warning.member.confirm_apply"/>',
+					                             function(yes) {
+					                		        if(yes){
+					                		        	Hap.submitOnlyForm({
+	                                                         form: apply_form,
+	                                                         url: '${base.contextPath}/mm/statusChange/save',
+	                                                         para: {
+	                                                             'memberId': memberId_send,
+	                                                             'operationType':apply_form.getEditor('operationType').getValue() ,
+	                                                             'remark': apply_form.getEditor('remark').inputText.val(),
+	                                                             'terminateDate': apply_form.getEditor('terminateDate').getValue()==""?new Date():apply_form.getEditor('terminateDate').getValue()
+	                                                         }
+	                                                     });
+					                		        }
+					                             },
+					                             function(no) {
+					                                 
+					                             });
+					                }
+					            },
+					            error: function() {
+					                $.ligerDialog.closeWaitting();
+					            }
+					        });
+                          
+                           
+                        }
+                    }
+                },
+                {
+                    text: '<@spring.message "sys.hand.btn.cancel"/>',
+                    onclick: function(item, dialog) {
+                        apply_form.getEditor('memberCode').clear();
+                        apply_form.getEditor('operationType').clear();
+                        apply_form.getEditor('remark').inputText.val("");
+                        apply_form.getEditor('status').inputText.val("");
+                        apply_form.getEditor('terminateDate').clear();
+                        $("input[ligeruiid='apply_form_terminate_date']").parent().parent().parent().parent().hide();
+                        checkValue();
+                        dialog.hide();
+                    }
+                }]
+            }) 
+        } else {
+            $.ligerDialog.show();
+        }
+        $('.l-dialog-title').text('<@spring.message "type.com.lkkhpg.dsis.common.member.statuschange.query.changestatus"/>'); //设置标题
+    }
+    
+    Hap.submitOnlyForm = function(options) {
+    	$.ligerDialog.waitting(options.waitingTip || $l('sys.hand.tip.processing'));
+        var form = options.form,
+        url = options.url,
+        para = options.para;
+        if (!form && !url) return;
+        if (! (form instanceof $.ligerui.controls.Form)) {
+            form = $.ligerui.get(form);
+        }
+        $.ajax({
+            url: url,
+            type: options.method || "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON2.stringify(para),
+            success: function(json) {
+            	if(json.success){
+            		$.ligerDialog.closeWaitting();
+            		options.json = json;
+                    options.successTip = json.message;
+                    Hap.defaultSuccessHandler(options)
+                    apply_form.getEditor('memberCode').clear();
+                    apply_form.getEditor('operationType').clear();
+                    apply_form.getEditor('remark').inputText.val("");
+                    apply_form.getEditor('status').inputText.val("");
+                    apply_form.getEditor('terminateDate').setValue(null);
+                    checkValue();
+                    setTimeout(function (){$.ligerDialog.hide();},2000);
+                    $("input[ligeruiid='apply_form_terminate_date']").parent().parent().parent().parent().hide();
+            	} else {
+            		$.ligerDialog.closeWaitting();
+            	}
+            },
+            error: function() {
+                $.ligerDialog.closeWaitting();
+            }
+        });
+    }
+    
+    
+  //由会员详情页申请自动弹出窗口
+    <#assign memberId = (RequestParameters.memberId ! ) />
+    <#assign memberCode = (RequestParameters.memberCode ! ) />
+    
+    <#if memberId != '' && memberCode != ''>
+    b_open();
+    apply_form.setData({
+    		memberCode:${RequestParameters.memberCode},memberId:${RequestParameters.memberId},operationType:"TERM"
+    	})
+    	liger.get('operationType').setValue('TERM')
+    	liger.get('operationType').setText('终止/Terminate')
+    	$.ajax({
+                                url: '${base.contextPath}/mm/statusChange/queryMembersByCode',
+                                type: 'POST',
+                                dataType: "json",
+                                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                                data: {
+                                    'memberCode': apply_form.getEditor('memberCode').inputText.val(),
+                                    'marketId': liger.get('marketId').selectedValue
+                                },
+                                success: function(json) {
+                                    if (json.success == true) {
+                                        apply_form.getEditor('status').inputText.val(getCodeDesc(memberStatus, json.rows[0].status));
+                                        memberId_send = json.rows[0].memberId;
+                                        
+                                    } else {
+                                        json.message = "<@spring.message 'msg.info.member.changestatus.can_not_operate_member' />";
+                                        apply_form.getEditor('memberCode').clear();
+                                    }
+                                },
+                                error: function() {
+                                    $.ligerDialog.closeWaitting();
+                                }
+                            });
+    </#if>
+    
+    
+    /*初始化申请框中的表单*/
+    function initApplyForm() {
+        window['apply_form'] = $("<form id='apply_div_form'></form>").appendTo($('body')).ligerForm({
+            fields: [{
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.upstreamchange.memberid"/>',
+                name: "memberCode",
+                id: 'apply_form_memberCode',
+                type: "popup",
+                newline: false,
+                textField: 'memberCode',
+                //很重要，lov的显示字段
+                style: 'margin-top:10px;text-align:right',
+                //labelWidth:120,
+                space: 20,
+                validate: {
+                    required: true
+                },
+                rightToken: ' ',
+                labelWidth: 80,
+                options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+                	onLoadData: function(){
+                        this.setParm('marketId', liger.get('marketId').selectedValue)
+                    } ,
+                    onSelected: function(obj) {
+                    	
+                        if (obj.value == "") {
+                            memberId_send = 0;
+                            return;
+                        } else {
+                            $.ajax({
+                                url: '${base.contextPath}/mm/statusChange/queryMembersByCode',
+                                type: 'POST',
+                                dataType: "json",
+                                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                                async:false,
+                                data: {
+                                    'memberCode': obj.text,
+                                    'marketId': liger.get('marketId').selectedValue
+                                },
+                                success: function(json) {
+                                    if (json.success == true) {
+                                        apply_form.getEditor('status').inputText.val(getCodeDesc(memberStatus, json.rows[0].status));
+                                        memberId_send = json.rows[0].memberId;
+                                        if (json.rows[0].status == "ACTV") {
+                                            proData = [{
+                                                id: "SUSP",
+                                                text: '暂停/Suspend'
+                                            },
+                                            {
+                                                id: "TERM",
+                                                text: '终止/Terminate'
+                                            }];
+                                        } else {
+                                            proData = [{
+                                                id: "REACT",
+                                                text: '重新激活/Reactive'
+                                            }];
+                                        }
+                                        //apply_form.getEditor('operationType').clear();
+                                        apply_form.getEditor('operationType').set("data", proData);
+                                    } else {
+                                        json.message = "<@spring.message 'msg.info.member.changestatus.can_not_operate_member' />";
+                                        apply_form.getEditor('memberCode').clear();
+                                    }
+                                },
+                                error: function() {
+                                    $.ligerDialog.closeWaitting();
+                                }
+                            });
+                        }
+                        checkValue();
+                    }
+                },{parms:{"marketId":liger.get('marketId').selectedValue}})
+            },
+            {
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.status"/>',
+                type: 'text',
+                name: 'status',
+                textField: 'status',
+                style: 'margin-top:10px;text-align-right',
+                rightToken: ' ',
+                newline: false,
+                labelWidth: 80,
+                readonly: true,
+                value: '',
+                editor:{
+                    type:'text'
+                }
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.operationtype"/>',
+                name: "operationType",
+                type: "combobox",
+                newline: true,
+                style: 'margin-top:10px;',
+                space: 20,
+                validate: {
+                    required: true
+                },
+                rightToken: ' ',
+                labelWidth: 80,
+                options: {
+                    cancelable: false,
+                    data: proData,
+                    onSelected : function (){
+                    	var operationType = $.ligerui.get('operationType').getValue();
+                    	if(operationType=="TERM"){
+                    		$("input[ligeruiid='apply_form_terminate_date']").parent().parent().parent().parent().show();
+                    	} else {
+                    		$("input[ligeruiid='apply_form_terminate_date']").parent().parent().parent().parent().hide();
+                    		apply_form.getEditor('terminateDate').clear();
+                    	}
+                    }
+                },
+            },
+            {
+                type: 'text',
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.remark"/>',
+                name: 'remark',
+                id: 'apply_form_remark',
+                style: 'margin-top:10px;',
+                newline: false,
+                rightToken: ' ',
+                labelwidth: 80,
+                validate: {
+                    required: true
+                }
+            },
+            {
+                type: 'date',
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.terminatedate"/>',
+                name: 'terminateDate',
+                id: 'apply_form_terminate_date',
+                style: 'margin-top:10px;',
+                newline: true,
+                rightToken: ' ',
+                labelwidth: 80,
+                validate: {
+                    required: true
+                }
+            }],
+
+        });
+
+        /*监听弹出框上memberCode的改变值事件*/
+        $("input[ligeruiid='apply_form_memberCode']").bind('input propertychange',function (){checkValue()});
+        
+        /*监听弹出框上remark的改变值事件*/
+        $("input[ligeruiid='apply_form_remark']").bind('input propertychange',function (){checkValue()});
+        
+        /*监听弹出框上operationType的选定值事件*/
+        apply_form.getEditor('operationType').bind('selected',function (){checkValue()});
+        
+        /*监听弹出框上memberCode文本框的聚焦事件*/
+        $("input[ligeruiid='apply_form_memberCode']").bind('blur',
+        function() {
+            if (apply_form.getEditor('memberCode').getText()=="") {
+                memberId_send = 0;
+                return
+            } else {
+                $.ajax({
+                    url: '${base.contextPath}/mm/statusChange/queryMembersByCode',
+                    type: 'POST',
+                    dataType: "json",
+                    contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                    data: {
+                        'memberCode': apply_form.getEditor('memberCode').getText(),
+                        'marketId': liger.get('marketId').selectedValue
+                    },
+                    success: function(json) {
+                        if (json.success == true) {
+                            apply_form.getEditor('status').inputText.val(getCodeDesc(memberStatus, json.rows[0].status));
+                            memberId_send = json.rows[0].memberId;
+                            if (json.rows[0].status == "ACTV") {
+                                proData = [{
+                                    id: "SUSP",
+                                    text: '暂停/Suspend'
+                                },
+                                {
+                                    id: "TERM",
+                                    text: '终止/Terminate'
+                                }];
+                            } else {
+                                proData = [{
+                                    id: "REACT",
+                                    text: '重新激活/Reactive'
+                                }];
+                            }
+                            //apply_form.getEditor('operationType').clear();
+                            apply_form.getEditor('operationType').set("data", proData);
+                        } else {
+                            json.message = "<@spring.message 'msg.info.member.changestatus.can_not_operate_member' />";
+                            apply_form.getEditor('memberCode').clear();
+                            memberId_send=0;
+                        }
+                    },
+                    error: function() {
+                        $.ligerDialog.closeWaitting();
+                    }
+                });
+            }
+            checkValue();
+        });
+        
+        $("input[ligeruiid='apply_form_terminate_date']").parent().parent().parent().parent().hide();
+    }
+
+    /*检验提交按钮是否可以点击*/
+    function checkValue(){
+        if (apply_form.getEditor('memberCode').getText()!=""&&apply_form.getEditor('operationType').getValue()!=""
+                &&apply_form.getEditor('remark').inputText.val()!="") {
+        	if(apply_form.getEditor('operationType').getValue()=="TERM"&&apply_form.getEditor('terminateDate').getValue()!=""){
+                $('#btn_ok').removeClass('l-button-disabled')
+        	} else if(apply_form.getEditor('operationType').getValue()!="TERM"){
+        		$('#btn_ok').removeClass('l-button-disabled')
+        	} else {
+        		$('#btn_ok').addClass('l-button-disabled')
+        	}
+        } else {
+            $('#btn_ok').addClass('l-button-disabled')
+        }
+    }
+    
+    /*跳转至会员详情页*/
+    function toDetailsHtml(data){
+    	window.top.f_removeTab("MEMBER_DETAIL");
+        window.top.f_addTab("MEMBER_DETAIL",
+              "<@spring.message 'type.com.lkkhpg.dsis.common.member.memberdetail'/>",
+              "mm/mm_member_edit.html?isedit=1&memberId="+data);
+    }
+    
+    /*
+        该例子实现 表单分页多选
+        即利用onCheckRow将选中的行记忆下来，并利用isChecked将记忆下来的行初始化选中
+        */
+    var checkedCustomer = {};
+
+    function findCheckedCustomer(changeId) {
+    	return checkedCustomer[changeId] ? 1 : -1;
+/*         for (var i = 0; i < checkedCustomer.length; i++) {
+            if (checkedCustomer[i] == changeId) return i;
+        }
+        return - 1; */
+    }
+    function addCheckedCustomer(data) {
+        if (findCheckedCustomer(data.changeId) == -1) checkedCustomer[data.changeId]=data;
+    }
+    function removeCheckedCustomer(changeId) {
+        var i = findCheckedCustomer(changeId);
+        if (i == -1) return;
+        delete checkedCustomer[changeId]
+        //checkedCustomer.splice(i, 1);
+    }
+    function f_isChecked(rowdata) {
+        if (findCheckedCustomer(rowdata.changeId) == -1) return false;
+        return true;
+    }
+    function f_onCheckRow(checked, data) {
+        if (checked) addCheckedCustomer(data);
+        else removeCheckedCustomer(data.changeId);
+        
+        checkIsAsnc();
+    }
+    
+    function checkIsAsnc(){
+        <#if accessService.access("SC_SYNC_ENABLE") != false>
+        	if (status_change_grid.getSelectedRows().length == 0) {
+                $.ligerui.get('synBtn').set('disabled', true);
+            } 
+        	else {
+            	for(var changeId in checkedCustomer){
+            		var row = checkedCustomer[changeId]
+            		if(!(row.operationType == "TERM"||row.operationType == "ATERM")) {
+                        $.ligerui.get('synBtn').set('disabled', true);
+                        break;
+                    }else{
+                    	$.ligerui.get('synBtn').set('disabled', false);
+                    }
+            	}
+                
+            }
+        </#if>
+    }
+
+    function SynToGds(){
+        $.ligerDialog.waitting($l('sys.hand.tip.processing'));
+        $.ajax({
+            url: '${base.contextPath}/mm/statusChange/syntogds',
+            type: "POST",
+            data: JSON2.stringify(status_change_grid.getSelectedRows()),
+            dataType: "json",
+            contentType: "application/json",
+            success: function(json) {
+                if(json.success){
+                    var manager = $.ligerDialog.open({ cls: 'success', type: 'success', content: '<div style="padding:4px">'+'<@spring.message "msg.info.member.success_to_sync_manually"/>'+'</div>', allowClose: false });
+                    setTimeout(function (){
+                        manager.close();
+                    }, 1000);
+                    $.ligerDialog.closeWaitting();
+                    Hap.gridQuery({
+                        form : status_change_query_form,
+                        grid : status_change_grid
+                    })
+                }
+                else {
+                    $.ligerDialog.closeWaitting();
+                }
+            },
+            error: function() {
+                $.ligerDialog.closeWaitting();
+            }
+        });
+    }
+    
+    </script>
+</body>
+</html>

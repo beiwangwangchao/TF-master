@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgMemberInfoSyncMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberInfoSync" >
+    <id column="INTERFACE_DETAIL_ID" property="interfaceDetailId" jdbcType="DECIMAL" />
+    <result column="INTERFACE_ID" property="interfaceId" jdbcType="DECIMAL" />
+    <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+    <result column="PRIVACY_FLAG" property="privacyFlag" jdbcType="VARCHAR" />
+    <result column="CERTIFICATE_NATION_CODE" property="certificateNationCode" jdbcType="VARCHAR" />
+    <result column="CERTIFICATE_TYPE" property="certificateType" jdbcType="VARCHAR" />
+    <result column="CERTIFICATE_NO" property="certificateNo" jdbcType="VARCHAR" />
+    <result column="CERTIFICATE_MEMO" property="certificateMemo" jdbcType="VARCHAR" />
+    <result column="CERTIFICATE_ADDR_ZIP_CODE" property="certificateAddrZipCode" jdbcType="VARCHAR" />
+    <result column="CERTIFICATE_ADDR_PROVINCE" property="certificateAddrProvince" jdbcType="VARCHAR" />
+    <result column="CERTIFICATE_ADDR_CITY" property="certificateAddrCity" jdbcType="VARCHAR" />
+    <result column="CERTIFICATE_ADDR_TAIL01" property="certificateAddrTail01" jdbcType="VARCHAR" />
+    <result column="CERTIFICATE_ADDR_TAIL02" property="certificateAddrTail02" jdbcType="VARCHAR" />
+    <result column="ADDR_NATION_CODE" property="addrNationCode" jdbcType="VARCHAR" />
+    <result column="ADDR_ZIP_CODE" property="addrZipCode" jdbcType="VARCHAR" />
+    <result column="ADDR_PROVINCE" property="addrProvince" jdbcType="VARCHAR" />
+    <result column="ADDR_CITY" property="addrCity" jdbcType="VARCHAR" />
+    <result column="ADDR_TAIL01" property="addrTail01" jdbcType="VARCHAR" />
+    <result column="ADDR_TAIL02" property="addrTail02" jdbcType="VARCHAR" />
+    <result column="ADDR_ENABLED" property="addrEnabled" jdbcType="VARCHAR" />
+    <result column="ADDR_MEMO" property="addrMemo" jdbcType="VARCHAR" />
+    <result column="CONTACT_TELE" property="contactTele" jdbcType="VARCHAR" />
+    <result column="CONTACT_FAX_NO" property="contactFaxNo" jdbcType="VARCHAR" />
+    <result column="CONTACT_MOBILE" property="contactMobile" jdbcType="VARCHAR" />
+    <result column="CONTACT_EMAIL" property="contactEmail" jdbcType="VARCHAR" />
+    <result column="RACE" property="race" jdbcType="VARCHAR" />
+    <result column="EDUCATION" property="education" jdbcType="VARCHAR" />
+    <result column="OCCUPATION" property="occupation" jdbcType="VARCHAR" />
+    <result column="BIRTHDAY" property="birthday" jdbcType="VARCHAR" />
+    <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="PROCESS_STATUS" property="processStatus" jdbcType="VARCHAR" />
+    <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP" />
+    <result column="PROCESS_MESSAGE" property="processMessage" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INTERFACE_DETAIL_ID, INTERFACE_ID, DEALER_NO, PRIVACY_FLAG, CERTIFICATE_NATION_CODE, 
+    CERTIFICATE_TYPE, CERTIFICATE_NO, CERTIFICATE_MEMO, CERTIFICATE_ADDR_ZIP_CODE, CERTIFICATE_ADDR_PROVINCE, 
+    CERTIFICATE_ADDR_CITY, CERTIFICATE_ADDR_TAIL01, CERTIFICATE_ADDR_TAIL02, ADDR_NATION_CODE, 
+    ADDR_ZIP_CODE, ADDR_PROVINCE, ADDR_CITY, ADDR_TAIL01, ADDR_TAIL02, ADDR_ENABLED, 
+    ADDR_MEMO, CONTACT_TELE, CONTACT_FAX_NO, CONTACT_MOBILE, CONTACT_EMAIL, RACE, EDUCATION, 
+    OCCUPATION, BIRTHDAY, COMMENTS, ADVISE_NO, PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+    REQUEST_ID, PROGRAM_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from ISG_MEMBER_INFO_SYNC
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from ISG_MEMBER_INFO_SYNC
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberInfoSync" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceDetailId" order="BEFORE" >
+      select ISG_MEMBER_INFO_SYNC_S.nextval from dual
+    </selectKey>
+    insert into ISG_MEMBER_INFO_SYNC (INTERFACE_DETAIL_ID, INTERFACE_ID, DEALER_NO, 
+      PRIVACY_FLAG, CERTIFICATE_NATION_CODE, CERTIFICATE_TYPE, 
+      CERTIFICATE_NO, CERTIFICATE_MEMO, CERTIFICATE_ADDR_ZIP_CODE, 
+      CERTIFICATE_ADDR_PROVINCE, CERTIFICATE_ADDR_CITY, 
+      CERTIFICATE_ADDR_TAIL01, CERTIFICATE_ADDR_TAIL02, 
+      ADDR_NATION_CODE, ADDR_ZIP_CODE, ADDR_PROVINCE, 
+      ADDR_CITY, ADDR_TAIL01, ADDR_TAIL02, 
+      ADDR_ENABLED, ADDR_MEMO, CONTACT_TELE, 
+      CONTACT_FAX_NO, CONTACT_MOBILE, CONTACT_EMAIL, 
+      RACE, EDUCATION, OCCUPATION, 
+      BIRTHDAY, COMMENTS, ADVISE_NO, 
+      PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+      REQUEST_ID, PROGRAM_ID)
+    values (#{interfaceDetailId,jdbcType=DECIMAL}, #{interfaceId,jdbcType=DECIMAL}, #{dealerNo,jdbcType=VARCHAR}, 
+      #{privacyFlag,jdbcType=VARCHAR}, #{certificateNationCode,jdbcType=VARCHAR}, #{certificateType,jdbcType=VARCHAR}, 
+      #{certificateNo,jdbcType=VARCHAR}, #{certificateMemo,jdbcType=VARCHAR}, #{certificateAddrZipCode,jdbcType=VARCHAR}, 
+      #{certificateAddrProvince,jdbcType=VARCHAR}, #{certificateAddrCity,jdbcType=VARCHAR}, 
+      #{certificateAddrTail01,jdbcType=VARCHAR}, #{certificateAddrTail02,jdbcType=VARCHAR}, 
+      #{addrNationCode,jdbcType=VARCHAR}, #{addrZipCode,jdbcType=VARCHAR}, #{addrProvince,jdbcType=VARCHAR}, 
+      #{addrCity,jdbcType=VARCHAR}, #{addrTail01,jdbcType=VARCHAR}, #{addrTail02,jdbcType=VARCHAR}, 
+      #{addrEnabled,jdbcType=VARCHAR}, #{addrMemo,jdbcType=VARCHAR}, #{contactTele,jdbcType=VARCHAR}, 
+      #{contactFaxNo,jdbcType=VARCHAR}, #{contactMobile,jdbcType=VARCHAR}, #{contactEmail,jdbcType=VARCHAR}, 
+      #{race,jdbcType=VARCHAR}, #{education,jdbcType=VARCHAR}, #{occupation,jdbcType=VARCHAR}, 
+      #{birthday,jdbcType=VARCHAR}, #{comments,jdbcType=VARCHAR}, #{adviseNo,jdbcType=VARCHAR}, 
+      #{processStatus,jdbcType=VARCHAR}, current_timestamp, #{processMessage,jdbcType=VARCHAR}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberInfoSync" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceDetailId" order="BEFORE" >
+      select ISG_MEMBER_INFO_SYNC_S.nextval from dual
+    </selectKey>
+    insert into ISG_MEMBER_INFO_SYNC
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INTERFACE_DETAIL_ID,
+      <if test="interfaceId != null" >
+        INTERFACE_ID,
+      </if>
+      <if test="dealerNo != null" >
+        DEALER_NO,
+      </if>
+      <if test="privacyFlag != null" >
+        PRIVACY_FLAG,
+      </if>
+      <if test="certificateNationCode != null" >
+        CERTIFICATE_NATION_CODE,
+      </if>
+      <if test="certificateType != null" >
+        CERTIFICATE_TYPE,
+      </if>
+      <if test="certificateNo != null" >
+        CERTIFICATE_NO,
+      </if>
+      <if test="certificateMemo != null" >
+        CERTIFICATE_MEMO,
+      </if>
+      <if test="certificateAddrZipCode != null" >
+        CERTIFICATE_ADDR_ZIP_CODE,
+      </if>
+      <if test="certificateAddrProvince != null" >
+        CERTIFICATE_ADDR_PROVINCE,
+      </if>
+      <if test="certificateAddrCity != null" >
+        CERTIFICATE_ADDR_CITY,
+      </if>
+      <if test="certificateAddrTail01 != null" >
+        CERTIFICATE_ADDR_TAIL01,
+      </if>
+      <if test="certificateAddrTail02 != null" >
+        CERTIFICATE_ADDR_TAIL02,
+      </if>
+      <if test="addrNationCode != null" >
+        ADDR_NATION_CODE,
+      </if>
+      <if test="addrZipCode != null" >
+        ADDR_ZIP_CODE,
+      </if>
+      <if test="addrProvince != null" >
+        ADDR_PROVINCE,
+      </if>
+      <if test="addrCity != null" >
+        ADDR_CITY,
+      </if>
+      <if test="addrTail01 != null" >
+        ADDR_TAIL01,
+      </if>
+      <if test="addrTail02 != null" >
+        ADDR_TAIL02,
+      </if>
+      <if test="addrEnabled != null" >
+        ADDR_ENABLED,
+      </if>
+      <if test="addrMemo != null" >
+        ADDR_MEMO,
+      </if>
+      <if test="contactTele != null" >
+        CONTACT_TELE,
+      </if>
+      <if test="contactFaxNo != null" >
+        CONTACT_FAX_NO,
+      </if>
+      <if test="contactMobile != null" >
+        CONTACT_MOBILE,
+      </if>
+      <if test="contactEmail != null" >
+        CONTACT_EMAIL,
+      </if>
+      <if test="race != null" >
+        RACE,
+      </if>
+      <if test="education != null" >
+        EDUCATION,
+      </if>
+      <if test="occupation != null" >
+        OCCUPATION,
+      </if>
+      <if test="birthday != null" >
+        BIRTHDAY,
+      </if>
+      <if test="comments != null" >
+        COMMENTS,
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO,
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS,
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE,
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{interfaceDetailId,jdbcType=DECIMAL},
+      <if test="interfaceId != null" >
+        #{interfaceId,jdbcType=DECIMAL},
+      </if>
+      <if test="dealerNo != null" >
+        #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="privacyFlag != null" >
+        #{privacyFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateNationCode != null" >
+        #{certificateNationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateType != null" >
+        #{certificateType,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateNo != null" >
+        #{certificateNo,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateMemo != null" >
+        #{certificateMemo,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateAddrZipCode != null" >
+        #{certificateAddrZipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateAddrProvince != null" >
+        #{certificateAddrProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateAddrCity != null" >
+        #{certificateAddrCity,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateAddrTail01 != null" >
+        #{certificateAddrTail01,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateAddrTail02 != null" >
+        #{certificateAddrTail02,jdbcType=VARCHAR},
+      </if>
+      <if test="addrNationCode != null" >
+        #{addrNationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="addrZipCode != null" >
+        #{addrZipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="addrProvince != null" >
+        #{addrProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="addrCity != null" >
+        #{addrCity,jdbcType=VARCHAR},
+      </if>
+      <if test="addrTail01 != null" >
+        #{addrTail01,jdbcType=VARCHAR},
+      </if>
+      <if test="addrTail02 != null" >
+        #{addrTail02,jdbcType=VARCHAR},
+      </if>
+      <if test="addrEnabled != null" >
+        #{addrEnabled,jdbcType=VARCHAR},
+      </if>
+      <if test="addrMemo != null" >
+        #{addrMemo,jdbcType=VARCHAR},
+      </if>
+      <if test="contactTele != null" >
+        #{contactTele,jdbcType=VARCHAR},
+      </if>
+      <if test="contactFaxNo != null" >
+        #{contactFaxNo,jdbcType=VARCHAR},
+      </if>
+      <if test="contactMobile != null" >
+        #{contactMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="contactEmail != null" >
+        #{contactEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="race != null" >
+        #{race,jdbcType=VARCHAR},
+      </if>
+      <if test="education != null" >
+        #{education,jdbcType=VARCHAR},
+      </if>
+      <if test="occupation != null" >
+        #{occupation,jdbcType=VARCHAR},
+      </if>
+      <if test="birthday != null" >
+        #{birthday,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberInfoSync" >
+    update ISG_MEMBER_INFO_SYNC
+    <set >
+      <if test="interfaceId != null" >
+        INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL},
+      </if>
+      <if test="dealerNo != null" >
+        DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="privacyFlag != null" >
+        PRIVACY_FLAG = #{privacyFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateNationCode != null" >
+        CERTIFICATE_NATION_CODE = #{certificateNationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateType != null" >
+        CERTIFICATE_TYPE = #{certificateType,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateNo != null" >
+        CERTIFICATE_NO = #{certificateNo,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateMemo != null" >
+        CERTIFICATE_MEMO = #{certificateMemo,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateAddrZipCode != null" >
+        CERTIFICATE_ADDR_ZIP_CODE = #{certificateAddrZipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateAddrProvince != null" >
+        CERTIFICATE_ADDR_PROVINCE = #{certificateAddrProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateAddrCity != null" >
+        CERTIFICATE_ADDR_CITY = #{certificateAddrCity,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateAddrTail01 != null" >
+        CERTIFICATE_ADDR_TAIL01 = #{certificateAddrTail01,jdbcType=VARCHAR},
+      </if>
+      <if test="certificateAddrTail02 != null" >
+        CERTIFICATE_ADDR_TAIL02 = #{certificateAddrTail02,jdbcType=VARCHAR},
+      </if>
+      <if test="addrNationCode != null" >
+        ADDR_NATION_CODE = #{addrNationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="addrZipCode != null" >
+        ADDR_ZIP_CODE = #{addrZipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="addrProvince != null" >
+        ADDR_PROVINCE = #{addrProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="addrCity != null" >
+        ADDR_CITY = #{addrCity,jdbcType=VARCHAR},
+      </if>
+      <if test="addrTail01 != null" >
+        ADDR_TAIL01 = #{addrTail01,jdbcType=VARCHAR},
+      </if>
+      <if test="addrTail02 != null" >
+        ADDR_TAIL02 = #{addrTail02,jdbcType=VARCHAR},
+      </if>
+      <if test="addrEnabled != null" >
+        ADDR_ENABLED = #{addrEnabled,jdbcType=VARCHAR},
+      </if>
+      <if test="addrMemo != null" >
+        ADDR_MEMO = #{addrMemo,jdbcType=VARCHAR},
+      </if>
+      <if test="contactTele != null" >
+        CONTACT_TELE = #{contactTele,jdbcType=VARCHAR},
+      </if>
+      <if test="contactFaxNo != null" >
+        CONTACT_FAX_NO = #{contactFaxNo,jdbcType=VARCHAR},
+      </if>
+      <if test="contactMobile != null" >
+        CONTACT_MOBILE = #{contactMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="contactEmail != null" >
+        CONTACT_EMAIL = #{contactEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="race != null" >
+        RACE = #{race,jdbcType=VARCHAR},
+      </if>
+      <if test="education != null" >
+        EDUCATION = #{education,jdbcType=VARCHAR},
+      </if>
+      <if test="occupation != null" >
+        OCCUPATION = #{occupation,jdbcType=VARCHAR},
+      </if>
+      <if test="birthday != null" >
+        BIRTHDAY = #{birthday,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        COMMENTS = #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberInfoSync" >
+    update ISG_MEMBER_INFO_SYNC
+    set INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL},
+      DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+      PRIVACY_FLAG = #{privacyFlag,jdbcType=VARCHAR},
+      CERTIFICATE_NATION_CODE = #{certificateNationCode,jdbcType=VARCHAR},
+      CERTIFICATE_TYPE = #{certificateType,jdbcType=VARCHAR},
+      CERTIFICATE_NO = #{certificateNo,jdbcType=VARCHAR},
+      CERTIFICATE_MEMO = #{certificateMemo,jdbcType=VARCHAR},
+      CERTIFICATE_ADDR_ZIP_CODE = #{certificateAddrZipCode,jdbcType=VARCHAR},
+      CERTIFICATE_ADDR_PROVINCE = #{certificateAddrProvince,jdbcType=VARCHAR},
+      CERTIFICATE_ADDR_CITY = #{certificateAddrCity,jdbcType=VARCHAR},
+      CERTIFICATE_ADDR_TAIL01 = #{certificateAddrTail01,jdbcType=VARCHAR},
+      CERTIFICATE_ADDR_TAIL02 = #{certificateAddrTail02,jdbcType=VARCHAR},
+      ADDR_NATION_CODE = #{addrNationCode,jdbcType=VARCHAR},
+      ADDR_ZIP_CODE = #{addrZipCode,jdbcType=VARCHAR},
+      ADDR_PROVINCE = #{addrProvince,jdbcType=VARCHAR},
+      ADDR_CITY = #{addrCity,jdbcType=VARCHAR},
+      ADDR_TAIL01 = #{addrTail01,jdbcType=VARCHAR},
+      ADDR_TAIL02 = #{addrTail02,jdbcType=VARCHAR},
+      ADDR_ENABLED = #{addrEnabled,jdbcType=VARCHAR},
+      ADDR_MEMO = #{addrMemo,jdbcType=VARCHAR},
+      CONTACT_TELE = #{contactTele,jdbcType=VARCHAR},
+      CONTACT_FAX_NO = #{contactFaxNo,jdbcType=VARCHAR},
+      CONTACT_MOBILE = #{contactMobile,jdbcType=VARCHAR},
+      CONTACT_EMAIL = #{contactEmail,jdbcType=VARCHAR},
+      RACE = #{race,jdbcType=VARCHAR},
+      EDUCATION = #{education,jdbcType=VARCHAR},
+      OCCUPATION = #{occupation,jdbcType=VARCHAR},
+      BIRTHDAY = #{birthday,jdbcType=VARCHAR},
+      COMMENTS = #{comments,jdbcType=VARCHAR},
+      ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL}
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select <include refid="Base_Column_List" />
+      from ISG_MEMBER_INFO_SYNC
+    <where>
+        PROCESS_DATE &gt; #{processDateFrom,jdbcType=TIMESTAMP}
+        <if test="requestDateTo != null" >
+            AND PROCESS_DATE &lt; #{processDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="processStatus != null" >
+            AND PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="advoiseNo != null" >
+            AND ADVISE_NO = #{advoiseNo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by interface_id desc
+  </select>
+</mapper>

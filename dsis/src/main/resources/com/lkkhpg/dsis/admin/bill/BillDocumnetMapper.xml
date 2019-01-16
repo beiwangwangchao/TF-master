@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.bill.mapper.BillDocumentMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.bill.dto.BillDto" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD">
+        <result column="PLAT_TRANSNO" property="plat_transno" jdbcType="VARCHAR"/>
+        <result column="ORG_PLAT_TRANSNO" property="org_plat_transno" jdbcType="VARCHAR"/>
+        <result column="PARTNERNO" property="partnerNo" jdbcType="VARCHAR"/>
+        <result column="SUBPARTNERNO" property="subpartnerNo" jdbcType="VARCHAR"/>
+        <result column="TOTAL_FEE" property="total_fee" jdbcType="DECIMAL"/>
+        <result column="OUT_TRADE_NO" property="out_trade_no" jdbcType="VARCHAR"/>
+        <result column="CURRENCYTYPE" property="CurrencyType" jdbcType="VARCHAR"/>
+        <result column="TRADE_STATE" property="trade_state" jdbcType="VARCHAR"/>
+        <result column="TRANS_TYPE" property="trans_type" jdbcType="VARCHAR"/>
+        <result column="PLATCHARGE" property="platCharge" jdbcType="DECIMAL"/>
+        <result column="SUBPLATCHARGE" property="subPlatCharge" jdbcType="DECIMAL"/>
+        <result column="ORDER_PROCESS_DATE" property="order_process_date" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <insert id="insert" parameterType="com.lkkhpg.dsis.admin.bill.dto.BillDto">
+        <!--<selectKey resultType="java.lang.Long" keyProperty="userId" order="BEFORE">
+            select xxx.nextval from dual;
+        </selectKey>-->
+        insert into TF_BILL_DOCUMENT_TEMPT (
+        PLAT_TRANSNO,
+        ORG_PLAT_TRANSNO,
+        PARTNERNO,
+        SUBPARTNERNO,
+        TOTAL_FEE,
+        OUT_TRADE_NO,
+        CURRENCYTYPE,
+        TRADE_STATE,
+        TRANS_TYPE,
+        PLATCHARGE,
+        SUBPLATCHARGE,
+        ORDER_PROCESS_DATE
+        )
+        values(
+        #{plat_transno, jdbcType=VARCHAR},
+        #{org_plat_transno, jdbcType=VARCHAR},
+        #{partnerNo, jdbcType=VARCHAR},
+        #{subpartnerNo, jdbcType=VARCHAR},
+        #{total_fee, jdbcType=DECIMAL},
+        #{out_trade_no, jdbcType=VARCHAR},
+        #{CurrencyType, jdbcType=DECIMAL},
+        #{trade_state, jdbcType=VARCHAR},
+        #{trans_type, jdbcType=VARCHAR},
+        #{platCharge, jdbcType=DECIMAL},
+        #{subPlatCharge, jdbcType=DECIMAL},
+        #{order_process_date, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <select id="selectByProcessDate" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select *  from TF_BILL_DOCUMENT_TEMPT WHERE ORDER_PROCESS_DATE = #{order_process_date,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectMaxDate" resultType="java.lang.String">
+        select max(ORDER_PROCESS_DATE)  from TF_BILL_DOCUMENT_TEMPT
+    </select>
+
+    <select id="selectUnit" resultMap="BaseResultMap"  parameterType="com.lkkhpg.dsis.admin.bill.dto.BillDto">
+        SELECT *
+        FROM TF_BILL_DOCUMENT_TEMPT tbdt
+        <where>
+            1=1
+            <if test="partnerNo !=null">
+               AND tbdt.PARTNERNO=#{partnerNo,jdbcType=VARCHAR}
+            </if>
+            <if test="publicSubPartner !=null">
+                AND tbdt.SUBPARTNERNO=#{publicSubPartner,jdbcType=VARCHAR}
+            </if>
+            <if test="out_trade_no !=null">
+                AND tbdt.OUT_TRADE_NO=#{out_trade_no,jdbcType=VARCHAR}
+            </if>
+            <if test="order_process_date !=null">
+                AND tbdt.ORDER_PROCESS_DATE=#{order_process_date,jdbcType=VARCHAR}
+            </if>
+            <if test="trade_state !=null">
+                AND tbdt.TRADE_STATE=#{trade_state,jdbcType=VARCHAR}
+            </if>
+            <if test="trans_type !=null">
+                AND tbdt.TRANS_TYPE=#{trans_type,jdbcType=VARCHAR}
+            </if>
+        </where>
+        UNION
+        SELECT *
+        FROM TF_BILL_DOCUMENT_TEMPT tbdt
+        <where>
+        1=1
+        <if test="partnerNo !=null">
+            AND tbdt.PARTNERNO=#{partnerNo,jdbcType=VARCHAR}
+        </if>
+        <if test="privateSubPartner !=null">
+            AND tbdt.SUBPARTNERNO=#{privateSubPartner,jdbcType=VARCHAR}
+        </if>
+        <if test="out_trade_no !=null">
+            AND tbdt.OUT_TRADE_NO=#{out_trade_no,jdbcType=VARCHAR}
+        </if>
+         <if test="order_process_date !=null">
+            AND tbdt.ORDER_PROCESS_DATE=#{order_process_date,jdbcType=VARCHAR}
+         </if>
+        <if test="trade_state !=null">
+            AND tbdt.TRADE_STATE=#{trade_state,jdbcType=VARCHAR}
+        </if>
+        <if test="trans_type !=null">
+            AND tbdt.TRANS_TYPE=#{trans_type,jdbcType=VARCHAR}
+        </if>
+        </where>
+    </select>
+
+    <select id="queryMarket" resultType="java.lang.Long" parameterType="java.lang.Long">
+	 SELECT
+        smb.COMPANY_ID
+        FROM spm_market_b smb
+        left join spm_market_tl tl on smb.market_id=tl.market_id and tl.lang=#{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+        WHERE smb.market_id=#{marketId,jdbcType=DECIMAL}
+    </select>
+
+</mapper>

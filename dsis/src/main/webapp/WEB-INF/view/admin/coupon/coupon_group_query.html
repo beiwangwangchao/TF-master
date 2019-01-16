@@ -1,0 +1,214 @@
+<#include "../include/head.html">
+    <script src="${base.contextPath}/common/code?groupStatusData=PDM.GROUP_STATUS" type="text/javascript"></script>
+    <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+    <body style="padding: 3px; overflow: hidden;">
+    <form id="coupon_group_form" ></form>
+    <div id="coupon_group_grid" style="margin: 0; padding: 0"></div>
+    <script>
+        var oldMarketIdValue= null;
+        var marketId = ${RequestParameters.marketId!_marketId};
+        var salesOrgByMarket = [];
+        $(function ()
+        {
+            <#--
+        * Description:
+            *   查询窗口
+            -->
+            window['coupon_group_form'] = $("#coupon_group_form").ligerForm({
+                fields: [
+                    {  type : 'combobox',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+                        name : 'marketId',
+                        newline : false ,
+                        options : {
+                            value : marketId,
+                            valueField : 'marketId',
+                            textField : 'name',
+                            cancelable : false,
+                            async : false,
+                            url : '${base.contextPath}/om/order/queryMarketList',
+                            onSuccess : function(data){
+                                this.setValue(marketId);
+                            },
+                            onBeforeSelect : function(){
+                                //该事件用于将初次加载标志置false,记录原值以及将重复标记置为true
+                                oldMarketIdValue = $.ligerui.get('marketId').getValue();
+                            },
+                            onSelected : function (value){
+                                $.ajax({
+                                    type: "POST",
+                                    dataType: "json",
+                                    async : false,
+                                    data : {marketId : value},
+                                    url : "${base.contextPath}/om/order/getSalesOrgData",
+                                    success: function(data) {
+                                        salesOrgByMarket = data.rows;
+                                    }
+                                });
+                                liger.get("salesOrgId").setData(salesOrgByMarket);
+                                if (!value) {
+                                    return false;
+                                }
+                                if (marketId != value) {
+                                    $.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.refresh_page"/>', $l('sys.hand.tip.info'),function(yes) {
+                                        if(yes){
+                                            var newMarketId = $.ligerui.get('marketId').getValue();
+                                            var tabid = window.top.tab.selectedTabId;
+                                            var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                            window.top.f_removeTab(tabid);
+                                            parent.f_addTab(tabid,tabname,"${base.contextPath}/coupon/coupon_group_query.html?marketId="+newMarketId);
+                                        }else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+                                            $.ligerui.get('marketId').setValue(oldMarketIdValue);
+                                        }
+                                    });
+                                }
+                            }
+
+                        },
+                        validate : {
+                            required : true
+                        }
+                    },
+                    {
+                        label: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition"/>',
+                        newline:false,
+                        name: 'salesOrgId',
+                        type : "combobox",
+                        options : {
+                            valueField: "salesOrgId",
+                            textField: "name",
+                            isMultiSelect : false,
+                            isShowCheckBox : false
+                        }
+                    },
+                    {
+                        type : 'text',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupcode"/>',
+                        newline : true,
+                        name : 'groupCode'
+                    },
+                    {
+                        type : 'text',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupname"/>',
+                        newline : false,
+                        name : 'groupName'
+                    },
+                    {
+                        type : 'select',
+                        label : '<@spring.message "com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupstatus"/>',
+                        newline : false,
+                        name : 'groupStatus',
+                        options: {
+                            data : groupStatusData,
+                            valueField : 'value',
+                            textField : 'meaning',
+                            isShowCheckBox: false,
+                            isMultiSelect: true
+                        }
+                    }
+                ]  , buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                        Hap.gridQuery({
+                            form:coupon_group_form,
+                            grid:coupon_group_grid
+                        })
+                    }}
+                ]
+            });
+
+            <#--
+        * Description:
+            *   新建分组窗口
+            -->
+            window.newGroup = function(){
+                    if (window.top.f_addTab != undefined) {
+                        window.top.f_addTab("groupEdit", '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.creategroup"/>',
+                            '${base.contextPath}/coupon/coupon_group_detail.html?marketId='+liger.get('marketId').getValue());
+                    }
+                    else{
+                        window.open('${base.contextPath}/coupon/coupon_group_detail.html?marketId='+liger.get('marketId').getValue())
+                    }
+                }
+
+                <#--
+        * Description:
+            *   coupon分组信息表格
+            -->
+            window['coupon_group_grid'] = $("#coupon_group_grid").ligerGrid({
+                    unSetValidateAttr:false,
+                    columns: [{
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupcode"/>',
+                        name: 'groupCode',
+                        align: 'left',
+                        width: 200,
+                        render: function(rowdata) {
+                            return "<a href='javascript:void(0);' onclick='couponGroupDetail(\"" + rowdata.groupCode + "\")'>" + rowdata.groupCode + "</a>";
+                        }
+                    }, {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupname"/>',
+                        name: 'groupName',
+                        align: 'left',
+                        width: 200,
+                    },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupdesc"/>',
+                            name: 'groupDesc',
+                            align: 'left',
+                            width: 300,
+                        },
+                        {
+                            display: '<@spring.message "com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupstatus"/>',
+                            name: 'groupStatus',
+                            align: 'left',
+                            width: 200,
+                            render : function(item) {
+                                for (var i = 0; i < groupStatusData.length; i++) {
+                                    if (groupStatusData[i].value == item.groupStatus) {
+                                        return groupStatusData[i].meaning;
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    url:'${base.contextPath}/coupon/queryCouponGroup',
+
+                <#--
+        * Description:
+            *   工具栏
+            -->
+            toolbar: { items: [
+            { text: '<@spring.message "sys.hand.btn.new"/>',disable:false, click: newGroup, icon: 'add' },
+            { line: true },
+            { text: '<@spring.message "sys.hand.btn.delete"/>', click: function(){
+                Hap.gridDelete({
+                    grid:coupon_group_grid,
+                    url:'${base.contextPath}/coupon/removeCouponGroup'})
+
+            }, icon: 'delete'}
+        ]
+        },
+            enabledEdit: false,
+                pageSize: 10,
+            root: 'rows',
+            record: 'total',
+            width: '100%',
+            height: '99%',
+            checkbox: true,
+            delayLoad : true
+        });
+            Hap.gridQuery({
+                form:coupon_group_form,
+                grid:coupon_group_grid
+            })
+        });
+        function couponGroupDetail(groupCode){
+            var path = "${base.contextPath}/coupon/coupon_group_detail.html?isedit=1&groupCode=" + groupCode + "&marketId="+liger.get('marketId').getValue();
+            if (window.parent.f_addTab != undefined) {
+                window.parent.f_addTab('groupEdit'+groupCode, '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.details"/>', path);
+            } else {
+                window.open(path)
+            }
+        }
+    </script>
+    </body>
+    </html>

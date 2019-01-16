@@ -1,0 +1,1022 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.SalesReturnMapper">
+	<resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.SalesReturn">
+		<id column="RETURN_ID" property="returnId" jdbcType="DECIMAL" />
+		<result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+		<result column="ORDER_HEADER_ID" property="orderHeaderId" jdbcType="DECIMAL" />
+		<result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+		<result column="RETURN_NUMBER" property="returnNumber" jdbcType="VARCHAR" />
+		<result column="RETURN_DATE" property="returnDate" jdbcType="TIMESTAMP" />
+		<result column="RETURN_TYPE" property="returnType" jdbcType="VARCHAR" />
+		<result column="RETURN_REASON" property="returnReason" jdbcType="VARCHAR" />
+		<result column="INV_ORG_ID" property="invOrgId" jdbcType="DECIMAL" />
+		<result column="RETURN_PROMOTION" property="returnPromotion" jdbcType="DECIMAL" />
+		<result column="REMARK" property="remark" jdbcType="VARCHAR" />
+		<result column="AMOUNT" property="amount" jdbcType="DECIMAL" />
+		<result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+		<result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+		<result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+		<result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+		<result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+		<result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+		<result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+		<result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+		<result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+		<result column="TAX_AMOUNT" property="taxAmount" jdbcType="DECIMAL" />
+		<result column="MANUAL_ADJUST_AMT" property="manualAdjustAmt" jdbcType="DECIMAL" />
+		<result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+		<!-- 退货单实退款 -->
+		<result column="ACTUAL_PAY_AMOUNT" property="actualPayAmount" jdbcType="DECIMAL" />
+		<result column="RETURN_STATUS" property="returnStatus" jdbcType="VARCHAR" />
+		<result column="INV_ORG_NAME" property="invOrgName" jdbcType="VARCHAR" />
+		<result column="RETURN_ADJUST_FLAG" property="returnAdjustFlag" jdbcType="VARCHAR" />
+        <result column="SYNC_FLAG" property="syncFlag" jdbcType="VARCHAR" />
+		<result column="SALES_ORG_LOCATION" property="salesOrgLocation" jdbcType="VARCHAR" />
+		<result column="INV_ORG_LOCATION" property="invOrgLocation" jdbcType="VARCHAR" />
+		<result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+		<result column="PERIOD_ID" property="periodId" jdbcType="DECIMAL" />
+		<!-- 订单类型 -->
+		<result column="ORDER_TYPE" property="orderType" jdbcType="TIMESTAMP" />
+		<!-- 订单支付日期 -->
+		<result column="PAY_DATE" property="payDate" jdbcType="TIMESTAMP" />
+		<!-- 退货-订单金额 -->
+		<result column="ORDER_AMT" property="orderAmt" jdbcType="DECIMAL" />
+		<!-- 退货-订单实付款 -->
+		<result column="ORDER_ACTRUAL_PAY_AMT" property="orderActrualPayAmt" jdbcType="DECIMAL" />
+		<!-- 退货-支付调整总和 -->
+		<result column="ADJUST_AMT" property="adjustAmt" jdbcType="DECIMAL"/>
+		<!-- 退货-退款金额总和 -->
+		<result column="RETURN_AMT" property="returnAmt" jdbcType="DECIMAL"/>
+		<!-- 退货-优惠券订单总额数 -->
+		<result column="VOUCHER_ORDER_AMT" property="voucherOrderAmt" jdbcType="DECIMAL"/>
+		<!-- 退货-优惠券的优惠值之和 -->
+		<result column="VOUCHER_AMT" property="voucherAmt" jdbcType="DECIMAL"/>
+		<!-- 退货-返还优惠值总和 -->
+		<result column="RETURN_PROMOTION_SUM" property="returnPromotionSum" jdbcType="DECIMAL"/>
+		<!-- 退货-订单实退款之和 -->
+		<result column="ACTUAL_RTN_AMT_SUM" property="actualRtnAmtSum" jdbcType="DECIMAL"/>
+		<result column="POINT" property="point" jdbcType="DECIMAL"/>
+		<result column="CREDIT_NOTE" property="creditNote" jdbcType="VARCHAR"/>
+		<result column="SHIPPING_FEE_FLAG" property="shippingFeeFlag" jdbcType="VARCHAR" />
+		<!-- 退货-订单运费之和 -->
+		<result column="SHIPPING_FEE_AMT" property="shippingFeeAmt" jdbcType="DECIMAL" />
+		<!-- 是否已返还人工调整 -->
+		<result column="RTN_ADJUST_FLAG_BEFORE" property="rtnAdjustFlagBefore" jdbcType="VARCHAR" />
+		<!-- 是否已返还运费 -->
+		<result column="SHIPPING_FEE_FLAG_BEFORE" property="shippingFeeFlagBefore" jdbcType="VARCHAR" />
+		<!-- 订单会员编号 -->
+		<result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+		<!-- 订单会员名称 -->
+		<result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR" />
+		<!-- 订单发票编号 -->
+		<result column="INVOICE_NUMBER" property="invoiceNumber" jdbcType="VARCHAR" />
+		<!-- 订单行上商品pv -->
+		<result column="orderLinePv" property="ORDER_LINE_PV" jdbcType="DECIMAL"/>
+		
+	</resultMap>
+	<sql id="Base_Column_List">
+		RETURN_ID, SALES_ORG_ID, ORDER_HEADER_ID, RETURN_NUMBER, RETURN_DATE,
+		RETURN_TYPE, RETURN_REASON, INV_ORG_ID, RETURN_PROMOTION, REMARK, AMOUNT, OBJECT_VERSION_NUMBER,
+		REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE,
+		LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+		ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11,
+		ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, TAX_AMOUNT, ACTUAL_PAY_AMOUNT,
+		RETURN_STATUS, RETURN_ADJUST_FLAG, SYNC_FLAG, CREDIT_NOTE, SHIPPING_FEE_FLAG, 
+		MANUAL_ADJUST_AMT, COMMENTS
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Long">
+		select <include refid="Base_Column_List" />
+		from OM_SALES_RETURN
+		where RETURN_ID = #{returnId,jdbcType=DECIMAL}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from OM_SALES_RETURN
+		where RETURN_ID = #{returnId,jdbcType=DECIMAL}
+	</delete>
+	<insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.SalesReturn">
+		<selectKey resultType="java.lang.Long" keyProperty="returnId" order="BEFORE">
+			select OM_SALES_RETURN_S.nextval from dual
+		</selectKey>
+		insert into OM_SALES_RETURN (RETURN_ID, SALES_ORG_ID, ORDER_HEADER_ID,
+			RETURN_NUMBER, RETURN_DATE, RETURN_TYPE,
+			RETURN_REASON, INV_ORG_ID, RETURN_PROMOTION,
+			REMARK, AMOUNT, OBJECT_VERSION_NUMBER,
+			REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+			CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE,
+			LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+			ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+			ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+			ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10,
+			ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+			ATTRIBUTE14, ATTRIBUTE15, RETURN_ADJUST_FLAG,
+			TAX_AMOUNT, ACTUAL_PAY_AMOUNT, RETURN_STATUS, 
+			MANUAL_ADJUST_AMT, COMMENTS)
+		values (#{returnId,jdbcType=DECIMAL}, #{salesOrgId,jdbcType=DECIMAL},
+			#{orderHeaderId,jdbcType=DECIMAL},
+			#{returnNumber,jdbcType=VARCHAR}, #{returnDate,jdbcType=TIMESTAMP}, #{returnType,jdbcType=VARCHAR},
+			#{returnReason,jdbcType=VARCHAR}, #{invOrgId,jdbcType=DECIMAL},
+			#{returnPromotion,jdbcType=DECIMAL},
+			#{remark,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, 1,
+			#{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP,
+			#{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL},
+			CURRENT_TIMESTAMP,
+			#{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR},
+			#{attribute1,jdbcType=VARCHAR},
+			#{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR},
+			#{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR},
+			#{attribute7,jdbcType=VARCHAR},
+			#{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR},
+			#{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR},
+			#{attribute13,jdbcType=VARCHAR},
+			#{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR},
+			#{returnAdjustFlag,jdbcType=VARCHAR},
+			#{taxAmount,jdbcType=VARCHAR},#{actualPayAmount,jdbcType=VARCHAR},
+			#{returnStatus,jdbcType=VARCHAR}, #{manualAdjustAmt,jdbcType=DECIMAL}, #{comments,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesReturn">
+		<selectKey resultType="java.lang.Long" keyProperty="returnId" order="BEFORE">
+			select OM_SALES_RETURN_S.nextval from dual
+		</selectKey>
+		insert into OM_SALES_RETURN
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			RETURN_ID,
+			<if test="salesOrgId != null">
+				SALES_ORG_ID,
+			</if>
+			<if test="orderHeaderId != null">
+				ORDER_HEADER_ID,
+			</if>
+			<if test="returnNumber != null">
+				RETURN_NUMBER,
+			</if>
+			<if test="returnDate != null">
+				RETURN_DATE,
+			</if>
+			<if test="returnType != null">
+				RETURN_TYPE,
+			</if>
+			<if test="returnReason != null">
+				RETURN_REASON,
+			</if>
+			<if test="invOrgId != null">
+				INV_ORG_ID,
+			</if>
+			<if test="returnPromotion != null">
+				RETURN_PROMOTION,
+			</if>
+			<if test="remark != null">
+				REMARK,
+			</if>
+			<if test="amount != null">
+				AMOUNT,
+			</if>
+			OBJECT_VERSION_NUMBER,
+			<if test="requestId != null">
+				REQUEST_ID,
+			</if>
+			<if test="programId != null">
+				PROGRAM_ID,
+			</if>
+			<if test="creationDate != null">
+				CREATION_DATE,
+			</if>
+			<if test="createdBy != null">
+				CREATED_BY,
+			</if>
+			<if test="lastUpdatedBy != null">
+				LAST_UPDATED_BY,
+			</if>
+			LAST_UPDATE_DATE,
+			<if test="lastUpdateLogin != null">
+				LAST_UPDATE_LOGIN,
+			</if>
+			<if test="attributeCategory != null">
+				ATTRIBUTE_CATEGORY,
+			</if>
+			<if test="attribute1 != null">
+				ATTRIBUTE1,
+			</if>
+			<if test="attribute2 != null">
+				ATTRIBUTE2,
+			</if>
+			<if test="attribute3 != null">
+				ATTRIBUTE3,
+			</if>
+			<if test="attribute4 != null">
+				ATTRIBUTE4,
+			</if>
+			<if test="attribute5 != null">
+				ATTRIBUTE5,
+			</if>
+			<if test="attribute6 != null">
+				ATTRIBUTE6,
+			</if>
+			<if test="attribute7 != null">
+				ATTRIBUTE7,
+			</if>
+			<if test="attribute8 != null">
+				ATTRIBUTE8,
+			</if>
+			<if test="attribute9 != null">
+				ATTRIBUTE9,
+			</if>
+			<if test="attribute10 != null">
+				ATTRIBUTE10,
+			</if>
+			<if test="attribute11 != null">
+				ATTRIBUTE11,
+			</if>
+			<if test="attribute12 != null">
+				ATTRIBUTE12,
+			</if>
+			<if test="attribute13 != null">
+				ATTRIBUTE13,
+			</if>
+			<if test="attribute14 != null">
+				ATTRIBUTE14,
+			</if>
+			<if test="attribute15 != null">
+				ATTRIBUTE15,
+			</if>
+			<if test="taxAmount != null">
+				TAX_AMOUNT,
+			</if>
+			<if test="actualPayAmount != null">
+				ACTUAL_PAY_AMOUNT,
+			</if>
+			<if test="returnStatus != null">
+				RETURN_STATUS,
+			</if>
+			<if test="returnAdjustFlag != null">
+				RETURN_ADJUST_FLAG,
+			</if>
+			<if test="shippingFeeFlag != null">
+				SHIPPING_FEE_FLAG,
+			</if>
+			<if test="manualAdjustAmt != null">
+				MANUAL_ADJUST_AMT,
+			</if>
+			<if test="comments != null">
+				COMMENTS
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{returnId,jdbcType=DECIMAL},
+			<if test="salesOrgId != null">
+				#{salesOrgId,jdbcType=DECIMAL},
+			</if>
+			<if test="orderHeaderId != null">
+				#{orderHeaderId,jdbcType=DECIMAL},
+			</if>
+			<if test="returnNumber != null">
+				#{returnNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="returnDate != null">
+				#{returnDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="returnType != null">
+				#{returnType,jdbcType=VARCHAR},
+			</if>
+			<if test="returnReason != null">
+				#{returnReason,jdbcType=VARCHAR},
+			</if>
+			<if test="invOrgId != null">
+				#{invOrgId,jdbcType=DECIMAL},
+			</if>
+			<if test="returnPromotion != null">
+				#{returnPromotion,jdbcType=DECIMAL},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="amount != null">
+				#{amount,jdbcType=DECIMAL},
+			</if>
+			1,
+			<if test="requestId != null">
+				#{requestId,jdbcType=DECIMAL},
+			</if>
+			<if test="programId != null">
+				#{programId,jdbcType=DECIMAL},
+			</if>
+			<if test="creationDate != null">
+				#{creationDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createdBy != null">
+				#{createdBy,jdbcType=DECIMAL},
+			</if>
+			<if test="lastUpdatedBy != null">
+				#{lastUpdatedBy,jdbcType=DECIMAL},
+			</if>
+			CURRENT_TIMESTAMP,
+			<if test="lastUpdateLogin != null">
+				#{lastUpdateLogin,jdbcType=DECIMAL},
+			</if>
+			<if test="attributeCategory != null">
+				#{attributeCategory,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute1 != null">
+				#{attribute1,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute2 != null">
+				#{attribute2,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute3 != null">
+				#{attribute3,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute4 != null">
+				#{attribute4,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute5 != null">
+				#{attribute5,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute6 != null">
+				#{attribute6,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute7 != null">
+				#{attribute7,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute8 != null">
+				#{attribute8,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute9 != null">
+				#{attribute9,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute10 != null">
+				#{attribute10,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute11 != null">
+				#{attribute11,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute12 != null">
+				#{attribute12,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute13 != null">
+				#{attribute13,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute14 != null">
+				#{attribute14,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute15 != null">
+				#{attribute15,jdbcType=VARCHAR},
+			</if>
+			<if test="taxAmount != null">
+				#{taxAmount,jdbcType=VARCHAR},
+			</if>
+			<if test="actualPayAmount != null">
+				#{actualPayAmount,jdbcType=VARCHAR},
+			</if>
+			<if test="returnStatus != null">
+				#{returnStatus,jdbcType=VARCHAR},
+			</if>
+			<if test="returnAdjustFlag != null">
+				#{returnAdjustFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="shippingFeeFlag != null">
+				#{shippingFeeFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="manualAdjustAmt != null">
+				#{manualAdjustAmt,jdbcType=DECIMAL},
+			</if>
+			<if test="comments != null">
+				#{comments,jdbcType=VARCHAR}
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesReturn">
+		update OM_SALES_RETURN
+		<set>
+			<if test="salesOrgId != null">
+				SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+			</if>
+			<if test="orderHeaderId != null">
+				ORDER_HEADER_ID = #{orderHeaderId,jdbcType=DECIMAL},
+			</if>
+			<if test="returnNumber != null">
+				RETURN_NUMBER = #{returnNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="returnDate != null">
+				RETURN_DATE = #{returnDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="returnType != null">
+				RETURN_TYPE = #{returnType,jdbcType=VARCHAR},
+			</if>
+			<if test="returnReason != null">
+				RETURN_REASON = #{returnReason,jdbcType=VARCHAR},
+			</if>
+			<if test="invOrgId != null">
+				INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+			</if>
+			<if test="returnPromotion != null">
+				RETURN_PROMOTION = #{returnPromotion,jdbcType=DECIMAL},
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="amount != null">
+				AMOUNT = #{amount,jdbcType=DECIMAL},
+			</if>
+			OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+			<if test="requestId != null">
+				REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+			</if>
+			<if test="programId != null">
+				PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+			</if>
+			<if test="creationDate != null">
+				CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createdBy != null">
+				CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+			</if>
+			<if test="lastUpdatedBy != null">
+				LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+			</if>
+			LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+			<if test="lastUpdateLogin != null">
+				LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+			</if>
+			<if test="attributeCategory != null">
+				ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute1 != null">
+				ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute2 != null">
+				ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute3 != null">
+				ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute4 != null">
+				ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute5 != null">
+				ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute6 != null">
+				ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute7 != null">
+				ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute8 != null">
+				ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute9 != null">
+				ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute10 != null">
+				ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute11 != null">
+				ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute12 != null">
+				ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute13 != null">
+				ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute14 != null">
+				ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute15 != null">
+				ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+			</if>
+			<if test="taxAmount != null">
+				TAX_AMOUNT = #{taxAmount,jdbcType=VARCHAR},
+			</if>
+			<if test="actualPayAmount != null">
+				ACTUAL_PAY_AMOUNT = #{actualPayAmount,jdbcType=VARCHAR},
+			</if>
+			<if test="returnStatus != null">
+				RETURN_STATUS = #{returnStatus,jdbcType=VARCHAR},
+			</if>
+			<if test="returnAdjustFlag != null">
+				RETURN_ADJUST_FLAG = #{returnAdjustFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="creditNote != null">
+				CREDIT_NOTE = #{creditNote,jdbcType=VARCHAR},
+			</if>
+			<if test="shippingFeeFlag != null">
+				SHIPPING_FEE_FLAG = #{shippingFeeFlag,jdbcType=VARCHAR},
+			</if>
+			<if test="manualAdjustAmt != null">
+				MANUAL_ADJUST_AMT = #{manualAdjustAmt,jdbcType=DECIMAL},
+			</if>
+			<if test="comments != null">
+				COMMENTS = #{comments,jdbcType=VARCHAR}
+			</if>
+		</set>
+		where RETURN_ID = #{returnId,jdbcType=DECIMAL}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.order.dto.SalesReturn">
+		update OM_SALES_RETURN
+		set SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+			ORDER_HEADER_ID = #{orderHeaderId,jdbcType=DECIMAL},
+			RETURN_NUMBER = #{returnNumber,jdbcType=VARCHAR},
+			RETURN_DATE = #{returnDate,jdbcType=TIMESTAMP},
+			RETURN_TYPE = #{returnType,jdbcType=VARCHAR},
+			RETURN_REASON = #{returnReason,jdbcType=VARCHAR},
+			INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+			RETURN_PROMOTION = #{returnPromotion,jdbcType=DECIMAL},
+			REMARK = #{remark,jdbcType=VARCHAR},
+			AMOUNT = #{amount,jdbcType=DECIMAL},
+			OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,,
+			REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+			PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+			CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+			CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+			LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+			LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+			LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+			ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+			ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+			ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+			ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+			ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+			ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+			ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+			ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+			ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+			ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+			ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+			ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+			ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+			ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+			ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+			ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+			TAX_AMOUNT = #{taxAmount,jdbcType=VARCHAR},
+			ACTUAL_PAY_AMOUNT = #{actualPayAmount,jdbcType=VARCHAR},
+			RETURN_STATUS = #{returnStatus,jdbcType=VARCHAR},
+			RETURN_ADJUST_FLAG = #{returnAdjustFlag,jdbcType=VARCHAR},
+			SHIPPING_FEE_FLAG = #{shippingFeeFlag,jdbcType=VARCHAR},
+			MANUAL_ADJUST_AMT = #{manualAdjustAmt,jdbcType=DECIMAL},
+			COMMENTS = #{comments,jdbcType=VARCHAR}
+		where RETURN_ID = #{returnId,jdbcType=DECIMAL}
+	</update>
+
+	<select id="selectByReturnIdForLock" parameterType="java.lang.Long" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		FROM OM_SALES_RETURN
+		WHERE RETURN_ID = #{returnId,jdbcType=DECIMAL}
+		for update
+	</select>
+
+	<select id="selectSalesReturnByParas" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.order.dto.SalesReturn">
+		SELECT
+			OSR.RETURN_ID,
+			OSR.SALES_ORG_ID,
+			OSR.ORDER_HEADER_ID,
+			OSR.RETURN_NUMBER,
+			OSR.RETURN_DATE,
+			OSR.RETURN_TYPE,
+			OSR.RETURN_REASON,
+			OSR.INV_ORG_ID,
+			OSR.RETURN_STATUS,
+			OSO.ORDER_NUMBER,
+			MM.MEMBER_CODE,
+			MM.MEMBER_NAME,
+			OSO.INVOICE_NUMBER
+		FROM
+		OM_SALES_RETURN OSR
+			LEFT OUTER JOIN OM_SALES_ORDER OSO ON (OSO.HEADER_ID = OSR.ORDER_HEADER_ID)
+			LEFT OUTER JOIN MM_MEMBER_V MM ON MM.MEMBER_ID = OSO.MEMBER_ID
+		<where>
+			<if test="salesOrgId != null">
+				osr.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+			</if>
+			<if test="returnId !=null">
+				AND osr.RETURN_ID = #{returnId,jdbcType=DECIMAL}
+			</if>
+			<if test="returnType !=null">
+				AND osr.RETURN_TYPE = #{returnType,jdbcType=VARCHAR}
+			</if>
+			<if test="orderHeaderId !=null">
+				AND osr.ORDER_HEADER_ID = #{orderHeaderId,jdbcType=DECIMAL}
+			</if>
+			<if test="orderNumber !=null">
+				AND Upper(OSO.ORDER_NUMBER) like concat('%',concat( Upper(#{orderNumber,jdbcType=VARCHAR}),'%'))
+			</if>
+			<if test="invoiceNumber !=null">
+				AND Upper(OSO.INVOICE_NUMBER) like concat('%',concat( Upper(#{invoiceNumber,jdbcType=VARCHAR}),'%'))
+			</if>
+			<if test="returnNumber !=null">
+				AND Upper(osr.RETURN_NUMBER) like concat('%',concat( Upper(#{returnNumber,jdbcType=VARCHAR}),'%'))
+			</if>
+			<if test="returnStatus !=null">
+				AND osr.RETURN_STATUS in
+				<foreach collection="returnStatusList" open="(" separator="," close=")" item="status" index="index">
+					#{status,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+			<if test="returnDateFrom !=null">
+				AND osr.return_date &gt;= #{returnDateFrom,jdbcType=TIMESTAMP}
+			</if>
+			<if test="returnDateTo !=null">
+				AND osr.return_date &lt;= #{returnDateTo,jdbcType=TIMESTAMP}
+			</if>
+			<if test="memberId != null">
+                AND mm.member_id = #{memberId, jdbcType=DECIMAL}
+            </if>
+            <if test="memberName != null">
+                AND ((upper(mm.english_name) LIKE upper(concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%'))) OR
+                   mm.member_id IN
+                   (SELECT member_id
+                        FROM MM_MEM_RELATIONSHIP rel
+                       WHERE rel.rel_type = 'SPOUS'
+                         AND (rel.chinese_name LIKE concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')) OR
+                             upper(rel.english_name) LIKE
+                             concat('%', concat(upper(#{memberName,jdbcType=VARCHAR}), '%'))))) OR
+                   (mm.chinese_name LIKE concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')) OR
+                   mm.member_id IN
+                   (SELECT member_id
+                        FROM MM_MEM_RELATIONSHIP rel
+                       WHERE rel.rel_type = 'SPOUS'
+                         AND (rel.chinese_name LIKE concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')) OR
+                             upper(rel.english_name) LIKE
+                             concat('%', concat(upper(#{memberName,jdbcType=VARCHAR}), '%')))))
+                             or (
+        						upper(mm.member_name) LIKE upper(concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')))
+      							)
+                             )
+            </if>
+			<if test="sortname == null and sortorder == null">
+				order by osr.RETURN_NUMBER desc
+			</if>
+			<if test="sortname == 'returnNumber'">
+				order by osr.RETURN_NUMBER ${sortorder}
+			</if>
+			<if test="sortname == 'orderNumber'">
+				order by oso.order_number ${sortorder}
+			</if>
+			<if test="sortname == 'returnDate'">
+				order by osr.RETURN_DATE ${sortorder}
+			</if>
+		</where>
+	</select>
+	<!-- 退货单创建页面 Form销售订单编号lov(根据当前销售组织屏蔽且订单状态=已完成或待确认) -->
+	 <select id="queryOrderNumberBySalesOrgId" resultMap="BaseResultMap">
+		select oso.HEADER_ID 						ORDER_HEADER_ID
+		        , oso.ORDER_NUMBER
+		        , oso.ORDER_TYPE
+		        , oso.PAY_DATE
+		        , oso.SALES_ORG_ID
+		        , oso.MEMBER_ID
+		        , oso.PERIOD_ID
+		        , nvl(osr.RETURN_ADJUST_FLAG,'N')			RETURN_ADJUST_FLAG
+		        , nvl(osl_ship.SHIPPING_FEE_FLAG,'N')		SHIPPING_FEE_FLAG
+		        , oso.ORDER_AMT
+		        , oso.ACTRUAL_PAY_AMT				ORDER_ACTRUAL_PAY_AMT
+				, adjustAmt.ADJUST_AMT
+				, OSL.SHIPPING_FEE            		SHIPPING_FEE_AMT
+				, returnAmt.RETURN_AMT
+				, returnAmt.RETURN_PROMOTION_SUM
+				, returnAmt.ACTUAL_RTN_AMT_SUM
+				, voucherAmt.VOUCHER_ORDER_AMT
+				, voucherAmt.VOUCHER_AMT
+				, MM.MEMBER_CODE
+				, MM.MEMBER_NAME
+				, OSO.INVOICE_NUMBER
+		from OM_SALES_ORDER oso
+				LEFT OUTER JOIN MM_MEMBER_V MM ON MM.MEMBER_ID = OSO.MEMBER_ID
+				LEFT OUTER JOIN OM_SALES_LOGISTICS OSL ON (OSL.HEADER_ID = OSO.HEADER_ID AND OSL.AUTOSHIP_FLAG = 'N')
+		        left outer join (
+		                select osa.HEADER_ID, SUM(osa.ADJUSTMENT_AMOUNT) ADJUST_AMT
+		                from om_sales_adjustment osa 
+		                        LEFT OUTER JOIN om_sales_order o on osa.HEADER_ID = o.HEADER_ID
+		                group by(osa.HEADER_ID)
+		        ) adjustAmt ON oso.HEADER_ID = adjustAmt.HEADER_ID
+		        LEFT OUTER JOIN om_sales_return osr ON (osr.ORDER_HEADER_ID = oso.HEADER_ID AND osr.RETURN_ADJUST_FLAG = 'Y')
+		        LEFT OUTER JOIN om_sales_return osl_ship ON (osl_ship.ORDER_HEADER_ID = oso.HEADER_ID AND osl_ship.SHIPPING_FEE_FLAG = 'Y')
+		        LEFT OUTER JOIN (
+		                select r.ORDER_HEADER_ID, 
+		                	sum(r.AMOUNT) RETURN_AMT, 
+		                	sum(r.RETURN_PROMOTION) RETURN_PROMOTION_SUM,
+		                	sum(r.ACTUAL_PAY_AMOUNT) ACTUAL_RTN_AMT_SUM
+		                from om_sales_return r 
+		                group by(r.ORDER_HEADER_ID)
+		        ) returnAmt ON oso.HEADER_ID = returnAmt.ORDER_HEADER_ID
+		        LEFT OUTER JOIN (
+		                select osv.HEADER_ID, sum(pv.ORDER_AMOUNT) VOUCHER_ORDER_AMT, sum(pv.DISCOUNT_VALUE) VOUCHER_AMT
+		                from om_sales_voucher osv
+		                        LEFT OUTER JOIN pdm_voucher pv ON osv.VOUCHER_ID = pv.VOUCHER_ID
+		                where pv.APPLY_CRITERIA = 'INVOI' AND pv.TYPE = 'AM' AND pv.DISCOUNT_TYPE = 'FIX'
+		                  group by (osv.HEADER_ID)
+		        ) voucherAmt ON oso.HEADER_ID = voucherAmt.HEADER_ID
+		<where>
+			oso.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL} and oso.ORDER_STATUS in ('CONF', 'COMP')
+			<if test="orderNumber != null ">
+		 		and Upper(oso.ORDER_NUMBER) like concat('%', concat(Upper(#{orderNumber, jdbcType=VARCHAR}), '%'))
+		 	</if>
+		</where>
+         <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        
+	 </select>
+	<!-- 根据退货单头ID查询退货单头详情 -->
+	<select id="selectDetailByReturnId" resultMap="BaseResultMap">
+		select
+	        osr.RETURN_ID, 
+	        osr.SALES_ORG_ID, 
+	        osr.ORDER_HEADER_ID, 
+	        osr.RETURN_NUMBER, 
+	        osr.RETURN_DATE, 
+	        osr.RETURN_TYPE,
+	        osr.RETURN_REASON, 
+	        osr.INV_ORG_ID, 
+	        osr.RETURN_PROMOTION, 
+	        osr.REMARK, 
+	        osr.AMOUNT, 
+	        osr.REQUEST_ID, 
+	        osr.CREDIT_NOTE,
+	        osr.PROGRAM_ID, 
+	        osr.CREATION_DATE, 
+	        osr.CREATED_BY, 
+	        osr.LAST_UPDATED_BY, 
+	        osr.LAST_UPDATE_DATE, 
+	        osr.LAST_UPDATE_LOGIN, 
+	        osr.ATTRIBUTE_CATEGORY,  
+	        osr.TAX_AMOUNT, 
+	        osr.ACTUAL_PAY_AMOUNT, 
+	        osr.RETURN_STATUS, 
+	        osr.SHIPPING_FEE_FLAG,
+	        osr.MANUAL_ADJUST_AMT,
+	        osr.COMMENTS,
+	        invtl.NAME INV_ORG_NAME, 
+	        osr.RETURN_ADJUST_FLAG, 
+	        salesorder.PAY_DATE, 
+	        salesorder.ORDER_TYPE,
+	        salesorder.ORDER_NUMBER, 
+	        salesorder.ADJUST_AMT, 
+	        salesorder.RETURN_AMT, 
+	        salesorder.RETURN_PROMOTION_SUM, 
+	        salesorder.VOUCHER_ORDER_AMT, 
+	        salesorder.VOUCHER_AMT, 
+	        salesorder.MEMBER_ID, 
+	        salesorder.PERIOD_ID, 
+	        salesorder.ORDER_AMT,
+	        salesorder.ORDER_ACTRUAL_PAY_AMT, 
+	        salesorder.SHIPPING_FEE_AMT,
+	        salesorder.INVOICE_NUMBER,
+	        salesorder.MEMBER_CODE,
+	        salesorder.MEMBER_NAME,
+	        nvl(salesorder.SHIPPING_FEE_FLAG_BEFORE, 'N') SHIPPING_FEE_FLAG_BEFORE,
+	        nvl(salesorder.RTN_ADJUST_FLAG_BEFORE, 'N') RTN_ADJUST_FLAG_BEFORE
+		from OM_SALES_RETURN osr
+	        LEFT OUTER JOIN
+	        (
+                SELECT oso.HEADER_ID
+                        , oso.ORDER_NUMBER
+                        , oso.MEMBER_ID
+                        , oso.PERIOD_ID
+                        , oso.PAY_DATE
+                        , oso.ORDER_TYPE
+                        , oso.ORDER_AMT
+                        , oso.ACTRUAL_PAY_AMT				ORDER_ACTRUAL_PAY_AMT
+                        , adjustAmt.ADJUST_AMT
+                        , osr_adj.RETURN_ADJUST_FLAG		RTN_ADJUST_FLAG_BEFORE
+                        , returnAmt.RETURN_AMT
+                        , returnAmt.RETURN_PROMOTION_SUM
+                        , voucherAmt.VOUCHER_ORDER_AMT
+                        , voucherAmt.VOUCHER_AMT
+                        , osl.SHIPPING_FEE 					SHIPPING_FEE_AMT
+                        , osr_ship.SHIPPING_FEE_FLAG		SHIPPING_FEE_FLAG_BEFORE
+                        , oso.INVOICE_NUMBER
+                        , mmv.MEMBER_CODE
+                        , mmv.MEMBER_NAME
+                FROM OM_SALES_ORDER oso
+                	LEFT OUTER JOIN om_sales_return osr_adj ON (
+                		osr_adj.ORDER_HEADER_ID = oso.HEADER_ID
+                		AND osr_adj.Return_Id != #{returnId,jdbcType=DECIMAL}
+                		AND osr_adj.RETURN_ADJUST_FLAG = 'Y')
+		        	LEFT OUTER JOIN om_sales_return osr_ship ON (
+		        		osr_ship.ORDER_HEADER_ID = oso.HEADER_ID
+		        		AND osr_ship.Return_Id != #{returnId,jdbcType=DECIMAL} 
+		        		AND osr_ship.SHIPPING_FEE_FLAG = 'Y')
+	                LEFT OUTER JOIN MM_MEMBER_V MMV ON MMV.MEMBER_ID = OSO.MEMBER_ID
+	                LEFT OUTER JOIN OM_SALES_LOGISTICS OSL ON (OSL.HEADER_ID = OSO.HEADER_ID AND OSL.AUTOSHIP_FLAG = 'N')
+	                LEFT OUTER JOIN (
+			                select osa.HEADER_ID, SUM(osa.ADJUSTMENT_AMOUNT) ADJUST_AMT
+			                from om_sales_adjustment osa 
+			                        LEFT OUTER JOIN om_sales_order o on osa.HEADER_ID = o.HEADER_ID
+			                where osa.HEADER_ID = o.HEADER_ID group by(osa.HEADER_ID)
+			        ) adjustAmt ON oso.HEADER_ID = adjustAmt.HEADER_ID
+			        LEFT OUTER JOIN (
+			                select r.ORDER_HEADER_ID, sum(r.AMOUNT) RETURN_AMT, sum(r.RETURN_PROMOTION) RETURN_PROMOTION_SUM
+			                from om_sales_return r
+			                where r.RETURN_ID != #{returnId,jdbcType=DECIMAL}
+			                group by(r.ORDER_HEADER_ID)
+			        ) returnAmt ON oso.HEADER_ID = returnAmt.ORDER_HEADER_ID
+			        LEFT OUTER JOIN (
+			                select osv.HEADER_ID, sum(pv.ORDER_AMOUNT) VOUCHER_ORDER_AMT, sum(pv.DISCOUNT_VALUE) VOUCHER_AMT
+			                from om_sales_voucher osv
+			                        LEFT OUTER JOIN pdm_voucher pv ON osv.VOUCHER_ID = pv.VOUCHER_ID
+			                where pv.APPLY_CRITERIA = 'INVOI' AND pv.TYPE = 'AM' AND pv.DISCOUNT_TYPE = 'FIX'
+			                  group by (osv.HEADER_ID)
+			        ) voucherAmt ON oso.HEADER_ID = voucherAmt.HEADER_ID
+		        )salesorder ON salesorder.header_id = osr.ORDER_HEADER_ID
+		        LEFT OUTER JOIN SPM_INV_ORGANIZATION_TL invtl 
+	                ON (osr.INV_ORG_ID = invtl.INV_ORG_ID and invtl.LANG = #{request.locale,jdbcType=VARCHAR})
+			WHERE osr.RETURN_ID = #{returnId,jdbcType=DECIMAL}
+	</select>
+	
+	<!-- 查询金额 -->
+	<select id="getAmount" resultMap="BaseResultMap" >
+		select oso.HEADER_ID,
+       		coalesce(oso.ORDER_AMT,0) ORDER_AMT,
+       		coalesce(adjustAmt.ADJUST_AMT,0) ADJUST_AMT,
+       		coalesce(returnAmt.RETURN_AMT,0) RETURN_AMT,
+       		coalesce(returnAmt.ACTUAL_RTN_AMT_SUM,0) ACTUAL_RTN_AMT_SUM,
+       		coalesce(returnAmt.RETURN_PROMOTION_SUM,0) RETURN_PROMOTION_SUM,
+       		coalesce(voucherAmt.VOUCHER_ORDER_AMT,0) VOUCHER_ORDER_AMT,
+       		coalesce(voucherAmt.VOUCHER_AMT,0) VOUCHER_AMT
+        from OM_SALES_ORDER oso
+	        LEFT OUTER JOIN (
+	          select osa.HEADER_ID, SUM(osa.ADJUSTMENT_AMOUNT) ADJUST_AMT
+	          from om_sales_adjustment osa 
+	                  LEFT OUTER JOIN om_sales_order o on osa.HEADER_ID = o.HEADER_ID
+	          where osa.HEADER_ID = o.HEADER_ID group by(osa.HEADER_ID)
+	  		) adjustAmt ON oso.HEADER_ID = adjustAmt.HEADER_ID
+	  		LEFT OUTER JOIN (
+	          select 
+	          	r.ORDER_HEADER_ID, 
+	          	sum(r.AMOUNT) RETURN_AMT, 
+	          	sum(r.RETURN_PROMOTION) RETURN_PROMOTION_SUM,
+	          	sum(r.ACTUAL_PAY_AMOUNT) ACTUAL_RTN_AMT_SUM
+	          from om_sales_return r
+	          <where>
+	          	<if test = "returnId != null">
+		          	r.RETURN_ID != #{returnId,jdbcType=DECIMAL}
+	          	</if>
+	          </where>
+	          group by(r.ORDER_HEADER_ID)
+	   		) returnAmt ON oso.HEADER_ID = returnAmt.ORDER_HEADER_ID
+	   		LEFT OUTER JOIN (
+	          select osv.HEADER_ID, sum(pv.ORDER_AMOUNT) VOUCHER_ORDER_AMT, sum(pv.DISCOUNT_VALUE) VOUCHER_AMT
+	          from om_sales_voucher osv
+	                  LEFT OUTER JOIN pdm_voucher pv ON osv.VOUCHER_ID = pv.VOUCHER_ID
+	          where pv.APPLY_CRITERIA = 'INVOI' AND pv.TYPE = 'AM' AND pv.DISCOUNT_TYPE = 'FIX'
+	            group by (osv.HEADER_ID)
+	  		) voucherAmt ON oso.HEADER_ID = voucherAmt.HEADER_ID
+  		where oso.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL} 
+  				and oso.ORDER_STATUS in ('CONF', 'COMP')
+		 	    and oso.HEADER_ID = #{orderHeaderId, jdbcType=DECIMAL}
+	</select>
+	
+	<!-- 查询退货单中是否已返还人工调整 -->
+	<select id="isReturnAdjustFlag" parameterType="java.lang.Long" resultType="java.lang.Integer">
+		SELECT count(*)
+		FROM om_sales_order oso
+		        LEFT OUTER JOIN om_sales_adjustment osa ON oso.HEADER_ID = osa.HEADER_ID
+		        LEFT OUTER JOIN om_sales_return osr ON oso.HEADER_ID = osr.ORDER_HEADER_ID
+		<where>
+			 	osr.RETURN_ADJUST_FLAG != 'N'
+				AND oso.HEADER_ID = #{headerId,jdbcType=DECIMAL}
+			<if test = "returnId != null">
+		    	AND	osr.RETURN_ID != #{returnId,jdbcType=DECIMAL}
+	        </if>
+		</where>
+	</select>
+	<!-- 查询退货单中是否已返还运费 -->
+	<select id="isReturnShippingFeeFlag" parameterType="java.lang.Long" resultType="java.lang.Integer">
+		SELECT count(*)
+		FROM om_sales_order oso
+		        LEFT OUTER JOIN om_sales_adjustment osa ON oso.HEADER_ID = osa.HEADER_ID
+		        LEFT OUTER JOIN om_sales_return osr ON oso.HEADER_ID = osr.ORDER_HEADER_ID
+		<where>
+			 	osr.SHIPPING_FEE_FLAG != 'N'
+				AND oso.HEADER_ID = #{headerId,jdbcType=DECIMAL}
+			<if test = "returnId != null">
+		    	AND	osr.RETURN_ID != #{returnId,jdbcType=DECIMAL}
+	        </if>
+		</where>
+	</select>
+    <select id="selectBySync" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.order.dto.SalesReturn">
+        select OSR.RETURN_ID,
+               OSR.SALES_ORG_ID,
+               OSR.ORDER_HEADER_ID,
+               OSR.RETURN_NUMBER,
+               OSR.RETURN_DATE,
+               OSR.RETURN_TYPE,
+               OSR.RETURN_REASON,
+               OSR.INV_ORG_ID,
+               OSR.RETURN_PROMOTION,
+               OSR.REMARK,
+               OSR.AMOUNT,
+                coalesce((SELECT SUM(osl.pv * srl.quantity)
+                  FROM om_sales_rtn_line srl,
+                       om_sales_line     osl
+                 WHERE srl.order_line_id = osl.line_id
+                   AND srl.return_id = osr.return_id),
+                0) POINT,
+               OSR.OBJECT_VERSION_NUMBER,
+               OSR.REQUEST_ID,
+               OSR.PROGRAM_ID,
+               OSR.CREATION_DATE,
+               OSR.CREATED_BY,
+               OSR.LAST_UPDATED_BY,
+               OSR.LAST_UPDATE_DATE,
+               OSR.LAST_UPDATE_LOGIN,
+               OSR.TAX_AMOUNT,
+               OSR.ACTUAL_PAY_AMOUNT,
+               OSR.RETURN_STATUS,
+               OSR.RETURN_ADJUST_FLAG,
+               OSR.SYNC_FLAG
+          from OM_SALES_RETURN osr,spm_market_b sm,SPM_SALES_ORGANIZATION_B sso
+         WHERE SYNC_FLAG = #{syncFlag,jdbcType=VARCHAR}
+           and RETURN_STATUS != #{returnStatus,jdbcType=VARCHAR}
+           and osr.sales_org_id = sso.sales_org_id
+           and sso.market_id = sm.market_id
+           and sm.market_id in
+           <foreach item="marketId" collection="marketIdList" open="(" separator="," close=")">
+                   #{marketId}
+           </foreach>
+           and OSR.ORDER_HEADER_ID in (select ish.header_id from isg_so_header ish)
+    </select>
+    <update id="updateSyncFlagByReturnNumber">
+        update OM_SALES_RETURN set SYNC_FLAG= #{syncFlag,jdbcType=VARCHAR} 
+        WHERE RETURN_NUMBER = #{returnNumber,jdbcType=VARCHAR} 
+    </update>
+    
+    <!-- lov用-查询当前登录用户可访问销售区域下所有退货单 -->
+    <select id="selectAllRtnOrder" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.order.dto.SalesReturn">
+		SELECT
+		    SSOT.NAME AS ATTRIBUTE1,
+		    OSR.RETURN_NUMBER
+		FROM
+		    OM_SALES_RETURN OSR
+		LEFT OUTER JOIN (
+		    SPM_SALES_ORGANIZATION_B SSOB
+		    LEFT OUTER JOIN SPM_SALES_ORGANIZATION_TL SSOT ON SSOT.SALES_ORG_ID = SSOB.SALES_ORG_ID
+		    AND SSOT.LANG = #{request.locale,jdbcType=VARCHAR}
+		) ON SSOB.SALES_ORG_ID = OSR.SALES_ORG_ID
+		WHERE
+		    EXISTS (SELECT 'X'
+          			FROM SYS_USER_ROLE_ASSIGN SURA
+         			WHERE SURA.ROLE_ID = #{request.roleId,jdbcType=DECIMAL}
+           				AND SURA.USER_ID = #{request.userId,jdbcType=DECIMAL}
+						AND OSR.SALES_ORG_ID = SURA.ASSIGN_VALUE
+           				AND SURA.ASSIGN_TYPE = 'SALES')
+		    <if test="returnNumber !=null">
+                AND Upper(OSR.RETURN_NUMBER) like concat('%',concat( Upper(#{returnNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            ORDER BY OSR.RETURN_NUMBER
+             <if test="sortname != null and sortname != 'returnNumber'">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+            ,${_colName} ${sortorder}
+        </if>
+            
+    </select>
+    
+    <!-- lov用-查询当前登录用户可访问销售区域下所有退货单 - autocomplete-->
+    <select id="selectAllRtnOrderLike" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.order.dto.SalesReturn">
+		SELECT
+		    OSR.RETURN_NUMBER
+		FROM
+		    OM_SALES_RETURN OSR
+		WHERE
+            Upper(OSR.RETURN_NUMBER) like concat('%',concat( Upper(#{returnNumber,jdbcType=VARCHAR}),'%'))
+        <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+            
+    </select>
+
+    <select id="selectRObySubRm" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select *
+         from om_sales_return osr
+        where osr.sales_org_id in
+             (select ssob.sales_org_id
+               from spm_sales_organization_b ssob
+              where ssob.market_id in (select smb.market_id
+                                        from spm_market_b smb
+                                       where smb.code = #{market,jdbcType=VARCHAR}))
+        and
+        ((SUBSTR(osr.return_number, 2, length(osr.return_number)) = #{returnNumber,jdbcType=VARCHAR}
+        and object_version_number &lt; 0) or
+        (osr.return_number = #{returnNumber,jdbcType=VARCHAR}
+        and object_version_number >= 0))
+    </select>
+</mapper>

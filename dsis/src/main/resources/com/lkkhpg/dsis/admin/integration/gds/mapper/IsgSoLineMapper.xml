@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgSoLineMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgSoLine" >
+    <id column="INTERFACE_DETAIL_ID" property="interfaceDetailId" jdbcType="DECIMAL" />
+    <result column="INTERFACE_ID" property="interfaceId" jdbcType="VARCHAR" />
+    <result column="GSO_MASTER" property="gsoMaster" jdbcType="VARCHAR" />
+    <result column="PRODUCT_CODE" property="productCode" jdbcType="VARCHAR" />
+    <result column="PRODUCT_PRICE" property="productPrice" jdbcType="DECIMAL" />
+    <result column="PRODUCT_POINT" property="productPoint" jdbcType="DECIMAL" />
+    <result column="LOCAL_SALE_PRICE" property="localSalePrice" jdbcType="DECIMAL" />
+    <result column="LOCAL_SALE_POINT" property="localSalePoint" jdbcType="DECIMAL" />
+    <result column="LOCAL_SALE_REBATE" property="localSaleRebate" jdbcType="DECIMAL" />
+    <result column="LOCAL_SALE_QTY" property="localSaleQty" jdbcType="DECIMAL" />
+    <result column="LINE_NO" property="lineNo" jdbcType="DECIMAL" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="PROCESS_STATUS" property="processStatus" jdbcType="VARCHAR" />
+    <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP" />
+    <result column="PROCESS_MESSAGE" property="processMessage" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INTERFACE_DETAIL_ID, INTERFACE_ID, GSO_MASTER, PRODUCT_CODE, PRODUCT_PRICE, PRODUCT_POINT, 
+    LOCAL_SALE_PRICE, LOCAL_SALE_POINT, LOCAL_SALE_REBATE, LOCAL_SALE_QTY, LINE_NO, ADVISE_NO, 
+    PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, REQUEST_ID, PROGRAM_ID, OBJECT_VERSION_NUMBER
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from ISG_SO_LINE
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from ISG_SO_LINE
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgSoLine" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceDetailId" order="BEFORE" >
+      SELECT ISG_SO_LINE_S.nextval from dual
+    </selectKey>
+    insert into ISG_SO_LINE (INTERFACE_DETAIL_ID, INTERFACE_ID, GSO_MASTER, 
+      PRODUCT_CODE, PRODUCT_PRICE, PRODUCT_POINT, 
+      LOCAL_SALE_PRICE, LOCAL_SALE_POINT, LOCAL_SALE_REBATE, 
+      LOCAL_SALE_QTY, LINE_NO, ADVISE_NO, 
+      PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+      REQUEST_ID, PROGRAM_ID, OBJECT_VERSION_NUMBER
+      )
+    values (#{interfaceDetailId,jdbcType=DECIMAL}, #{interfaceId,jdbcType=VARCHAR}, #{gsoMaster,jdbcType=VARCHAR}, 
+      #{productCode,jdbcType=VARCHAR}, #{productPrice,jdbcType=DECIMAL}, #{productPoint,jdbcType=DECIMAL}, 
+      #{localSalePrice,jdbcType=DECIMAL}, #{localSalePoint,jdbcType=DECIMAL}, #{localSaleRebate,jdbcType=DECIMAL}, 
+      #{localSaleQty,jdbcType=DECIMAL}, #{lineNo,jdbcType=DECIMAL}, #{adviseNo,jdbcType=VARCHAR}, 
+      #{processStatus,jdbcType=VARCHAR}, current_timestamp, #{processMessage,jdbcType=VARCHAR}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, #{objectVersionNumber,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgSoLine" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceDetailId" order="BEFORE" >
+      SELECT ISG_SO_LINE_S.nextval from dual
+    </selectKey>
+    insert into ISG_SO_LINE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INTERFACE_DETAIL_ID,
+      <if test="interfaceId != null" >
+        INTERFACE_ID,
+      </if>
+      <if test="gsoMaster != null" >
+        GSO_MASTER,
+      </if>
+      <if test="productCode != null" >
+        PRODUCT_CODE,
+      </if>
+      <if test="productPrice != null" >
+        PRODUCT_PRICE,
+      </if>
+      <if test="productPoint != null" >
+        PRODUCT_POINT,
+      </if>
+      <if test="localSalePrice != null" >
+        LOCAL_SALE_PRICE,
+      </if>
+      <if test="localSalePoint != null" >
+        LOCAL_SALE_POINT,
+      </if>
+      <if test="localSaleRebate != null" >
+        LOCAL_SALE_REBATE,
+      </if>
+      <if test="localSaleQty != null" >
+        LOCAL_SALE_QTY,
+      </if>
+      <if test="lineNo != null" >
+        LINE_NO,
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO,
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS,
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE,
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{interfaceDetailId,jdbcType=DECIMAL},
+      <if test="interfaceId != null" >
+        #{interfaceId,jdbcType=VARCHAR},
+      </if>
+      <if test="gsoMaster != null" >
+        #{gsoMaster,jdbcType=VARCHAR},
+      </if>
+      <if test="productCode != null" >
+        #{productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productPrice != null" >
+        #{productPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="productPoint != null" >
+        #{productPoint,jdbcType=DECIMAL},
+      </if>
+      <if test="localSalePrice != null" >
+        #{localSalePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="localSalePoint != null" >
+        #{localSalePoint,jdbcType=DECIMAL},
+      </if>
+      <if test="localSaleRebate != null" >
+        #{localSaleRebate,jdbcType=DECIMAL},
+      </if>
+      <if test="localSaleQty != null" >
+        #{localSaleQty,jdbcType=DECIMAL},
+      </if>
+      <if test="lineNo != null" >
+        #{lineNo,jdbcType=DECIMAL},
+      </if>
+      <if test="adviseNo != null" >
+        #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="objectVersionNumber != null" >
+        #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgSoLine" >
+    update ISG_SO_LINE
+    <set >
+      <if test="interfaceId != null" >
+        INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR},
+      </if>
+      <if test="gsoMaster != null" >
+        GSO_MASTER = #{gsoMaster,jdbcType=VARCHAR},
+      </if>
+      <if test="productCode != null" >
+        PRODUCT_CODE = #{productCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productPrice != null" >
+        PRODUCT_PRICE = #{productPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="productPoint != null" >
+        PRODUCT_POINT = #{productPoint,jdbcType=DECIMAL},
+      </if>
+      <if test="localSalePrice != null" >
+        LOCAL_SALE_PRICE = #{localSalePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="localSalePoint != null" >
+        LOCAL_SALE_POINT = #{localSalePoint,jdbcType=DECIMAL},
+      </if>
+      <if test="localSaleRebate != null" >
+        LOCAL_SALE_REBATE = #{localSaleRebate,jdbcType=DECIMAL},
+      </if>
+      <if test="localSaleQty != null" >
+        LOCAL_SALE_QTY = #{localSaleQty,jdbcType=DECIMAL},
+      </if>
+      <if test="lineNo != null" >
+        LINE_NO = #{lineNo,jdbcType=DECIMAL},
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgSoLine" >
+    update ISG_SO_LINE
+    set INTERFACE_ID = #{interfaceId,jdbcType=VARCHAR},
+      GSO_MASTER = #{gsoMaster,jdbcType=VARCHAR},
+      PRODUCT_CODE = #{productCode,jdbcType=VARCHAR},
+      PRODUCT_PRICE = #{productPrice,jdbcType=DECIMAL},
+      PRODUCT_POINT = #{productPoint,jdbcType=DECIMAL},
+      LOCAL_SALE_PRICE = #{localSalePrice,jdbcType=DECIMAL},
+      LOCAL_SALE_POINT = #{localSalePoint,jdbcType=DECIMAL},
+      LOCAL_SALE_REBATE = #{localSaleRebate,jdbcType=DECIMAL},
+      LOCAL_SALE_QTY = #{localSaleQty,jdbcType=DECIMAL},
+      LINE_NO = #{lineNo,jdbcType=DECIMAL},
+      ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL}
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </update>
+  
+  <update id="updateProccessStatusByAdviseNoAndSONO">
+    update ISG_SO_LINE
+    set  PROCESS_STATUS = #{status,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processTime,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{message,jdbcType=VARCHAR}
+    where ADVISE_NO = #{adviseNo,jdbcType=VARCHAR} AND GSO_MASTER = #{soNo,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select <include refid="Base_Column_List" />
+      from ISG_SO_LINE
+    <where>
+        PROCESS_DATE &gt; #{processDateFrom,jdbcType=TIMESTAMP}
+        <if test="requestDateTo != null" >
+            AND PROCESS_DATE &lt; #{processDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="processStatus != null" >
+            AND PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="advoiseNo != null" >
+            AND ADVISE_NO = #{advoiseNo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by interface_id desc
+  </select>
+</mapper>

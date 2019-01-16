@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.system.CodeMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.system.Code">
+        <id column="CODE_ID" property="codeId" jdbcType="DECIMAL" />
+        <result column="CODE" property="code" jdbcType="VARCHAR" />
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber"
+            jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate"
+            jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy"
+            jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate"
+            jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin"
+            jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory"
+            jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        CODE_ID, CODE, DESCRIPTION, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID,
+        CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14,
+        ATTRIBUTE15
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap"
+        parameterType="com.lkkhpg.dsis.platform.dto.system.Code">
+        SELECT scb.code_id,scb.code,sct.description
+                ,scb.OBJECT_VERSION_NUMBER, scb.REQUEST_ID, scb.PROGRAM_ID,
+        scb.CREATION_DATE, scb.CREATED_BY, scb.LAST_UPDATED_BY,
+        scb.LAST_UPDATE_DATE, scb.LAST_UPDATE_LOGIN, scb.ATTRIBUTE_CATEGORY,
+        scb.ATTRIBUTE1, scb.ATTRIBUTE2, scb.ATTRIBUTE3,
+        scb.ATTRIBUTE4, scb.ATTRIBUTE5, scb.ATTRIBUTE6,
+        scb.ATTRIBUTE7, scb.ATTRIBUTE8, scb.ATTRIBUTE9,
+        scb.ATTRIBUTE10, scb.ATTRIBUTE11, scb.ATTRIBUTE12,
+        scb.ATTRIBUTE13, scb.ATTRIBUTE14, scb.ATTRIBUTE15
+        FROM sys_code_b scb LEFT OUTER JOIN sys_code_tl sct
+        on( scb.code_id = sct.code_id
+        AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+        where scb.CODE_ID = #{codeId,jdbcType=DECIMAL}
+    </select>
+
+    <select id="selectCodes" resultMap="BaseResultMap"
+        parameterType="com.lkkhpg.dsis.platform.dto.system.Code">
+        SELECT scb.code_id,scb.code,sct.description
+                ,scb.OBJECT_VERSION_NUMBER, scb.REQUEST_ID, scb.PROGRAM_ID,
+        scb.CREATION_DATE, scb.CREATED_BY, scb.LAST_UPDATED_BY,
+        scb.LAST_UPDATE_DATE, scb.LAST_UPDATE_LOGIN, scb.ATTRIBUTE_CATEGORY,
+        scb.ATTRIBUTE1, scb.ATTRIBUTE2, scb.ATTRIBUTE3,
+        scb.ATTRIBUTE4, scb.ATTRIBUTE5, scb.ATTRIBUTE6,
+        scb.ATTRIBUTE7, scb.ATTRIBUTE8, scb.ATTRIBUTE9,
+        scb.ATTRIBUTE10, scb.ATTRIBUTE11, scb.ATTRIBUTE12,
+        scb.ATTRIBUTE13, scb.ATTRIBUTE14, scb.ATTRIBUTE15
+        FROM sys_code_b scb LEFT OUTER JOIN sys_code_tl sct
+        on( scb.code_id = sct.code_id
+        AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+
+        <where>
+            <if test="codeId != null">
+                scb.code_id = #{codeId,jdbcType=DECIMAL}
+            </if>
+            <if test="code != null">
+                AND Upper(scb.code) like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="description != null">
+                AND sct.description like concat('%',concat(#{description,jdbcType=VARCHAR},'%'))
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.Code">
+        delete from SYS_CODE_B
+        where CODE_ID = #{codeId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.Code"
+        useGeneratedKeys="false" keyProperty="codeId">
+        <selectKey resultType="long" keyProperty="codeId" order="BEFORE">
+            select sys_code_b_s.nextVal as codeId from dual
+        </selectKey>
+        insert into SYS_CODE_B (CODE_ID, CODE, DESCRIPTION,
+        REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10,
+        ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14, ATTRIBUTE15)
+        values (#{codeId,jdbcType=DECIMAL}, #{code,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR},
+        #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},
+        #{creationDate,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL},
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR},
+        #{attribute4,jdbcType=VARCHAR},
+        #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR},
+        #{attribute10,jdbcType=VARCHAR},
+        #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.platform.dto.system.Code">
+        update SYS_CODE_B
+        <set>
+            <if test="code != null">
+                CODE = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                DESCRIPTION = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="objectVersionNumber != null">
+                OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+            </if>
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = current_timestamp,
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where CODE_ID = #{codeId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.Code">
+        update SYS_CODE_B
+        set CODE = #{code,jdbcType=VARCHAR},
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE = current_timestamp,
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+        where CODE_ID = #{codeId,jdbcType=DECIMAL}
+    </update>
+</mapper>

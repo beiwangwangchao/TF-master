@@ -1,0 +1,483 @@
+<#--
+ * description: 银行维护界面
+ * version: 1.0 
+ * author: liuxuan
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+
+<#include "../include/head.html">
+<body style="padding: 10px;">
+<script src="${base.contextPath}/common/code?incortems=SPM.BANK_TYPE&tel=SYS.TEL_COUNTRY_CODE&types=SYS.BANK_HANDING_FEE_TYPE" type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+<!-- <script
+		src="${base.contextPath}/common/code?scStatus=SC.SERVICE_CENTER_STATUS&tel=SYS.TEL_COUNTRY_CODE"
+		type="text/javascript"></script>
+ -->
+
+    <form id="bankForm"></form>
+    <div id="bankGrid" style="margin: 0; padding: 0">
+    </div>
+
+ <script type="text/javascript">
+    var index = 0;
+    var endDate=1;
+    <#assign isedit = (RequestParameters.isedit!'0')/> 
+    jQuery.validator.addMethod("stringMaxLength", function(value, element, param) {  
+        var length = value.length;  
+        for(var i = 0; i < value.length; i++){  
+            if(value.charCodeAt(i) > 127){  
+                length = length + 2;  
+            }  
+        }  
+        return this.optional(element) || ( length <= param );  
+    }, "<@spring.message "sys.hand.btn.string240"/>");  
+    $(function() {
+        window['bankForm'] = $("#bankForm").ligerForm({
+            fields : [
+                {name : "__status",type : "hidden",options:{value:"<#if isedit =='1'>update<#else>add</#if>"},newline : false},
+                
+                <#if isedit == '1'>
+                
+                {name: 'marketId', type:'hidden',value:_marketId}, 
+                { name : 'marketName', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.marketid"/>', newline : false,type:'text', readonly:true
+                  },
+                  
+                <#else>
+	                {
+	                    label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.marketid"/>',
+	                    newline:false, 
+	                    name: 'marketId',
+	                    type : "combobox",
+	                    options : {
+	                        url: '${base.contextPath}/spm/market/queryMarketsByRole',
+	                        valueField: "marketId",
+	                        textField: "name"
+	                    },
+	                    validate : {
+	                        required : true
+	                    }
+	                },
+                </#if>
+                
+                { name : 'currencyCode', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.currencycode"/>',
+                  newline : false,
+                  type:'combobox',
+                  //readonly : true,
+                  options:{
+                      valueField:'currencyCode',
+                      textField : 'currencyName',
+                      url:"${base.contextPath}/spm/currency/query?page=-1"
+                  }
+                },
+                { name : 'endActiveDate', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.startenddate"/>', newline : false,type:'date',
+                         <#if isedit != '1'>
+                        options : {
+                            format : 'yyyy-MM-dd',
+                            onChangeDate : function(data){
+                                var endActiveDate = new Date(data);
+                                var date = new Date();
+                                if (index == 0 && endActiveDate < new Date(date.getFullYear(),date.getMonth(),date.getDate())) {
+                                    liger.get('endActiveDate').setValue("");
+                                    $.ligerDialog.warn('<@spring.message "msg.error.config.spmbank.date"/>');
+                                    return false;
+                                }
+                               if (endDate ==0 && endActiveDate < new Date(date.getFullYear(),date.getMonth(),date.getDate())) {
+                                    liger.get('endActiveDate').setValue("");
+                                    $.ligerDialog.warn('<@spring.message "msg.error.config.spmbank.date"/>');
+                                    return false;
+                                }
+                                index =0;
+                            }
+                        }
+                        </#if>
+                },
+                { name : 'bankNumber', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.banknumber"/>', type : 'text', newline:true ,
+                 <#if isedit == '1'>
+                    readonly:true,
+                     </#if>
+                    validate : {
+                        required : true
+                    }
+                },
+                { name : 'bankName', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.bankname"/>', newline:false,
+                    type:'tl',options:{idField:'bankId',dto:'com.lkkhpg.dsis.common.config.dto.SpmBank'},
+                    validate : {
+                        required : true
+                    }
+                },{ name : 'bankShortName', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.bankshortname"/>', type : 'text', newline:false,
+                    type:'tl',options:{idField:'bankId',dto:'com.lkkhpg.dsis.common.config.dto.SpmBank'},
+                    validate : {
+                        required : true
+                    }
+                },
+                { name : 'bankType', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.banktype"/>', newline : true,type:'select',
+                    textField:'meaning',
+                    valueField:'value',
+                    options : {
+                        valueField : "value",
+                        textField : "meaning",
+                        data : incortems,
+                        onSelected:function(){
+                            changeBankType();
+                        }
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                {name : 'headOfficeId', type : 'popup', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.headofficeid"/>', newline : false ,
+                    textField:'headOfficeName',
+                    valueField:'headOfficeId',
+                    options  : function(){
+                    	var o = ${lovService.getLov(base.contextPath, base.locale, "lov_headoffice")};
+                    	   o.onLoadData=function(){
+                               var bankId = bankForm.getData().bankId;
+                               if (bankId){
+                                     this.setParm('bankId', bankId);
+                               }
+                           }
+                    	   o.grid.delayLoad = true;
+                    	   return o;
+                   	}()
+                },
+                { name : 'contacts', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.contacts"/>', newline : false , type : 'text'
+                },
+                
+         
+               
+                { name : 'address', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.address"/>', newline : true ,width:496,height:30, type : "text",
+                    validate : {
+                        required : true
+                    }
+                },
+               { name : 'email', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.email"/>', newline : false , type : 'text'
+            },
+            
+                { name : 'remark', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.remark"/>', newline : true ,width:496,height:30,
+                type:'textarea',
+                validate: {
+                	 stringMaxLength : 240
+                }
+                },
+                {name : 'areaCode',
+                	type : 'select',
+                	label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.phone"/>', 
+                	newline : false , 
+                	attr : { placeHolder : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.areacode"/>' }, 
+                	width : 46,space : 5,
+                    validate : {
+                        required : true
+                    },
+                    options:{
+                     	valueField:"value",
+                     	textField:"meaning",
+                     	data:tel,
+                     }
+                },
+               
+                { name : 'phone', label : '-', newline : false , type : 'text',
+                	hideLabel: true,
+                	width:130,
+                    validate : {
+                        required : true
+                    }
+                },
+                
+            ],
+            buttons : [
+                {
+                    text : '<@spring.message "sys.hand.btn.save"/>',
+                    disabled : false,
+                    width : 60,
+                    click : function() {
+                        f_save();
+                    }
+                }
+            ]
+        });
+        <#if isedit != '1'>
+            liger.get('marketId').setText(_marketName);
+        </#if> 
+        var bankGrid;
+         bankGrid = window['bankGrid'] = $("#bankGrid").ligerGrid({
+            columns : [
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.bonusfrom"/>',
+                    name : 'bonusFrom',
+                    align : 'left',
+                    width:150,
+                    editor:{
+                         type:'int',
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.bonusto"/>',
+                    name : 'bonusTo',
+                    width:150,
+                    textField:'unitName',
+                    valueField:'bonusTo',
+                    align : 'left',
+                    editor:{
+                         type:'int',
+                     onChanged : function(e){
+                            if(e.value<0){                              
+                                Hap.showError('<@spring.message "msg.error.delivery.invamountto_lessZero"/>');
+                            }
+                        }   
+                    },
+                  
+                    validate : {
+                        required : true
+                        //notGreaterthanfrom:true
+                    }
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.charges"/>',
+                    name : 'charges',
+                    width:100,
+                    textField:'charges',
+                    align : 'left',
+                    editor:{
+                    	type:'float'
+                    },
+                    validate : {
+                        required : true
+                    },
+                    render: function(item) {
+                    	if(item.chargeType == 'PER'){
+                    		return item.charges+'%';
+                    	}
+                    	if(item.charges == 0){
+                    		return '0';
+                    	}
+                    	return item.charges;
+                    }
+                },
+                {
+                	display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.feetype"/>',
+                	width:100,
+                	name : 'chargeType',
+                	align : 'left',
+                	textField:"meaning",
+                	editor:{
+                		type:'text'
+                	},
+                    render: function(item) {
+                        return getCodeDesc(types, item.chargeType);
+                    },
+                    validate : {
+                        required : true
+                    }
+                }
+            ],
+            <#if isedit == '1'>
+            url : '${base.contextPath}/spm/edit/query?bankId='+${RequestParameters.bankId},
+            </#if>
+            enabledEdit : true,
+            checkbox:true,
+            onBeforeSubmitEdit : function(e) {
+            	var testData = e.record;
+                if (e.column.columnname == "bonusFrom") {
+                    if(e.value < 0){
+                        $.ligerDialog.warn("<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.ming"/>");
+                        return false;
+                    }
+                }
+                
+                if (e.column.columnname == "bonusTo") {
+                    if(e.value < 0){
+                        $.ligerDialog.warn("<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.ming"/>");
+                        return false;
+                    }
+                } 
+                if (e.column.columnname == "charges") {
+                	var chargeType = testData.chargeType;
+                	if(chargeType == 'PER'){
+                		if(parseFloat(e.value) > 100){
+                			$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.config.dto.chargetype.error"/>');
+                			return false;
+                		}
+                	}
+                	if(chargeType == 'FIX'){
+                		if(!e.value == '0'){
+                            if(parseInt(e.value) == 0){
+                                $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.ming"/>');
+                                return false;
+                            }
+                        }
+                	}
+                }
+            },
+            onBeforeEdit : function (e)  {
+            	var testData = e.record;
+            	if(e.column.columnname == "chargeType"){
+                    e.column.editor = {
+                            type : 'select',
+                            valueField:"value",
+                            textField:"meaning",
+                            data:types,
+                            onBeforeSelect : function(data) {
+                            	
+                            	if(data == 'PER'){
+                            		var charges = testData.charges;
+                            		if(parseFloat(charges) > parseFloat(100)){
+                            			$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.config.dto.chargetype.error"/>');
+                            			return false;
+                            		}
+                            	}
+                            	if(data == 'FIX'){
+                            		var charges = testData.charges;
+                            		if(!charges == 0){
+                            			if(parseInt(charges) == 0){
+                                            $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.ming"/>');
+                                            return false;
+                                        }
+                            		}
+                            	}
+                            }
+                    }
+                }
+            },
+            toolbar : {
+                items: [
+                    {
+                        text: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.add"/>',
+                        disable:false, 
+                        click: function(){
+                            var currencyCode = $.ligerui.get('currencyCode').getValue();
+                            if(currencyCode==""){
+                                Hap.showError('<@spring.message "msg.error.delivery.shipping_tier_org_currency_notexist"/>');
+                                return;
+                            }
+                         bankGrid.addRow({})
+                        }, icon: 'add'
+                    },
+                    { line: true },
+                    { 
+                        text : '<@spring.message "sys.hand.btn.delete"/>',
+                        click : function(){
+                          Hap.gridDelete({
+                                 grid : bankGrid
+                             })
+                        }, 
+                        icon : 'delete'
+                    }
+                ]
+            }
+        });
+        
+       <#if isedit == '1'>
+            Hap.loadForm({form:bankForm,url:'${base.contextPath}/spm/bank/query',
+                    para:{bankId:${RequestParameters.bankId},marketId:${RequestParameters.marketId}},
+                    callback : function(d,json){
+                        marketCurrency(d.marketId); 
+                        changeBankType();
+                    }
+            });
+       </#if>
+       <#if isedit == '0'>
+           $("#marketId").val(_marketId);
+           liger.get("marketName").setValue(_marketName);
+           marketCurrency(_marketId); 
+       </#if>
+       
+    });
+    function f_save(){
+        var chargeData=bankGrid.getData();
+        for(var i in chargeData){
+//             if(!(chargeData[i].bonusFrom!=null || chargeData[i].bonusFrom != undefined || chargeData[i].bonusFrom !="")  ){
+//                 Hap.showError('<@spring.message "msg.error.bank.bonusfrom_null"/>');
+//                 return false;
+//             }
+            if(Number(chargeData[i].bonusFrom)<0){
+                Hap.showError('<@spring.message "msg.error.bank_lesszero"/>');
+                return false;
+            }
+            if(Number(chargeData[i].bonusTo)<0){
+                Hap.showError('<@spring.message "msg.error.bank_lesszero"/>');
+                return false;
+            }
+            
+            if(Number(chargeData[i].bonusFrom) >= Number(chargeData[i].bonusTo)){
+                Hap.showError('<@spring.message "msg.error.bank.bonusfrom_bonusto"/>');
+                return false;
+            } 
+            
+//             if(chargeData[i].charges == null){
+//                 Hap.showError('<@spring.message "msg.error.bank.charges_null"/>');
+//                 return false;
+//             }   
+            
+            if(Number(chargeData[i].charges)<0){
+                Hap.showError('<@spring.message "msg.error.bank.bonusfrom_bonusto"/>');
+                return false;
+            }               
+            
+        }  
+        Hap.submitForm({
+            form:bankForm,
+            grid:bankGrid,
+            gridName:"spmBankChargess",
+            url:'${base.contextPath}/spm/bank/save',
+            success:function(json,opt){
+                $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+                	self.location = 'spm_bank_edit.html?isedit=1&bankId=' +json.rows[0].bankId +'&marketId='+ json.rows[0].marketId;
+                }); 
+            }   
+         
+        })
+    }
+    jQuery.validator.addMethod("notGreaterthanfrom",
+            function(value, element) {
+        var row = element.row;
+        if ( row.bonusFrom != null && row.bonusTo != null) {
+        
+            var bonusFrom = row.bonusFrom,
+            bonusTo = row.bonusTo;
+            if (bonusTo < bonusFrom) {
+                
+                return false;
+            }
+        }
+        return true;
+    },
+    
+    '<@spring.message "msg.error.config.numbering.great_than_end_date"/>');
+
+    function marketCurrency(marketId){
+        var params = [{
+            orgType: 'MKT',
+            orgId: marketId,
+            paramNames: ['SPM.CURRENCY']}];
+         Hap.ajax({
+                url : '${base.contextPath}/spm/orgParam/get',
+                data : params,
+                success : function(json) {
+                    var currency = json.rows[0].paramValues['SPM.CURRENCY'] == undefined ? null : json.rows[0].paramValues['SPM.CURRENCY'];
+                    // 把currency设置到控件上
+                    liger.get('currencyCode').setValue(currency);
+                    liger.get('currencyCode').downFocus();
+                    liger.get('currencyCode').setReadonly(true);
+                }
+        });
+    }
+    function changeBankType() {
+        var bankType = liger.get('bankType').getValue();
+        if (bankType == 'HQ') {
+            liger.get("headOfficeId").setDisabled(true);
+            liger.get("headOfficeId").setRequired(false);
+            liger.get("headOfficeId").setText(null);
+            liger.get("headOfficeId").setValue(null);
+        } else {
+        	liger.get("headOfficeId").setEnabled(true)
+            liger.get("headOfficeId").setRequired(true);
+        }
+    }
+</script>
+</body>
+</html>

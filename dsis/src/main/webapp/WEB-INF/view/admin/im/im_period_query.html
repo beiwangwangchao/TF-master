@@ -1,0 +1,368 @@
+<#--
+        * description: 库存会计期间.
+        * version: 1.0
+        * author:houmin
+        * .
+        *
+        -->
+    <#include "../include/head.html">
+        <style>
+            #form_title {
+                margin: 0;
+                padding: 0;
+                width:99%;
+                height:29px;
+                background-color:#F0F0F0;
+                border:1px solid #D6D6D6;
+            }
+            #form_title p {
+                padding-left: 25px;
+                font-size: 12px;
+                font-weight: bold;
+            }
+        </style>
+        <body style="padding: 10px;">
+        <script src="${base.contextPath}/common/code?closingStatus=SPM.CLOSE_STATUS" type="text/javascript"></script>
+        <form id="d_im_001_form" style="margin-top: 20px;" autocomplete="off"></form>
+        <div id="d_im_001_grid" style="margin: 0; padding: 0"></div>
+        <script type="text/javascript">
+            //#POS2SUPT-805 20170410 BEGIN
+            var mydate = new Date();
+            var start_year = '2016';
+            var currency_year = mydate.getFullYear();
+            var periodYear=[];
+            function get_year(year){
+                var o = {};
+                o.value = year;
+                o.meaning = year;
+                return o;
+            }
+            for(var i = currency_year+20;i>=start_year;i--){
+                periodYear.push(get_year(i));
+            }
+            //#POS2SUPT-805 20170410 END
+            /*库存组织获取*/
+            var invOrgS = [];
+            function queryInvOrgS(){
+                $.ajax({
+                    url: '${base.contextPath}/spm/invOrganization/queryInvOrgsByRole',
+                    type:"POST",
+                    dataType:"json",
+                    contentType : "application/json",
+                    data : '',
+                    async: false,
+                    success : function(json) {
+                        if(json.success){
+                            $(json.rows).each(function(i,o){
+                                invOrgS.push({"invOrgId":o.invOrgId, "name":o.name});
+                            })
+                        }
+                    }
+                });
+            }
+
+            $(function(){
+                queryInvOrgS();
+                window['d_im_001_form'] = $("#d_im_001_form").ligerForm({
+                    fields: [
+                        {
+                            name : "orgId",
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.organizationid"/>',
+                            newline: false,
+                            type : "combobox",
+                            options: {
+                                textField: 'name',
+                                valueField: 'invOrgId',
+                                data: invOrgS,
+                                //cancelable: false,
+                                onSelected: function(obj) {
+                                    if(obj){
+                                        if($.ligerui.get('periodYear').getValue()){
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "${base.contextPath}/im/period/query",
+                                                data: {
+                                                    orgId : $.ligerui.get('orgId').getValue(),
+                                                    periodYear : $.ligerui.get('periodYear').getValue()
+                                                },
+                                                dataType: "json",
+                                                success: function(data){
+                                                    if(data.rows[0]){
+                                                        $.ligerui.get("generate").setDisabled(true);
+                                                    }else{
+                                                        $.ligerui.get("generate").setEnabled(true);
+                                                    }
+                                                }
+                                            });
+                                        }else{
+                                            $.ligerui.get("generate").setDisabled(true);
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            name : "periodYear",
+                            type : "combobox",
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.year"/>',
+                            newline: false,
+                            options : {
+                                valueField : 'value',
+                                textField : 'meaning',
+                                data : periodYear,
+                                onSelected: function(obj) {
+                                    if(obj){
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "${base.contextPath}/im/period/query",
+                                            data: {
+                                                orgId : $.ligerui.get('orgId').getValue(),
+                                                periodYear : $.ligerui.get('periodYear').getValue()
+                                            },
+                                            dataType: "json",
+                                            success: function(data){
+                                                if(data.rows[0]){
+                                                    $.ligerui.get("generate").setDisabled(true);
+                                                }else{
+                                                    $.ligerui.get("generate").setEnabled(true);
+                                                }
+                                            }
+                                        })
+                                    }else{
+                                        $.ligerui.get("generate").setDisabled(true);
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    buttons: [{
+                        text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60,
+                        click: function(){
+                            if($.ligerui.get('orgId').getValue() == "" && $.ligerui.get('periodYear').getValue() == ""){
+                                $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.please.select.a.condition"/>')
+                                return;
+                            }
+                            Hap.gridQuery({
+                                form:d_im_001_form,
+                                grid:d_im_001_grid
+                            })
+                        }
+                    },
+                        {
+                            text: '<@spring.message "com.lkkhpg.dsis.common.inventory.dto.generate"/>',
+                            disabled:true,
+                            width: 60, id:"generate",
+                            click: function(){
+                                var name = liger.get("orgId").getText();
+                                var year = liger.get("periodYear").getValue();
+                                var promptString="<@spring.message 'com.lkkhpg.dsis.common.inventory.dto.generate'/>["
+                                    +name+"]["+year+"]<@spring.message 'type.com.lkkhpg.dsis.common.config.period_record'/>";
+                                $.ligerDialog.confirm(promptString, function (flag) {
+                                    if(flag) {
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "${base.contextPath}/im/period/insert",
+                                            data: {
+                                                orgId : $.ligerui.get('orgId').getValue(),
+                                                periodYear : $.ligerui.get('periodYear').getValue()
+                                            },
+                                            dataType: "json",
+                                            success: function(data){
+                                                if(data.success){
+                                                    $.ligerui.get("generate").setDisabled(true);
+                                                    $.ligerDialog.success('<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.generate.success"/>');
+                                                }
+                                                Hap.gridQuery({
+                                                    form:d_im_001_form,
+                                                    grid:d_im_001_grid
+                                                })
+                                            }
+                                        })
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            text: '<@spring.message "sys.hand.btn.close"/>',
+                            disabled:true,
+                            width: 60, id:"closeBtn",
+                            click: function(){
+                                var rowData = d_im_001_grid.getSelectedRow();
+                                var promptString="<@spring.message 'sys.hand.btn.close'/>["+rowData.invOrgName+"]["+rowData.periodName+"]<@spring.message 'type.com.lkkhpg.dsis.common.config.period_record'/>";
+                                $.ligerDialog.confirm(promptString, function (boolData) {
+                                    if(boolData){
+                                        $.ajax({
+                                            type:"POST",
+                                            dataType:"json",
+                                            contentType:'application/json; charset=utf-8',
+                                            url:"${base.contextPath}/im/period/closeInvPeriod",
+                                            data:JSON2.stringify(rowData),
+                                            success: function(data){
+                                                if(data.success){
+                                                    //POS2SUPT-1130 20171010 BEGIN
+                                                    $.ligerDialog.success('<@spring.message "sys.hand.btn.close.success"/>');
+                                                    if(data.rows[0]!=null){
+                                                        //$.ajaxSetup({async:false});
+                                                        var orgName =data.rows[0].split(",")[0];
+                                                        var trxType =data.rows[0].split(",")[1];
+                                                        var message="["+orgName+"]<@spring.message 'type.com.lkkhpg.dsis.common.config.trx_messsage_first'/>["+trxType+"]<@spring.message 'type.com.lkkhpg.dsis.common.config.trx_messsage_second'/>";
+                                                        $.ligerDialog.warn(message);
+                                                    }
+                                                    //var option = new Object();
+                                                    //option.json = data;
+                                                    //option.successTip = '<@spring.message "sys.hand.btn.close.success"/>';
+                                                    //Hap.defaultSuccessHandler(option);
+                                                    //POS2SUPT-1130 20171010 END
+                                                    Hap.gridQuery({
+                                                        form:d_im_001_form,
+                                                        grid:d_im_001_grid
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            text: '<@spring.message "sys.hand.btn.open"/>',
+                            disabled:true,
+                            width: 60, id:"openBtn",
+                            click: function(){
+                                //#POS2SUPT-805 2017-04-22 BEGIN
+                                var rowData = d_im_001_grid.getSelectedRow();
+                                var promptString="<@spring.message 'sys.hand.btn.open'/>["+rowData.invOrgName+"]["+rowData.periodName+"]<@spring.message 'type.com.lkkhpg.dsis.common.config.period_record'/>";
+                                $.ligerDialog.confirm(promptString, function (boolData) {
+                                    if(boolData){
+                                        $.ajax({
+                                            type: "POST",
+                                            dataType: "json",
+                                            contentType:'application/json; charset=utf-8',
+                                            url: "${base.contextPath}/im/period/openInvPeriod",
+                                            data:JSON2.stringify(rowData),
+                                            success: function(data){//打开成功
+                                                if(data.message == '1'){
+                                                    var option = new Object();
+                                                    option.json = data;
+                                                    option.successTip = '<@spring.message "sys.hand.btn.open.success"/>';
+                                                    Hap.defaultSuccessHandler(option);
+                                                    Hap.gridQuery({
+                                                        form:d_im_001_form,
+                                                        grid:d_im_001_grid
+                                                    })
+                                                } else if (data.message == '2') {//不满足打开条件。成本已获取，确认是否删除？
+                                                    $.ligerDialog.confirm('<@spring.message "msg.error.inv.period.not_allow_open_unit_cost_get"/>', function (yes) {
+                                                        if(yes){//删除details记录
+                                                            var paramObj = new Object();
+                                                            paramObj.year = rowData.periodYear;
+                                                            paramObj.month = rowData.periodMonth;
+                                                            paramObj.invOrgId = rowData.orgId;
+                                                            $.ajax({
+                                                                url : "${base.contextPath}/inv/details/delete",
+                                                                type : "POST",
+                                                                data : paramObj,
+                                                                success:function(data){
+                                                                    if(data.success){//删除成功后打开期间
+                                                                        $.ajax({
+                                                                            type: "POST",
+                                                                            dataType: "json",
+                                                                            contentType:'application/json; charset=utf-8',
+                                                                            url: "${base.contextPath}/im/period/openInvPeriod",
+                                                                            data:JSON2.stringify(rowData),
+                                                                            success: function(data){//打开成功
+                                                                                if (data.success) {
+                                                                                    var option = new Object();
+                                                                                    option.json = data;
+                                                                                    option.successTip = '<@spring.message "sys.hand.btn.open.success"/>';
+                                                                                    Hap.defaultSuccessHandler(option);
+                                                                                    Hap.gridQuery({
+                                                                                        form:d_im_001_form,
+                                                                                        grid:d_im_001_grid
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
+                                                            })
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                            //#POS2SUPT-805 2017-04-22 END
+                        }
+                    ]
+                });
+
+                window['d_im_001_grid'] = $("#d_im_001_grid").ligerGrid({
+                    columns: [
+                        {
+                            name: 'invOrgName',
+                            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.assignname"/>'
+                        },
+                        {
+                            name: 'periodName',
+                            display: '<@spring.message "com.lkkhpg.dsis.common.inventory.dto.periodname"/>'
+                        },
+                        {
+                            name: 'startDate',
+                            display: '<@spring.message "type.com.lkkhpg.dsis.platform.job.dto.triggerdto.starttime"/>',
+                            type : "date",
+                            format : "yyyy-MM-dd"
+                        },
+                        {
+                            name: 'endDate',
+                            display:  '<@spring.message "type.com.lkkhpg.dsis.platform.job.dto.triggerdto.endtime"/>',
+                            type : "date",
+                            format : "yyyy-MM-dd"
+                        },
+                        {
+                            name: 'closingStatus',
+                            display:  '<@spring.message "type.com.lkkhpg.dsis.platform.job.dto.triggerdto.period.state"/>',
+                            render : function(item) {
+                                for (var i = 0; i < closingStatus.length; i++) {
+                                    if (closingStatus[i]['value'] == item.closingStatus)
+                                        return closingStatus[i]['meaning']
+                                }
+                                return item.closingStatus;
+                            }
+                        },
+                        {
+                            name: 'creationDate',
+                            display:  '<@spring.message "type.com.lkkhpg.dsis.platform.job.dto.triggerdto.creation.time"/>',
+                            type : "date",
+                            format : "yyyy-MM-dd"
+                        },
+                        {
+                            name: 'closedDate',
+                            //#POS2SUPT-805 20170410 BEGIN
+                            display:  '<@spring.message "type.com.lkkhpg.dsis.platform.job.dto.jobrunninginfodto.previousupdatetime"/>',
+                            //#POS2SUPT-805 20170410 END
+                            type : "date",
+                            format : "yyyy-MM-dd"
+                        }],
+                    onSelectRow : function (rowdata, rowid, rowobj) {
+                        if ("N" == rowdata.closingStatus) {
+                            $.ligerui.get("closeBtn").setEnabled(true);
+                            $.ligerui.get("openBtn").setDisabled(true);
+                        } else {
+                            $.ligerui.get("closeBtn").setDisabled(true);
+                            $.ligerui.get("openBtn").setEnabled(true);
+                        }
+                    },
+                    url:'${base.contextPath}/im/period/query',
+                    rownumbers:true,
+                    checkbox: true,
+                    isSingleCheck : true,
+                    delayLoad : true,
+                    width: '99%',
+                    height: '98%'
+                });
+            });
+        </script>
+        </body>
+        </html>

@@ -1,0 +1,294 @@
+<#include "/mws/include/header.html">
+
+<link href="${base.contextPath}/resources/css/bootstrap-combobox${resource_suffix!}.css" rel="stylesheet">
+<style>
+body {
+	color: black;
+}
+</style>
+	<script
+		src="${base.contextPath}/common/code?timeZone=SPM.TIME_ZONE&dateFormat=SYS.DATE_FORMAT&timeFormat=SYS.TIME_FORMAT&weekStartDate=SYS.WEEK_START_DATE"
+		type="text/javascript"></script>
+		<script src="${base.contextPath}/resources/js/bootstrap-combobox${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/navbar${resource_suffix!}.js"></script>
+<script type="text/javascript">
+	var sysLevel=20;
+	$(function() {
+		
+		initTimeZone(timeZone);
+		initDefalutSalesOrg();
+		/* initWeekStartDate(weekStartDate);
+		initDateFormat(dateFormat);
+		initTimeFormat(timeFormat); */
+	});
+
+	//初始化时区下拉框
+	function initTimeZone(options){
+        $("select[id='timeZone']").empty();
+        $("select[id='timeZone']").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("select[id='timeZone']").append("<option value='"+options[i].value+"'>"+options[i].meaning+"</option>");
+        }
+	}
+	
+	//初始化店铺下拉框
+	function initDefalutSalesOrg(){
+		$.ajax({
+            type : "POST",
+            url : "${base.contextPath}/account/selectByMarketName",
+            contentType : "application/json",
+            data : {
+            	igiCode : ""
+            },
+            dataType : "json",
+            success : function(data) {
+            	$("select[id='defaultSalesOrganization']").empty();
+                $("select[id='defaultSalesOrganization']").append("<option value='' selected></option>");
+                for(var i=0; i<data.total; i++){
+                    $("select[id='defaultSalesOrganization']").append("<option value='"+data.rows[i].salesOrgId+"'>"+data.rows[i].name+"</option>");
+                }
+                initDefault();
+            }
+		});
+	}
+	
+/* 	//初始化周起始日下拉框
+	function initWeekStartDate(options){
+        $("select[id='weekStartDate']").empty();
+        $("select[id='weekStartDate']").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("select[id='weekStartDate']").append("<option value='"+options[i].value+"'>"+options[i].meaning+"</option>");
+        }
+	}
+	//初始化日期格式下拉框
+	function initDateFormat(options){
+        $("select[id='dateFormat']").empty();
+        $("select[id='dateFormat']").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("select[id='dateFormat']").append("<option value='"+options[i].value+"'>"+options[i].meaning+"</option>");
+        }
+	}
+	//初始化时间格式下拉框
+	function initTimeFormat(options){
+        $("select[id='timeFormat']").empty();
+        $("select[id='timeFormat']").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("select[id='timeFormat']").append("<option value='"+options[i].value+"'>"+options[i].meaning+"</option>");
+        }
+	} */
+	
+	function initDefault(){
+		var SysPreferences={};
+		SysPreferences.preferencesLevel=sysLevel;
+		SysPreferences.accountId=${Session.accountId};
+		$.ajax({
+            type : "POST",
+            url : "${base.contextPath}/sys/preferences/queryPreferences",
+            contentType : "application/json",
+            data : JSON2.stringify(SysPreferences),
+            dataType : "json",
+            success : function(data) {
+                if(data.success){//根据当前用户和环境查询首选项信息，设置form初始值
+                    for(var i=0;i<data.total;i++){
+	                    if(data.rows[i].preferences=="timeZone"){
+	                    	var selectCode=document.getElementById("timeZone");
+	                    	 for(var j=0;j<selectCode.options.length;j++){  
+	                             if(selectCode.options[j].value==data.rows[i].preferencesValue){  
+	                                 selectCode.options[j].selected=true;  
+	                                 break;  
+	                             }  
+	                         } 
+	                    }
+	                    if(data.rows[i].preferences=="defaultSalesOrganization"){
+	                    	var selectCode2=document.getElementById("defaultSalesOrganization");
+	                    	 for(var j=0;j<selectCode2.options.length;j++){  
+	                             if(selectCode2.options[j].value==data.rows[i].preferencesValue){  
+	                                 selectCode2.options[j].selected=true;  
+	                                 break;  
+	                             }  
+	                         } 
+	                    }
+	                    /* if(data.rows[i].preferences=="dateFormat"){
+	                    	var selectCode=document.getElementById("dateFormat");
+	                    	 for(var j=0;j<selectCode.options.length;j++){  
+	                             if(selectCode.options[j].value==data.rows[i].preferencesValue){  
+	                                 selectCode.options[j].selected=true;  
+	                                 break;  
+	                             }  
+	                         } 
+	                    }
+	                    if(data.rows[i].preferences=="timeFormat"){
+	                    	var selectCode=document.getElementById("timeFormat");
+	                    	 for(var j=0;j<selectCode.options.length;j++){  
+	                             if(selectCode.options[j].value==data.rows[i].preferencesValue){  
+	                                 selectCode.options[j].selected=true;  
+	                                 break;  
+	                             }  
+	                         } 
+	                    }
+	                    if(data.rows[i].preferences=="weekStartDate"){
+	                    	var selectCode=document.getElementById("weekStartDate");
+	                    	 for(var j=0;j<selectCode.options.length;j++){  
+	                             if(selectCode.options[j].value==data.rows[i].preferencesValue){  
+	                                 selectCode.options[j].selected=true;  
+	                                 break;  
+	                             }  
+	                         } 
+	                    } */
+                    }
+                    $('#timeZone').combobox(); 
+                    $('#defaultSalesOrganization').combobox(); 
+                    /* $('#dateFormat').combobox(); 
+                    $('#timeFormat').combobox(); 
+                    $('#weekStartDate').combobox(); */ 
+                }
+                
+            }
+        });
+	}
+	
+	function save(){
+		if($("#timeZone").val()==null||$("#timeZone").val()==""||$("#timeZone").val()==undefined){
+			var errorMsg = "<@spring.message 'msg.error.mws.required_fields_is_empty'/>\n";
+			$.dialog.error("<@spring.message 'mws.dialog.error'/>", errorMsg);
+			return;
+		}
+		/* if($("#dateFormat").val()==null||$("#dateFormat").val()==""||$("#dateFormat").val()==undefined){
+			var errorMsg = "<@spring.message 'msg.error.mws.required_fields_is_empty'/>\n";
+			alert(errorMsg);
+			return;
+		}
+		if($("#timeFormat").val()==null||$("#timeFormat").val()==""||$("#timeFormat").val()==undefined){
+			var errorMsg = "<@spring.message 'msg.error.mws.required_fields_is_empty'/>\n";
+			alert(errorMsg);
+			return;
+		}
+		if($("#weekStartDate").val()==null||$("#weekStartDate").val()==""||$("#weekStartDate").val()==undefined){
+			var errorMsg = "<@spring.message 'msg.error.mws.required_fields_is_empty'/>\n";
+			alert(errorMsg);
+			return;
+		} */
+		var preferencesAry=[];//把form数据组成对象数组
+		var SysPreferences={};		
+		SysPreferences.preferences='timeZone';
+		SysPreferences.preferencesValue=$("#timeZone").val();
+		SysPreferences.preferencesLevel=sysLevel;
+		preferencesAry.push(SysPreferences);
+		var SysPreferences1={};
+		SysPreferences1.preferences='defaultSalesOrganization';
+		SysPreferences1.preferencesLevel=sysLevel;
+		if (null == $("#defaultSalesOrganization").val() || $("#defaultSalesOrganization").val()=="" || $("#defaultSalesOrganization").val()==undefined) {
+			//清空该accountId对应的默认销售组织记录
+			SysPreferences1.preferencesValue="-1";
+		} else {
+			SysPreferences1.preferencesValue=$("#defaultSalesOrganization").val();
+		}
+		preferencesAry.push(SysPreferences1);
+		/* var SysPreferences={};
+		SysPreferences.preferences='dateFormat';
+		SysPreferences.preferencesValue=$("#dateFormat").val();
+		SysPreferences.preferencesLevel=sysLevel;
+		SysPreferences.accountId=${Session.accountId};
+		preferencesAry.push(SysPreferences);
+		var SysPreferences={};
+		SysPreferences.preferences='timeFormat';
+		SysPreferences.preferencesValue=$("#timeFormat").val();
+		SysPreferences.preferencesLevel=sysLevel;
+		SysPreferences.accountId=${Session.accountId};
+		preferencesAry.push(SysPreferences);
+		var SysPreferences={};
+		SysPreferences.preferences='weekStartDate';
+		SysPreferences.preferencesValue=$("#weekStartDate").val();
+		SysPreferences.preferencesLevel=sysLevel;
+		SysPreferences.accountId=${Session.accountId};
+		preferencesAry.push(SysPreferences); */
+		var ajaxUrl="${base.contextPath}/sys/preferences/savePreferences";//保存首选项url
+		$.ajax({
+            type : "POST",
+            url : ajaxUrl,
+            contentType : "application/json",
+            data : JSON2.stringify(preferencesAry),
+            dataType : "json",
+            success : function(data) {
+                if(data.success){
+                	$.dialog.success("<@spring.message 'mws.dialog.success'/>", '<@spring.message "msg.infor.dm.save_success"/>',
+                			function () {
+                		location.reload();
+                	});
+                }
+            }
+        });
+		
+	}
+</script>
+</head>
+<body>
+	<section id="content">
+		<div class="container">
+			<ol class="breadcrumb">
+				<li><a href="index.html"><@spring.message "mws.menu.home"/></a></li>
+				<li><@spring.message "mws.menu.preferences"/></li>
+			</ol>
+			<div class="row">
+				<#include "../include/account-menu.html">
+				<div class="col-sm-8 col-md-9">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title"><@spring.message
+								"mws.menu.preferences"/></h3>
+						</div>
+						<div class="panel-body">
+							<form action="#" class="class="portlet details-form"" autocomplete="off">
+								<!-- <div class="row ">
+								<div class="col-md-4 form-group">
+										<label  class="control-label" for="timeFormat"><@spring.message "mws.preferences.timeformat"/></label>
+										<select class="form-control" id="timeFormat">
+										</select>
+									</div>
+						
+									<div class="col-md-4 form-group ">
+										<label  class="control-label" for="dateFormat"><@spring.message "mws.preferences.dateformat"/></label>
+										<select class="form-control" id="dateFormat">
+										</select>
+									</div>
+								</div> -->
+								<div class="row ">
+									<div class="col-md-4 form-group ">
+										<label  class="control-label" for="timeZone"><@spring.message "mws.preferences.timezone"/></label>
+										<select class="form-control" id="timeZone">
+										</select>
+									</div>
+									
+									<!-- <div class="col-md-4  form-group">
+										<label  class="control-label" for="weekStartDate"><@spring.message "mws.preferences.weekstartday"/></label>
+										<select class="form-control" id="weekStartDate">
+										</select>
+									</div> -->
+								</div>
+																<div class="row ">
+									<div class="col-md-4 form-group ">
+										<label  class="control-label" for=""><@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.defaul_shop"/></label>
+										<select class="form-control" id="defaultSalesOrganization">
+										</select>
+									</div>
+									
+									<!-- <div class="col-md-4  form-group">
+										<label  class="control-label" for="weekStartDate"><@spring.message "mws.preferences.weekstartday"/></label>
+										<select class="form-control" id="weekStartDate">
+										</select>
+									</div> -->
+								</div>
+								<div class="row ">
+									<div class="col-md-2 col-sm-2 col-md-offset-8 col-sm-offset-8 info">
+										<button type="button" class="btn btn-info" onclick="save();"><@spring.message "sys.hand.btn.save"/></button>
+									</div>
+								</div>
+							</form>
+						</div>
+
+					</div>
+				</div>
+			</div>
+	</section>
+
+	<#include "/mws/include/footer.html">

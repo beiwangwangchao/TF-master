@@ -1,0 +1,343 @@
+<#--
+ * description: 报表程序运行界面
+ * version: 1.0 
+ * author: wangc
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../../include/head.html">
+<body style="padding: 10px;">
+	<script
+		src="${base.contextPath}/common/code?exportTypeData=SYS.REPORT_EXPORT_TYPE&paramEvent=SYS.REPORT_PARAM_EVENT"></script>
+	<form id="report_run_form" name="report_form"
+		action="${base.contextPath}/report/run" method="post" target="_blank"></form>
+	<div id="report_run_grid" style="margin: 0; padding: 0"></div>
+<script type="text/javascript">
+window['report_run_form'] = $("#report_run_form").ligerForm({
+	buttons : [
+               {
+	                text : '<@spring.message "sys.hand.btn.submit"/>',
+	                disabled : false,
+	                width : 60,
+	                click : function() {
+	                	$('#report_run_form').submit();
+	                }
+	            }
+           ]
+});	
+var baseFields = [{
+    name : "reportProgramCode",
+    type : 'hidden',
+},{
+	name : 'programName',
+	newline: true,
+	readonly: true,
+	type : 'text',
+	label : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.programname"/>',
+	validate: {
+		required: true
+	}
+}, {
+	name : 'remark',
+	newline: true,
+	readonly: true,
+	type : 'text',
+	label : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.remark"/>'
+}, {
+	name : 'docType',
+	newline: true,
+	type : 'select',
+	label : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.exporttype"/>',
+	options: {
+		valueField: 'value',
+        textField: 'meaning',
+        data: exportTypeData
+	},
+	validate: {
+		required: true
+	}
+}];
+var formFields = [];
+var paramFields = [];
+var lovOptions;
+//全局变量。可添加联动参数在其中
+var linkageParameters = {};
+$.ajax({
+    type: "POST",
+    data: {
+    	'programCode': '${RequestParameters.programCode}'
+    },
+    async: false,
+    url: "${base.contextPath}/sys/reportProgram/getByCode",
+    success: function(data) {
+    	var row = data.rows[0];
+    	var reportParams = row.reportParams;
+    	if(reportParams){
+    		setParamForm(reportParams);
+    		setParamFormValue(row);
+    		setParamDefaultValue(reportParams);
+    		setParamLink(reportParams);
+    	}
+    }
+});
+
+function setParamForm(reportParams){
+	for (var i in reportParams){
+		var fieldType = reportParams[i].fieldType;
+		var paramName = reportParams[i].paramName;
+		var display = reportParams[i].display;
+		var fieldSelectSource = reportParams[i].fieldSelectSource;
+		var fieldSelectCode = reportParams[i].fieldSelectCode;
+		var fieldSelectUrl = reportParams[i].fieldSelectUrl;
+		var fieldSelectVf = reportParams[i].fieldSelectVf;
+		var fieldSelectTf = reportParams[i].fieldSelectTf;
+		var fieldTextfield = reportParams[i].fieldTextfield;
+		var fieldLovCode = reportParams[i].fieldLovCode;
+		var require;
+		var requireFlag = reportParams[i].requireFlag;
+		if(requireFlag == 'Y'){
+			require = true;
+		}else{
+			require = false;
+		}
+		var isMultiSelect;
+		var fieldSelectMulti = reportParams[i].fieldSelectMulti;
+		if(fieldSelectMulti == 'Y'){
+			isMultiSelect = true;
+		}else{
+			isMultiSelect = false;
+		}
+		var fieldDateFormat = reportParams[i].fieldDateFormat;
+		if('text' == fieldType || 'int' == fieldType){
+			var textField = {
+					label: display,
+					name: paramName,
+					newline: true,
+					type: fieldType,
+					validate:{
+					    required: require
+					}
+			};
+			paramFields.push(textField);
+		}
+		if('date' == fieldType){
+			var dateField = {
+					label: display,
+					name: paramName,
+					newline: true,
+					type: fieldType,
+					options: {
+						format: fieldDateFormat
+					},
+					validate:{
+					    required: require
+					}
+			};
+			paramFields.push(dateField);
+		}
+		if('select' == fieldType && 'url' == fieldSelectSource){
+			var selectField1 = {};
+			if(isMultiSelect==true){
+				selectField1 = {
+						label: display,
+						name: paramName,
+						newline: true,
+						type: fieldType,
+				        options: {
+				        	valueField: fieldSelectVf,
+		                    textField: fieldSelectTf,
+		                    url: _basePath + fieldSelectUrl,
+		                    isMultiSelect: isMultiSelect,
+		                    addRowButton: '<@spring.message "mws.shopcart.checkall"/>',
+		                    addRowButtonClick: function (event)  //新增事件
+		                    {
+		                    	var valueStr = '';
+		                    	var textStr = '';
+		                    	//设置多选框全选
+		                    	$("input[type='CheckBox']").each(function(){this.checked=true;}); 
+		                    	$(":checkbox").parent().find("a").addClass("l-checkbox-checked");
+		                    	//获取选中的值
+		                    	$(event.target).parent().parent().find('td').each(function(index,element){
+		                    		if($(element).next().attr('index') == $(element).attr('index'))
+		                    		valueStr += $(element).attr('value')+",";
+		                    	})
+		                    	 if (valueStr.length > 0) valueStr = valueStr.substr(0, valueStr.length - 1);
+		                    	//设置值
+		                    	liger.get(formFields[$(event.target).parent().parent().index()-1].name).setValue(valueStr);
+		                    },
+		                    split: ','
+				        },
+				        validate:{
+						    required: require
+						}
+				};
+			}else{
+				selectField1 = {
+						label: display,
+						name: paramName,
+						newline: true,
+						type: fieldType,
+				        options: {
+				        	valueField: fieldSelectVf,
+		                    textField: fieldSelectTf,
+		                    url: _basePath + fieldSelectUrl,
+		                    isMultiSelect: isMultiSelect,
+		                    split: ','
+				        },
+				        validate:{
+						    required: require
+						}
+				};
+			}
+
+			paramFields.push(selectField1);
+		}
+		if('select' == fieldType && 'code' == fieldSelectSource){
+			$.ajax({
+			    type: "GET",
+			    async: false,
+			    url: "${base.contextPath}/common/code?selResult="+fieldSelectCode,
+			});
+			var selectField2 = {};
+			if(isMultiSelect==true){
+				selectField2 = {
+						label: display,
+						name: paramName,
+						newline: true,
+						type: fieldType,
+						options: {
+							valueField: 'value',
+		                    textField: 'meaning',
+		                    data: selResult,
+		                    isMultiSelect: isMultiSelect,
+		                    addRowButton: '<@spring.message "mws.shopcart.checkall"/>',
+		                    addRowButtonClick: function (event)  //新增事件
+		                    {
+		                    	var valueStr = '';
+		                    	var textStr = '';
+		                    	//设置多选框全选
+		                    	$("input[type='CheckBox']").each(function(){this.checked=true;}); 
+		                    	$(":checkbox").parent().find("a").addClass("l-checkbox-checked");
+		                    	//获取选中的值
+		                    	$(event.target).parent().parent().find('td').each(function(index,element){
+		                    		if($(element).next().attr('index') == $(element).attr('index'))
+		                    		valueStr += $(element).attr('value')+",";
+		                    	})
+		                    	 if (valueStr.length > 0) valueStr = valueStr.substr(0, valueStr.length - 1);
+		                    	//设置值
+		                    	liger.get(formFields[$(event.target).parent().parent().index()-1].name).setValue(valueStr);
+		                    },
+		                    split: ','
+						},
+						validate:{
+						    required: require
+						}
+				}
+			}else{
+				selectField2 = {
+						label: display,
+						name: paramName,
+						newline: true,
+						type: fieldType,
+						options: {
+							valueField: 'value',
+		                    textField: 'meaning',
+		                    data: selResult,
+		                    isMultiSelect: isMultiSelect,
+		                    split: ','
+						},
+						validate:{
+						    required: require
+						}
+				}
+			}
+			paramFields.push(selectField2);
+		}
+	} 
+	//添加lov
+    var lovDatas = [];
+    <#if reportParams??>
+    <#list reportParams as param>
+    var requireLov = false;
+	var isCheck = false;
+	var singleCheck = true;
+    <#if '${param.fieldType}' == 'popup'>
+    <#if '${param.requireFlag}' == 'Y'>
+    requireLov = true;
+    </#if>
+    <#if '${param.fieldSelectMulti}' == 'Y'>
+    isCheck = true;
+    singleCheck = false;
+    </#if>
+    var options = $.extend(${lovService.getLov(base.contextPath, base.locale, '${param.fieldLovCode}')},{
+    	split: ','
+    });
+    options.grid.checkbox = isCheck;
+    options.grid.isSingleCheck = singleCheck;
+    var lovData = {
+    		label: '${param.display}',
+    		name:'${param.paramName}',
+            textField : '${param.fieldTextfield}',
+            options : options,
+            type: 'popup',
+            newline: true,
+            validate:{
+			    required: requireLov
+			}
+    }
+    lovDatas.push(lovData);
+    </#if>
+    </#list>
+    </#if>
+	formFields = [].concat(baseFields).concat(paramFields).concat(lovDatas);
+	report_run_form._setFields(formFields);
+}
+
+function setParamFormValue(row){
+	var programName = row.programName;
+	var programCode = row.programCode;
+	var remark = row.remark;
+	$.ligerui.get('programName').setValue(programName);
+	$('#reportProgramCode').val(programCode);
+	$.ligerui.get('remark').setValue(remark);
+}
+
+function setParamDefaultValue(reportParams){
+	for (var i in reportParams){
+		var fieldType = reportParams[i].fieldType;
+		var paramName = reportParams[i].paramName;
+		var fieldDefaultValue = reportParams[i].fieldDefaultValue;
+		if(fieldDefaultValue !=null){
+			if(fieldType == 'date' && fieldDefaultValue == 'sysdate'){
+				$.ligerui.get(paramName).setValue(new Date());
+			}
+			else{
+				$.ligerui.get(paramName).setValue(fieldDefaultValue);
+			}
+		}
+		
+	}
+}
+
+function setParamLink(reportParams){
+	for (var i in reportParams){
+		var paramName = reportParams[i].paramName;
+		var fieldLinkEvent = reportParams[i].fieldLinkEvent;
+		var fieldLinkRule = reportParams[i].fieldLinkRule;
+		if(fieldLinkEvent != null && fieldLinkRule != null){
+			<#if linkParams??>
+		    <#list linkParams as param>
+		    	<#if '${param.fieldType}' == 'popup'>
+		    		$.ligerui.get('${param.paramName}').options.${param.fieldLinkEvent} = ${param.fieldLinkRule}
+		    	<#else>
+			    	$.ligerui.get('${param.paramName}').bind('${param.fieldLinkEvent}',${param.fieldLinkRule}); 
+		    	</#if>
+		    </#list>
+		    </#if>
+		}
+	} 
+}
+	
+</script>
+</body>
+</html>

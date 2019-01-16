@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.mws.mapper.MemberSiteMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.member.dto.MemSite" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD" >
+    <id column="SITE_ID" property="siteId" jdbcType="DECIMAL" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="SITE_USE_CODE" property="siteUseCode" jdbcType="VARCHAR" />
+    <result column="LOCATION_ID" property="locationId" jdbcType="DECIMAL" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR" />
+    <result column="PHONE" property="phone" jdbcType="VARCHAR" />
+    <result column="DEFAULT_FLAG" property="defaultFlag" jdbcType="VARCHAR" />
+    <result column="ADDRESS" property="address" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    SITE_ID, MEMBER_ID, SITE_USE_CODE, LOCATION_ID, NAME, PHONE, DEFAULT_FLAG, OBJECT_VERSION_NUMBER, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, AREA_CODE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEM_SITE
+    where SITE_ID = #{siteId,jdbcType=DECIMAL}
+  </select>
+    <select id="selectCountByMemberAndType" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.member.dto.MemSite" >
+        SELECT count(*) from MM_MEM_SITE s
+        WHERE s.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+        and s.SITE_USE_CODE = #{siteUseCode,jdbcType=VARCHAR}
+        and s.SITE_ID <![CDATA[<>]]> (#{siteId,jdbcType=DECIMAL})
+    </select>
+    <select id="selectDefaultSiteByMemberAndType" resultType="java.lang.Long" parameterType="com.lkkhpg.dsis.common.member.dto.MemSite" >
+        SELECT SITE_ID from MM_MEM_SITE
+        WHERE MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+        and SITE_USE_CODE = #{siteUseCode,jdbcType=VARCHAR}
+        and DEFAULT_FLAG = 'Y'
+    </select>
+  <delete id="deleteByPrimaryKey">
+    delete from MM_MEM_SITE
+    where SITE_ID = #{siteId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemSite" >
+    <selectKey resultType="java.lang.Long" keyProperty="siteId" order="BEFORE" >
+      select MM_MEM_SITE_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_SITE (SITE_ID, MEMBER_ID, SITE_USE_CODE, 
+      LOCATION_ID, NAME, AREA_CODE, PHONE, 
+      DEFAULT_FLAG, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+      PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+      ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+      ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, 
+      ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+      ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+      ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+      ATTRIBUTE15)
+    values (#{siteId,jdbcType=DECIMAL}, #{memberId,jdbcType=DECIMAL}, #{siteUseCode,jdbcType=VARCHAR}, 
+      #{locationId,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{defaultFlag,jdbcType=VARCHAR}, 1, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL},CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, 
+      #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, 
+      #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, 
+      #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, 
+      #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, 
+      #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, 
+      #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemSite" >
+    update MM_MEM_SITE
+    <set >
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="siteUseCode != null" >
+        SITE_USE_CODE = #{siteUseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="locationId != null" >
+        LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="areaCode != null" >
+        AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        PHONE = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="defaultFlag != null" >
+        DEFAULT_FLAG = #{defaultFlag,jdbcType=VARCHAR},
+      </if>
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where SITE_ID = #{siteId,jdbcType=DECIMAL}
+  </update>
+    <update id="updateDefaultFlag">
+        update MM_MEM_SITE s
+        <set>
+            s.DEFAULT_FLAG = 'N',
+            <if test="requestId != null" >
+              REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null" >
+              PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null" >
+              LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+	        </if>
+	        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+	        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1
+        </set>
+        WHERE s.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+        and s.SITE_USE_CODE = #{siteUseCode,jdbcType=VARCHAR}
+        and s.SITE_ID <![CDATA[<>]]> (#{siteId,jdbcType=DECIMAL})
+    </update>
+    
+     <update id="updateDefaultFlag2" parameterType="com.lkkhpg.dsis.common.member.dto.MemSite" >
+        update MM_MEM_SITE s
+        <set>
+            s.DEFAULT_FLAG = 'N',
+            <if test="requestId != null" >
+              REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null" >
+              PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null" >
+              LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1
+        </set>
+        WHERE s.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+        and s.SITE_USE_CODE = #{siteUseCode,jdbcType=VARCHAR}
+        and s.SITE_ID <![CDATA[<>]]> (#{siteId,jdbcType=DECIMAL})
+    </update>
+    
+    <update id="updateOtherSiteDefault" parameterType="com.lkkhpg.dsis.common.member.dto.MemSite">
+        UPDATE MM_MEM_SITE s
+        <set>
+            s.DEFAULT_FLAG = 'Y',
+            <if test="requestId != null" >
+              REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null" >
+              PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null" >
+              LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1
+        </set>
+        WHERE
+            s.site_id = (
+                SELECT
+                    MAX (SITE_ID)
+                FROM
+                    mm_mem_site
+                WHERE MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+                and SITE_USE_CODE = #{siteUseCode,jdbcType=VARCHAR}
+                and SITE_ID <![CDATA[<>]]> #{siteId,jdbcType=DECIMAL}
+            )
+    </update>
+    
+    <update id="updateOtherSiteDefault2">
+        UPDATE MM_MEM_SITE s
+        <set>
+            s.DEFAULT_FLAG = 'Y',
+            <if test="requestId != null" >
+              REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null" >
+              PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null" >
+              LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1
+        </set>
+        WHERE
+            s.site_id = (
+                SELECT
+                    MAX (SITE_ID)
+                FROM
+                    mm_mem_site
+                WHERE MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+                and SITE_USE_CODE = #{siteUseCode,jdbcType=VARCHAR}
+                and SITE_ID <![CDATA[<>]]> #{siteId,jdbcType=DECIMAL}
+            )
+    </update>
+  
+  <resultMap type="com.lkkhpg.dsis.common.member.dto.MemSite" id="SiteLocationResultMap" extends="BaseResultMap">
+    <association property="spmLocation" javaType="com.lkkhpg.dsis.common.config.dto.SpmLocation">
+        <id column="LOCATION_ID" property="locationId" jdbcType="DECIMAL" />
+        <result column="CITY_CODE" property="cityCode" jdbcType="VARCHAR" />
+        <result column="STATE_CODE" property="stateCode" jdbcType="VARCHAR" />
+        <result column="COUNTRY_CODE" property="countryCode" jdbcType="VARCHAR" />
+        <result column="LOCATION_CODE" property="locationCode" jdbcType="VARCHAR" />
+        <result column="NAME" property="name" jdbcType="VARCHAR" />
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+        <result column="ADDRESS_LINE1" property="addressLine1" jdbcType="VARCHAR" />
+        <result column="ADDRESS_LINE2" property="addressLine2" jdbcType="VARCHAR" />
+        <result column="ADDRESS_LINE3" property="addressLine3" jdbcType="VARCHAR" />
+        <result column="ADDRESS_LINE4" property="addressLine4" jdbcType="VARCHAR" />
+        <result column="ADDRESS_LINE5" property="addressLine5" jdbcType="VARCHAR" />
+        <result column="ZIP_CODE" property="zipCode" jdbcType="VARCHAR" />
+        <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+        <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+        <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+    </association>
+  </resultMap>
+
+    <sql id="Member_Site_List">
+        mms.site_id,mms.member_id,mms.site_use_code,mms.location_id,
+        mms.name,mms.phone,mms.default_flag,mms.object_version_number,
+        mms.request_id,mms.program_id,mms.creation_date,mms.created_by,
+        mms.last_updated_by,mms.last_update_date,mms.last_update_login,mms.attribute_category,mms.area_code,
+        sl.address,sl.city_code,sl.state_code,sl.COUNTRY_CODE,sl.location_code,
+        sl.name,sl.description,sl.address_line1,sl.address_line2,
+        sl.address_line3,sl.address_line4,sl.address_line5,sl.zip_code,SCOT."NAME" as ATTRIBUTE1,SST."NAME" as ATTRIBUTE2,SCIT."NAME" as ATTRIBUTE3
+    </sql>
+
+    <select id="selectMemSites" resultMap="SiteLocationResultMap" parameterType="com.lkkhpg.dsis.common.member.dto.MemSite">
+        SELECT 
+            <include refid="Member_Site_List"></include>
+        FROM 
+            mm_mem_site mms,
+            spm_location_v sl,
+            SPM_COUNTRY_TL scot,
+            SPM_STATE_TL sst,
+            SPM_CITY_TL scit
+        <where>
+             mms.location_id = sl.location_id
+             AND SCOT.COUNTRY_CODE = SL.COUNTRY_CODE
+             AND SCOT.lang = #{request.locale,jdbcType=VARCHAR}
+             AND SST.STATE_CODE = SL.STATE_CODE
+             AND SST.lang = #{request.locale,jdbcType=VARCHAR}
+             AND SCIT.CITY_CODE = SL.CITY_CODE
+             AND SCIT.lang = #{request.locale,jdbcType=VARCHAR}
+             <if test = "memberId != null">
+                AND mms.member_id = #{memberId,jdbcType=DECIMAL}
+             </if>
+             <if test ="siteUseCode != null">
+                AND mms.site_use_code = #{siteUseCode,jdbcType=VARCHAR}
+             </if>
+             <if test ="siteId != null">
+                AND mms.site_id = #{siteId,jdbcType=VARCHAR}
+             </if>
+        </where>
+        ORDER BY DEFAULT_FLAG DESC, CREATION_DATE DESC
+    </select>
+    
+</mapper>

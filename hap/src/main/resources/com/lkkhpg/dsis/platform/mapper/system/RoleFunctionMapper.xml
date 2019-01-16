@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.system.RoleFunctionMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.system.RoleFunction" >
+    <id column="SRF_ID" property="srfId" jdbcType="DECIMAL" />
+    <result column="ROLE_ID" property="roleId" jdbcType="DECIMAL" />
+    <result column="FUNCTION_ID" property="functionId" jdbcType="DECIMAL" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    SRF_ID, ROLE_ID, FUNCTION_ID, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15
+  </sql>
+
+   <select id="selectRoleFunctions" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.system.RoleFunction" >
+        select
+        <include refid="Base_Column_List" />
+        FROM SYS_ROLE_FUNCTION
+        WHERE ROLE_ID = #{roleId,jdbcType=DECIMAL}
+  </select>
+
+   <select id="selectCountByFunctionCode" resultType="java.lang.Integer">
+   SELECT count(1)
+      FROM sys_role_function srf
+      LEFT JOIN sys_function_b sfb
+        ON srf.function_id = sfb.function_id
+    Where srf.role_id = #{roleId,jdbcType=DECIMAL}
+      and sfb.function_code = #{functionCode,jdbcType=VARCHAR}
+   
+   
+   </select>
+
+  <delete id="deleteByRoleId" parameterType="java.lang.Long">
+        delete from SYS_ROLE_FUNCTION
+        where ROLE_ID = #{roleId,jdbcType=DECIMAL}
+  </delete>
+
+
+  <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.RoleFunction" >
+    <selectKey resultType="java.lang.Long" keyProperty="srfId" order="BEFORE" >
+      select sys_role_function_s.nextval from dual
+    </selectKey>
+    insert into SYS_ROLE_FUNCTION (SRF_ID, ROLE_ID, FUNCTION_ID, 
+       REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+      )
+    values (#{srfId,jdbcType=DECIMAL}, #{roleId,jdbcType=DECIMAL}, #{functionId,jdbcType=DECIMAL}, 
+       #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+      #{creationDate,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      #{lastUpdateDate,jdbcType=TIMESTAMP}, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+      )
+  </insert>
+
+
+
+
+
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from SYS_ROLE_FUNCTION
+    where SRF_ID = #{srfId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SYS_ROLE_FUNCTION
+    where SRF_ID = #{srfId,jdbcType=DECIMAL}
+  </delete>
+
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.RoleFunction" >
+    <selectKey resultType="java.lang.Long" keyProperty="srfId" order="BEFORE" >
+      select sys_role_function_s.nextval from dual
+    </selectKey>
+    insert into SYS_ROLE_FUNCTION
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      SRF_ID,
+      <if test="roleId != null" >
+        ROLE_ID,
+      </if>
+      <if test="functionId != null" >
+        FUNCTION_ID,
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{srfId,jdbcType=DECIMAL},
+      <if test="roleId != null" >
+        #{roleId,jdbcType=DECIMAL},
+      </if>
+      <if test="functionId != null" >
+        #{functionId,jdbcType=DECIMAL},
+      </if>
+      <if test="objectVersionNumber != null" >
+        #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.platform.dto.system.RoleFunction" >
+    update SYS_ROLE_FUNCTION
+    <set >
+      <if test="roleId != null" >
+        ROLE_ID = #{roleId,jdbcType=DECIMAL},
+      </if>
+      <if test="functionId != null" >
+        FUNCTION_ID = #{functionId,jdbcType=DECIMAL},
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where SRF_ID = #{srfId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.RoleFunction" >
+    update SYS_ROLE_FUNCTION
+    set ROLE_ID = #{roleId,jdbcType=DECIMAL},
+      FUNCTION_ID = #{functionId,jdbcType=DECIMAL},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where SRF_ID = #{srfId,jdbcType=DECIMAL}
+  </update>
+  <select id="selectAllRoleResouces" resultType="org.springframework.util.LinkedCaseInsensitiveMap">
+    SELECT srf.ROLE_ID,sfr.RESOURCE_ID FROM
+    SYS_ROLE_FUNCTION srf
+    INNER JOIN SYS_FUNCTION_RESOURCE  sfr ON srf.FUNCTION_ID = sfr.FUNCTION_ID
+  </select>
+  <select id="selectRoleResouces" parameterType="long" resultType="org.springframework.util.LinkedCaseInsensitiveMap">
+    SELECT sfr.RESOURCE_ID FROM
+    SYS_ROLE_FUNCTION srf
+    INNER JOIN SYS_FUNCTION_RESOURCE  sfr ON srf.FUNCTION_ID = sfr.FUNCTION_ID
+    where srf.ROLE_ID = #{roleId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByFunction" parameterType="com.lkkhpg.dsis.platform.dto.system.Function" >
+    delete from SYS_ROLE_FUNCTION
+    where FUNCTION_ID = #{functionId,jdbcType=DECIMAL}
+  </delete>
+  <delete id="deleteByRole" parameterType="com.lkkhpg.dsis.platform.dto.system.Role" >
+    delete from SYS_ROLE_FUNCTION
+    where ROLE_ID = #{roleId,jdbcType=DECIMAL}
+  </delete>
+  <select id="selectAllRoleFunctions" resultType="org.springframework.util.LinkedCaseInsensitiveMap">
+    select role_id, function_id from sys_role_function
+  </select>
+  
+</mapper>

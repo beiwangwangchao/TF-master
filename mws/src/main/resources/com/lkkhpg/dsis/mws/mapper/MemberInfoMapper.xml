@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.mws.mapper.MemberInfoMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.mws.dto.MemberInfo"
+               extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD">
+        <id column="MEMBER_ID" property="memberId" jdbcType="DECIMAL"/>
+        <result column="ENGLISH_NAME" property="englishName" jdbcType="VARCHAR"/>
+        <result column="CHINESE_NAME" property="chineseName" jdbcType="VARCHAR"/>
+        <result column="GENDER" property="gender" jdbcType="VARCHAR"/>
+        <result column="DOB" property="dob" jdbcType="TIMESTAMP"/>
+        <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR"/>
+        <result column="OTHER_AREA_CODE" property="otherAreaCode" jdbcType="VARCHAR"/>
+        <result column="PHONE_NO" property="phoneNo" jdbcType="VARCHAR"/>
+        <result column="OTH_PHONE_NO" property="othPhoneNo" jdbcType="VARCHAR"/>
+        <result column="EMAIL" property="email" jdbcType="VARCHAR"/>
+        <result column="availableDiscount" property="availableDiscount" jdbcType="DECIMAL"/>
+        <!-- 关联属性 -->
+        <result column="SALES_POINT" property="salesPoint" jdbcType="DECIMAL"/>
+        <result column="EXCHANGE_BALANCE" property="exchangeBalance" jdbcType="DECIMAL"/>
+        <result column="REMAINING_BALANCE" property="remainingBalance" jdbcType="DECIMAL"/>
+        <result column="CURRENT_PV" property="currentPv" jdbcType="DECIMAL"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    MEMBER_ID, ENGLISH_NAME, CHINESE_NAME, GENDER, DOB,
+    OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+    LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+    ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+    ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,
+    PHONE_NO, OTH_PHONE_NO, EMAIL, SALES_POINT, EXCHANGE_BALANCE, REMAINING_BALANCE
+  </sql>
+
+    <!-- 根据会员表ID查询会员信息 -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    SELECT mm.member_id,
+           mm.english_name,
+           mm.chinese_name,
+           mm.member_name,
+           mm.gender,
+           mm.dob,
+           mm.area_code,
+           mm.other_area_code,
+           mm.phone_no,
+           mm.oth_phone_no,
+           mm.email,
+           mm.salespiont,
+           mm.exchangebalance,
+           mm.remainingbalance,
+           (SELECT mmr.pv
+              FROM mm_mem_rank mmr
+             WHERE mmr.member_id = mm.member_id
+               AND mmr.month = (SELECT to_char(SYSDATE, 'yyyy-MM') FROM dual)) currentpv
+      FROM mm_member_v mm
+     WHERE mm.member_id = #{memberId,jdbcType=DECIMAL}
+  </select>
+
+    <!-- 根据会员表ID查询会员RemainingBalance -->
+    <!--updated by 11816 at 2018/01/22 18:20-->
+    <select id="queryRemBalByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+      SELECT
+      nvl(mm.remainingbalance,0) remainingbalance,
+      (
+        SELECT nvl(m.DISCOUNT_AMT, 0) - nvl(
+        (
+             SELECT sum(DISCOUNT_AMT)
+             FROM OM_SALES_ORDER b
+             WHERE MEMBER_ID = mm.member_id
+             AND b.ORDER_STATUS IN ('SAV', 'WPAY', 'CHECK', 'PAYIN')), 0)
+        FROM mm_member m
+        WHERE m.member_id = mm.member_id) availableDiscount,
+        nvl(mm.discount,0) discount
+    FROM mm_member_v mm
+     WHERE mm.member_id = #{memberId,jdbcType=DECIMAL}
+  </select>
+    <!--<select id="queryAvbDiscountByPrimaryKey" resultType="com.lkkhpg.dsis.mws.dto.MemberInfo">-->
+    <!--SELECT nvl(mm.DISCOUNT_AMT, 0) - nvl((-->
+    <!--SELECT sum(mm.DISCOUNT_AMT)-->
+    <!--FROM OM_SALES_ORDER-->
+    <!--WHERE MEMBER_ID = mm.member_id), 0) availableDiscount-->
+    <!--FROM MM_MEMBER mm-->
+    <!--where mm.member_id = #{memberId, jdbcType=DECIMAL}-->
+    <!--</select>-->
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.member.dto.Member">
+        update MM_MEMBER
+        <set>
+            <if test="areaCode != null">
+                AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+            </if>
+            <if test="otherAreaCode != null">
+                OTHER_AREA_CODE = #{otherAreaCode,jdbcType=VARCHAR},
+            </if>
+            <if test="phoneNo != null">
+                PHONE_NO = #{phoneNo,jdbcType=VARCHAR},
+            </if>
+            <if test="othPhoneNo != null">
+                OTH_PHONE_NO = #{othPhoneNo,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                EMAIL = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1
+        </set>
+        where MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+    </update>
+
+    <update id="updateMemberLastUpdateDate" parameterType="com.lkkhpg.dsis.common.member.dto.Member">
+      update mm_member t set t.last_update_date = sysdate where t.member_id = #{memberId,jdbcType=DECIMAL}
+  </update>
+
+</mapper>

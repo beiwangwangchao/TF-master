@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE generatorConfiguration
+   PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+   "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+ <generatorConfiguration>
+     <!--数据库驱动-->
+<!--     <classPathEntry location="C:/Users/myuse/apache-tomcat-8.0.24/lib/ojdbc6.jar"/> -->
+     <classPathEntry location="C:/apache-tomcat-8.0.20/lib/ojdbc7.jar"/>  
+    <!--  <classPathEntry location="D:/hap-classes.jar"/> -->
+     <context id="DB2Tables"    targetRuntime="MyBatis3">
+         <commentGenerator>
+             <property name="suppressDate" value="true"/>
+             <property name="suppressAllComments" value="true"/>
+         </commentGenerator>
+         <!--数据库链接地址账号密码-->
+         <jdbcConnection driverClass="oracle.jdbc.driver.OracleDriver" connectionURL="jdbc:oracle:thin:@192.168.123.10:1522/PDB1" userId="dsis" password="dsis">
+         </jdbcConnection>
+         <javaTypeResolver>
+             <property name="forceBigDecimals" value="false"/>
+         </javaTypeResolver>
+         <!--生成Model类存放位置-->
+         <javaModelGenerator targetPackage="com.lkkhpg.dsis.common.member.dto" targetProject="common-service/src/main/java/">
+             <property name="enableSubPackages" value="true"/>
+             <property name="trimStrings" value="true"/>
+             <property name="rootClass" value="com.lkkhpg.dsis.platform.dto.BaseDTO"/>
+         </javaModelGenerator>
+         <!--生成映射文件存放位置-->
+         <sqlMapGenerator targetPackage="com.lkkhpg.dsis.common.member.mapper" targetProject="common-service/src/main/resources">
+             <property name="enableSubPackages" value="true"/>
+         </sqlMapGenerator>
+         <!--生成Dao类存放位置-->
+         <javaClientGenerator type="XMLMAPPER" targetPackage="com.lkkhpg.dsis.common.member.mapper" targetProject="common-service/src/main/java/">
+             <property name="enableSubPackages" value="true"/>
+         </javaClientGenerator>
+         <!--生成对应表及类名-->
+         <table tableName="MM_OVERSEAS_SPONSOR" domainObjectName="MmOverseasSponsor" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+             <generatedKey column="SPONSOR_ID" sqlStatement="select MM_OVERSEAS_SPONSOR_S.nextval from dual"/>
+         </table>
+     </context>
+</generatorConfiguration>

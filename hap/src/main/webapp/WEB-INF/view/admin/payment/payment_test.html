@@ -1,0 +1,401 @@
+<#include "../include/head.html">
+<body style="padding: 3px; overflow: hidden;">
+	<script src="${base.contextPath}/common/language?var=languageData"
+		type="text/javascript"></script>
+	<form id="d_migs_pay_form" method="post"
+		action="${base.contextPath}/payment/pay/migs"></form>
+
+	<form id="d_migs_pay_callback_form" method="post"
+		action="${base.contextPath}/payment/pay/callback/migs?vpc_3DSECI=01&vpc_3DSXID=BXAGZ4b1GyQJPsdUzsXKJIHbb8Y%3D&vpc_3DSenrolled=Y&vpc_3DSstatus=A&vpc_AVSRequestCode=Z&vpc_AVSResultCode=Unsupported&vpc_AcqAVSRespCode=Unsupported&vpc_AcqCSCRespCode=Unsupported&vpc_AcqResponseCode=00&vpc_Amount=10000&vpc_AuthorizeId=566026&vpc_BatchNo=20160331&vpc_CSCResultCode=Unsupported&vpc_Card=MC&vpc_Command=pay&vpc_Locale=en&vpc_MerchTxnRef=EvanTest1234&vpc_Merchant=TEST00000493197&vpc_Message=Approved&vpc_OrderInfo=migs20160331110&vpc_ReceiptNo=609122566026&vpc_SecureHash=4D4D0A307A46C8629D1B4C91FB1ED3DCFA9ADB227BFC69E49542E83481BBC35B&vpc_SecureHashType=SHA256&vpc_TransactionNo=2000000049&vpc_TxnResponseCode=0&vpc_VerSecurityLevel=06&vpc_VerStatus=M&vpc_VerToken=hlisowcyh2TcYwAAGQs9AIYAAAA%3D&vpc_VerType=3DS&vpc_Version=1"></form>
+	<form id="d_non_union_pay_form"
+		action="${base.contextPath}/payment/pay/non_union"></form>
+	<form id="d_union_pay_form"
+		action="${base.contextPath}/payment/pay/union?lidm=20160418120001&purchAmt=11111&sourceKey1=2222"
+		method="post"></form>
+
+	<form id="d_union_callback_form" method="post"
+		action="${base.contextPath}/payment/pay/callback/union?version=1.0.0&charset=UTF-8&xid=20160408162927396022_201600407120001&lidm=201600407120001&purchAmt=10000&orderStatus=13&respCode=00&respMsg=success&traceNumber=313873&traceTime=0408162924&qid=201604081629243138738&settleAmount=247131&settleCurrency=344&settleDate=0408&exchangeRate=72471311&exchangeDate=0227&inMac=B84E9D11FA4C5F838FE0790283F52F2B101394188074C099"></form>
+	<div id="d_union_query_form"></div>
+	<div id="d_union_refund_form"></div>
+	<form id="d_non_union_callback_form"
+		action="${base.contextPath}/payment/pay/callback/non_union?merID=3435&URLResEnc=911D12A6B97B800488B41992EFF66C7DC25AA8521B30315187E7A46B0A53DEF91E320B2B5B747E52729F338F353183C760A47676DACEA2D9A3C1507D2FDEC77E861C978FDE9B0988432DCBEFEA66380A1C279BC01E4D74A2734697670C17F45D6704C2C92B35B9BAB62D6B7ED5F32024404DC5635409D8426F43E603E4D2C024E8A3E6D527D297055D2606944ADFC30462DB5053BB0A12F35E5AB34C4AAE6357D3F41F2644676B0E3059A9B9C87A8E70E27418F34F08C8A18B93393EA6C9CB6F22342C4EAE4B14F8439099B5097B27734458D34FF518F11AAFC1CC3B51799E8B4582A18323C5135644B72B91486B89A826A55439F3D971FE4ABA2A16AC4A4DFC485451C3DF85590BA566729BCA4C307DDE0BBEC286CC366D5228BD15DD32801413B596CCA2F9CB9D587E78FA7E544FCAF495835EE6575904B77ED74BCF123BCAB42FF144E5C2EF6C"
+		method="post"></form>
+	<form id="d_non_union_query_form"></form>
+
+	<form id="d_non_union_refund_form"></form>
+
+	<script type="text/javascript">
+		$(function() {
+
+			//d_migs_pay_form
+			var d_migs_pay_form = window['d_migs_pay_form'] = $(
+					"#d_migs_pay_form").ligerForm({
+				fields : [
+				//vpc_OrderInfo,vpc_Currency?
+				{
+					type : 'hidden',
+					label : 'vpc_OrderInfo',
+					name : 'vpc_OrderInfo',
+					options : {
+						value : 'migs20160420110'
+					}
+				}, {
+					type : 'hidden',
+					label : 'vpc_Amount',
+					name : 'vpc_Amount',
+					//value : '10000'
+					options : {
+						value : '10000'
+					}
+				}, {
+					type : 'hidden',
+					label : 'sourceKey1',
+					name : 'sourceKey1',
+					//value : '10000'
+					options : {
+						value : '3333'
+					}
+				}
+				/* , {
+					type : 'hidden',
+					label : 'vpc_Version',
+					name : 'vpc_Version',
+					options : {
+						value : '1'
+					}
+				}, {
+					type : 'hidden',
+					label : 'vpc_Command',
+					name : 'vpc_Command',
+					options : {
+						value : 'pay'
+					}
+				}, {
+					type : 'hidden',
+					label : 'vpc_Locale',
+					name : 'vpc_Locale',
+					options : {
+						value : 'en'
+					}
+				}  */
+				],
+				buttons : [ {
+					text : 'migs_pay',
+					width : 200,
+					click : function() {
+						d_migs_pay_form.form.submit();
+					}
+				} ]
+			});
+
+			//d_non_union_pay_form
+			var d_non_union_pay_form = window['d_non_union_pay_form'] = $(
+					"#d_non_union_pay_form").ligerForm({
+				fields : [ {
+					type : 'hidden',
+					label : 'lidm',
+					name : 'lidm',
+					options : {
+						value : 'non20160420120'
+					}
+				}, {
+					type : 'hidden',
+					label : 'purchAmt',
+					name : 'purchAmt',
+					options : {
+						value : '100111'
+					}
+				}, {
+					type : 'hidden',
+					id : 'sourceKeyId', 
+					name : 'sourceKey1',
+					options : {
+						value : '4444666'
+					}
+				}, {
+					type : 'hidden',
+					id : 'sourceType', 
+					name : 'sourceType',
+					options : {
+						value : 'ORDER'
+					}
+				}
+				,
+				/* {
+					type : 'hidden',
+					label : 'option',
+					name : 'option',
+
+					options : {
+						value : '1'
+					}
+				},  */
+				/* {
+					type : 'hidden',
+					label : 'numberOfPay',
+					name : 'numberOfPay',
+					options : {
+						value : '1'
+					}
+				}, {
+					type : 'hidden',
+					label : 'autoCap',
+					name : 'autoCap',
+					options : {
+						value : '1'
+					}
+				}, {
+					type : 'hidden',
+					label : 'txType',
+					name : 'txType',
+
+					options : {
+						value : '0'
+					}
+				}, */
+				{
+					type : 'hidden',
+					label : 'customize',
+					name : 'customize',
+					options : {
+						value : '0'
+					}
+				} ],
+				buttons : [ {
+					text : 'non_union_pay',
+					width : 200,
+					click : function() {
+						d_non_union_pay_form.form.submit();
+					}
+				} ]
+			});
+
+			//d_union_pay_form
+			var d_union_pay_form = window['d_union_pay_form'] = $(
+					"#d_union_pay_form").ligerForm({
+				fields : [],
+				buttons : [ {
+					text : 'union_pay',
+					width : 200,
+					click : function() {
+						d_union_pay_form.form.submit();
+					}
+				} ]
+			});
+
+			//d_union_callback_form
+			var d_union_callback_form = window['d_union_callback_form'] = $(
+					"#d_union_callback_form").ligerForm({
+				fields : [],
+				buttons : [ {
+					text : 'union_pay_callback',
+					width : 200,
+					click : function() {
+						d_union_callback_form.form.submit();
+					}
+				} ]
+			});
+
+			//d_union_query_form
+			var d_union_query_form = window['d_union_query_form'] = $(
+					"#d_union_query_form")
+					.ligerForm(
+							{
+								fields : [],
+								buttons : [ {
+									text : 'union_pay_query',
+									width : 200,
+									click : function() {
+										var obj = {
+											'lidm' : '20161230120000',
+											'purchAmt' : '10000',
+											'sourceKey1' : '5555'
+										};
+										$
+												.ajax({
+													type : "POST",
+													dataType : "json",
+													contentType : "application/json",
+													url : "${base.contextPath}/payment/pay/query/union",
+													data : JSON2.stringify(obj),
+													success : function(data) {
+														alert(JSON2
+																.stringify(data));
+													}
+												});
+
+									}
+								} ]
+							});
+			//d_non_union_callback_form
+			var d_non_union_callback_form = window['d_non_union_callback_form'] = $(
+					"#d_non_union_callback_form").ligerForm({
+				fields : [],
+				buttons : [ {
+					text : 'non_union_callback',
+					width : 200,
+					click : function() {
+						//debugger
+						d_non_union_callback_form.form.submit();
+					}
+				} ]
+			});
+			//d_non_union_query_form
+			var d_non_union_query_form = window['d_non_union_query_form'] = $(
+					"#d_non_union_query_form")
+					.ligerForm(
+							{
+								fields : [],
+								buttons : [ {
+									text : 'non_union_query',
+									width : 200,
+									click : function() {
+
+										var obj = {
+											lidm : 'non20160408120',
+											purchAmt : '10000',
+											sourceKey1 : '6666'
+										};
+										$
+												.ajax({
+													type : "POST",
+													dataType : "json",
+													contentType : "application/json",
+													url : "${base.contextPath}/payment/query/non_union",
+													data : JSON2.stringify(obj),
+													success : function(data) {
+														alert(JSON2
+																.stringify(data));
+													}
+												});
+
+										//d_non_union_query_form.form.submit();
+									}
+								} ]
+							});
+
+			//d_non_union_refund_form
+			var d_non_union_refund_form = window['d_non_union_refund_form'] = $(
+					"#d_non_union_refund_form")
+					.ligerForm(
+							{
+								fields : [],
+								buttons : [ {
+									text : 'non_union_refund',
+									width : 200,
+									click : function() {
+										/* xid:'E988FC5600004432408_non20160331119',
+										authcode:'010825',
+										authAmt:'10000',
+										originalAmt:'-1',
+											batchID:'11',
+												batchSeq:'1'
+										
+										
+										/* inq_auth ret = 0
+										TX_ATTRIBUTE=TX_AUTH
+										QueryCode=1
+										Lidm=non20160331119
+										xid=E988FC5600004432408_non20160331119
+										PAN=333434******2134
+										ECI=07
+										AuthAmt=10000
+										RespCode=0
+										ErrCode=00
+										AuthCode=010825
+										TermSeq=84
+										RetrRef=008333000084
+										CurrentState=10
+										BatchID=11
+										BatchSeq=1
+										OffsetAmt=-1
+										OriginalAmt=-1
+										UtilizedPoint=-1
+										AwardedPoint=-1
+										PointBalance=-1 */
+										var obj = {
+											lidm : 'non20160408120',
+											purchAmt : '10000',
+											xid : 'AD5F075700022501480_non20160408120',
+											authCode : '003972',
+											authAmt : '10000',
+											originalAmt : '10000',
+											batchID : '16',
+											batchSeq : '1',
+											sourceKey1 : '7777'
+										};
+										$
+												.ajax({
+													type : "POST",
+													dataType : "json",
+													contentType : "application/json",
+													url : "${base.contextPath}/payment/pay/refund/non_union",
+													data : JSON2.stringify(obj),
+													success : function(data) {
+														alert(JSON2
+																.stringify(data));
+													}
+												});
+
+										//d_non_union_query_form.form.submit();
+									}
+								} ]
+							});
+
+			//d_union_refund_form
+
+			/* act.setLidm(model.getLidm());
+			   // 設置交易識別碼
+			   act.setXid(model.getXid()); // 設置退貨金額
+			   act.setPurchAmt(Integer.valueOf(model.getPurchAmt())); 
+			action="${base.contextPath}/payment/pay/callback/union?version=1.0.0&charset=UTF-8&xid=20160331152934083013_20160331120000&lidm=20160331120000&purchAmt=10000&orderStatus=13&respCode=00&respMsg=success&traceNumber=202992&traceTime=0331152927&qid=201603311529272029928&settleAmount=247131&settleCurrency=344&settleDate=0331&exchangeRate=72471311&exchangeDate=0227&inMac=36BB47BB2773E72795ECE4A30217D800F156763A64E040B9"></form>
+
+			 */
+			var d_union_refund_form = window['d_union_refund_form'] = $(
+					"#d_union_refund_form")
+					.ligerForm(
+							{
+								fields : [],
+								buttons : [ {
+									text : 'union_refund',
+									width : 200,
+									click : function() {
+										var obj = {
+											lidm : '201600407120001',
+											xid : '20160408162927396022_201600407120001',
+											purchAmt : '10000',
+											sourceKey1 : '88888'
+										};
+										$
+												.ajax({
+													type : "POST",
+													dataType : "json",
+													contentType : "application/json",
+													url : "${base.contextPath}/payment/pay/refund/union",
+													data : JSON2.stringify(obj),
+													success : function(data) {
+														alert(JSON2
+																.stringify(data));
+													}
+												});
+
+									}
+								} ]
+							});
+			//d_migs_pay_callback_form
+			var d_migs_pay_callback_form = window['d_migs_pay_callback_form'] = $(
+					"#d_migs_pay_callback_form").ligerForm({
+				fields : [],
+				buttons : [ {
+					text : 'migs_callback',
+					width : 200,
+					click : function() {
+						d_migs_pay_callback_form.form.submit();
+					}
+				} ]
+			});
+
+		});
+	</script>
+</body>
+</html>

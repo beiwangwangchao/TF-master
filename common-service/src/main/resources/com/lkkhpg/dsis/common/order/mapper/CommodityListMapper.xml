@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.CommodityListMapper">
+  <resultMap type="com.lkkhpg.dsis.common.order.dto.CommodityList" id="BaseResultMap">
+    <result column="DEFAULT_INV_ORG_ID" property="defaultInvOrgId" jdbcType="DECIMAL" />
+    <result column="ITEM_SALES_TYPE" property="itemSalesType" jdbcType="VARCHAR" />
+    <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL" />
+    <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR" />
+    <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+    <result column="ITEM_TYPE" property="itemType" jdbcType="VARCHAR" />
+    <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="CODE" property="salesOrgCode" jdbcType="VARCHAR" />
+    <result column="USER_TYPE" property="userType" jdbcType="VARCHAR" />
+    <result column="ORDER_TYPE" property="orderType" jdbcType="VARCHAR" />
+    <result column="ORDER_STATUS" property="orderStatus" jdbcType="VARCHAR" />
+    <result column="CHANNEL" property="channel" jdbcType="VARCHAR" />
+    <result column="PV" property="pv" jdbcType="DECIMAL" />
+    <result column="UNIT_ORIG_PRICE" property="unitOrigPrice" jdbcType="DECIMAL" />
+    <result column="UNIT_SELLING_PRICE" property="unitSellingPrice" jdbcType="DECIMAL" />
+    <result column="NAME" property="voucherName" jdbcType="VARCHAR" />
+    <result column="QUANTITY" property="quantity" jdbcType="DECIMAL" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="VARCHAR" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+    <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR" />
+    <result column="CURRENT_PV" property="currentPv" jdbcType="DECIMAL" />
+    <result column="SALES_POINT" property="salesPoint" jdbcType="DECIMAL" />
+    <result column="UNIT_REDEEM_POINT" property="unitRedeemPoint" jdbcType="DECIMAL" />
+    <result column="REDEEM_POINT" property="redeemPoint" jdbcType="DECIMAL" />
+    <result column="TAX_AMT" property="taxAmt" jdbcType="DECIMAL" />
+    <result column="SHIPPING_FEE" property="shippingFee" jdbcType="DECIMAL" />
+    <result column="ADJUSTMENT_AMOUNT_COUNT" property="adjustmentAmountCount" jdbcType="DECIMAL" />
+    <result column="ORDER_AMT" property="orderAmt" jdbcType="VARCHAR" />
+    <result column="ACTRUAL_PAY_AMT" property="actrualPayAmt" jdbcType="DECIMAL" />
+    <result column="COD_FLAG" property="codFlag" jdbcType="VARCHAR" />
+    <result column="DISCOUNT_VALUE_SUM" property="discountValueSum" jdbcType="DECIMAL" />
+    <result column="SOURCE_KEY" property="sourceKey" jdbcType="VARCHAR" />
+    <result column="SOURCE_TYPE" property="sourceType" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Order_Item_List"> 
+    ITEM_LINE.DEFAULT_INV_ORG_ID, ITEM_LINE.ITEM_SALES_TYPE, ITEM_LINE.ITEM_NUMBER, ITEM_LINE.ITEM_NAME, 
+    S_ORDER.ORDER_NUMBER,S_ORDER.MEMBER_ID, S_ORDER.SALES_ORG_ID, S_ORDER.ORDER_TYPE,	ITEM_LINE.PV, ITEM_LINE.UNIT_ORIG_PRICE, 
+    ITEM_LINE.UNIT_SELLING_PRICE, ITEM_LINE.NAME, ITEM_LINE.QUANTITY,  BALANCE.SALES_POINT,
+	ITEM_LINE.UNIT_REDEEM_POINT, ITEM_LINE.REDEEM_POINT, S_ORDER.TAX_AMT, ITEM_LINE.SHIPPING_FEE, ITEM_LINE.ADJUSTMENT_AMOUNT_COUNT, 
+	S_ORDER.ORDER_AMT, S_ORDER.ACTRUAL_PAY_AMT, S_ORDER.COD_FLAG, ITEM_LINE.AMOUNT,	ITEM_LINE.ITEM_TYPE, ITEM_LINE.ITEM_ID, 
+	S_ORDER.SOURCE_KEY, S_ORDER.SOURCE_TYPE, S_ORDER.ORDER_STATUS, S_VOUCHER.DISCOUNT_VALUE_SUM, USER_TYPE, CHANNEL, SALES_B.CODE
+  </sql>
+
+	<!-- 根据订单头ID查询对应订单包含商品信息 -->
+	<select id="selectItemsByOrderHeaderId" resultMap="BaseResultMap" >
+	    SELECT 
+	    	<include refid="Order_Item_List" />,
+	    	MMV.MEMBER_CODE,
+	    	(CASE WHEN MMV.ENGLISH_NAME IS NULL THEN
+				 MMV.CHINESE_NAME
+				 WHEN MMV.CHINESE_NAME IS NULL THEN
+					 MMV.ENGLISH_NAME
+					 ELSE
+						 (MMV.CHINESE_NAME || '/' || MMV.ENGLISH_NAME)
+			END) MEMBER_NAME,
+	    	(
+	       		SELECT MMR.PS
+         		FROM OMK.OMK_RTL_SALARY_BALANCE mmr
+         		WHERE MMR.DEALER_NO = MMV.MEMBER_CODE
+               		AND mmr.REF_PERIOD = (SELECT to_char(CURRENT_TIMESTAMP, 'yyyyMM') FROM dual)
+	     	) CURRENT_PV
+		FROM OM_SALES_ORDER S_ORDER
+			LEFT OUTER JOIN SPM_SALES_ORGANIZATION_B SALES_B ON S_ORDER.SALES_ORG_ID = SALES_B.SALES_ORG_ID
+			LEFT OUTER JOIN MM_MEMBER_V MMV ON MMV.MEMBER_ID = S_ORDER.MEMBER_ID
+			LEFT OUTER JOIN (
+	     		SELECT SA.ACCOUNT_ID,
+               		SA.LOGIN_NAME,
+               		SU.USER_ID,
+               		SU.USER_NAME,
+               		SU.USER_TYPE
+		       	FROM SYS_USER SU, SYS_ACC_REL SAR, SYS_ACCOUNT SA
+		       	WHERE SU.USER_ID = SAR.REL_PARTY_ID
+		           AND SAR.ACCOUNT_ID = SA.ACCOUNT_ID
+		           AND SAR.ACCOUNT_TYPE = 'USER'
+			) CREATE_USER ON CREATE_USER.ACCOUNT_ID = S_ORDER.CREATED_BY
+	        LEFT OUTER JOIN(
+	                SELECT S_LINE.HEADER_ID, S_LINE.UNIT_ORIG_PRICE, S_LINE.UNIT_SELLING_PRICE, S_LINE.PV, 
+	                   S_LINE.QUANTITY, S_LINE.AMOUNT, S_LINE.UNIT_REDEEM_POINT, S_LINE.REDEEM_POINT, S_LINE.VOUCHER_ID, 
+	                   S_LINE.DEFAULT_INV_ORG_ID,ITEM.ITEM_NUMBER,ITEM.ITEM_NAME, P_VOUCHER.NAME, S_LINE.ITEM_SALES_TYPE, 
+	                   S_LINE.ITEM_ID, ITEM.ITEM_TYPE, LOGISTICS.SHIPPING_FEE, ADJUSTCOUNT.ADJUSTMENT_AMOUNT_COUNT
+	                FROM OM_SALES_LINE S_LINE
+						LEFT OUTER JOIN PDM_VOUCHER P_VOUCHER ON P_VOUCHER.VOUCHER_ID = S_LINE.VOUCHER_ID
+	                                        LEFT OUTER JOIN SPM_INV_ORGANIZATION_B INV_ORG ON (S_LINE.DEFAULT_INV_ORG_ID=INV_ORG.INV_ORG_ID )
+						LEFT OUTER JOIN (SELECT I_ITEM.ITEM_ID, I_ITEM.ITEM_NUMBER, ITEM_TL.ITEM_NAME, I_ITEM.ITEM_TYPE FROM INV_ITEM_B I_ITEM 
+											LEFT OUTER JOIN INV_ITEM_TL ITEM_TL ON (I_ITEM.ITEM_ID = ITEM_TL.ITEM_ID AND ITEM_TL.LANG = #{request.locale,jdbcType=VARCHAR})) ITEM 
+											ON ITEM.ITEM_ID = S_LINE.ITEM_ID
+						LEFT OUTER JOIN OM_SALES_LOGISTICS LOGISTICS ON (LOGISTICS.HEADER_ID = S_LINE.HEADER_ID AND logistics.AUTOSHIP_FLAG = 'N')
+						LEFT OUTER JOIN (
+							SELECT SUM(ADJUSTMENT.ADJUSTMENT_AMOUNT) ADJUSTMENT_AMOUNT_COUNT, ADJUSTMENT.HEADER_ID
+							FROM OM_SALES_ADJUSTMENT ADJUSTMENT
+							GROUP BY(ADJUSTMENT.HEADER_ID)
+						) ADJUSTCOUNT ON (S_LINE.HEADER_ID = ADJUSTCOUNT.HEADER_ID)
+	        ) ITEM_LINE on S_ORDER.HEADER_ID = ITEM_LINE.HEADER_ID
+	        LEFT OUTER JOIN (
+	                SELECT MAB.MEMBER_ID MEMBER_ID , MAB.BALANCE SALES_POINT 
+					FROM MM_ACCOUNTING_BALANCE MAB
+	                WHERE  MAB.ACCOUNTING_TYPE = 'SP'
+	        ) BALANCE ON (BALANCE.MEMBER_ID = S_ORDER.MEMBER_ID)
+	        LEFT OUTER JOIN (
+	               SELECT osv.HEADER_ID, SUM(voucher.DISCOUNT_VALUE) DISCOUNT_VALUE_SUM
+	               FROM OM_SALES_VOUCHER osv
+	                       LEFT OUTER JOIN PDM_VOUCHER voucher ON osv.VOUCHER_ID = voucher.VOUCHER_ID
+	                       GROUP BY (osv.HEADER_ID)
+	        ) S_VOUCHER ON (S_ORDER.HEADER_ID = S_VOUCHER.HEADER_ID )
+	  WHERE S_ORDER.HEADER_ID = #{orderHeaderId, jdbcType=DECIMAL}
+	</select>
+
+</mapper>

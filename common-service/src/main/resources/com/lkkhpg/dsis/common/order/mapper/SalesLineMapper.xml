@@ -1,0 +1,1134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.SalesLineMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.SalesLine">
+        <id column="LINE_ID" property="lineId" jdbcType="DECIMAL"/>
+        <result column="HEADER_ID" property="headerId" jdbcType="DECIMAL"/>
+        <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL"/>
+        <result column="UNIT_ORIG_PRICE" property="unitOrigPrice" jdbcType="DECIMAL"/>
+        <result column="UNIT_DISCOUNT_PRICE" property="unitDiscountPrice" jdbcType="DECIMAL"/>
+        <result column="UNIT_SELLING_PRICE" property="unitSellingPrice" jdbcType="DECIMAL"/>
+        <result column="ITEM_SALES_TYPE" property="itemSalesType" jdbcType="VARCHAR"/>
+        <result column="PV" property="pv" jdbcType="DECIMAL"/>
+        <result column="QUANTITY" property="quantity" jdbcType="DECIMAL"/>
+        <result column="AMOUNT" property="amount" jdbcType="DECIMAL"/>
+        <result column="STATUS" property="status" jdbcType="VARCHAR"/>
+        <result column="UNIT_REDEEM_POINT" property="unitRedeemPoint" jdbcType="DECIMAL"/>
+        <result column="REDEEM_POINT" property="redeemPoint" jdbcType="DECIMAL"/>
+        <result column="SOURCE_TYPE" property="sourceType" jdbcType="VARCHAR"/>
+        <result column="SOURCE_KEY" property="sourceKey" jdbcType="VARCHAR"/>
+        <result column="VOUCHER_ID" property="voucherId" jdbcType="DECIMAL"/>
+        <result column="DEFAULT_INV_ORG_ID" property="defaultInvOrgId" jdbcType="DECIMAL"/>
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL"/>
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL"/>
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL"/>
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE1" property="disableTaxFlag" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR"/>
+        <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL"/>
+        <result column="UOM_CODE" property="uomCode" jdbcType="VARCHAR"/>
+        <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR"/>
+        <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR"/>
+        <result column="UNPICK_QUANTITY" property="unpickQuantity" jdbcType="DECIMAL"/>
+        <result column="SYNC_FLAG" property="syncFlag" jdbcType="VARCHAR"/>
+        <result column="LINE_NUM" property="lineNum" jdbcType="DECIMAL"/>
+        <result column="ITEM_TYPE" property="itemType" jdbcType="VARCHAR"/>
+        <result column="PARENT_LINE_ID" property="parentLineId" jdbcType="DECIMAL"/>
+        <!-- 退货单 -->
+        <!-- 实际商品ID -->
+        <result column="COUNT_ITEM_ID" property="countItemId" jdbcType="DECIMAL"/>
+        <!-- 实际商品编号 -->
+        <result column="COUNT_ITEM_NUMBER" property="countItemNumber" jdbcType="VARCHAR"/>
+        <!-- 实际商品名称 -->
+        <result column="COUNT_ITEM_NAME" property="countItemName" jdbcType="VARCHAR"/>
+        <!-- 商品单位名称 -->
+        <result column="UOM_NAME" property="uomName" jdbcType="VARCHAR"/>
+        <!-- 已发运商品数量 -->
+        <result column="OUTSTANDING_QTY" property="outstandingQty" jdbcType="DECIMAL"/>
+        <!-- 已退货商品数量 -->
+        <result column="RETURN_QTY" property="returnQty" jdbcType="DECIMAL"/>
+        <!-- 折扣类型 -->
+        <result column="DISCOUNT_TYPE" property="discountType" jdbcType="VARCHAR"/>
+        <!-- 折扣值 -->
+        <result column="DISCOUNT_VALUE" property="discountValue" jdbcType="DECIMAL"/>
+        <!-- 支付调整-优惠金额 -->
+        <result column="ADJUSTMENT_AMOUNT" property="adjustmentAmount" jdbcType="DECIMAL"/>
+        <!-- 商品是否启用批次控制标识 -->
+        <result column="LOT_CTRL_FLAG" property="lotCtrlFlag" jdbcType="VARCHAR"/>
+        <!-- 商品计算计算库存 -->
+        <result column="COUNT_STOCK_FLAG" property="countStockFlag" jdbcType="VARCHAR"/>
+        <!-- 商品包库存计算方式 -->
+        <result column="COUNT_TYPE" property="countType" jdbcType="VARCHAR"/>
+        <!-- 商品父级ID -->
+        <result column="PARENT_ITEM_ID" property="parentItemId" jdbcType="DECIMAL"/>
+        <!-- 商品描述 -->
+        <result column="ITEM_DESCRIPTION" property="itemDescription" jdbcType="VARCHAR"/>
+        <!-- 行号 -->
+        <result column="rownum" property="rownum" jdbcType="DECIMAL"/>
+
+        <!-- 币种符号 -->
+        <result column="CURRENCY" property="currency" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    LINE_ID, HEADER_ID, ITEM_ID, UNIT_ORIG_PRICE, UNIT_DISCOUNT_PRICE, UNIT_SELLING_PRICE, 
+    ITEM_SALES_TYPE, PV, QUANTITY, AMOUNT, STATUS, UNIT_REDEEM_POINT, REDEEM_POINT, SOURCE_TYPE, 
+    SOURCE_KEY, VOUCHER_ID, DEFAULT_INV_ORG_ID, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+    CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+    ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+    ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+    ATTRIBUTE14, ATTRIBUTE15, SALES_ORG_ID, UOM_CODE, UNPICK_QUANTITY,SYNC_FLAG,LINE_NUM,ITEM_TYPE,PARENT_LINE_ID
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from OM_SALES_LINE
+        where LINE_ID = #{lineId,jdbcType=DECIMAL}
+    </select>
+    <select id="selectByPrimaryKeyForLock" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from OM_SALES_LINE
+        where LINE_ID = #{lineId,jdbcType=DECIMAL}
+        for update
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.order.dto.SalesLine">
+    delete from OM_SALES_LINE
+    where LINE_ID = #{lineId,jdbcType=DECIMAL} OR PARENT_LINE_ID=#{lineId,jdbcType=DECIMAL}
+  </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.SalesLine">
+        <selectKey resultType="java.lang.Long" keyProperty="lineId" order="BEFORE">
+            SELECT OM_SALES_LINE_S.nextval from dual
+        </selectKey>
+        insert into OM_SALES_LINE (LINE_ID, HEADER_ID, ITEM_ID,
+        UNIT_ORIG_PRICE, UNIT_DISCOUNT_PRICE, UNIT_SELLING_PRICE,
+        ITEM_SALES_TYPE, PV, QUANTITY,
+        AMOUNT, STATUS, UNIT_REDEEM_POINT,
+        REDEEM_POINT, SOURCE_TYPE, SOURCE_KEY,
+        VOUCHER_ID, DEFAULT_INV_ORG_ID,
+        REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10,
+        ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14, ATTRIBUTE15, SALES_ORG_ID,
+        UOM_CODE,UNPICK_QUANTITY,SYNC_FLAG,LINE_NUM,ITEM_TYPE,PARENT_LINE_ID)
+        values (#{lineId,jdbcType=DECIMAL}, #{headerId,jdbcType=DECIMAL}, #{itemId,jdbcType=DECIMAL},
+        #{unitOrigPrice,jdbcType=DECIMAL}, #{unitDiscountPrice,jdbcType=DECIMAL}, #{unitSellingPrice,jdbcType=DECIMAL},
+        #{itemSalesType,jdbcType=VARCHAR}, #{pv,jdbcType=DECIMAL}, #{quantity,jdbcType=DECIMAL},
+        #{amount,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{unitRedeemPoint,jdbcType=DECIMAL},
+        #{redeemPoint,jdbcType=DECIMAL}, #{sourceType,jdbcType=VARCHAR}, #{sourceKey,jdbcType=VARCHAR},
+        #{voucherId,jdbcType=DECIMAL}, #{defaultInvOrgId,jdbcType=DECIMAL},
+        #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP,
+        #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP,
+        #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR},
+        #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR},
+        #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{salesOrgId,jdbcType=DECIMAL},
+        #{uomCode,jdbcType=VARCHAR},#{unpickQuantity,jdbcType=DECIMAL},'N',#{lineNum,jdbcType=DECIMAL},
+        #{itemType,jdbcType=VARCHAR} ,#{parentLineId,jdbcType=DECIMAL} )
+    </insert>
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesLine">
+        <selectKey resultType="java.lang.Long" keyProperty="lineId" order="BEFORE">
+            SELECT OM_SALES_LINE_S.nextval from dual
+        </selectKey>
+        insert into OM_SALES_LINE
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            LINE_ID,
+            <if test="headerId != null">
+                HEADER_ID,
+            </if>
+            <if test="itemId != null">
+                ITEM_ID,
+            </if>
+            <if test="unitOrigPrice != null">
+                UNIT_ORIG_PRICE,
+            </if>
+            <if test="unitDiscountPrice != null">
+                UNIT_DISCOUNT_PRICE,
+            </if>
+            <if test="unitSellingPrice != null">
+                UNIT_SELLING_PRICE,
+            </if>
+            <if test="itemSalesType != null">
+                ITEM_SALES_TYPE,
+            </if>
+            <if test="pv != null">
+                PV,
+            </if>
+            <if test="quantity != null">
+                QUANTITY,
+            </if>
+            <if test="amount != null">
+                AMOUNT,
+            </if>
+            <if test="status != null">
+                STATUS,
+            </if>
+            <if test="unitRedeemPoint != null">
+                UNIT_REDEEM_POINT,
+            </if>
+            <if test="redeemPoint != null">
+                REDEEM_POINT,
+            </if>
+            <if test="sourceType != null">
+                SOURCE_TYPE,
+            </if>
+            <if test="sourceKey != null">
+                SOURCE_KEY,
+            </if>
+            <if test="voucherId != null">
+                VOUCHER_ID,
+            </if>
+            <if test="defaultInvOrgId != null">
+                DEFAULT_INV_ORG_ID,
+            </if>
+            OBJECT_VERSION_NUMBER,
+
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            CREATION_DATE,
+
+
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            LAST_UPDATE_DATE,
+
+
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY,
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1,
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2,
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3,
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4,
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5,
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6,
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7,
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8,
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9,
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10,
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11,
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12,
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13,
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14,
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15,
+            </if>
+            <if test="salesOrgId != null">
+                SALES_ORG_ID,
+            </if>
+            <if test="uomCode != null">
+                UOM_CODE,
+            </if>
+            <if test="unpickQuantity != null">
+                UNPICK_QUANTITY,
+            </if>
+            <if test="syncFlag != null">
+                SYNC_FLAG,
+            </if>
+            <if test="lineNum!=null">
+                LINE_NUM,
+            </if>
+            <if test="itemType != null">
+                ITEM_TYPE,
+            </if>
+            <if test="parentLineId !=null">
+                PARENT_LINE_ID,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{lineId,jdbcType=DECIMAL},
+            <if test="headerId != null">
+                #{headerId,jdbcType=DECIMAL},
+            </if>
+            <if test="itemId != null">
+                #{itemId,jdbcType=DECIMAL},
+            </if>
+            <if test="unitOrigPrice != null">
+                #{unitOrigPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="unitDiscountPrice != null">
+                #{unitDiscountPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="unitSellingPrice != null">
+                #{unitSellingPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="itemSalesType != null">
+                #{itemSalesType,jdbcType=VARCHAR},
+            </if>
+            <if test="pv != null">
+                #{pv,jdbcType=DECIMAL},
+            </if>
+            <if test="quantity != null">
+                #{quantity,jdbcType=DECIMAL},
+            </if>
+            <if test="amount != null">
+                #{amount,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="unitRedeemPoint != null">
+                #{unitRedeemPoint,jdbcType=DECIMAL},
+            </if>
+            <if test="redeemPoint != null">
+                #{redeemPoint,jdbcType=DECIMAL},
+            </if>
+            <if test="sourceType != null">
+                #{sourceType,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceKey != null">
+                #{sourceKey,jdbcType=VARCHAR},
+            </if>
+            <if test="voucherId != null">
+                #{voucherId,jdbcType=DECIMAL},
+            </if>
+            <if test="defaultInvOrgId != null">
+                #{defaultInvOrgId,jdbcType=DECIMAL},
+            </if>
+            1,
+
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="creationDate != null">
+                CURRENT_TIMESTAMP,
+            </if>
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateDate != null">
+                CURRENT_TIMESTAMP,
+            </if>
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                #{attribute15,jdbcType=VARCHAR},
+            </if>
+            <if test="salesOrgId != null">
+                #{salesOrgId,jdbcType=DECIMAL},
+            </if>
+            <if test="uomCode != null">
+                #{uomCode,jdbcType=VARCHAR},
+            </if>
+            <if test="unpickQuantity != null">
+                #{unpickQuantity,jdbcType=DECIMAL},
+            </if>
+            <if test="syncFlag != null">
+                #{syncFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="lineNum!=null">
+                #{lineNum,jdbcType=VARCHAR},
+            </if>
+            <if test="itemType != null">
+                #{itemType,jdbcType=VARCHAR},
+            </if>
+            <if test="parentLineId !=null">
+                #{parentLineId,jdbcType=DECIMAL} ,
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesLine">
+        update OM_SALES_LINE
+        <set>
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            <if test="headerId != null">
+                HEADER_ID = #{headerId,jdbcType=DECIMAL},
+            </if>
+            <if test="itemId != null">
+                ITEM_ID = #{itemId,jdbcType=DECIMAL},
+            </if>
+            <if test="unitOrigPrice != null">
+                UNIT_ORIG_PRICE = #{unitOrigPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="unitDiscountPrice != null">
+                UNIT_DISCOUNT_PRICE = #{unitDiscountPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="unitSellingPrice != null">
+                UNIT_SELLING_PRICE = #{unitSellingPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="itemSalesType != null">
+                ITEM_SALES_TYPE = #{itemSalesType,jdbcType=VARCHAR},
+            </if>
+            <if test="pv != null">
+                PV = #{pv,jdbcType=DECIMAL},
+            </if>
+            <if test="quantity != null">
+                QUANTITY = #{quantity,jdbcType=DECIMAL},
+            </if>
+            <if test="amount != null">
+                AMOUNT = #{amount,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="unitRedeemPoint != null">
+                UNIT_REDEEM_POINT = #{unitRedeemPoint,jdbcType=DECIMAL},
+            </if>
+            <if test="redeemPoint != null">
+                REDEEM_POINT = #{redeemPoint,jdbcType=DECIMAL},
+            </if>
+            <if test="sourceType != null">
+                SOURCE_TYPE = #{sourceType,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceKey != null">
+                SOURCE_KEY = #{sourceKey,jdbcType=VARCHAR},
+            </if>
+            <if test="voucherId != null">
+                VOUCHER_ID = #{voucherId,jdbcType=DECIMAL},
+            </if>
+            <if test="defaultInvOrgId != null">
+                DEFAULT_INV_ORG_ID = #{defaultInvOrgId,jdbcType=DECIMAL},
+            </if>
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+            <if test="salesOrgId != null">
+                SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+            </if>
+            <if test="uomCode != null">
+                UOM_CODE = #{uomCode,jdbcType=VARCHAR},
+            </if>
+            <if test="unpickQuantity != null">
+                UNPICK_QUANTITY = #{unpickQuantity,jdbcType=DECIMAL},
+            </if>
+            <if test="syncFlag != null">
+                SYNC_FLAG = #{syncFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="lineNum!=null">
+                LINE_NUM=#{lineNum,jdbcType=VARCHAR},
+            </if>
+            <if test="itemType != null">
+                ITEM_TYPE=#{itemType,jdbcType=VARCHAR},
+            </if>
+            <if test="parentLineId !=null">
+                PARENT_LINE_ID=#{parentLineId,jdbcType=DECIMAL} ,
+            </if>
+        </set>
+        where LINE_ID = #{lineId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.order.dto.SalesLine">
+    update OM_SALES_LINE
+    set HEADER_ID = #{headerId,jdbcType=DECIMAL},
+      ITEM_ID = #{itemId,jdbcType=DECIMAL},
+      UNIT_ORIG_PRICE = #{unitOrigPrice,jdbcType=DECIMAL},
+      UNIT_DISCOUNT_PRICE = #{unitDiscountPrice,jdbcType=DECIMAL},
+      UNIT_SELLING_PRICE = #{unitSellingPrice,jdbcType=DECIMAL},
+      ITEM_SALES_TYPE = #{itemSalesType,jdbcType=VARCHAR},
+      PV = #{pv,jdbcType=DECIMAL},
+      QUANTITY = #{quantity,jdbcType=DECIMAL},
+      AMOUNT = #{amount,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=VARCHAR},
+      UNIT_REDEEM_POINT = #{unitRedeemPoint,jdbcType=DECIMAL},
+      REDEEM_POINT = #{redeemPoint,jdbcType=DECIMAL},
+      SOURCE_TYPE = #{sourceType,jdbcType=VARCHAR},
+      SOURCE_KEY = #{sourceKey,jdbcType=VARCHAR},
+      VOUCHER_ID = #{voucherId,jdbcType=DECIMAL},
+      DEFAULT_INV_ORG_ID = #{defaultInvOrgId,jdbcType=DECIMAL},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      UOM_CODE = #{uomCode,jdbcType=VARCHAR},
+      UNPICK_QUANTITY = #{unpickQuantity,jdbcType=DECIMAL},
+      SYNC_FLAG = #{syncFlag,jdbcType=VARCHAR},
+      LINE_NUM=#{lineNum,jdbcType=VARCHAR},
+      ITEM_TYPE=#{itemType,jdbcType=VARCHAR},
+      PARENT_LINE_ID=#{parentLineId,jdbcType=DECIMAL}
+    where LINE_ID = #{lineId,jdbcType=DECIMAL}
+  </update>
+    <delete id="deleteByHeadId" parameterType="java.lang.Long">
+    delete from OM_SALES_LINE where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </delete>
+
+    <select id="selectByHeadId" resultMap="BaseResultMap">
+        select OSL.LINE_ID,OSL.HEADER_ID,OSL.ITEM_ID,OSL.UNIT_DISCOUNT_PRICE,OSL.UNIT_ORIG_PRICE,
+        OSL.ITEM_SALES_TYPE,OSL.UNIT_SELLING_PRICE,OSL.PV,OSL.QUANTITY,OSL.AMOUNT,OSL.STATUS,OSL.UNIT_REDEEM_POINT,OSL.REDEEM_POINT,
+        OSL.SOURCE_TYPE,OSL.SOURCE_KEY,OSL.VOUCHER_ID,OSL.DEFAULT_INV_ORG_ID,OSL.SALES_ORG_ID,OSL.UOM_CODE,ITL.ITEM_NAME,itb.ITEM_NUMBER,OSL.LINE_NUM,
+        OSL.ITEM_TYPE,OSL.PARENT_LINE_ID, OSL.ATTRIBUTE1
+        from (OM_SALES_LINE osl LEFT OUTER JOIN INV_ITEM_TL itl ON(osl.ITEM_ID=itl.ITEM_ID AND
+        itl.LANG=#{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}))
+        LEFT OUTER JOIN INV_ITEM_B itb ON(itb.ITEM_ID=osl.ITEM_ID)
+        where osl.HEADER_ID = #{headerId,jdbcType=DECIMAL}
+        <if test="!isVirtual">
+            AND osl.ITEM_TYPE !='VPAK'
+        </if>
+        <if test="!isDetail">
+            AND osl.PARENT_LINE_ID is null
+        </if>
+    </select>
+
+    <!-- 退货单-商品查询 lov -->
+    <select id="selectByReturnHeaderId" resultMap="BaseResultMap">
+        SELECT osl.LINE_ID,
+        osl.ITEM_ID,
+        itemUom.ITEM_NUMBER,
+        itemUom.NAME UOM_NAME,
+        itl.ITEM_NAME,
+        countItem.ITEM_TYPE,
+        countItem.LOT_CONTROL_FLAG LOT_CTRL_FLAG,
+        countItem.COUNT_TYPE COUNT_TYPE,
+        countItem.COUNT_STOCK_FLAG,
+        countItem.COUNT_ITEM_ID COUNT_ITEM_ID,
+        countItem.ITEM_NUMBER COUNT_ITEM_NUMBER,
+        countItem.ITEM_NAME COUNT_ITEM_NAME,
+        osl.UNIT_ORIG_PRICE UNIT_ORIG_PRICE,
+        osl.UNIT_SELLING_PRICE,
+        osl.UNIT_DISCOUNT_PRICE,
+        osl.UNIT_REDEEM_POINT,
+        osl.QUANTITY,
+        (
+        CASE WHEN osl.ITEM_TYPE IN ('VY', 'VN')
+        THEN (
+        SELECT
+        SUM(dodl.OUTSTANDING_QTY)/(select iih.QUANTITY
+        from inv_item_hierarchy iih
+        where iih.ITEM_ID =dodl.ITEM_ID and iih.PARENT_ITEM_ID = dodl.PACKAGE_ITEM_ID
+        ) OUTSTANDING_QTY
+        FROM DM_ORDER_DELIVERY_LINE dodl
+        LEFT OUTER JOIN om_sales_line ol ON ol.LINE_ID = dodl.ORDER_LINE_ID
+        LEFT OUTER JOIN dm_order_delivery dd ON dd.delivery_id = dodl.delivery_id
+        WHERE osl.STATUS != 'USHIP' AND dd.delivery_status in ('PCKUP','SHIPP')
+        AND dodl.PACKAGE_ITEM_ID = osl.ITEM_ID AND ol.PARENT_LINE_ID = osl.LINE_ID
+        AND dodl.ORDER_LINE_ID = (SELECT max(dl.ORDER_LINE_ID) FROM DM_ORDER_DELIVERY_LINE dl
+        LEFT OUTER JOIN om_sales_line oline ON dl.ORDER_LINE_ID = oline.LINE_ID
+        WHERE dl.PACKAGE_ITEM_ID = osl.ITEM_ID AND oline.PARENT_LINE_ID = osl.LINE_ID
+        )
+        GROUP BY(dodl.ORDER_LINE_ID, dodl.PACKAGE_ITEM_ID, dodl.ITEM_ID)
+        )
+        ELSE (
+        COALESCE(deliveryline.OUTSTANDING_QTY, 0)
+        )
+        END
+        ) as OUTSTANDING_QTY,
+        returnline.RETURN_QTY RETURN_QTY,
+        pv.DISCOUNT_TYPE DISCOUNT_TYPE,
+        pv.DISCOUNT_VALUE DISCOUNT_VALUE,
+        osa.ADJUSTMENT_AMOUNT ADJUSTMENT_AMOUNT,
+        osl.PV,
+        osl.PARENT_LINE_ID PARENT_LINE_ID,
+        osl.ATTRIBUTE1
+        FROM OM_SALES_LINE osl
+        LEFT OUTER JOIN OM_SALES_ADJUSTMENT osa ON (osa.HEADER_ID = osl.HEADER_ID and osa.ADJUSTMENT_TYPE = 'CP')
+        LEFT OUTER JOIN PDM_VOUCHER pv ON (pv.VOUCHER_ID = osl.VOUCHER_ID)
+        LEFT OUTER JOIN INV_ITEM_TL itl ON (osl.ITEM_ID=itl.ITEM_ID AND itl.LANG = #{request.locale, jdbcType=VARCHAR})
+        LEFT OUTER JOIN (
+        SELECT iib.ITEM_ID, iib.ITEM_NUMBER, uomtl.NAME
+        FROM INV_ITEM_B iib
+        LEFT OUTER JOIN INV_UNIT_OF_MEASURE_TL uomtl ON (uomtl.UOM_CODE = iib.UOM_CODE and uomtl.LANG =
+        #{request.locale, jdbcType=VARCHAR})
+        ) itemUom ON (itemUom.ITEM_ID=osl.ITEM_ID)
+        LEFT OUTER JOIN (
+        SELECT dodl.ORDER_LINE_ID, SUM(dodl.OUTSTANDING_QTY) OUTSTANDING_QTY
+        FROM DM_ORDER_DELIVERY_LINE dodl
+        LEFT OUTER JOIN dm_order_delivery dd ON dd.delivery_id = dodl.delivery_id
+        WHERE dd.delivery_status in ('PCKUP','SHIPP')
+        GROUP BY(dodl.ORDER_LINE_ID)
+        ) deliveryline ON osl.LINE_ID = deliveryline.ORDER_LINE_ID
+        LEFT OUTER JOIN (
+        SELECT osrl.ORDER_LINE_ID, SUM(osrl.QUANTITY) RETURN_QTY
+        FROM OM_SALES_RTN_LINE osrl
+        LEFT OUTER JOIN OM_SALES_RETURN osr ON (osr.RETURN_ID = osrl.RETURN_ID )
+        -- WHERE osr.RETURN_STATUS != 'NEW'
+        <where>
+            1=1
+            <if test="returnId != null and returnId != '' and returnStatus == 'NEW' ">
+                AND osr.RETURN_ID != #{returnId, jdbcType=DECIMAL}
+            </if>
+        </where>
+        GROUP BY(osrl.ORDER_LINE_ID)
+        ) returnline ON osl.LINE_ID = returnline.ORDER_LINE_ID
+        LEFT OUTER JOIN
+        (
+        SELECT v.ORGANIZATION_ID, iib.ITEM_ID, v.ITEM_ID COUNT_ITEM_ID, v.ITEM_NAME, v.ITEM_NUMBER, v.ITEM_TYPE,
+        v.COUNT_STOCK_FLAG, v.LOT_CONTROL_FLAG, v.COUNT_TYPE
+        FROM inv_item_b iib
+        LEFT OUTER JOIN inv_item_property_v v ON(COALESCE(iib.COUNT_ITEM_ID, iib.ITEM_ID) = v.ITEM_ID)
+        LEFT OUTER JOIN inv_item_tl itl ON (iib.COUNT_ITEM_ID = itl.ITEM_ID AND itl.LANG =
+        #{request.locale, jdbcType=VARCHAR})
+        ) countItem ON (countItem.item_id = osl.ITEM_ID and countItem.ORGANIZATION_ID =
+        #{defaultInvOrgId, jdbcType=DECIMAL})
+        <where>
+            osl.HEADER_ID = #{headerId,jdbcType=DECIMAL}
+            AND osl.STATUS != 'USHIP'
+            AND (CASE WHEN osl.ITEM_TYPE IN ('VY', 'VN')
+            THEN (
+            SELECT SUM(dodl.OUTSTANDING_QTY)/(select iih.QUANTITY from inv_item_hierarchy iih where iih.ITEM_ID
+            =dodl.ITEM_ID and iih.PARENT_ITEM_ID=dodl.PACKAGE_ITEM_ID) OUTSTANDING_QTY
+            FROM DM_ORDER_DELIVERY_LINE dodl
+            LEFT OUTER JOIN om_sales_line ol ON ol.LINE_ID = dodl.ORDER_LINE_ID
+            LEFT OUTER JOIN dm_order_delivery dd ON dd.delivery_id = dodl.delivery_id
+            WHERE osl.STATUS != 'USHIP'
+            AND dd.delivery_status in ('PCKUP','SHIPP')
+            AND dodl.PACKAGE_ITEM_ID = osl.ITEM_ID AND ol.PARENT_LINE_ID = osl.LINE_ID
+            AND dodl.ORDER_LINE_ID = (SELECT max(dl.ORDER_LINE_ID) FROM DM_ORDER_DELIVERY_LINE dl
+            LEFT OUTER JOIN om_sales_line oline ON dl.ORDER_LINE_ID = oline.LINE_ID
+            WHERE dl.PACKAGE_ITEM_ID = osl.ITEM_ID AND oline.PARENT_LINE_ID = osl.LINE_ID
+            )
+            GROUP BY(dodl.ORDER_LINE_ID, dodl.PACKAGE_ITEM_ID, dodl.ITEM_ID)
+            )
+            ELSE (
+            COALESCE(deliveryline.OUTSTANDING_QTY, 0)
+            )
+            END) > coalesce(RETURN_QTY, 0)
+            AND EXISTS (
+            select 1
+            FROM INV_ITEM_ASSIGN iia
+            WHERE iia.ITEM_ID = osl.ITEM_ID
+            and iia.ENABLED_FLAG = 'Y'
+            and iia.ASSIGN_TYPE ='INV'
+            and iia.ASSIGN_VALUE = #{defaultInvOrgId, jdbcType=DECIMAL}
+            )
+            <if test="parentLineId == null">
+                AND osl.PARENT_LINE_ID is null
+            </if>
+            <if test="parentLineId != null">
+                AND osl.PARENT_LINE_ID = #{parentLineId,jdbcType=DECIMAL}
+            </if>
+        </where>
+        <if test="sortname != null">
+            <bind name='_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+            ORDER BY ${_colName} ${sortorder}
+        </if>
+
+    </select>
+
+    <select id="selectByParentLineId" resultMap="BaseResultMap">
+  select OSL.LINE_ID,OSL.HEADER_ID,OSL.ITEM_ID,OSL.UNIT_DISCOUNT_PRICE,OSL.UNIT_ORIG_PRICE,
+    OSL.ITEM_SALES_TYPE,OSL.UNIT_SELLING_PRICE,OSL.PV,OSL.QUANTITY,OSL.AMOUNT,OSL.STATUS,OSL.UNIT_REDEEM_POINT,OSL.REDEEM_POINT,
+    OSL.SOURCE_TYPE,OSL.SOURCE_KEY,OSL.VOUCHER_ID,OSL.DEFAULT_INV_ORG_ID,OSL.SALES_ORG_ID,OSL.UOM_CODE,ITL.ITEM_NAME,itb.ITEM_NUMBER,OSL.LINE_NUM,
+    OSL.ITEM_TYPE,OSL.PARENT_LINE_ID
+    from (OM_SALES_LINE osl LEFT OUTER JOIN INV_ITEM_TL itl ON(osl.ITEM_ID=itl.ITEM_ID AND itl.LANG=#{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})) 
+    LEFT OUTER JOIN INV_ITEM_B itb ON(itb.ITEM_ID=itl.ITEM_ID)
+    where osl.PARENT_LINE_ID =#{parentLineId,jdbcType=DECIMAL}
+  </select>
+
+    <delete id="deleteByParentLineId">
+    delete from OM_SALES_LINE where PARENT_LINE_ID =#{parentLineId,jdbcType=DECIMAL}
+  </delete>
+    <select id="selectByHeaderId" resultMap="BaseResultMap" parameterType="java.util.Map">
+      select 
+        rownum,
+        osl.LINE_ID, osl.HEADER_ID, osl.ITEM_ID, osl.UNIT_ORIG_PRICE, osl.UNIT_DISCOUNT_PRICE, 
+        osl.UNIT_SELLING_PRICE, 
+        osl.ITEM_SALES_TYPE, osl.PV, osl.QUANTITY, osl.AMOUNT, osl.STATUS, osl.UNIT_REDEEM_POINT, 
+        osl.REDEEM_POINT, osl.SOURCE_TYPE, 
+        osl.SOURCE_KEY, osl.VOUCHER_ID, osl.DEFAULT_INV_ORG_ID, osl.SALES_ORG_ID, osl.UOM_CODE, 
+        osl.UNPICK_QUANTITY,osl.SYNC_FLAG,LINE_NUM,osl.ITEM_TYPE,osl.PARENT_LINE_ID,
+        iib.DESCRIPTION ITEM_DESCRIPTION
+      from OM_SALES_LINE osl,
+      INV_ITEM_B iib
+      LEFT OUTER JOIN INV_ITEM_TL iitl
+      on (iib.ITEM_ID = iitl.ITEM_ID AND iitl.LANG = #{request.locale, jdbcType=VARCHAR})
+      where osl.HEADER_ID = #{headerId,jdbcType=DECIMAL}
+        AND iib.ITEM_ID = osl.ITEM_ID
+        and osl.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL} 
+  </select>
+    <select id="selectOrderLine" resultMap="BaseResultMap" parameterType="java.util.Map">
+      select osl.LINE_ID,
+       osl.HEADER_ID,
+       osl.ITEM_ID,
+       osl.UNIT_ORIG_PRICE,
+       osl.UNIT_DISCOUNT_PRICE,
+       osl.UNIT_SELLING_PRICE,
+       osl.ITEM_SALES_TYPE,
+       osl.PV,
+       osl.QUANTITY,
+       osl.AMOUNT,
+       osl.STATUS,
+       osl.UNIT_REDEEM_POINT,
+       osl.REDEEM_POINT,
+       osl.SOURCE_TYPE,
+       osl.SOURCE_KEY,
+       osl.VOUCHER_ID,
+       osl.DEFAULT_INV_ORG_ID,
+       osl.OBJECT_VERSION_NUMBER,
+       osl.REQUEST_ID,
+       osl.PROGRAM_ID,
+       osl.CREATION_DATE,
+       osl.CREATED_BY,
+       osl.LAST_UPDATED_BY,
+       osl.LAST_UPDATE_DATE,
+       osl.LAST_UPDATE_LOGIN,
+       osl.ATTRIBUTE_CATEGORY,
+       osl.SALES_ORG_ID,
+       osl.UOM_CODE,
+       osl.UNPICK_QUANTITY,
+       osl.SYNC_FLAG,
+       osl.LINE_NUM,
+       osl.ITEM_TYPE,
+       osl.PARENT_LINE_ID,
+       ii.ITEM_NUMBER
+      from OM_SALES_LINE osl, inv_item_b ii
+      where osl.LINE_ID =  #{lineId,jdbcType=DECIMAL} 
+        and osl.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL} 
+        and ii.ITEM_ID = osl.ITEM_ID
+  </select>
+    <select id="querySalesLineByHeaderId" resultMap="BaseResultMap" parameterType="java.util.Map">
+      select 
+       rownum,
+        osl.LINE_ID, osl.HEADER_ID, osl.ITEM_ID, osl.UNIT_ORIG_PRICE, osl.UNIT_DISCOUNT_PRICE, 
+        osl.UNIT_SELLING_PRICE, 
+        osl.ITEM_SALES_TYPE, osl.PV, osl.QUANTITY, osl.AMOUNT, osl.STATUS, osl.UNIT_REDEEM_POINT, 
+        osl.REDEEM_POINT, osl.SOURCE_TYPE, 
+        osl.SOURCE_KEY, osl.VOUCHER_ID, osl.DEFAULT_INV_ORG_ID, osl.SALES_ORG_ID, osl.UOM_CODE, 
+        osl.UNPICK_QUANTITY,osl.SYNC_FLAG,LINE_NUM,osl.ITEM_TYPE,osl.PARENT_LINE_ID,
+        iib.DESCRIPTION ITEM_DESCRIPTION,iib.ITEM_NUMBER,iitl.item_name,OSO.CURRENCY
+      from OM_SALES_LINE osl,OM_SALES_ORDER OSO,
+      INV_ITEM_B iib
+      LEFT OUTER JOIN INV_ITEM_TL iitl
+      on (iib.ITEM_ID = iitl.ITEM_ID AND iitl.LANG = #{request.locale, jdbcType=VARCHAR})
+      where osl.HEADER_ID = #{headerId,jdbcType=DECIMAL}
+        AND iib.ITEM_ID = osl.ITEM_ID
+        AND OSO.HEADER_ID = OSL.HEADER_ID
+        AND OSL.PARENT_LINE_ID IS NULL
+  </select>
+
+    <select id="checkOrderShipStatus" resultType="java.lang.Long" parameterType="java.lang.Long">
+       select count(1) from OM_SALES_ORDER o
+		INNER JOIN OM_SALES_LINE l on l.header_id = o.header_id
+		where o.HEADER_ID = #{headerId,jdbcType=DECIMAL}
+		and l.STATUS != 'SHIPP'
+  </select>
+
+    <select id="checkOrderItemType" resultType="java.lang.Long" parameterType="java.lang.Long">
+       select count(1) from OM_SALES_LINE osl,inv_item_b ii
+		where OSL.ITEM_ID = II.ITEM_ID
+		and II.ITEM_TYPE = 'ITEM'
+		and OSL.LINE_ID = #{lineId,jdbcType=DECIMAL}
+  </select>
+
+    <select id="getLinesForDapp" resultMap="BaseResultMap" parameterType="java.lang.Long">
+  SELECT
+	osl.LINE_ID,
+	osl.HEADER_ID,
+	osl.ITEM_ID,
+	osl.UNIT_ORIG_PRICE,
+	osl.UNIT_DISCOUNT_PRICE,
+	osl.UNIT_SELLING_PRICE,
+	osl.ITEM_SALES_TYPE,
+	osl.PV,
+	osl.QUANTITY,
+	osl.AMOUNT,
+	osl.STATUS,
+	osl.UNIT_REDEEM_POINT,
+	osl.REDEEM_POINT,
+	osl.SOURCE_TYPE,
+	osl.SOURCE_KEY,
+	osl.VOUCHER_ID,
+	osl.DEFAULT_INV_ORG_ID,
+	osl.OBJECT_VERSION_NUMBER,
+	osl.REQUEST_ID,
+	osl.PROGRAM_ID,
+	osl.CREATION_DATE,
+	osl.CREATED_BY,
+	osl.LAST_UPDATED_BY,
+	osl.LAST_UPDATE_DATE,
+	osl.LAST_UPDATE_LOGIN,
+	osl.ATTRIBUTE_CATEGORY,
+	osl.ATTRIBUTE1,
+	osl.ATTRIBUTE2,
+	osl.ATTRIBUTE3,
+	osl.ATTRIBUTE4,
+	osl.ATTRIBUTE5,
+	osl.ATTRIBUTE6,
+	osl.ATTRIBUTE7,
+	osl.ATTRIBUTE8,
+	osl.ATTRIBUTE9,
+	osl.ATTRIBUTE10,
+	osl.ATTRIBUTE11,
+	osl.ATTRIBUTE12,
+	osl.ATTRIBUTE13,
+	osl.ATTRIBUTE14,
+	osl.ATTRIBUTE15,
+	osl.SALES_ORG_ID,
+	osl.UOM_CODE,
+	osl.UNPICK_QUANTITY,
+	osl.SYNC_FLAG,
+	osl.LINE_NUM,
+	osl.ITEM_TYPE,
+	osl.PARENT_LINE_ID, 
+		(
+		SELECT
+			SUM (rl.QUANTITY)
+		FROM
+			OM_SALES_RTN_LINE rl
+		WHERE
+			rl.ORDER_LINE_ID = OSL.line_id
+		AND rl.RETURN_ID IN (
+			SELECT
+				sr.RETURN_ID
+			FROM
+				OM_SALES_RETURN sr
+			WHERE
+				sr.RETURN_STATUS != 'NEW'
+		)
+		GROUP BY
+			(rl.ORDER_LINE_ID)
+	) AS RETURN_QTY,
+(case when ((select count(1) from OM_SALES_LINE osl,inv_item_b ii
+		where OSL.ITEM_ID = II.ITEM_ID
+		and II.ITEM_TYPE = 'ITEM'
+		and OSL.LINE_ID = osl.line_id) > 0)
+then (select coalesce(sum(l.OUTSTANDING_QTY),0) from DM_ORDER_DELIVERY_LINE l
+		where l.ORDER_LINE_ID = osl.line_id
+		and EXISTS(
+		select 1 from DM_ORDER_DELIVERY d where d.DELIVERY_ID = l.DELIVERY_ID 
+		and d.DELIVERY_TYPE = oso.delivery_type
+		and (d.DELIVERY_STATUS = 'SHIPP' or d.DELIVERY_STATUS = 'PCKUP')
+		))
+else (SELECT DISTINCT
+	       coalesce(SUM(dodl.outstanding_qty), 0) /
+	       (SELECT iih.quantity
+	          FROM inv_item_hierarchy iih
+	         WHERE iih.parent_item_id = oslp.item_id 
+	           AND iih.item_id = osl.item_id) AS shippedqty
+	  FROM dm_order_delivery_line dodl,
+				 DM_ORDER_DELIVERY dod,
+	       om_sales_line          osl,
+	       om_sales_line          oslp
+	 WHERE dodl.order_line_id = osl.line_id
+	   AND osl.parent_line_id = oslp.line_id
+		 and DOD.DELIVERY_ID = DODL.DELIVERY_ID
+	   AND osl.parent_line_id IS NOT NULL 
+	   AND EXISTS (SELECT 'x'
+	          FROM inv_item_b ii
+	         WHERE ii.quantity_count_type = 'IDV'
+	           AND ii.item_type = 'PACKG'
+	           AND oslp.item_id = ii.item_id)
+			   and (dod.DELIVERY_STATUS = 'SHIPP' or dod.DELIVERY_STATUS = 'PCKUP')
+	   		and oslp.LINE_ID = osl.line_id
+	 	GROUP BY oslp.item_id,
+	          osl.item_id,
+	          osl.line_id)
+end )as OUTSTANDING_QTY,
+(select item_name from inv_item_b iib WHERE iib.item_id = osl.item_id) as item_name,
+(select item_number from inv_item_b iib WHERE iib.item_id = osl.item_id) as item_number
+FROM
+	om_sales_line osl,
+	om_sales_order oso
+WHERE
+	OSO.header_id = OSL.header_id
+AND OSO.header_id = #{headerId,jdbcType=DECIMAL}
+  </select>
+
+    <select id="getLinesByHeadersForDapp" resultMap="BaseResultMap" parameterType="java.util.Map">
+        SELECT
+        osl.LINE_ID,
+        osl.HEADER_ID,
+        osl.ITEM_ID,
+        osl.UNIT_ORIG_PRICE,
+        osl.UNIT_DISCOUNT_PRICE,
+        osl.UNIT_SELLING_PRICE,
+        osl.ITEM_SALES_TYPE,
+        osl.PV,
+        osl.QUANTITY,
+        osl.AMOUNT,
+        osl.STATUS,
+        osl.UNIT_REDEEM_POINT,
+        osl.REDEEM_POINT,
+        osl.SOURCE_TYPE,
+        osl.SOURCE_KEY,
+        osl.VOUCHER_ID,
+        osl.DEFAULT_INV_ORG_ID,
+        osl.OBJECT_VERSION_NUMBER,
+        osl.REQUEST_ID,
+        osl.PROGRAM_ID,
+        osl.CREATION_DATE,
+        osl.CREATED_BY,
+        osl.LAST_UPDATED_BY,
+        osl.LAST_UPDATE_DATE,
+        osl.LAST_UPDATE_LOGIN,
+        osl.ATTRIBUTE_CATEGORY,
+        osl.ATTRIBUTE1,
+        osl.ATTRIBUTE2,
+        osl.ATTRIBUTE3,
+        osl.ATTRIBUTE4,
+        osl.ATTRIBUTE5,
+        osl.ATTRIBUTE6,
+        osl.ATTRIBUTE7,
+        osl.ATTRIBUTE8,
+        osl.ATTRIBUTE9,
+        osl.ATTRIBUTE10,
+        osl.ATTRIBUTE11,
+        osl.ATTRIBUTE12,
+        osl.ATTRIBUTE13,
+        osl.ATTRIBUTE14,
+        osl.ATTRIBUTE15,
+        osl.SALES_ORG_ID,
+        osl.UOM_CODE,
+        osl.UNPICK_QUANTITY,
+        osl.SYNC_FLAG,
+        osl.LINE_NUM,
+        osl.ITEM_TYPE,
+        osl.PARENT_LINE_ID,
+        (
+        SELECT
+        SUM (rl.QUANTITY)
+        FROM
+        OM_SALES_RTN_LINE rl
+        WHERE
+        rl.ORDER_LINE_ID = OSL.line_id
+        AND rl.RETURN_ID IN (
+        SELECT
+        sr.RETURN_ID
+        FROM
+        OM_SALES_RETURN sr
+        WHERE
+        sr.RETURN_STATUS != 'NEW'
+        )
+        GROUP BY
+        (rl.ORDER_LINE_ID)
+        ) AS RETURN_QTY,
+        (case when ((select count(1) from OM_SALES_LINE osl,inv_item_b ii
+        where OSL.ITEM_ID = II.ITEM_ID
+        and II.ITEM_TYPE = 'ITEM'
+        and OSL.LINE_ID = osl.line_id) > 0)
+        then (select coalesce(sum(l.OUTSTANDING_QTY),0) from DM_ORDER_DELIVERY_LINE l
+        where l.ORDER_LINE_ID = osl.line_id
+        and EXISTS(
+        select 1 from DM_ORDER_DELIVERY d where d.DELIVERY_ID = l.DELIVERY_ID
+        and d.DELIVERY_TYPE = oso.delivery_type
+        and (d.DELIVERY_STATUS = 'SHIPP' or d.DELIVERY_STATUS = 'PCKUP')
+        ))
+        else (SELECT DISTINCT
+        coalesce(SUM(dodl.outstanding_qty), 0) /
+        (SELECT iih.quantity
+        FROM inv_item_hierarchy iih
+        WHERE iih.parent_item_id = oslp.item_id
+        AND iih.item_id = osl.item_id) AS shippedqty
+        FROM dm_order_delivery_line dodl,
+        DM_ORDER_DELIVERY dod,
+        om_sales_line osl,
+        om_sales_line oslp
+        WHERE dodl.order_line_id = osl.line_id
+        AND osl.parent_line_id = oslp.line_id
+        and DOD.DELIVERY_ID = DODL.DELIVERY_ID
+        AND osl.parent_line_id IS NOT NULL
+        AND EXISTS (SELECT 'x'
+        FROM inv_item_b ii
+        WHERE ii.quantity_count_type = 'IDV'
+        AND ii.item_type = 'PACKG'
+        AND oslp.item_id = ii.item_id)
+        and (dod.DELIVERY_STATUS = 'SHIPP' or dod.DELIVERY_STATUS = 'PCKUP')
+        and oslp.LINE_ID = osl.line_id
+        GROUP BY oslp.item_id,
+        osl.item_id,
+        osl.line_id)
+        end )as OUTSTANDING_QTY,
+        (select item_name from inv_item_b iib WHERE iib.item_id = osl.item_id) as item_name,
+        (select item_number from inv_item_b iib WHERE iib.item_id = osl.item_id) as item_number
+        FROM
+        om_sales_line osl,
+        om_sales_order oso
+        WHERE
+        OSO.header_id = OSL.header_id
+        AND OSO.header_id in
+        <foreach collection="headerIds" item="headerId" index="index"
+                 open="(" close=")" separator=",">
+            #{headerId,jdbcType=DECIMAL}
+        </foreach>
+    </select>
+
+    <select id="selectSalesLineByHead" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from om_sales_line osl where osl.header_id =  #{headerId,jdbcType=DECIMAL}
+    </select>
+</mapper>

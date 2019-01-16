@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.product.mapper.InvUnitOfMeasureBMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.product.dto.InvUnitOfMeasureB">
+        <id column="UOM_CODE" property="uomCode" jdbcType="VARCHAR" />
+        <result column="NAME" property="name" jdbcType="VARCHAR" />
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+        <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+        <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+        <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        UOM_CODE, NAME, DESCRIPTION, ENABLED_FLAG, START_ACTIVE_DATE, END_ACTIVE_DATE,
+        OBJECT_VERSION_NUMBER,
+        REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11,
+        ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+    </sql>
+
+    <select id="selectUomCodeLov" resultMap="BaseResultMap">
+        select 
+        mt.uom_code,
+        mt.name
+        from inv_unit_of_measure_b b
+        left outer join inv_unit_of_measure_tl mt on mt.uom_code = b.uom_code and mt.lang = #{request.locale,jdbcType=VARCHAR}
+        where b.enabled_flag = 'Y'
+        and (current_timestamp &lt;= b.end_active_date or b.end_active_date is null)
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List" />
+        from INV_UNIT_OF_MEASURE_B
+        where UOM_CODE = #{uomCode,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from INV_UNIT_OF_MEASURE_B
+        where UOM_CODE = #{uomCode,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.product.dto.InvUnitOfMeasureB">
+        <selectKey resultType="java.lang.String" keyProperty="uomCode" order="BEFORE">
+            select INV_UNIT_OF_MEASURE_B_S.nextval from dual
+        </selectKey>
+        insert into INV_UNIT_OF_MEASURE_B (UOM_CODE, NAME, DESCRIPTION,
+        ENABLED_FLAG, START_ACTIVE_DATE, END_ACTIVE_DATE,
+        OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID,
+        CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3,
+        ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+        )
+        values (#{uomCode,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR},
+        #{enabledFlag,jdbcType=VARCHAR}, #{startActiveDate,jdbcType=TIMESTAMP},
+        #{endActiveDate,jdbcType=TIMESTAMP},
+        1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR},
+        #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR},
+        #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR},
+        #{attribute6,jdbcType=VARCHAR},
+        #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR},
+        #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR},
+        #{attribute12,jdbcType=VARCHAR},
+        #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.product.dto.InvUnitOfMeasureB">
+        <selectKey resultType="java.lang.String" keyProperty="uomCode" order="BEFORE">
+            select INV_UNIT_OF_MEASURE_B_S.nextval from dual
+        </selectKey>
+        insert into INV_UNIT_OF_MEASURE_B
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            UOM_CODE,
+            <if test="name != null">
+                NAME,
+            </if>
+            <if test="description != null">
+                DESCRIPTION,
+            </if>
+            <if test="enabledFlag != null">
+                ENABLED_FLAG,
+            </if>
+            <if test="startActiveDate != null">
+                START_ACTIVE_DATE,
+            </if>
+            <if test="endActiveDate != null">
+                END_ACTIVE_DATE,
+            </if>
+            OBJECT_VERSION_NUMBER,
+
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            CREATION_DATE,
+
+
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            LAST_UPDATE_DATE,
+
+
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY,
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1,
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2,
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3,
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4,
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5,
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6,
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7,
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8,
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9,
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10,
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11,
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12,
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13,
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14,
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{uomCode,jdbcType=VARCHAR},
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="enabledFlag != null">
+                #{enabledFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="startActiveDate != null">
+                #{startActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endActiveDate != null">
+                #{endActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            1,
+
+
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="creationDate != null">
+                CURRENT_TIMESTAMP,
+            </if>
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateDate != null">
+                CURRENT_TIMESTAMP,
+            </if>
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.product.dto.InvUnitOfMeasureB">
+        update INV_UNIT_OF_MEASURE_B
+        <set>
+            <if test="name != null">
+                NAME = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                DESCRIPTION = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="enabledFlag != null">
+                ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="startActiveDate != null">
+                START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endActiveDate != null">
+                END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where UOM_CODE = #{uomCode,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.product.dto.InvUnitOfMeasureB">
+        update INV_UNIT_OF_MEASURE_B
+        set NAME = #{name,jdbcType=VARCHAR},
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+        START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+        where UOM_CODE = #{uomCode,jdbcType=VARCHAR}
+    </update>
+    <!-- 查询单位（包装类型信息） -->
+    <select id="getUom" resultMap="BaseResultMap">
+        select uom.UOM_CODE, uomct.NAME as NAME
+        from INV_UNIT_OF_MEASURE_B uom LEFT OUTER JOIN INV_UNIT_OF_MEASURE_TL
+        uomct
+        on (uom.UOM_CODE = uomct.UOM_CODE AND uomct.LANG =
+        #{request.locale,jdbcType=VARCHAR})
+        where uom.ENABLED_FLAG = 'Y'
+        and (uom.END_ACTIVE_DATE >= CURRENT_TIMESTAMP OR uom.END_ACTIVE_DATE is
+        null)
+        and uom.UOM_CODE = #{uomCode, jdbcType=VARCHAR}
+    </select>
+
+    <!-- 查询单位信息 -->
+    <select id="queryUomByCode" resultMap="BaseResultMap">
+        select uom.UOM_CODE, uomct.NAME as NAME
+        from INV_UNIT_OF_MEASURE_B uom
+        LEFT OUTER JOIN INV_UNIT_OF_MEASURE_TL
+        uomct
+        on (uom.UOM_CODE = uomct.UOM_CODE AND uomct.LANG =
+        #{request.locale,jdbcType=VARCHAR})
+        where
+        uom.UOM_CODE = #{uomCode, jdbcType=VARCHAR}
+    </select>
+
+    <!-- 查询初始单位 -->
+    <select id="queryAllUom" resultMap="BaseResultMap">
+        select uom.UOM_CODE, uomct.NAME as NAME
+        from INV_UNIT_OF_MEASURE_B uom LEFT OUTER JOIN INV_UNIT_OF_MEASURE_TL
+        uomct
+        on (uom.UOM_CODE = uomct.UOM_CODE AND uomct.LANG =
+        #{request.locale,jdbcType=VARCHAR})
+        where uom.ENABLED_FLAG = 'Y'
+        and (uom.END_ACTIVE_DATE >= CURRENT_TIMESTAMP OR uom.END_ACTIVE_DATE is
+        null)
+    </select>
+    <!-- 单位维护界面Form单位名称查询 lov -->
+    <select id="queryUnitNamesOfUomManage" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvUnitOfMeasureB">
+        select uomb.UOM_CODE UOM_CODE, uomtl.NAME NAME, uomtl.DESCRIPTION DESCRIPTION, uomb.END_ACTIVE_DATE
+        END_ACTIVE_DATE
+        from INV_UNIT_OF_MEASURE_B uomb
+        left outer join INV_UNIT_OF_MEASURE_TL uomtl
+        on (uomb.UOM_CODE = uomtl.UOM_CODE and uomtl.LANG = #{request.locale,jdbcType=VARCHAR})
+        <where>
+            <if test="uomCode != null and uomCode != '' ">
+                and Upper(uomb.UOM_CODE) like concat(concat('%', Upper(#{uomCode, jdbcType=VARCHAR})), '%')
+            </if>
+            <if test="name != null and name != '' ">
+                and Upper(uomb.NAME) like concat(concat('%', Upper(#{name, jdbcType=VARCHAR})), '%')
+            </if>
+        </where>
+         <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        
+    </select>
+    <!-- 单位转换界面Grid目标单位查询lov -->
+    <select id="queryUnitOfUomConvert" resultMap="BaseResultMap">
+        select uomtl.NAME as NAME, uomb.UOM_CODE UOM_CODE, uomb.END_ACTIVE_DATE END_ACTIVE_DATE
+        from INV_UNIT_OF_MEASURE_B uomb
+        left outer join INV_UNIT_OF_MEASURE_TL uomtl
+        on (uomb.UOM_CODE = uomtl.UOM_CODE and uomtl.LANG = #{request.locale,jdbcType=VARCHAR})
+        <where>
+            (uomb.END_ACTIVE_DATE &gt;= CURRENT_TIMESTAMP or uomb.END_ACTIVE_DATE is null)
+            <if test="uomCode != null and uomCode != '' ">
+                and uomb.UOM_CODE = #{uomCode, jdbcType=VARCHAR}
+            </if>
+            <if test="name != null and name != '' ">
+                and uomb.NAME like concat(concat('%', #{name, jdbcType=VARCHAR}), '%')
+            </if>
+        </where>
+         <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        
+    </select>
+    <!-- 校验UOM_CODE唯一性 -->
+    <select id="selectByUomCodeIsExist" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from INV_UNIT_OF_MEASURE_B uomb
+        where uomb.UOM_CODE = #{uomCode, jdbcType=VARCHAR}
+    </select>
+        <!-- 校验UOM_NAME唯一性 -->
+    <select id="selectByUomNameIsExist" resultType = "java.lang.Integer">
+        select count(1)
+        from INV_UNIT_OF_MEASURE_B uomb
+        left outer join INV_UNIT_OF_MEASURE_TL tl
+        on(uomb.uom_code=tl.uom_code and  tl.LANG = #{request.locale,jdbcType=VARCHAR})
+        where tl.name = #{name, jdbcType=VARCHAR}
+    </select>
+    <!-- 新增单位信息 -->
+    <insert id="insertUnitOfMeasureB" parameterType="com.lkkhpg.dsis.common.product.dto.InvUnitOfMeasureB">
+        insert into INV_UNIT_OF_MEASURE_B(UOM_CODE, NAME, DESCRIPTION, START_ACTIVE_DATE, END_ACTIVE_DATE, CREATION_DATE,
+        LAST_UPDATE_DATE)
+        values (#{uomCode,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, CURRENT_TIMESTAMP,
+        #{endActiveDate,jdbcType=TIMESTAMP},
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    </insert>
+    <!-- 更新单位信息 -->
+    <update id="updateUnitOfMeasureB" parameterType="com.lkkhpg.dsis.common.product.dto.InvUnitOfMeasureB">
+        update INV_UNIT_OF_MEASURE_B uomb
+        set uomb.DESCRIPTION = #{description, jdbcType=VARCHAR} , uomb.END_ACTIVE_DATE = #{endActiveDate, jdbcType=TIMESTAMP},
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1, LAST_UPDATE_DATE = CURRENT_TIMESTAMP
+        where uomb.UOM_CODE = #{uomCode, jdbcType=VARCHAR}
+    </update>
+</mapper>

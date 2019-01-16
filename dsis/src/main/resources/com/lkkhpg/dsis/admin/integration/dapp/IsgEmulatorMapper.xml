@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgEmulatorMapper"> 
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgEmulator">
+        <result column="SERVICE_NAME" jdbcType="VARCHAR" property="serviceName" />
+        <result column="METHOD_NAME" jdbcType="VARCHAR" property="methodName" />
+        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+        <result column="REQUEST" jdbcType="CLOB" property="requestData" />
+        <result column="RESPONSE" jdbcType="CLOB" property="response" />
+        <result column="AUTO_RESP" jdbcType="VARCHAR" property="autoResp" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        SERVICE_NAME, METHOD_NAME, DESCRIPTION, REQUEST, RESPONSE, AUTO_RESP
+    </sql>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from isg_emulator
+    </select>
+    <update id="updateIsgEmulator" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgEmulator">
+        update isg_emulator
+        set DESCRIPTION = #{description,jdbcType=VARCHAR},
+            REQUEST = #{requestData,jdbcType=CLOB},
+            RESPONSE = #{response,jdbcType=CLOB},
+            AUTO_RESP = #{autoResp,jdbcType=VARCHAR},
+            LAST_UPDATE_DATE = current_timestamp
+        where METHOD_NAME = #{methodName,jdbcType=VARCHAR}
+    </update>
+</mapper>

@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+        <style type="text/css">
+            <!-- 
+/*横向*/
+@page { 
+    size:813px 524px;
+    mso-page-orientation:landscape;
+    mso-header-margin:0pt;
+    mso-footer-margin:0pt;
+    mso-paper-source:0;
+    margin-bottom: 0px;
+    
+}
+/*@top-left {
+  content: element(pageHeader);
+}*/
+
+body {
+  font-family: 'Microsoft JhengHei';
+  font-size: 12px;
+}
+.title {
+  font-size: 24px;
+  font-weight: bolder;
+}
+.subTitle {
+  font-size: 20px;
+}
+.label {
+  text-align: right;
+  width:74px;
+
+}
+.text {
+  text-align: left;
+  padding-left: 5px;
+}
+.lian {
+  width:26px;
+  height:400px;
+  float:left;
+  line-height:24px;
+  text-align: center;
+
+}
+.detail {
+  text-align:justify;
+  text-justify:inter-ideograph;
+}
+.border_bottom {
+  border-bottom: 1px solid black;
+}
+.border_top {
+  border-top: 1px solid black;
+}
+.border_left {
+  border-left: 1px solid black;
+}
+.border_right {
+  border-right: 1px solid black;
+}
+.border_all {
+  border: 1px solid black;
+}
+.space {
+  padding-left: 2px;
+}
+.line{
+  height: 30px;
+}
+--></style>
+    </head>
+    
+    <body>
+    <#list lines as ln>
+        <#if ln_index != lines?size -1>
+            <div style="width:100%;page-break-after:always">
+         <#else>
+            <div style="width:100%;page-break-after:avoid;margin-top:8px;">
+         </#if>
+          <div style="width:100%;padding-top:5px;">
+            <table border="0" width="100%">
+              <tr>
+                  <td align="center">
+                    <table width="100%">
+                      <tr>
+                        <td align="right" width="260px">${year!}</td>
+                        <td align="right" width="75px">${month!}</td>
+                        <td align="right" width="95px">${day!}</td>
+                        <td align="center"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+            </table>
+           </div>
+
+           <div style="width:100%;margin-top:-5px;padding-left:40px;height:60px;">
+            <table border="0" cellspacing="0">
+                <tr>
+                    <td class="text" width="355px">${head.invoiceNumber!}</td>
+                    <td class="text" width="160px">${head.memberCode!}</td>
+                    <td class="text">${code!}</td></tr>
+                <tr>
+                    <td class="text">${head.memberName!}</td>
+                    <td class="text">${uniformNumber!}</td>
+                    <td class="text">${head.orderNumber!}</td></tr>
+                <tr>
+                    <td class="text" height="15px" colspan="3">${address}</td>
+                </tr>
+             </table>
+
+             <div style="position: relative;top:0px;left:364px;z-index: 999;margin-bottom:5px;margin-top: -10px">
+                <table>
+                    <tr>
+                        <td style="width: 160px;"><div><#if totalAmount == 0>零元發票兌獎無效</#if></div></td>
+                        <td><div><#if tailNumber??>簽帳卡號末四碼:${tailNumber!}</#if></div></td>
+                    </tr>
+                </table> 
+                
+                
+             </div>
+             
+           </div>
+
+
+           <div style="width:100%;margin-top:22px; height:250px;">
+              <div style="width:82%;float:left;">
+              <table cellpadding="0" cellspacing="0" width="100%" style="TABLE-LAYOUT:fixed;line-height:18px;">
+                   <#list ln as line>
+                      <tr>
+                          <td class=" space"  align="left" width="95px;">${line.itemNumber!}</td>
+                          <td class=" space"  align="left" width="210px;">${line.itemName!}</td>
+                          <td class=" space"  align="right" width="50px">${line.quantity!}</td>
+                          <td class=" space"  align="right" width="60px"><#if line.unitSellingPrice??> ${line.unitSellingPrice?string(',###.##')!} </#if></td>
+                          <td class=" space"  align="right" width="88px"><#if line.amount??> ${line.amount?string(',###.##')!} </#if></td>
+                          <td></td>
+                      </tr>
+                    </#list>
+              </table>
+              </div>
+              <div  style="width:16%;float:left;word-wrap:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${head.remark!}
+              </div>
+           </div>
+
+
+           <div style="width:100%;margin-top:5px;padding-top:-5px;" >
+              <#if ln_index != lines?size -1>
+              <table cellpadding="0" cellspacing="0" width="520px" style="line-height:15px;">
+                  <tr> 
+                    <td colspan="4"  align="right">*********</td>
+                  </tr>
+                    <tr>
+                      <td align="right" width="120px;"><!--營按稅-->√</td>
+                      <td align="right" width="160px;"><!--税率--></td>
+                      <td align="right" width="120px;"><!--免税--></td>
+                      <td align="right">*********</td>
+                    </tr>
+                    <tr>
+                      <td align="right" colspan="4">*********</td>
+                    </tr>
+                    <tr>
+                        <td  height="25" colspan="4" style="padding-left:60px;margin-top:-12px;">
+                        <#list totalNum as t>
+                          <span style="margin-right:37px;">*</span>
+                        </#list>
+                        </td>
+                    </tr>
+              </table>
+              <#else>
+              <table cellpadding="0" cellspacing="0" width="520px" style="line-height:15px;">
+                  <tr> 
+                    <td colspan="4"  align="right">${totalAmount?string(',###.##')}</td>
+                  </tr>
+                    <tr>
+                      <td align="right" width="120px;"><!--營按稅-->√</td>
+                      <td align="right" width="160px;"><!--税率--></td>
+                      <td align="right" width="120px;"><!--免税--></td>
+                      <td align="right">*********</td>
+                    </tr>
+                    <tr>
+                      <td align="right" colspan="4">${totalAmount?string(',###.##')}</td>
+                    </tr>
+                    <tr>
+                        <td  height="25" colspan="4" style="padding-left:60px;margin-top:-13px;padding-bottom:5px;">
+                        <#list totalNum as t>
+                          <span style="margin-right:30px;">${t}</span>
+                        </#list>
+                        </td>
+                    </tr>
+              </table>
+
+
+              </#if>
+              <table cellpadding="0" cellspacing="0" width="100%" style="line-height:15px;">
+                  <tr>
+                      <td align="right" width="70px">
+                      <!--物流-->
+                      <#if head.deliveryType = "PCKUP">
+                        自取
+                      <#else>
+                        物流
+                      </#if>
+                      </td>
+                      <td align="right" width="213px">總PV</td>
+                      <td align="right" width="60px">${totalPV!}</td>
+                      <td align="right" width="244px">${username!}</td>
+                      <td></td>
+                  </tr>
+              </table>
+           </div>
+
+        </div>
+  </#list>
+    </body>
+</html>

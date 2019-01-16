@@ -1,0 +1,270 @@
+<#--
+ * description: 用户资料查询界面
+ * version: 1.0 
+ * author:zhaoqi
+ * .
+ * 
+-->
+<#include "../include/head.html">
+<style>
+    #form_title {
+        margin: 0;
+        padding: 0;
+        width:99%;
+        height:29px;
+        background-color:#F0F0F0;
+        border:1px solid #D6D6D6;
+    }
+    #form_title p {
+        padding-left: 25px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+</style>
+<body style="padding: 10px;">
+    <script src="${base.contextPath}/common/code?codeData=SPM.MARKER_CODE&closingStatus=SPM.CLOSE_STATUS" type="text/javascript"></script>
+    <form id="d_spm_001_form" style="margin-top: 20px;" autocomplete="off"></form>
+    <div id="d_spm_001_grid" style="margin: 0; padding: 0"></div> 
+    <script type="text/javascript">
+    var mydate = new Date();
+    var start_year = '2016';
+    var currency_year = mydate.getFullYear();
+    var periodYear=[];
+    function get_year(year){
+        var o = {};
+        o.value = year;
+        o.meaning = year;
+        return o;
+    }
+    for(var i = start_year;i<=currency_year+20;i++){
+    	periodYear.push(get_year(i));
+    }
+    $(function(){
+        window['d_spm_001_form'] = $("#d_spm_001_form").ligerForm({
+//         	onAfterSetFields:function(){
+//                 $.ligerui.get("generate").setDisabled(true);
+//                 return true;
+//             },
+            fields: [
+                { name : "orgId", 
+                  display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.marketid"/>', 
+                  newline: false,
+                  type : "combobox",
+                  options : {
+                      valueField : 'marketId',
+                      textField : 'name',
+                      url:"${base.contextPath}/spm/period/queryByMarket",
+                      onSelected: function(obj) {
+                        if(obj){
+                           if($.ligerui.get('periodYear').getValue()){
+                           $.ajax({
+                                  type: "POST",
+                                  url: "${base.contextPath}/spm/period/querySpmPeriod",
+                                  data: {
+                                         orgId : $.ligerui.get('orgId').getValue(),
+                                         periodYear : $.ligerui.get('periodYear').getValue()
+                                  },
+                                  dataType: "json",
+                                  success: function(data){
+                                  	<#if accessService.access("GENERATE_EDITABLE") != false>
+
+                                      if(data.rows[0]){
+                                    	  $.ligerui.get("generate").setDisabled(true);
+                                      }else{
+                                    	  $.ligerui.get("generate").setEnabled(true);
+                                      }
+
+                                  	</#if>
+                                  }
+                           })
+                           }else{
+                               $.ligerui.get("generate").setDisabled(true);
+                           }
+                        }
+                      //$.ligerui.get("generate").setEnabled(true);
+                        //$.ligerui.get("generate").setDisabled(true);
+                      },
+                  }
+                },
+                { 
+                    name : "periodYear",
+                    type : "combobox",
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.year"/>',
+                    newline: false,
+                    options : {
+                        onSelected: function(obj) {
+                            if(obj){
+                                $.ajax({
+                                       type: "POST",
+                                       url: "${base.contextPath}/spm/period/querySpmPeriod",
+                                       data: {
+                                              orgId : $.ligerui.get('orgId').getValue(),
+                                              periodYear : $.ligerui.get('periodYear').getValue()
+                                       },
+                                       dataType: "json",
+                                       success: function(data){
+                                         	<#if accessService.access("GENERATE_EDITABLE") != false>
+                                           if(data.rows[0]){
+                                               $.ligerui.get("generate").setDisabled(true);
+                                           }else{
+                                               $.ligerui.get("generate").setEnabled(true);
+                                           }
+                                           </#if>
+                                       }
+                                })
+                            }else{
+                            	$.ligerui.get("generate").setDisabled(true);
+                            }
+                        },
+                        valueField : 'value',
+                        textField : 'meaning',
+                        data : periodYear,
+                    }
+                }
+            ], buttons: [
+                { 
+                    text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, 
+                    click: function(){
+                    	if($.ligerui.get('orgId').getValue() == "" && $.ligerui.get('periodYear').getValue() == ""){
+                    		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.please.select.a.condition"/>')
+                    		return;
+                    	}
+                        Hap.gridQuery({
+                            form:d_spm_001_form,
+                            grid:d_spm_001_grid
+                        })
+                    }
+                },
+                { 
+                    text: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.generate"/>', 
+                	<#if accessService.access("GENERATE_EDITABLE") == false>
+                    disabled:true,
+                	</#if>
+                     
+                    width: 60, id:"generate",
+                    click: function(){
+                        $.ajax({
+                        	type: "POST",
+                            url: "${base.contextPath}/spm/period/generateBonusPeriod",
+                            data: {
+                                   orgId : $.ligerui.get('orgId').getValue(),
+                                   periodYear : $.ligerui.get('periodYear').getValue()
+                            },
+                            dataType: "json",
+                            success: function(data){
+                                if(data.success){
+                                    $.ligerui.get("generate").setDisabled(true);
+                                    $.ligerDialog.success('<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.generate.success"/>');
+                                }
+                                Hap.gridQuery({
+                                    form:d_spm_001_form,
+                                    grid:d_spm_001_grid
+                                })
+                            }
+                        })
+                    }
+                },
+                { 
+                    text: '<@spring.message "sys.hand.btn.close"/>', 
+                	<#if accessService.access("CLOSE_EDITABLE") == false>
+                    disabled:true,
+                	</#if>
+                    width: 60, id:"closeBtn",
+                    click: function(){
+                    	if($.ligerui.get('orgId').getValue()){
+                    		var promptString="<@spring.message 'sys.hand.btn.close'/>["+$.ligerui.get('orgId').getText()+"]<@spring.message 'type.com.lkkhpg.dsis.common.config.period_record'/>";
+                    	}else{
+                    		var promptString="<@spring.message 'type.com.lkkhpg.dsis.common.config.close_all_market_period'/>";
+                    	}                   	
+                    	
+                    	$.ligerDialog.confirm(promptString, function (boolData) { 
+
+	                    	if(boolData){
+	                    		$.ajax({
+	                                type: "POST",
+	                                url: "${base.contextPath}/spm/period/closeBonusPeriod",
+	                                data: {
+	                                       orgId : $.ligerui.get('orgId').getValue()
+	                                },
+	                                dataType: "json",
+	                                success: function(data){
+	                                	if(data.success){
+	                                		$.ligerDialog.success('<@spring.message "sys.hand.btn.close.success"/>')
+	                                	}
+	                                    Hap.gridQuery({
+	                                        form:d_spm_001_form,
+	                                        grid:d_spm_001_grid
+	                                    })
+	                                }
+	                            });                   		
+	                    		
+	                    	}                   	
+                    	
+                    	
+                    	
+                    	});
+                    	
+                    	
+                        
+                    }
+                }
+            ]
+        });
+        
+        $.ligerui.get("generate").setDisabled(true);
+      
+        window['d_spm_001_grid'] = $("#d_spm_001_grid").ligerGrid({
+//             onLoaded:function(){
+//                 $.ligerui.get("generate").setDisabled(true);
+//             },
+            columns: [
+                { name: 'orgId', 
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.market.code"/>',
+                  textField : 'name',
+                  url:"${base.contextPath}/spm/market/query",
+                  render : function(item) {
+                        return item.name;
+                  }
+                },
+                { name: 'periodName', display: '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.periodid"/>' },
+                { name: 'startDate',
+                  display: '<@spring.message "type.com.lkkhpg.dsis.platform.job.dto.triggerdto.starttime"/>',
+                  newline : false,
+                  type : "date",
+                  format : "yyyy-MM-dd"
+                },
+                { name: 'endDate',
+                  display:  '<@spring.message "type.com.lkkhpg.dsis.platform.job.dto.triggerdto.endtime"/>',
+                  newline : false,
+                  type : "date",
+                  format : "yyyy-MM-dd"
+                },
+                { name: 'closingStatus',
+                  display:  '<@spring.message "type.com.lkkhpg.dsis.platform.job.dto.triggerdto.period.state"/>',
+                  render : function(item) {
+                      for (var i = 0; i < closingStatus.length; i++) {
+                          if (closingStatus[i]['value'] == item.closingStatus)
+                              return closingStatus[i]['meaning']
+                      }
+                      return item.closingStatus;
+                  }
+                },
+                { name: 'creationDate',
+                  display:  '<@spring.message "type.com.lkkhpg.dsis.platform.job.dto.triggerdto.creation.time"/>',
+                  newline : false,                 type : "date",
+                  format : "yyyy-MM-dd"
+                }
+                     ], 
+            url:'${base.contextPath}/spm/period/querySpmPeriod',
+
+            rownumbers:true,
+            enabledEdit: true,
+            width: '99%', 
+            height: '98%', 
+            checkbox: false
+        });
+        
+    });
+  </script>
+</body>
+</html> 

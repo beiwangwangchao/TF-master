@@ -1,0 +1,215 @@
+<#--
+ * description: 供货查询界面
+ * version: 1.0
+ * author: wangc
+ * .
+ *
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+    <form id="spm_supply_form"></form>
+    <div id="spm_supply_grid" style="margin: 0; padding: 0"></div>
+    <div id="supply_div" style="display: none;">
+        <form id="supply_type_edit"></form>
+    </div>
+<script type="text/javascript">
+$(function() {
+	window['spm_supply_form'] = $("#spm_supply_form").ligerForm({
+	    fields: [{
+	        type: 'text',
+	        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierseg.countryname" />',
+	        name: 'countryName',
+	    },
+	    {
+	        type: 'text',
+	        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtlseg.citycode" />',
+	        name: 'cityName',
+	        newline: false
+	    },
+	    {
+	        type: 'text',
+	        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtlseg.statecode" />',
+	        name: 'stateName',
+	        newline: false
+	    },
+	    {
+	        type: 'text',
+	        label: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition" />',
+	        name: 'salesOrgName',
+	    }],
+	    buttons: [{
+	        text: '<@spring.message "sys.hand.btn.query" />',
+	        disabled: false,
+	        width: 60,
+	        click: function() {
+	            Hap.gridQuery({
+	                form: spm_supply_form,
+	                grid: spm_supply_grid
+	            })
+	        }
+	    }]
+	});
+
+	window['spm_supply_grid'] = $("#spm_supply_grid").ligerGrid({
+	    columns: [{
+	        display: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition" />',
+	        name: 'salesOrgName',
+	    },
+	    {
+	        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierseg.countryname" />',
+	        name: 'countryName',
+	    },
+	    {
+	        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtlseg.statecode" />',
+	        name: 'stateName',
+	    },
+	    {
+	        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtlseg.citycode" />',
+	        name: 'cityName',
+	    },
+	    {
+	        display: '<@spring.message "sys.hand.btn.action"/>',
+	        align: 'center',
+	        render: function(rowdata) {
+	        	rowdata.mode = 'edit';
+	        	rowdata = JSON2.stringify(rowdata);
+	            return "<a href='javascript:void(0);' onclick='openSupplyEdit("+ rowdata + ")'><@spring.message "sys.hand.btn.action"/></a>"
+	        }
+	    }],
+	    url: ' ${base.contextPath}/spm/supply/query',
+	    toolbar: {
+	        items: [{
+	            click: addSupplyEdit,
+	            text: '<@spring.message "sys.hand.btn.new" />',
+	            icon: 'add'
+	        }]
+	    },
+	    enabledEdit: true,
+	    width: '98%',
+	    height: '99%'
+	});
+
+	window['supply_type_edit'] = $("#supply_type_edit").ligerForm({
+        labelWidth: 50,
+        inputWidth: 130,
+        fields: [{
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.orgtemplatedtl.assignvalue" />',
+            name: "salesOrg",
+            type: "checkbox",
+            newline: false,
+            options: {
+                checkValue: 'Y',
+                uncheckValue: 'N'
+            }
+        },
+        {
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.seg" />',
+            name: "address",
+            type: "checkbox",
+            newline: false,
+            options: {
+                checkValue: 'Y',
+                uncheckValue: 'N'
+            }
+        },
+        ],
+    });
+
+});
+
+function editType() {
+    /* window['supply_type_edit'] = $("#supply_type_edit").ligerForm({
+        labelWidth: 50,
+        inputWidth: 130,
+        fields: [{
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.orgtemplatedtl.assignvalue" />',
+            name: "salesOrg",
+            type: "checkbox",
+            newline: false,
+            options: {
+                checkValue: 'Y',
+                uncheckValue: 'N'
+            }
+        },
+        {
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.seg" />',
+            name: "address",
+            type: "checkbox",
+            newline: false,
+            options: {
+                checkValue: 'Y',
+                uncheckValue: 'N'
+            }
+        },
+        ],
+    }); */
+    liger.get('salesOrg').setValue("N");
+    liger.get('address').setValue("N");
+    $.ligerDialog.open({
+        height: 150,
+        width: 300,
+        title: '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.selecttype" />',
+        target: $('#supply_div'),
+        buttons: [{
+            text: '<@spring.message "sys.hand.btn.ok" />',
+            onclick: function(item, dialog) {
+            	addSupplyEdit(dialog);
+            }
+        }]
+    });
+}
+
+function addSupplyEdit(dialog) {
+	var supplyType;
+//    var type = supply_type_edit.getData();
+//    if ('Y' == type.salesOrg && 'Y' == type.address) {
+//    	$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.config.supply.choosetype" />');
+//    	return;
+//    }
+//    if ('N' == type.salesOrg && 'N' == type.address) {
+//    	$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.config.supply.select.one.type" />');
+//    	return;
+//    }
+   // if('Y' == type.salesOrg && 'N' == type.address){
+    	supplyType = 'ORG';
+    //}
+//    if('Y' == type.address && 'N' == type.salesOrg){
+//    	supplyType = 'SITE';
+//    }
+    var rowdata = [];
+    rowdata.mode = 'add';
+    rowdata.supplyType = supplyType;
+    openSupplyEdit(rowdata);
+    dialog.hide();
+}
+
+
+function openSupplyEdit(rowdata) {
+	if('add' == rowdata.mode){
+		url = 'spm_supply_edit.html?isedit=0&type='+rowdata.supplyType;
+	}else{
+		var supplyType = rowdata.supplyType;
+		var salesOrgId = rowdata.salesOrgId;
+		var countryCode = rowdata.countryCode;
+		var stateCode = rowdata.stateCode;
+		var cityCode = rowdata.cityCode;
+		if(rowdata.supplyType == 'ORG'){
+			url = 'spm_supply_edit.html?isedit=1&type='+supplyType+'&salesOrgId='+salesOrgId;
+		}
+		if(rowdata.supplyType == 'SITE'){
+			url = 'spm_supply_edit.html?isedit=1&type='+supplyType+'&countryCode='+countryCode
+			+'&stateCode='+stateCode+'&cityCode='+cityCode;
+		}
+	}
+	
+	$.ligerDialog.open({
+        height: 600,
+        width: 900,
+        title: '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.supplyedit" />',
+        url: url
+    });
+}
+
+</script>
+</body>
+</html>

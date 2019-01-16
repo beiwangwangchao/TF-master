@@ -1,0 +1,212 @@
+<#--
+ * description: 物流资料查询界面
+ * version: 1.0 
+ * author: huangjiajing
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+
+<#include "../include/head.html">
+<body style="padding: 10px;">
+    <form id="d_stm_001_form"></form>
+    <div id="d_stm_001_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+    <script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161107" type="text/javascript"></script>
+    <script type="text/javascript">
+    $(function() {
+        window['d_stm_001_form'] = $("#d_stm_001_form").ligerForm({
+            fields : [
+				/* { name : 'salesOrgId', label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.salesorgid"/>', newline : false ,type:'hidden',
+				readonly : true,
+				options:{
+					value:_salesOrgId
+				}
+				},
+				{ name : 'salesOrgName', label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.salesorgid"/>', newline : false ,type:'text',
+	                readonly : true,
+	                options:{
+	                    value:_salesOrgName
+	                }
+	            }, */
+	            {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition"/>',
+                    newline:false, 
+                    name: 'salesOrgId',
+                    type : "combobox",
+                    options : {
+                        url: '${base.contextPath}/sys/salesOrg/queryOrg',
+                        value:_salesOrgId,
+                        valueField: "salesOrgId",
+                        textField: "name",
+                        onSelected : function() {
+                        	Hap.gridQuery({
+                                form : d_stm_001_form,
+                                grid : d_stm_001_grid
+                            })
+                        }
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                { name : 'shippingTierCode', label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.shippingtiercode"/>', newline : false},
+	            { name : 'shippingTierName', type : 'text', label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.shippingtiername"/>', newline : false },
+	            {
+	                name : 'startActiveDate',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.startactivedate"/>',
+	                type : 'date',
+	                format: 'YYYY-MM-DD',
+	                newline:true,
+	                options:{
+		                onChangeDate  :function(date){
+		                	if($("input[name='endActiveDate']").val()<date){
+		                		if($("input[name='endActiveDate']").val()!=""){
+			                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+			                		$.ligerui.get("startActiveDate").setValue("");
+		                		}
+		                	}
+		                }
+	                }
+	            },
+	            {
+	                name : 'endActiveDate',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.endactivedate"/>',
+	                type : 'date',
+	                format: 'YYYY-MM-DD',
+	                newline:false,
+	                options:{
+		                onChangeDate : function(date){
+		                	if($("input[name='startActiveDate']").val()>date){
+		                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+		                		$.ligerui.get("endActiveDate").setValue("");
+		                	}
+		                }
+	                }
+	            }
+	        ],
+            buttons : [
+				{
+				    text : '<@spring.message "sys.hand.btn.create"/>',
+				    <#if accessService.access("CREATE_EDITABLE") == false>
+				    disabled : true,
+				    </#if> 
+				    width : 60,
+				    click: function(){	
+				    	window.top.f_removeTab('DM_SHIPPING_TIER');
+				    	window.top.f_addTab('DM_SHIPPING_TIER','<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shipping.createshipping"/>','${base.contextPath}/dm/dm_shipping_tier.html');
+				    }
+				},
+                {
+	                text : '<@spring.message "sys.hand.btn.query"/>',
+	                disabled : false,
+	                width : 60,
+	                click : function() {
+	                	if(Hap.validateForm(d_stm_001_form) == false){ // 未通过校验
+                            return;
+                        }
+	                    Hap.gridQuery({
+	                        form : d_stm_001_form,
+	                        grid : d_stm_001_grid
+	                    })
+	                }
+	            }
+            ]
+        });
+        liger.get('salesOrgId').setText(_salesOrgName);
+         var d_stm_001_grid;
+         d_stm_001_grid = window['d_stm_001_grid'] = $("#d_stm_001_grid").ligerGrid({
+            unSetValidateAttr : false,
+            columns : [
+                {
+   	                display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.salesorgid"/>',
+   	                name : 'salesOrgName',
+   	                align : 'left',
+   	                width : 200
+    	        },
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.shippingtiercode"/>',
+	                name : 'shippingTierCode',
+	                align : 'left',
+	                isSort : true,
+	                width : 100,
+	                isAllowHide: false,
+                    render: function (row){
+                    	return "<a href='javascript:void(0);' onclick='shippingTierEdit(\""+row.shippingTierId+"\")'>" + row.shippingTierCode + "</a> ";
+                    }
+                },
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.shippingtiername"/>',
+	                name : 'shippingTierName',
+	                align : 'left',
+	                isSort : true,
+	                width : 200,
+                    type : 'text'
+	            },
+	            {
+	                name : 'startActiveDate',
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.startactivedate"/>',
+	                align : 'left',
+	                width : 200,
+	                isSort : true,
+	                format: "YYYY-MM-DD",
+                    type : 'date'
+	            },
+                {
+                    name : 'endActiveDate',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.endactivedate"/>',
+                    align : 'left',
+                    width : 200,
+                    isSort : true,
+                    format: "YYYY-MM-DD",
+                    type : 'date'
+                }
+            ],
+            url : '${base.contextPath}/dm/shippingTier/query',
+            toolbar: {
+                items: [
+                { line: true },
+                {                  
+                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                    menu:{ width: 120, items:
+                            [
+                                {                   
+                                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                    click:   function (){exportSelected("d_stm_001_form","d_stm_001_grid",{},_basePath);}
+                                },
+                                { line: true },
+                                {                   
+                                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                    click: function (){exportAll("d_stm_001_form","d_stm_001_grid",{},_basePath);}
+                                    
+                                }
+                          ]
+                    }                        
+                }
+                ]
+            },
+            enabledEdit : false,
+            delayLoad : false,
+            width : '99%',
+            height : '98%',
+            rownumbers : true,
+            checkbox : true
+        });
+         Hap.gridQuery({
+            form : d_stm_001_form,
+            grid : d_stm_001_grid
+        })
+    });
+    
+    function submitForm(){
+        Hap.gridSave({
+            grid:d_stm_001_grid,
+            url:'${base.contextPath}/dm/shippingTier/query'
+        });
+    }
+    function shippingTierEdit(shippingTierId){
+        window.top.f_removeTab('shipping_tier_edit');
+        window.top.f_addTab('shipping_tier_edit', '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shipping.shippingtier"/>', '${base.contextPath}/dm/dm_shipping_tier.html?isedit=1&shippingTierId='+shippingTierId+'&salesOrgId='+liger.get('salesOrgId').getValue());
+    }
+</script>
+</body>
+</html>

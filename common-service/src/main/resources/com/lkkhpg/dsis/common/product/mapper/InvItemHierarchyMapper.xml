@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.product.mapper.InvItemHierarchyMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.product.dto.InvItemHierarchy" >
+    <result column="HIERARCHY_ID" property="hierarchyId" jdbcType="DECIMAL" />
+    <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL" />
+    <result column="PARENT_ITEM_ID" property="parentItemId" jdbcType="DECIMAL" />
+    <result column="UOM_CODE" property="uomCode" jdbcType="VARCHAR" />
+    <result column="QUANTITY" property="quantity" jdbcType="DECIMAL" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR" />
+    <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+    <!-- 计算库存标记 -->
+    <result column="count_stock_flag" property="countStockFlag" jdbcType="VARCHAR" />
+    <!-- 批次控制标记 -->
+    <result column="lot_control_flag" property="lotControlFlag" jdbcType="VARCHAR" />
+    <!-- 计算库存商品Id -->
+    <result column="inv_count_item_id" property="invCountItemId" jdbcType="DECIMAL" />
+    <!-- 计算库存商品编号 -->
+    <result column="inv_count_item_number" property="invCountItemNumber" jdbcType="VARCHAR" />
+    <!-- 计算库存商品名称 -->
+    <result column="inv_count_item_name" property="invCountItemName" jdbcType="DECIMAL" />
+    <!-- 库存组织 -->
+    <result column="ORGANIZATION_ID" property="organizationId" jdbcType="DECIMAL" />
+    <!-- 单位名称 -->
+    <result column="UOM_NAME" property="uomName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.product.dto.InvItemHierarchy" >
+    delete from INV_ITEM_HIERARCHY
+    where HIERARCHY_ID = #{hierarchyId,jdbcType=DECIMAL}
+  </delete>
+  
+  
+  <!-- 根据itemId查询 -->
+  <select id="getHierarchyByItemId" resultMap="BaseResultMap">
+       SELECT ih.hierarchy_id,
+       ih.item_id,
+       (select i.item_number from inv_item_b i where i.item_id=ih.item_id) as item_number,
+       (select tl.item_name from inv_item_b i 
+               left join inv_item_tl tl on (tl.item_id = i.item_id and tl.lang = #{request.locale,jdbcType=VARCHAR}) 
+               where i.item_id=ih.item_id) as item_name,
+       (select i.count_stock_flag from inv_item_b i where i.item_id=ih.item_id ) as count_stock_flag,
+       (select i.lot_ctrl_flag from inv_item_b i where i.item_id=ih.item_id ) as lotcontrolflag,
+       (select i.count_item_id from inv_item_b i where i.item_id=ih.item_id) as inv_count_item_id,
+       (select tl.item_name from inv_item_b iib 
+               left outer join inv_item_tl tl on (tl.item_id = iib.count_item_id and tl.lang = #{request.locale,jdbcType=VARCHAR}) 
+               where iib.item_id = ih.item_id ) as inv_count_item_name,
+       ih.parent_item_id,
+       ih.uom_code,
+       (select u.name from inv_unit_of_measure_tl u 
+       where u.uom_code = ih.uom_code and u.lang = #{request.locale,jdbcType=VARCHAR}) uom_name,
+       ih.quantity
+       FROM inv_item_hierarchy ih
+       WHERE ih.parent_item_id = #{itemId,jdbcType=DECIMAL}
+    </select>
+
+  
+  <!-- 根据itemNumber查询 -->
+  <select id="getHierarchyByItemNumber" parameterType="java.lang.String" resultMap="BaseResultMap">
+      SELECT ii.item_id,
+           ii.item_number,
+           ii.bar_code,
+           ii.item_name,
+           ii.uom_code,
+           iih.hierarchy_id,
+           iih.quantity
+      FROM inv_item_hierarchy iih,
+           inv_item_b         ii,
+           inv_item_b         iip
+     WHERE iih.item_id = ii.item_id
+       AND iih.parent_item_id = iip.item_id
+       AND iip.item_number = #{itemNumber,jdbcType=VARCHAR}
+    </select>
+
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.product.dto.InvItemHierarchy" >
+    <selectKey resultType="java.lang.Short" keyProperty="hierarchyId" order="BEFORE" >
+      select inv_item_hierarchy.nextval from dual
+    </selectKey>
+    insert into INV_ITEM_HIERARCHY (HIERARCHY_ID, ITEM_ID, PARENT_ITEM_ID, 
+      UOM_CODE, QUANTITY, OBJECT_VERSION_NUMBER, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15)
+    values (#{hierarchyId,jdbcType=DECIMAL}, #{itemId,jdbcType=DECIMAL}, #{parentItemId,jdbcType=DECIMAL}, 
+      #{uomCode,jdbcType=VARCHAR}, #{quantity,jdbcType=DECIMAL}, 1, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},CURRENT_TIMESTAMP, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.product.dto.InvItemHierarchy" >
+    <selectKey resultType="java.lang.Long" keyProperty="hierarchyId" order="BEFORE" >
+      select inv_item_hierarchy_s.nextval from dual
+    </selectKey>
+    insert into INV_ITEM_HIERARCHY 
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      HIERARCHY_ID,
+      <if test="itemId != null" >
+        ITEM_ID,
+      </if>
+      <if test="parentItemId != null" >
+        PARENT_ITEM_ID,
+      </if>
+      <if test="uomCode != null" >
+        UOM_CODE,
+      </if>
+      <if test="quantity != null" >
+        QUANTITY,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{hierarchyId,jdbcType=DECIMAL},
+      <if test="itemId != null" >
+        #{itemId,jdbcType=DECIMAL},
+      </if>
+      <if test="parentItemId != null" >
+        #{parentItemId,jdbcType=DECIMAL},
+      </if>
+      <if test="uomCode != null" >
+        #{uomCode,jdbcType=VARCHAR},
+      </if>
+      <if test="quantity != null" >
+        #{quantity,jdbcType=DECIMAL},
+      </if> 
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+       CURRENT_TIMESTAMP,
+       
+       
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+        
+        
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.product.dto.InvItemHierarchy">
+    update INV_ITEM_HIERARCHY
+    <set>
+      <if test="hierarchyId != null">
+        HIERARCHY_ID = #{hierarchyId,jdbcType=DECIMAL},
+      </if>
+      <if test="itemId != null">
+        ITEM_ID = #{itemId,jdbcType=DECIMAL},
+      </if>
+      <if test="parentItemId != null">
+        PARENT_ITEM_ID = #{parentItemId,jdbcType=DECIMAL},
+      </if>
+      <if test="uomCode != null">
+        UOM_CODE = #{uomCode,jdbcType=VARCHAR},
+      </if>
+      <if test="quantity != null">
+        QUANTITY = #{quantity,jdbcType=DECIMAL},
+      </if>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+        
+        
+      <if test="requestId != null">
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null">
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null">
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null">
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        
+        
+      <if test="lastUpdateLogin != null">
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null">
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null">
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null">
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null">
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null">
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null">
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null">
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null">
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null">
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null">
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null">
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null">
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null">
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null">
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null">
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null">
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where HIERARCHY_ID = #{hierarchyId,jdbcType=DECIMAL}
+  </update>
+  
+  <!-- 查询库存组织下的商品包的商品明细 -->
+  <select id="queryItemsByOrganizationId" parameterType="com.lkkhpg.dsis.common.product.dto.InvItemHierarchy" resultMap="BaseResultMap">
+    SELECT iih.item_id,
+           iip.item_number,
+           iip.item_name,
+           iih.parent_item_id,
+           iih.uom_code,
+           iih.hierarchy_id,
+           iih.quantity,
+           coalesce(count_item_iip.count_stock_flag, iip.count_stock_flag) count_stock_flag,
+           coalesce(count_item_iip.lot_control_flag, iip.lot_control_flag) lot_control_flag,
+           iip.count_item_id               inv_count_item_id,
+           count_item_iip.item_number      inv_count_item_number,
+           count_item_iip.item_name        inv_count_item_name
+      FROM inv_item_hierarchy  iih,
+           inv_item_property_v iip,
+           inv_item_property_v count_item_iip
+     WHERE iip.organization_id = #{organizationId,jdbcType=DECIMAL}
+       AND iih.parent_item_id = #{packageItemId,jdbcType=DECIMAL}
+       AND iih.item_id = iip.item_id
+       AND iip.organization_id = count_item_iip.organization_id
+       AND iip.count_item_id = count_item_iip.item_id
+    </select>
+    
+    <!-- 根据商品包的ID获取商品包下的所有商品 -->
+    <select id="selectPkgItemsByPkgItemId" resultMap="BaseResultMap">
+    	select iih.item_id, iih.parent_item_id, iih.uom_code, iih.quantity
+    	  from inv_item_hierarchy iih where iih.parent_item_id = #{parentItemId, jdbcType=DECIMAL}
+    </select>
+</mapper>

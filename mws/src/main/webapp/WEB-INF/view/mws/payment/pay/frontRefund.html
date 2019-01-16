@@ -1,0 +1,426 @@
+<#include "/mws/include/header.html">
+    
+<!-- ========== MENU END ========== -->
+
+<!-- ========== JS START ========= -->
+<style>
+#download_invoice a:hover{TEXT-DECORATION:none !important}
+</style>
+<script src="${base.contextPath}/common/code?deliveryType=DM.DELIVERY_TYPE&ecouponInvisible=SYS.MWS_ECOUPON_INVISIBLE"
+        type="text/javascript"></script>
+        
+        
+<!-- 初始化页面 -->
+<script type="text/javascript">
+var memberRole = "";
+var currencySymbol = "";
+var code = "${Session._marketCode}";
+var orderToken ="";
+<#if memberRole??>
+    memberRole = "${memberRole}";
+</#if>
+
+$(function(){
+	
+	// 当前市场code等于快码code，就隐藏ecoupon。
+	for(var i=0;i<ecouponInvisible.length;i++){
+		if(ecouponInvisible[i].value == code){
+			$("#hideEcoupon").hide();
+		}
+	}
+	
+    //取得地址栏的参数(订单头)
+    var param = new Object();
+        param.headerId = "${RequestParameters.headerId}";
+    $("#sumPanel .headerId").val(param.headerId);
+    
+     $.ajax({
+        type : "POST",
+        dataType : "json",
+        data : param,
+        url : "${base.contextPath}/orderHistory/queryProductsByHeadId",
+           success : function(data) {
+               if(data.success){
+                   //alert(JSON2.stringify(data));
+                   if(data.total == 0){
+                       $("#Table_body").html("<tr><td colspan='6'><div style='width: 100%; height: 300px; text-align: center; font-size: 50px; color: red;'><@spring.message 'mws.orderhistory.nodata'/></div></td></tr>");
+                   }
+                   else{
+                       discountInfo(data);
+                       initOrderInfo(data);
+                       initProductTable(data);
+                   }
+               }
+               else{
+                   $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'mws.menu.loadfail'/>", function(){
+                        return true; 
+                    })
+               }   
+           }
+    }) 
+});
+</script>
+
+<!-- 调用方法 -->
+<script type="text/javascript">
+//初始化订单信息
+var invoiceNumber = "";
+function initOrderInfo(data){
+    var shop = data.rows[0].salesOrganization.name;
+    var delivery = "";
+    var deliveryAddress = data.rows[0].attribute1;
+    var orderStatusCode = data.rows[0].orderStatus;
+    var orderStatusDesc = data.rows[0].orderStatusDesc;
+    var orderNumber = data.rows[0].orderNumber;
+    invoiceNumber = data.rows[0].invoiceNumber;
+    orderToken = data.rows[0]._token;
+    //设置下单店铺
+    $("#orderInfoPanel .shop").html(shop);
+    
+    //设置配送方式
+    for (var i = 0; i < deliveryType.length; i++) {
+        if (deliveryType[i].value == data.rows[0].deliveryType) {
+            delivery = deliveryType[i].meaning;
+            $("#orderInfoPanel .delivery").html(delivery);
+        }
+    }
+
+    //设置配送地址
+    $("#orderInfoPanel .deliveryAddress").html(deliveryAddress);
+
+    //设置订单类型(未添加英文检测)
+    $("#orderInfoPanel .orderStatus").html(orderStatusDesc);
+    if(orderStatusCode == "WPAY") {
+        $("#sumPanel_btnPanel").css("display","block");
+    }
+    else{
+        $("#sumPanel_btnPanel").css("display","none");
+    }
+	
+    if ('CONF' == orderStatusCode || 'COMP' == orderStatusCode) {
+    	$("#download_invoice").css("display","block");
+    } else {
+    	$("#download_invoice").css("display","none");
+    }
+    
+    //设置订单编号
+    $("#orderInfoPanel .orderNumber").html(orderNumber);
+}
+
+
+//初始化商品表及统计信息
+function initProductTable(data){
+    var htmlStr = "";
+    var productsList = data.rows[0].lines;
+    var sumPrice = data.rows[0].actrualPayAmt;
+    var sumPV = 0;
+    
+
+
+    for(index in productsList){
+        var itemImgId = productsList[index].itemImg ? productsList[index].itemImg[0].fileId : "";
+        var itemImgSrc = "${base.contextPath}/resources/img/NOT_IMAGE.png";
+        var itemId =  productsList[index].itemId;
+        var itemName = productsList[index].itemName;
+        var description = productsList[index].itemDescription;
+
+        var disAmt = productsList[index].unitSellingPrice;
+        var pvAmt = productsList[index].pv;
+        var itemAmount = productsList[index].quantity;
+        var PreferentialWay = "";
+        var count = parseFloat(disAmt) * parseFloat(itemAmount);
+
+        if (itemImgId != "") {
+            itemImgSrc = "${base.contextPath}/sys/image/view?fileId=" + itemImgId + "&compressLevel=L";
+        }
+        sumPV += parseFloat(pvAmt) * parseFloat(itemAmount);
+
+        htmlStr += "<tr class='cart_item'>"
+                +      "<td data-title='<@spring.message 'mws.orderhistory.tabletitle_productdescription'/>'>"
+                +          "<dl>"
+                +              "<dt class='hidden-xs'><img src='" + itemImgSrc + "' alt='' style='width: 100px;height: 100px'></dt>"
+                +              "<dd>"
+                +                  "<div style='font-size: 20px;'><a href='${base.contextPath}/product/product.html?categoryId=&itemId=" + itemId + "'>" + itemName + "</a></div>"
+                +                  "<p class='hidden-xs'>" + (description||'') + "</p>"
+                +              "</dd>"
+                +          "</dl>"
+                +      "</td>"
+                +      "<td class='product-price' data-title='<@spring.message 'mws.orderhistory.tabletitle_price'/>'>"
+                +          "<h3>" + currencySymbol + disAmt.toFixed(2) + "</h3>"
+                +      "</td>";
+        if(memberRole != "VIP"){
+        htmlStr +=       "<td class='product-pv visible-md visible-lg' data-title='<@spring.message 'mws.orderhistory.tabletitle_pv'/>'>"
+                +          "<h3>" + pvAmt + "</h3>"
+                +      "</td>";
+        }
+        htmlStr +=      "<td class='product-qty' data-title='<@spring.message 'mws.orderhistory.tabletitle_quantity'/>'>"
+                +          "<h3>X" + itemAmount + "</h3>"
+                +      "</td>"
+                +      "<td class='product-PreferentialWay visible-md visible-lg' data-title='<@spring.message 'mws.orderhistory.tabletitle_preferentialway'/>'>"
+                +          "<h4>" + PreferentialWay + "</h4>"
+                +      "</td>"
+                +      "<td class='product-count' data-title='<@spring.message 'mws.orderhistory.tabletitle_count'/>'>"
+                +          "<h3>" + currencySymbol + count.toFixed(2) + "</h3>"
+                +      "</td>"
+                +  "</tr>";
+    }
+    
+    $("#Table_body").html(htmlStr);
+    $("#sumPanel .sumPrice").html(currencySymbol+"  "+(sumPrice.toFixed(2)-remainingBal-voucherTotal-total));
+    if(memberRole != "VIP"){
+        $("#sumPanel .sumPV").html("PV  "+sumPV);
+    }
+    $("#sumPanel .btn_cancel").attr("herf","#1");
+
+    /*******运费**********/
+    if(data.rows[0].logistics!=null){
+
+        $("#orderFreight").text(currencySymbol+' '+data.rows[0].logistics.shippingFee);
+    }else{
+    	$("#orderFreight").text(currencySymbol+' '+0);
+    }
+
+    // remainingBalance 是否可见
+    var orgValue = data.rows[10];
+    if(orgValue == "N"){
+        $("#hideRemainingBal").hide();
+    }else{
+        $("#hideRemainingBal").show();
+    }
+}
+
+    var headerId = "${RequestParameters.headerId}";
+
+	var total = 0;
+	var voucherTotal = 0;
+	var remainingBal = 0;
+	function discountInfo(data){
+		var discountArray = [];
+		currencySymbol = data.rows[0].spmCurrency.symbol;
+		for(var i=0;i< data.rows[0].salesVouchers.length;i++){
+
+			if(data.rows[0].salesVouchers[i] != null){
+				voucherTotal = voucherTotal+data.rows[0].salesVouchers[i].discountValue;
+			}
+		}
+		for(var i=0;i< data.rows[0].mwsOrderPayments.length;i++){
+			if("ECUP" == data.rows[0].mwsOrderPayments[i].paymentMethod){
+				total =total+data.rows[0].mwsOrderPayments[i].paymentAmount;
+			}
+			if("RBPAY" == data.rows[0].mwsOrderPayments[i].paymentMethod){
+				remainingBal=remainingBal+data.rows[0].mwsOrderPayments[i].paymentAmount;
+			}
+		}
+		
+		$("#ecouponAmt").html(currencySymbol+' '+total);
+		$("#voucherAmt").html(currencySymbol+' '+voucherTotal);
+		$("#rbCount").html(currencySymbol+' '+ remainingBal);
+		
+		// 当三种优惠都没用到，隐藏-号
+        if(total == 0){
+            $("#labelEcouponAmt").hide();
+        }
+        if(voucherTotal == 0){
+            $("#labelVoucherAmt").hide();
+        }
+        if(remainingBal == 0){
+            $("#labelRbCount").hide();
+        }
+	}
+</script>
+
+<!-- 事件监听 -->
+<script type="text/javascript">
+$(document).ready(function(){
+    //待付款时立即付款功能
+    $("#sumPanel .btn_pay").click(function(){
+        $("#sumPanel .orderPaymentForm").submit();
+    })
+
+    //待付款时取消订单功能
+    $("#sumPanel .btn_cancel").click(function(){
+        $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", "<@spring.message 'mws.orderhistory.order_cancel_yn'/>", function(){
+            //取得地址栏的参数(订单头)
+            var param = new Object();
+            param.headerId = "${RequestParameters.headerId}";
+            param._token = orderToken;
+            
+            $("#sumPanel .headerId").val(param.headerId);
+            
+            $.ajax({
+                type : "POST",
+                dataType : "json",
+                data : param,
+                url : "${base.contextPath}/orderHistory/cannelOrder",
+                   success : function(data) {
+                       if(data.success){
+                           $.dialog.success("<@spring.message 'mws.dialog.success'/>", "<@spring.message 'mws.orderhistory.order_cancel_success'/>", function(){
+                               window.location.reload();
+                            })
+                       }
+                       else{
+                           $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'mws.orderhistory.order_cancel_failure'/>", function(){
+                               return true;
+                            })
+                       }   
+                   }
+            })
+        }, function(){});        
+    })
+
+})
+</script>
+
+
+
+
+
+<!-- ========== JS END ========= -->
+
+<!-- ========== CONTENT START ========== -->
+
+<section id="content">
+    <div class="container">
+
+        <ol class="breadcrumb">
+            <li><a href="index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.menu.myaccount"/></li>
+        </ol>
+
+        <div class="row">
+            <!-- Sidebar Start -->
+            <#include "../include/account-menu.html">
+            <!-- Sidebar End -->
+            
+            <!-- Posts Start -->
+            <div class="col-sm-8 col-md-9">
+                <article class="account-details-wrap">
+                    <h2 class="entry-title"><@spring.message "mws.orderhistory.title_myorderdetails"/></h2>
+
+                    <div id="orderInfoPanel" class="row" style="border:1px solid gainsboro;">
+                        <div class="col-md-5 col-sm-5">
+                            <div class="row" style="font-weight: bolder; font-size: 18px;background-color:#E8E8E8;padding-left: 14px"><@spring.message "mws.orderhistory.orderinfo_orderinfo"/></div>
+                            <div class="row" style="background-color: whitesmoke;padding: 3px 0px 3px 0px">
+                                <div class="col-md-12 col-sm-12">
+                                    <div class="col-md-4 col-sm-12" style="padding: 0px;"><@spring.message "mws.orderhistory.orderinfo_ordershop"/>：</div>
+                                    <div class="shop col-md-8 col-sm-11 col-md-offset-0 col-sm-offset-1 col-xs-offset-1" style="padding: 0px;"></div>
+                                </div>
+                                <div  class="col-md-12 col-sm-12">
+                                    <div class="col-md-4 col-sm-12" style="padding: 0px;"><@spring.message "mws.orderhistory.orderinfo_deliverytype"/>：</div>
+                                    <div class="delivery col-md-8 col-sm-11 col-md-offset-0 col-sm-offset-1 col-xs-offset-1" style="padding: 0px;"></div>
+                                </div>
+                                <div  class="col-md-12 col-sm-12">
+                                    <div class="col-md-4 col-sm-12" style="padding: 0px;"><@spring.message "mws.orderhistory.orderinfo_deliveryaddress"/>：</div>
+                                    <div class="deliveryAddress col-md-8 col-sm-11 col-md-offset-0 col-sm-offset-1 col-xs-offset-1" style="padding: 0px;word-break:break-all"></div>
+
+
+                                </div>
+                                <div class="col-md-12 col-sm-12"><hr></div>
+                                <div  class="col-md-12 col-sm-12">
+                                    <div class="col-md-4 col-sm-12" style="padding: 0px;"><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>：</div>
+                                    <div class="orderNumber col-md-8 col-sm-11 col-md-offset-0 col-sm-offset-1 col-xs-offset-1" style="padding: 0px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-7 col-sm-7">
+                        <!-- 调整页面布局，与左边模块相对应 -->
+                            <div class="col-md-6 col-sm-12 col-xs-2">&nbsp;</div>
+                            <div class="col-md-6 col-sm-12 col-xs-2">&nbsp;</div>
+                            <div class="col-md-6 col-sm-12 col-xs-2">&nbsp;</div>
+                            <div class="col-md-6 col-sm-12 col-xs-2">&nbsp;</div>
+                            <div class="col-md-6 col-sm-12 col-xs-2">&nbsp;</div>
+                            <div class="col-md-6 col-sm-12 col-xs-2">&nbsp;</div>
+                            
+                            <div class="col-md-12 col-sm-12" style="padding:10px 0px 0px 0px; margin-left: 0px;" class="row">
+                                <div class="col-md-offset-3 col-sm-offset-2">
+                                    <div class="col-md-12 col-sm-12 ">
+                                        <img src="${base.contextPath}/resources/img/warming.png" alt='' style="margin-right: 10px;">
+                                        <strong><@spring.message "mws.orderhistory.orderinfo_orderstatus"/>：</strong>
+                                        <strong class="orderStatus" style="color: Chocolate;"></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="portlet-body no-more-tables">
+
+                            <table class="shop_table cart table-striped table-condensed table-striped cf" style="margin-top: 20px">
+                                <thead class="cf">
+                                <tr>
+                                    <th class="Description" style="width: 45%;"><div class="hidden-xs" style="text-align: center;"><@spring.message "mws.orderhistory.tabletitle_productdescription"/></div></th>
+                                    <th class="Price"  style="text-align: center;"><@spring.message "mws.orderhistory.tabletitle_price"/></th>
+                                    <#if memberRole != "VIP">
+                                    <th class="PV visible-md visible-lg product-price"  style="text-align: center;"><@spring.message "mws.orderhistory.tabletitle_pv"/></th>
+                                    </#if>
+                                    <th class="Qty product-price"  style="text-align: center;"><@spring.message "mws.orderhistory.tabletitle_quantity"/></th>
+                                    <th class="PreferentialWay visible-md visible-lg" style="text-align: center;"><@spring.message "mws.orderhistory.tabletitle_preferentialway"/></th>
+                                    <th class="Count" style="text-align: center;"><@spring.message "mws.orderhistory.tabletitle_count"/></th>
+                                </tr>
+                                </thead>
+                                
+                                <tbody id="Table_body">
+                                    <tr><td colspan="6"><div style='width: 100%; height: 300px; text-align: center; font-size: 50px;'><@spring.message 'mws.menu.loading'/></div></td></tr>
+                                </tbody>
+                                
+                            </table>
+                            <div class="row" style="padding-right: 30px; padding-top:30px; color: black;font-weight: bolder;font-size: 18px;">
+                                <div class="col-md-offset-8 col-sm-offset-6 col-xs-offset-6">
+                                    <div class="col-md-5 col-sm-5 col-xs-12" style="text-align: left"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.coupons"/>：</div>
+                                    <div class="col-md-7 col-sm-7 col-xs-12" style="text-align: right"><label for="rbCount" id="labelVoucherAmt">-</label><span id="voucherAmt">0</span></div>
+                                </div>
+                                <div class="col-md-offset-8 col-sm-offset-6 col-xs-offset-6" id="hideEcoupon">
+                                    <div class="col-md-5 col-sm-5 col-xs-12" style="text-align: left">Ecoupon：</div>
+                                    <div class="col-md-7 col-sm-7 col-xs-12" style="text-align: right"><label for="ecouponAmt" id="labelEcouponAmt">-</label><span id="ecouponAmt">0</span></div>
+                                </div>
+                                <div class="col-md-offset-8 col-sm-offset-6 col-xs-offset-6" id="hideRemainingBal">
+                                    <div class="col-md-5 col-sm-5 col-xs-12" style="text-align: left">RB：</div>
+                                    
+                                    <div class="col-md-7 col-sm-7 col-xs-12" style="text-align: right"><label for="rbCount" id="labelRbCount">-</label><span id="rbCount">0</span></div>
+                                </div>
+                            </div>
+                            <div id="sumPanel" class="row" style="padding-right: 30px; padding-top:10px; color: black;font-weight: bolder;font-size: 18px;">
+                                
+                                <div style="height: 2px;background-color: goldenrod; margin-bottom: 10px" class="col-md-offset-8 col-sm-offset-6 col-xs-offset-6">
+                                </div>
+                                <div class="col-md-offset-8 col-sm-offset-6">
+                                    <div class="col-md-5 col-sm-5 col-xs-12" style="text-align: left;white-space:nowrap;"><@spring.message "mws.orderconfirm.freight"/>：</div>
+                                    <div class="col-md-7 col-sm-7 col-xs-12" style="text-align: right" id="orderFreight">0</div>
+                                </div>
+                                <div class="col-md-offset-8 col-sm-offset-6 col-xs-offset-6">
+                                    <div class="col-md-5 col-sm-5 col-xs-12" style="text-align: left;white-space:nowrap;"><@spring.message "mws.orderhistory.sum_actualpay"/>：</div>
+                                    <div class="sumPrice col-md-7 col-sm-7 col-xs-12" style="text-align: right"></div>
+                                </div>
+                                <#if memberRole != "VIP">
+                                <div class="col-md-offset-8 col-sm-offset-6 col-xs-offset-6">
+                                    <div class="col-md-6 col-sm-6 col-xs-12" style="text-align: left;white-space:nowrap;"><@spring.message "mws.orderhistory.sum_get"/>：</div>
+                                    <div class="sumPV col-md-6 col-sm-6 col-xs-12" style="text-align: right"></div>
+                                </div>
+                                </#if>
+                                <div style="height: 2px;background-color: gainsboro;margin-top: 10px" class="col-md-offset-8 col-sm-offset-6 col-xs-offset-6 col-md-4 col-sm-6 col-xs-6 portlet"></div>
+                            </div>
+
+                            
+                        </div>
+                    </div>
+
+
+
+                </article>
+            </div>
+            <!-- Posts End -->
+
+
+
+        </div>
+    </div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">
+
+</body>
+</html>

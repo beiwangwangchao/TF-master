@@ -1,0 +1,1847 @@
+<#include "/mws/include/header.html">
+<style>
+    .vertical-middle {
+        vertical-align: middle;
+    }
+    .title {
+        margin-left:15px;
+        color: black;
+        font-weight:bold;
+    }
+    .sites {
+        width:92%;
+        margin:0 auto;
+    }
+    .site {
+        text-align: center;
+        margin-bottom: 5px;
+    }
+    .site > div {
+        padding-top: 2px;
+    }
+    .site a {
+        visibility: hidden;
+    }
+    .row-hover {
+        background-color: #FEEAEB !important;
+    }
+    .row-hover a {
+        visibility: visible;
+    }
+    .checkSite {
+        background-color: #F5F5F5;
+    }
+    .hide {
+        display: none;
+    }
+    .show {
+        display: block;
+    }
+    .a-link {
+        cursor: pointer;
+    }
+    
+    .a-link:hover {
+        text-decoration: underline;
+    }
+    .default-border {
+        z-index: 100;/* 防止点击事件区域被遮住 */
+        cursor: pointer;
+        border: 2px solid red;
+        margin-left: -15px;
+        background-color: white !important;
+        padding-top: 0px !important;/* 屏蔽父级div带来的padding-top */
+    }
+    .default-no-border {
+        z-index: 100;
+        cursor: pointer;
+        border: 2px solid #EEEEEE;
+        margin-left: -15px;
+        background-color: white !important;
+        padding-top: 0px !important;/* 屏蔽父级div带来的padding-top */
+    }
+    .no-wrap {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    .table>thead>tr>th, .thead>thead>tr>th, .table>tbody>tr>td, .table>tbody>tr>th {
+        vertical-align: middle;
+        text-align: center;
+    }
+    .small-select {
+        padding: 0 6px;
+        height: 26px;
+    }
+    .col-small-margin {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+    .align-right {
+        text-align: right;
+    }
+    .align-left {
+        text-align: left;
+    }
+    .setDefaultBtn {
+        padding-top: 1px !important;
+    }
+    .defaultText {
+        padding: 3px;
+        background-color: #999999;
+        color: white;
+        font-size:13px;
+    }
+    .defaultBtn {
+        padding: 3px;
+        background-color: #BC2826;
+        color: white;
+        font-size:13px;
+    }
+    .item-img {
+         width: 60px;
+         height: 60px;
+    }
+    .panel-brief-default {
+        border-color: #ddd;
+    }
+    .panel-brief {
+        background-color: #fff;
+        border: 1px solid transparent;
+    }
+    .panel-brief-heading {
+        color: #333;
+        border-bottom: 4px solid #ddd;
+        padding: 10px 15px;
+    }
+    .panel-brief-title {
+        margin-top: 0;
+        margin-left: 10px;
+        margin-bottom: 0;
+        font-size: 18px;
+        color: inherit;
+        font-weight:bold;
+    }
+    .panel-brief-body {
+        padding: 15px;
+    }
+    #submitButton a:hover{TEXT-DECORATION:none !important}
+</style>
+<!-- ========== MENU END ========== -->
+
+<!-- ========== CONTENT START ========== -->
+<script src="${base.contextPath}/common/code?telAreaCode=SYS.TEL_COUNTRY_CODE&creditCardType=MM.CREDIT_CARD_TYPE&deliveryTypeData=DM.DELIVERY_TYPE" type="text/javascript"></script>
+<script src="${base.contextPath}/resources/js/spinner${resource_suffix!}.js"></script>
+<section id="content">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.menu.autoship"/></li>
+        </ol>
+        
+        <div class="row">
+            <!-- Sidebar Start -->
+            <#include "../include/account-menu.html">
+            <!-- Sidebar End -->
+            <#if result??>
+                <div class="col-sm-8 col-md-9">
+                     <h3 style="text-align: center"><@spring.message "mws.autoship.msg.open.autoship"/></h3>               
+
+                </div>
+            <#else>
+            <!-- 隐藏域 -->
+            <div style="display:none">
+                <p id="pointRate">${pointRate}</p>
+                <p id="pointLimit">${pointLimit}</p>
+                <p id="autoSalesOrgId">${autoSalesOrgId}</p>
+                <p id="orgCurrency">${currency?html}</p>
+                <p id="orgCurrencyCode">${currencyCode?html}</p>
+                <#if taxRate??>
+                    <p id="taxRate">${taxRate}</p>
+                <#else>
+                    <p id="taxRate">0</p>
+                </#if>
+            </div>
+            <!-- Posts Start -->
+            <div class="col-sm-8 col-md-9">
+                <div class="row">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><@spring.message "mws.menu.autoship"/></h3>
+                        </div>
+                        <div class="panel-body">
+                            <!-- 订单信息 -->
+                            <div class="col-md-12 col-sm-12">
+                                <div class="portlet-body no-more-tables">
+                                    <table class="shop_table table-striped table-condensed table-striped cf" style="border: 1px solid gainsboro;">
+                                        <thead class="cf">
+                                        <tr>
+                                            <th class="product-price hidden-xs col-md-1 col-sm-1"><input type="checkbox" name = "chk_list" onclick="checkallByBox(this)"></th>
+                                            <th class="product-price col-md-2 col-sm-2"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.images"/></th>
+                                            <th class="product-price col-md-3 col-sm-3"><@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/></th>
+                                            <th class="product-price col-md-1 col-sm-1"><@spring.message "mws.orderlist.tableitem_unitprice" /></th>
+
+
+
+                                            <th class="product-price col-md-1 col-sm-1">PV</th>
+                                            <th class="product-price col-md-2 col-sm-2"><@spring.message "mws.orderlist.tableitem_quantity" /></th>
+                                            <th class="product-price col-md-1 col-sm-1"><@spring.message "mws.autoship.subtotal" /></th>
+
+
+                                        </tr>
+                                        </thead>
+                                        <tbody id="tBody">
+                                        <#if products??>
+                                        <#list products as product>
+                                        <tr class="cart_item">
+                                            <td style="text-align: center" data-title="">
+                                                <div class="hidden-xs"><input type="checkbox" value = "${product.itemId}" id ="checkbox_${product.itemId}" name = "chk_list"></div>
+                                                <div class="hidden-md hidden-sm hidden-lg"><button class="btn btn-sm btn-default" style="margin: -12px;" name = "delete_${product.itemId}" onclick="deleteRow(this.name)"><@spring.message "sys.hand.btn.delete" /></button></div>
+                                            </td>
+                                            <td data-title="" style="text-align: center">
+                                            <#if product.itemImg??>
+                                                <#if product.itemImg[0]??>
+                                                    <img class="hidden-xs" id = "img_${product.itemId}" src="${base.contextPath}/sys/image/view?fileId=${product.itemImg[0].fileId}&compressLevel=L" onerror="javascript:this.src = '${base.contextPath}/resources/img/60-60.png'" alt="" style="width: 60px;height: 60px">
+                                                <#else>
+                                                    <img class="hidden-xs" id = "img_${product.itemId}" src='${base.contextPath}/resources/img/NOT_IMAGE.png' alt="" style="width: 60px;height: 60px">
+                                                </#if>
+                                            <#else>
+                                                <img class="hidden-xs" id = "img_${product.itemId}" src='${base.contextPath}/resources/img/NOT_IMAGE.png' alt="" style="width: 60px;height: 60px">
+                                            </#if>
+                                            </td>
+                                            <td data-title='<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>' style="text-align: center">
+
+                                                <h4><a href="#" id = "itemName_${product.itemId}">${product.itemName?html}</a></h4>
+                                            </td>
+                                            <td data-title='<@spring.message "mws.orderlist.tableitem_unitprice" />' style="text-align: center">
+
+                                                <h5 ><span>${product.currencySymbol?html}</span><span id = "unitPrice_${product.itemId}">${product.disAmt?string("0.00")}</span></h5>
+                                            </td>
+                                            <td data-title="PV" style="text-align: center">
+                                                <h5 id = "unitPV_${product.itemId}">${product.pvAmt}</h5>
+                                            </td>
+                                            <td data-title='<@spring.message "mws.orderlist.tableitem_quantity" />'>
+
+                                                <div class="buttons_added" style="text-align: center">
+                                                    <!-- <button class="minus" onclick="minusQuantity(this)" name = "minus_${product.itemId}"><i class="fa fa-minus"></i></button> -->
+                                                    <input type="text" maxlength="5" class="qty text form-control" value="${product.itemAmount}"   name="quantity_${product.itemId}" id="quantity_${product.itemId}" >
+                                                    <!-- <button class="plus" onclick="plusQuantity(this)" name = "plus_${product.itemId}"><i class="fa fa-plus"></i></button> -->
+                                                </div>
+                                            </td>
+                                            <td data-title='<@spring.message "mws.autoship.subtotal" />' style="text-align: center">
+
+                                                <h5><p class="product-price" style="display:inline"><strong>${product.currencySymbol?html}</strong><span id = "subtotal_${product.itemId}">${(product.disAmt*product.itemAmount)?string("0.00")}</span></p></h5>
+                                                <h5><strong>PV:</strong><span id = "pv_${product.itemId}">${product.pvAmt*product.itemAmount}</span></h5>
+                                            </td>
+                                        </tr>
+                                        </#list>
+                                        </#if>
+                                        </tbody>
+                                    </table>
+                                </div><!--商品表格-->
+            
+                                <div class="row" style="margin:14px 0px 0px 0px;border: 1px solid gainsboro">
+                                    <div class="col-md-1 col-sm-1 col-xs-1" style="margin-top:22px;">
+                                        <button class="btn btn-sm glyphicon glyphicon-plus" data-toggle="modal" data-target="#productModal" onclick="openModel()"></button>
+                                    </div>
+                                    <div class="col-md-1 col-sm-1 col-xs-1" style="margin-top:22px;">
+                                        <button class="btn btn-sm glyphicon glyphicon-minus" onclick="deleteProduct()"></button>
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-xs-3" style="margin-top:22px;">
+                                        <select id="deliveryMethod" name="deliveryMethod" class="form-control small-select">
+                            			</select>
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-md-offset-2 col-xs-3" style="margin-top:18px;">
+                                        <span><@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.salesscore"/>：</span><span id = "totalPoint">${totalPoint}</span>
+
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-xs-3" style="margin-top:18px;">
+                                        <span>PV：</span><span id = "totalPV">${totalPV}</span>
+                                    </div>
+                                    <div class="col-md-2 col-sm-2 col-xs-3" style="margin-top:18px;">
+                                        <span><@spring.message "mws.autoship.product.subtotal"/>：${currency?html}</span><span id = "totalPrice">${totalPrice?string("0.00")}</span>
+                                    </div>
+                                    <!-- <div class="col-md-2 col-sm-2 col-xs-3" style="margin-top:22px;">
+                                        <select id="deliveryMethod" name="deliveryMethod" class="form-control small-select">
+                            			</select>
+                                    </div> -->
+                                </div><!--添加\删除商品按钮-合计-->
+                            </div>
+                        </div>
+                        <!-- List group -->
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <!-- 账单信息 -->
+                                <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <div class="panel-brief panel-brief-default">
+                                        <div class="panel-brief-heading">
+                                            <h3 class="panel-brief-title"><@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.billinginfo"/></h3>
+
+                                        </div>
+                                        <div class="panel-brief-body">
+                                            <!-- 账单地址 -->
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <h4 class="title"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.billaddress"/></h4>
+
+                                                </div>
+                                                <div class="col-sm-3 col-sm-offset-4">
+                                                    <a class="pull-right a-link" onclick="addSite('BILL')"><@spring.message "mws.addressbook.createbilling"/></a>
+
+                                                </div>
+                                            </div>
+                                            <div class="row sites">
+                                                <#if billSites??>
+                                                <#list billSites as billSite>
+                                                <#if billSite.siteId != -1>
+                                                <div name="billSite" class="col-sm-12 site hide" id="${billSite.siteId}" attr_location="${billSite.locationId}">
+                                                    <div class="col-sm-2 no-wrap col-small-margin default-no-border" onclick="chooseSite(this)">
+                                                        <span><@spring.message "mws.autoship.address.checked"/></span>
+
+                                                    </div>
+                                                    <div class="col-sm-2 no-wrap col-small-margin">
+                                                        <span>${billSite.name?html}</span>
+                                                    </div>
+						                            <div class="col-sm-2 no-wrap col-small-margin" title="${billSite.attribute1!?html}${billSite.attribute2!?html}${billSite.attribute3!?html}${billSite.spmLocation.addressLine1!?html}${billSite.spmLocation.addressLine2!?html}${billSite.spmLocation.addressLine3!?html}">
+						                                <span>${billSite.attribute1!?html}${billSite.attribute2!?html}${billSite.attribute3!?html}${billSite.spmLocation.addressLine1!?html}${billSite.spmLocation.addressLine2!?html}${billSite.spmLocation.addressLine3!?html}</span>
+						                            </div>
+                                                    <div class="col-sm-2 no-wrap col-small-margin" title="${billSite.phone?html}">
+                                                        <span>${billSite.phone?html}</span>
+                                                    </div>
+                                                    <div class="col-sm-2 col-small-margin just-no-wrap">
+                                                        <a class="a-link" onclick="editSite(${billSite.siteId},'BILL')"><@spring.message "sys.hand.btn.edit"/></a>&nbsp;
+                                                        <a class="a-link" onclick="deleteSite(${billSite.siteId},'${billSite._token}')"><@spring.message "sys.hand.btn.delete"/></a>
+
+                                                    </div>
+                                                </div>
+                                                <#else>
+                                                <div name="billSite" class="col-sm-12 site checkSite show" id="billHistory">
+                                                    <div class="col-sm-2 no-wrap col-small-margin default-border" onclick="chooseSite(this)">
+                                                        <span><@spring.message "mws.autoship.current.address"/></span>
+
+                                                    </div>
+                                                    <div class="col-sm-2 no-wrap col-small-margin">
+                                                        <span>${billSite.name?html}</span>
+                                                    </div>
+                                                    <div class="col-sm-4 no-wrap col-small-margin" title="${billSite.address?html}">
+                                                        <span>${billSite.address?html}</span>
+                                                    </div>
+                                                    <div class="col-sm-2 no-wrap col-small-margin" title="${billSite.phone?html}">
+                                                        <span>${billSite.phone?html}</span>
+                                                    </div>
+                                                </div>
+                                                </#if>
+                                                </#list>
+                                                </#if>
+                                                <div id="billFoldSite" class="col-sm-12">
+                                                    <a class="a-link" onclick="toggleSite(this,'bill')"><@spring.message "mws.autoship.more.address"/>&nbsp;<span class="vertical-middle glyphicon glyphicon-chevron-down"></span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <!-- 配送信息 -->
+                                <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <div  class="panel-brief panel-brief-default">
+                                        <div id = "shipInfoLable" class="panel-brief-heading">
+                                            <h3 class="panel-brief-title"><@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.distributioninfo"/></h3>
+                                            
+                                        </div>
+                                        <!-- <div class = "col-md-4 col-sm-4">
+                                        	<select id="deliveryMethod" name="deliveryMethod" class="form-control small-select">
+                            				</select>
+                                        </div> -->
+                                        
+                                        <div id = "shipInfo" class="panel-brief-body">
+                                            <!-- 收货地址 -->
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <h4 class="title"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliveryaddress"/></h4>
+
+                                                </div>
+                                                <div class="col-sm-3 col-sm-offset-4">
+                                                    <a class="pull-right a-link" onclick="addSite('SHIP')"><@spring.message "mws.autoship.address.add.receipt"/></a>
+
+                                                </div>
+                                            </div>
+                                            <div class="row sites">
+                                                <#if shipSites??>
+                                                <#list shipSites as shipSite>
+                                                <#if shipSite.siteId != 0>
+                                                <div name="shipSite" class="col-sm-12 site hide" id="${shipSite.siteId}" attr_location="${shipSite.locationId}">
+                                                    <div class="col-sm-2 no-wrap col-small-margin default-no-border" onclick="chooseSite(this)">
+                                                        <span><@spring.message "mws.autoship.address.checked"/></span>
+
+                                                    </div>
+                                                    <div class="col-sm-2 no-wrap col-small-margin">
+                                                        <span>${shipSite.name?html}</span>
+                                                    </div>
+						                            <div class="col-sm-2 no-wrap col-small-margin" title="${shipSite.attribute1!?html}${shipSite.attribute2!?html}${shipSite.attribute3!?html}${shipSite.spmLocation.addressLine1!?html}${shipSite.spmLocation.addressLine2!?html}${shipSite.spmLocation.addressLine3!?html}">
+						                                <span>${shipSite.attribute1!?html}${shipSite.attribute2!?html}${shipSite.attribute3!?html}${shipSite.spmLocation.addressLine1!?html}${shipSite.spmLocation.addressLine2!?html}${shipSite.spmLocation.addressLine3!?html}</span>
+						                            </div>
+                                                    <div class="col-sm-2 no-wrap col-small-margin" title="${shipSite.phone?html}">
+                                                        <span>${shipSite.phone?html}</span>
+                                                    </div>
+                                                    <div class="col-sm-2 col-small-margin just-no-wrap">
+                                                        <a class="a-link" onclick="editSite(${shipSite.siteId},'SHIP')"><@spring.message "sys.hand.btn.edit"/></a>&nbsp;&nbsp;
+                                                        <a class="a-link" onclick="deleteSite(${shipSite.siteId},'${shipSite._token}')"><@spring.message "sys.hand.btn.delete"/></a>
+
+                                                    </div>
+                                                </div>
+                                                <#else>
+                                                <div name="shipSite" class="col-sm-12 site checkSite show" id="shipHistory">
+                                                    <div class="col-sm-2 no-wrap col-small-margin default-border" onclick="chooseSite(this)">
+                                                        <span><@spring.message "mws.autoship.current.address"/></span>
+
+                                                    </div>
+                                                    <div class="col-sm-2 no-wrap col-small-margin">
+                                                        <span>${shipSite.name?html}</span>
+                                                    </div>
+                                                    <div class="col-sm-4 no-wrap col-small-margin" title="${shipSite.address?html}">
+                                                        <span>${shipSite.address?html}</span>
+                                                    </div>
+                                                    <div class="col-sm-2 no-wrap col-small-margin" title="${shipSite.phone?html}">
+                                                        <span>${shipSite.phone?html}</span>
+                                                    </div>
+                                                </div>
+                                                </#if>
+                                                </#list>
+                                                </#if>
+                                                <div id="shipFoldSite" class="col-sm-12">
+                                                    <a class="a-link" onclick="toggleSite(this,'ship')"><@spring.message "mws.autoship.more.address"/>&nbsp;<span class="vertical-middle glyphicon glyphicon-chevron-down"></span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ul class="list-group">
+                                            <li id="express" class="list-group-item">
+                                                <!-- 选择物流公司 -->
+                                                <div class="row">
+                                                    <div id = "expressSelect" class="col-sm-2 col-md-2 col-sm-offset-1 col-md-offset-1 col-xs-4 col-xs-offset-1">
+                                                        <select id="expressCompany" name="expressCompany" class="form-control small-select">
+                                                        </select>
+                                                    </div>
+                                                    <div id="freight" class="col-sm-3 col-md-3 col-sm-offset-5 col-md-offset-5 col-xs-12 align-right">
+                                                        <span><@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.shippingfee"/>：<strong style="color: red;"></strong></span>
+
+                                                    </div>
+                                                    <div id="expressTotal" class="col-sm-3 col-md-3 col-sm-offset-8 col-md-offset-8 col-xs-12 align-right">
+                                                        <span><@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.autoshipamt"/>：<strong style="color: red;"></strong></span>
+
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <!-- 信用卡信息 -->
+                                <div class="row" style="padding-left: 10px;margin: 10px 0px 0px 0px;border: 1px solid gainsboro">
+                                    <div class="row"  style="padding:10px 0px 0px 30px">
+                                        <strong style="font-size: 14px"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.creditcard"/></strong>
+
+                                    </div>
+                                    <#if creditCard ??>
+                                    <div class="row"  style="padding:0px 0px 16px 30px">
+                                        <div class="col-md-offset-1 col-sm-offset-1 col-md-5 col-sm-5">
+                                            <h5>
+                                            	<#if creditCard.bankCode ??>
+                                            		<span id ="cardName">${creditCard.bankCode?html}</span>
+                                            	</#if>
+                                            	<span id = "cardNumber">${creditCard.maskedCardNumber?html}</span>
+                                            </h5>
+                                        </div>
+                                        <div class="col-md-5 col-sm-5">
+                                            <h5 id = "cardType">${creditCard.cardSubType?html}</h5>
+                                        </div>
+                                    </div>
+                                    </#if>
+                                </div>
+                            </li>
+                            <div id = "submitButton" style="clear:both;float:right" >
+                                <a class="btn btn-primary btn-lg a-link" style="border-radius:5px;" onclick="autoShipSubmit()"><@spring.message "sys.hand.btn.submit"/></a>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            </#if>
+            <!-- Posts End -->
+        </div>
+    </div>
+</section>
+<!-- 添加商品模态框 -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="productMyModalLabel"><@spring.message "mws.autoship.product.add"/></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="row">
+                        <div class="col-md-offset-1 col-md-2 col-sm-2 col-xs-3" style="padding-right: 0px">
+                            <h4 style="float: right;margin-top: 8px"><@spring.message "mws.autoship.product.name"/>：</h4>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-xs-5" style="padding-right: 0px">
+                            <input type="text" class="form-control" id = "queryItemName" onkeydown="entersearch()">
+                        </div>
+                        <div class="col-md-2 col-sm-2 col-xs-3" style="padding-left: 0px;">
+                            <input type="button" value="<@spring.message 'sys.hand.btn.query'/>" onclick="showOptionalProducts()" class="btn btn-info btn-sm form-control">
+                        </div>
+                    </div>
+                </div><!--搜索物品栏-->
+
+                <div class="row">
+                    <div style="height: 300px;margin: 0px 10px 0px 10px;overflow-y:auto;overflow-x: hidden" id = "optionalProducts">
+                        
+                    </div>
+                </div><!--物品列表-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="SaveProduct" onclick="addProduct()"><@spring.message "sys.hand.btn.save"/></button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message "sys.hand.btn.close"/></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 修改收货地址模态框 -->
+<div class="modal fade" id="siteModal" tabindex="-1" aria-labelledby="siteModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button onclick="cancelEditSite()" type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="siteModalLabel"><@spring.message 'mws.addressbook.createdelivery'/></h4>
+            </div>
+            <div class="modal-body" class="col-sm-12">
+                <div class="row">
+                    <form id="editSite">
+                    	<input type="hidden" name="_token">
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="name"><@spring.message "mws.addressbook.name"/></label>
+                            <input type="text" class="form-control" name="name" placeholder="<@spring.message 'mws.addressbook.name'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="location"><@spring.message "mws.addressbook.location"/></label>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <select id="countryCode" name="countryCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="国家">
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select id="stateCode" name="stateCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="省">
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select id="cityCode" name="cityCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="市">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="addressLine1"><@spring.message "mws.addressbook.address1"/></label>
+                            <input type="text" class="form-control" name="addressLine1" placeholder="<@spring.message 'mws.addressbook.address1'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="addressLine2"><@spring.message "mws.addressbook.address2"/></label>
+                            <input type="text" class="form-control" name="addressLine2" placeholder="<@spring.message 'mws.addressbook.address2'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="addressLine3"><@spring.message "mws.addressbook.address3"/></label>
+                            <input type="text" class="form-control" name="addressLine3" placeholder="<@spring.message 'mws.addressbook.address3'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="phone"><@spring.message "mws.addressbook.phone"/></label>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <select name="areaCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="areaCode">
+                                    </select>
+                                </div>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="phone" placeholder="<@spring.message 'mws.addressbook.phone'/>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="zipCode"><@spring.message "mws.addressbook.zipcode"/></label>
+                            <input type="text" class="form-control" name="zipCode" placeholder="<@spring.message 'mws.addressbook.zipcode'/>">
+                        </div>
+                        <div id="defaultCheckBox" class="col-sm-10 col-sm-offset-2 form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input name="defaultFlag" type="checkbox" checked="checked"><span><@spring.message "mws.addressbook.setdefault"/></span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="saveSite(event)" type="button" class="btn btn-primary" data-dismiss="modal"><@spring.message "sys.hand.btn.save"/></button>
+                <button onclick="cancelEditSite()" type="button" class="btn btn-default" data-dismiss="modal"><@spring.message "sys.hand.btn.cancel"/></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== CONTENT END ========== -->
+<script type="text/javascript">
+    //全局变量
+    var sitesData = null;//所有收货地址详情！
+    var isEditingSite = null;//正在编辑的收货地址详情
+    var createSiteType = null;//新建地址类型
+    var discountAmt = 0;//优惠金额
+    var freight = 0;//运费
+    var taxRate  = $('#taxRate').text() - 0;
+    var subtotal = $('#totalPrice').text() - 0;//小计总额-税后
+    var pretax = (subtotal/(1 + taxRate/100)).toFixed(2); //税前总额
+    var allowSubmit = true;//是否允许提交-物流时运费和地址为空时无法提交
+    var curLocationCode = null;//当前选中收货地location-为了在选中另外地址时如果location没变就不重新查物流
+    var currencyCode = $("#orgCurrencyCode").text();
+    var currencySymbol = $("#orgCurrency").text();
+    var shippingTier = new Array();//所有物流信息
+    var salesOrgId = $("#autoSalesOrgId").text();//销售区域
+    var phoneReg = /^[0-9]{1,14}$/;
+    var zipCodeReg = /^[0-9]{1,10}$/;
+    //全局变量--订单商品列表
+    var productList = null;
+    /* var historySites = null; */
+    var optionalProductList = null;
+    //DOM Load完成时
+    $(function(){
+        <#if result??>
+            return;
+        </#if>
+        //加载商品数据
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : "${base.contextPath}/autoship/product/querybyid",
+            success : function(data) {
+                if(data.rows){
+                	productList = data.rows;
+                }
+            }
+        });
+        renderCreditCard();
+        //保存商品
+        /*添加一行物品js*/
+        /*******************************************************/
+        /* 地址信息和物流信息初始化-                                    /
+        /*******************************************************/
+        //FreeMarker取出地址信息全局化
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : "${base.contextPath}/autoship/sites/query",
+            success : function(data) {
+                if(data.rows){
+                	sitesData = data.rows;
+                	$("#deliveryMethod").trigger("change");
+                }
+            }
+        });
+        //注册地址div的hover事件
+        $("div[name='shipSite']").hover(
+                function(){$(this).addClass('row-hover');},
+                function(){$(this).removeClass('row-hover');
+        });
+        $("div[name='billSite']").hover(
+                function(){$(this).addClass('row-hover');},
+                function(){$(this).removeClass('row-hover');
+        });
+        //注册配送方式下拉框的change事件
+        $("#deliveryMethod").change(function(e){
+            if($(this).val() == "PCKUP"){//自提类型
+                allowSubmit = true;
+                
+                $("#shipInfo").removeClass("show");
+                $("#shipInfo").addClass("hide");
+                $("#shipInfoLable").removeClass("show");
+                $("#shipInfoLable").addClass("hide");
+                $("#expressSelect").css("visibility" , "hidden");
+                freight = 0;
+                $("#freight > span > strong").text(currencySymbol+freight.toFixed(2));
+                $("#expressTotal > span > strong").text(currencySymbol+(subtotal+freight).toFixed(2));
+            }else if($(this).val() == "SHIPP"){//配送类型
+                $("#shipInfo").removeClass("hide");
+                $("#shipInfo").addClass("show");
+                $("#shipInfoLable").removeClass("hide");
+                $("#shipInfoLable").addClass("show");
+                $("#expressSelect").css("visibility" , "visible");
+                //取出物流公司信息并设置
+                queryShippingTier();
+            }
+        });
+        
+        //注册物流公司下拉框的change事件
+        $("#expressCompany").change(function(e){
+            allowSubmit = true;
+            //debugger;
+            //console.log($(this).find("option:selected").length)
+
+            if($(this).find("option:selected").length == 0){
+                allowSubmit = false;
+                freight = 0;
+            }else{
+                freight = parseFloat($(this).find("option:selected").attr("fee"));
+            }
+            $("#freight > span > strong").text(currencySymbol+freight.toFixed(2));
+            $("#expressTotal > span > strong").text(currencySymbol+(subtotal+freight).toFixed(2));
+        });
+        initDeliveryMethod();
+        <#if deliveryType??>
+    		$("#deliveryMethod").val($.escapeHtml("${deliveryType?html}"));
+		</#if>
+        
+        //地址编辑器相关初始化
+        $("#countryCode").change(function(e){
+            //这样的逻辑保证了如果query失败,后面两个select都不会轻举妄动
+            if($("#countryCode").val()){
+                queryState(function(){$("#cityCode").empty();});
+            }else{
+                $("#stateCode").empty();
+                $("#cityCode").empty();
+            }
+        });
+        $("#stateCode").change(function(e){
+            if($("#stateCode").val()) queryCity();
+            else $("#cityCode").empty();
+        });
+        //为第一个下拉框求取值范围
+        queryCountry();
+        //为地区编号下拉框设取值范围
+        areaCodeSetData();
+        initQty();
+    });
+    
+    function initQty(){
+        $(".qty").spinner({
+            step:1,
+            min:1,
+            max:null
+            }).change(function(){
+            var thisQty = $(this),
+                name = thisQty.attr("name");
+            updateQuantity(name);
+        });
+    }
+    
+    //初始化配送方式下拉框
+    function initDeliveryMethod(){
+        $("#deliveryMethod").empty();
+        for(var i=0; i<deliveryTypeData.length; i++){
+            if(deliveryTypeData[i].value == "SHIPP"){
+                $("#deliveryMethod").append("<option value='"+$.escapeHtml(deliveryTypeData[i].value)+"' selected>"+$.escapeHtml(deliveryTypeData[i].meaning)+"</option>");
+            }else{
+                //$("#deliveryMethod").append("<option value='"+$.escapeHtml(deliveryTypeData[i].value)+"'>"+$.escapeHtml(deliveryTypeData[i].meaning)+"</option>");
+            }
+        }
+    }
+    /* function onlyNum() 
+    { 
+        if(!(event.keyCode==46)&&!(event.keyCode==8)&&!(event.keyCode==37)&&!(event.keyCode==39)) 
+        if(isNaN(String.fromCharCode(event.keyCode))) {
+            if(event.preventDefault){
+                event.preventDefault();
+            }else{
+                event.returnValue=false; 
+            }
+        }
+    } 
+    
+    function minusQuantity(param){
+        var index = param.name.indexOf("_");
+        var id  = param.name.substring(index + 1);
+        var oldQuantity = $('#quantity_'+id).val();
+        if(oldQuantity -1 < 1) {
+            return false;
+        }
+        $('#quantity_'+id).val(oldQuantity -1);
+        updateSubtotal(id);
+        total();
+    }
+
+    function plusQuantity(param){
+        var index = param.name.indexOf("_");
+        var id  = param.name.substring(index + 1);
+        var oldQuantity = $('#quantity_'+id).val();
+        if(oldQuantity -0 + 1 > 999) {
+            return false;
+        }
+        $('#quantity_'+id).val(oldQuantity -0 +1);
+        updateSubtotal(id);
+        total();
+    } */
+    
+    function updateQuantity(name){
+        var index = name.indexOf("_");
+        var id  = name.substring(index + 1);
+        updateSubtotal(id);
+        total();
+    }
+    
+    function updateSubtotal(id){
+        var quantity = $('#quantity_'+id).val();
+        var price = $('#unitPrice_'+id).text();
+        var pv = $('#unitPV_'+id).text();
+        for (var i = 0 ; i < productList.length; i++) {
+            if (id == productList[i].itemId) {
+                productList[i].itemAmount = quantity;
+            }
+        }
+        $('#subtotal_'+id).text((Number(price) * Number(quantity)).toFixed(2));
+        $('#pv_'+id).text(Number(pv) * Number(quantity));
+    }
+    
+    function checkallByBox(param){
+        $("input[name='chk_list']").prop("checked",param.checked);
+    }
+    
+    function total(){
+        var allChk=$("input[name='chk_list']:not(:first)");
+        var totalPrice = 0;
+        var totalPV = 0;
+        $(allChk).each(function(){
+            var id = this.value;
+            totalPrice = totalPrice -0 + Number($('#subtotal_'+id).text());
+            totalPV = totalPV -0 + Number($('#pv_'+id).text());
+        });
+        $('#totalPrice').text(totalPrice.toFixed(2));
+        subtotal = totalPrice;
+        pretax = (subtotal/(1 + taxRate/100)).toFixed(2);
+        $("#expressTotal > span > strong").text(currencySymbol+(subtotal+freight));
+        $('#totalPV').text(totalPV);
+        var pointRate = $("#pointRate").text();
+        var pointLimit = $("#pointLimit").text();
+        var totalPoint = 0;
+        totalPoint = Math.round(totalPrice * pointRate / 100) ;
+        if (-1 == pointLimit) {
+            $('#totalPoint').text(totalPoint);
+        } else {
+            if (pointLimit > totalPoint) {
+                $('#totalPoint').text(totalPoint);
+            } else {
+                $('#totalPoint').text(pointLimit);
+            }
+        }
+        queryShippingTier();
+    }
+    
+    function updateProductList() {
+        productList = [];
+    }
+    
+    function entersearch(){
+        var event = window.event || arguments.callee.caller.arguments[0];
+        if (event.keyCode == 13)
+        {
+            showOptionalProducts();
+        }
+        return false;
+    }
+    
+    function openModel(){
+        $('#queryItemName').val("");
+        showOptionalProducts();
+    }
+    
+    function showOptionalProducts(){
+        $('#optionalProducts').empty();
+        var itemName = $('#queryItemName').val();
+        //获取当前页面上已选择的id集合
+        var allChk=$("input[name='chk_list']:not(:first)");
+        var selectedProducts = [];
+        var orgId = $('#autoSalesOrgId').text();
+        $(allChk).each(function(){
+            var id = this.value;
+            selectedProducts.push(id);
+        });
+        var temp = "";
+        //ajax 发送给后台需要剔除的商品条目，返回可选剩余商品条目，拼接展示在页面上.
+        $.ajax({
+            url: "${base.contextPath}/autoship/product/query",
+            type:"POST",
+            dataType:"json",
+            contentType : "application/json; charset=UTF-8",
+            data : JSON2.stringify({
+                itemIds : selectedProducts,
+                itemName : itemName
+            }),
+            success : function(data) {
+                if(data.success){
+                    optionalProductList = data.rows;
+                    for (var i = 0 ; i < optionalProductList.length; i++) {
+                        temp = temp +'<div class="row" style="padding: 0px 0px 0px 10px;font-size: 18px"><div style="border: 1px solid gainsboro;margin: 0px" class="row">'
+                                +'<div class="col-md-1 col-sm-1 col-xs-1"><input type="checkbox" name="CB" value = "'+optionalProductList[i].itemId+'"></div><div class="col-md-6 col-sm-6 col-xs-6">'+$.escapeHtml(optionalProductList[i].itemName)+'</div>';
+                        if (null == optionalProductList[i].ggcsContent) {
+                            temp = temp + '<div class="col-md-5 col-sm-5 col-xs-5"></div></div></div>';
+                        } else {
+                            temp = temp + '<div class="col-md-5 col-sm-5 col-xs-5">'+$.escapeHtml(optionalProductList[i].ggcsContent)+'</div></div></div>';
+                        }        
+                    }
+                    $('#optionalProducts').append(temp);
+                }
+            },
+            error : function() {
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", 'error');
+            }
+        });
+    }
+    
+    function renderTable(){
+        
+        $('#tBody').empty();
+        var bodyStr = "";
+        var currency = $('#orgCurrency').text();
+        for (var i = 0; i < productList.length; i++) {
+            var id = productList[i].itemId;
+            var subtotalPrice = productList[i].itemAmount * productList[i].disAmt;
+            var subtotalPV = productList[i].itemAmount * productList[i].pvAmt;
+            bodyStr += '<tr class="cart_item">'
+            + '<td style="text-align: center" data-title="">'
+            + '<div class="hidden-xs"><input type="checkbox" value = "'+id+'" id ="checkbox_'+id+'" name = "chk_list"></div>'
+            + '<div class="hidden-md hidden-sm hidden-lg"><button class="btn btn-sm btn-default" style="margin: -12px;" name = "delete_'+id+'" onclick="deleteRow(this.name)">删除</button></div></td>';
+            if (null != productList[i].itemImg) {
+                if (null != productList[i].itemImg[0]) {
+                    bodyStr += '<td data-title="" style="text-align: center"><img class="hidden-xs" id = "img_'+id+'" src="${base.contextPath}/sys/image/view?compressLevel=L&fileId='+productList[i].itemImg[0].fileId+'" onerror="javascript:this.src = \'${base.contextPath}/resources/img/60-60.png\'" alt="" style="width: 60px;height: 60px"></td>';
+                } else {
+                    bodyStr += '<td data-title="" style="text-align: center"><img class="hidden-xs" id = "img_'+id+'" src="${base.contextPath}/resources/img/NOT_IMAGE.png" alt="" style="width: 60px;height: 60px"></td>';
+                }
+            } else {
+                bodyStr += '<td data-title="" style="text-align: center"><img class="hidden-xs" id = "img_'+id+'" src="${base.contextPath}/resources/img/NOT_IMAGE.png" alt="" style="width: 60px;height: 60px"></td>';
+            }
+            bodyStr += '<td data-title="<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>" style="text-align: center"><h4><a href="#" id = "itemName_'+id+'">'+$.escapeHtml(productList[i].itemName)+'</a></h4></td>'
+            + '<td data-title="<@spring.message "mws.orderlist.tableitem_unitprice" />" style="text-align: center"><h5 ><span>'+$.escapeHtml(currency)+'</span><span id = "unitPrice_'+id+'">'+productList[i].disAmt+'</span></h5></td>'
+            + '<td data-title="PV" style="text-align: center"><h5 id = "unitPV_'+id+'">'+productList[i].pvAmt+'</h5></td>'
+            + '<td data-title="<@spring.message "mws.orderlist.tableitem_quantity" />"><div class="buttons_added" style="text-align: center">'
+            + '<input type="text" maxlength="5" class="qty text form-control" value="'+productList[i].itemAmount+'"   name="quantity_'+id+'" id="quantity_'+id+'" >'
+            + '</div></td>'
+            + '<td data-title="<@spring.message "mws.autoship.subtotal" />" style="text-align: center"><h5><p class="product-price" style="display:inline"><strong>'+$.escapeHtml(currency)+'</strong><span id = "subtotal_'+id+'">'+subtotalPrice.toFixed(2)+'</span></p></h5><h5><strong>PV:</strong><span id = "pv_'+id+'">'+subtotalPV+'</span></h5></td></tr>';
+        }
+        $('#tBody').append(bodyStr);
+        initQty();
+    }
+    
+    function deleteProduct(){
+        var allChk=$("input[name='chk_list']:not(:first):checked");
+        if (0 == allChk.length) {
+            $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", '<@spring.message "msg.warning.dto.inventory.stockio.no_item_selected"/>');
+            return;
+        }
+        $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", '<@spring.message "msg.alert.pub.delete_or_not"/>',
+            function(){
+                $(allChk).each(function(){
+                    var id = this.value;
+                    for (var i = 0 ; i < productList.length; i++) {
+                        if (id == productList[i].itemId) {
+                            productList.splice(i,1);
+                        }
+                    }
+                });
+                renderTable();
+                total();
+            }        
+        );
+    }
+    
+    function deleteRow(value){
+        $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", '<@spring.message "msg.alert.pub.delete_or_not"/>',
+            function(){
+                var index = value.indexOf("_");
+                var id = value.substring(index+1);
+                for (var i = 0 ; i < productList.length; i++) {
+                    if (id == productList[i].itemId) {
+                        productList.splice(i,1);
+                    }
+                }
+                renderTable();
+                total();
+            }        
+        );
+    }
+    
+    function addProduct(){
+        var allChk = $("input[name='CB']:checked");
+        var productsTemp = [];
+        $(allChk).each(function(){
+            var id = this.value;
+            var temp ;
+            for (var i = 0; i < optionalProductList.length; i++) {
+                if (id == optionalProductList[i].itemId){
+                    optionalProductList[i].itemAmount = 1;
+                    productsTemp.push(optionalProductList[i]);
+                }
+            }
+        });
+        var temp = [];
+        $.ajax({
+            url: "${base.contextPath}/autoship/productinfo/addimg",
+            type:"POST",
+            dataType:"json",
+            contentType : "application/json; charset=UTF-8",
+            data : JSON2.stringify(productsTemp),
+            success : function(data) {
+                for (var i = 0; i < data.total; i++) {
+                    productList.push(data.rows[i]);
+                }
+                renderTable();
+                total();
+            },
+            error : function() {
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", 'error');
+            }
+        });
+    }
+    
+    function renderCreditCard(){
+        <#if creditCard ??>
+        	var cardNumber = $('#cardNumber').text();
+        	$('#cardNumber').text(cardNumber.substring(cardNumber.length - 4));
+            var cardCode = $('#cardType').text();
+            for(var i = 0 ; i < creditCardType.length ; i++){
+                if(creditCardType[i].value == cardCode){
+                    $('#cardType').text(creditCardType[i].meaning);
+                }
+            }
+        </#if>
+    }
+    
+    function autoShipSubmit(){
+        if($("div[name='shipSite']").filter(".checkSite").length <= 0 && $("#deliveryMethod").val() == "SHIPP"){ //收货信息是否异常
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.have.no.shipinfo'/>");
+            return;
+        }
+        if(!allowSubmit){
+            $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", '<@spring.message "mws.autoship.address.no.logistics"/>');
+            return;
+        }
+        if (productList.lenght == 0 ) {
+            $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", '<@spring.message "mws.autoship.product.no_add"/>');
+            return;
+        }
+        //自提允许账单为空
+        if($("div[name='billSite']").filter(".checkSite").length <= 0 && $("#deliveryMethod").val() != "PCKUP"){ //账单信息是否异常
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.have.no.billinfo'/>");
+            return;
+        }
+        var salesSites = getCheckSites();
+        //配送信息
+        var logistics;
+        if($("#deliveryMethod").val() == "SHIPP"){//如果配送类型是物流配送
+            //物流公司
+            logistics = {
+                    shippingTierId:$("#expressCompany option:selected").val(),
+                    shippingFee:$("#expressCompany option:selected").attr("fee"),
+                    salesOrgId:$("#autoSalesOrgId").text(),
+                    codFlag:"N"
+            };
+        }
+        var autoshipOrder = {
+                salesSites : salesSites,
+                logistics : logistics,
+                deliveryType : $("#deliveryMethod").val()
+        }
+        $.ajax({
+            url: "${base.contextPath}/autoship/productline/update",
+            type:"POST",
+            dataType:"json",
+            contentType : "application/json; charset=UTF-8",
+            data : JSON2.stringify({
+                autoshipOrder : autoshipOrder,
+                products : productList
+            }),
+            success : function(data) {
+                if (data.rows[0] == 'error1') {
+                    var errorStr = "";
+                    for (var i = 1; i < data.rows.length; i++) {
+                        var errorProduct = data.rows[i];
+                        var index = errorProduct.indexOf("_");
+                        var errorProductName = errorProduct.substring(0,index);
+                        var errorProductMin = errorProduct.substring(index - 0 +1);
+                        errorStr = errorStr + errorProductName + '<@spring.message "mws.shopcart.min.number"/>' + errorProductMin + ","; 
+                    }
+                    $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", errorStr.substring(0,errorStr.length-1));
+                } else if (data.rows[0] == 'error2') {
+                    $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.minimumorderamount"/>' + data.rows[1]);
+                } else if (data.rows[0] == 'success')　{
+                    $.dialog.success("<@spring.message 'mws.dialog.success'/>", '<@spring.message "mws.autoship.submit.success"/>');
+                }
+            },
+            error : function() {
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", 'error');
+            }
+        });
+    }
+    //获取选中的地址
+    function getCheckSites(){
+        var checkSites = new Array();
+        var billSiteId = $("div[name='billSite']").filter(".checkSite").attr("id");
+        var shipSiteId = $("div[name='shipSite']").filter(".checkSite").attr("id");
+        var checkBill = null;
+        var checkShip = null;
+        var count = 0;
+        if(billSiteId == "billHistory"){
+            billSiteId = -1;
+        }
+        if(shipSiteId == "shipHistory"){
+            shipSiteId = 0;
+        }
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == billSiteId){
+                checkBill = sitesData[i];
+                count++;
+                if(count > 1){
+                    break;
+                }
+            }else if(sitesData[i].siteId == shipSiteId){
+                checkShip = sitesData[i];
+                count++;
+                if(count > 1){
+                    break;
+                }
+            }
+        }
+        if(checkBill){
+            var salesBill = {
+                    salesOrgId : salesOrgId,
+                    siteType : "BILL",
+                    name : checkBill.name,
+                    phone : checkBill.phone,
+                    cityCode : checkBill.spmLocation.cityCode,
+                    stateCode : checkBill.spmLocation.stateCode,
+                    countryCode : checkBill.spmLocation.countryCode,
+                    address : concatString(checkBill.spmLocation.addressLine1,checkBill.spmLocation.addressLine2,checkBill.spmLocation.addressLine3),
+                    areaCode : checkBill.areaCode,
+                    zipCode : checkBill.spmLocation.zipCode,
+                    autoshipFlag : "Y",
+                    address1: checkBill.spmLocation.addressLine1,
+                    address2: checkBill.spmLocation.addressLine2,
+                    address3: checkBill.spmLocation.addressLine3
+            }
+            if(billSiteId != -1){
+                checkSites.push(salesBill);
+            }
+        }
+        if(checkShip){
+            var salesShip = {
+                    salesOrgId : salesOrgId,
+                    siteType : "SHIP",
+                    name : checkShip.name,
+                    phone : checkShip.phone,
+                    cityCode : checkShip.spmLocation.cityCode,
+                    stateCode : checkShip.spmLocation.stateCode,
+                    countryCode : checkShip.spmLocation.countryCode,
+                    address : concatString(checkShip.spmLocation.addressLine1,checkShip.spmLocation.addressLine2,checkShip.spmLocation.addressLine3),
+                    areaCode : checkShip.areaCode,
+                    zipCode : checkShip.spmLocation.zipCode,
+                    autoshipFlag : "Y",
+                    address1: checkShip.spmLocation.addressLine1,
+                    address2: checkShip.spmLocation.addressLine2,
+                    address3: checkShip.spmLocation.addressLine3
+            }
+            if(shipSiteId != 0){
+            	checkSites.push(salesShip);
+            }
+        }
+        return checkSites;
+    }
+    
+    //工具函数-连接多个字符串,如果有字符串为null转换成""再连接
+    function concatString(){
+        var argsLength = arguments.length;
+        if(argsLength < 1){
+            return "";
+        }
+        var str = "";
+        for(var i=0; i<arguments.length; i++){
+            if(arguments[i] != null){
+                str += arguments[i];
+            }
+        }
+        return str;
+    }
+</script>
+
+<!-- SCRIPT-地址信息 -->
+<script type="text/javascript">
+    //配送信息
+    //toggle地址列表
+    function toggleSite(link,type){
+        if($("div[name='"+type+"Site']").filter(".hide").length > 0){
+            $("div[name='"+type+"Site']").filter(".hide").addClass("show");
+            $("div[name='"+type+"Site']").filter(".hide").removeClass('hide');
+            $(link).html("<@spring.message 'mws.autoship.address.putaway'/>&nbsp;<span class='vertical-middle glyphicon glyphicon-chevron-up'></span>");
+        }else{
+            $("div[name='"+type+"Site']").filter(".show").not(".checkSite").addClass('hide');
+            $("div[name='"+type+"Site']").filter(".show").not(".checkSite").removeClass("show");
+            $(link).html("<@spring.message 'mws.autoship.more.address'/>&nbsp;<span class='vertical-middle glyphicon glyphicon-chevron-down'></span>");
+        }
+    }
+    //open地址列表
+    function unfoldSite(type){
+        $("div[name='"+type+"Site']").filter(".hide").addClass("show");
+        $("div[name='"+type+"Site']").filter(".hide").removeClass('hide');
+        $("#"+type+"FoldSite>a").html("<@spring.message 'mws.autoship.address.putaway'/>&nbsp;<span class='vertical-middle glyphicon glyphicon-chevron-up'></span>");
+    }
+    // 更改选中地址
+    function chooseSite(div){
+        var parent = $(div).parent();
+        if(!parent.hasClass("checkSite")){
+            //更新页面
+            var oldCheck = parent.siblings(".checkSite");
+            oldCheck.removeClass("checkSite");
+            var oldCheckChild = oldCheck.children("div:first");
+            oldCheckChild.removeClass("default-border");
+            oldCheckChild.addClass("default-no-border");
+            parent.addClass("checkSite");
+            $(div).removeClass("default-no-border");
+            $(div).addClass("default-border");
+            if(parent.attr("name") == "shipSite"){//如果是收货地址变更
+                //查询新的物流公司-如果是第一次进入页面或者location有变化,就重新查询物流
+                var flag = checkLocationChange(oldCheck.length>0?oldCheck[0].id:null, parent[0].id);
+                if(flag) queryShippingTier();//重新查询物流
+            }
+        }
+    }
+    //检查选中地址后location是否变化
+    function checkLocationChange(oldSiteId, newSiteId){
+        if(oldSiteId == null){// 之前没有选择任何地址
+            return true;
+        }
+        var oldSite = null;
+        var newSite = null;
+        var count = 0;
+        if(oldSiteId == "shipHistory"){
+            oldSiteId = 0;
+        }
+        if(newSiteId == "shipHistory"){
+            newSiteId = 0;
+        }
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == oldSiteId){
+                oldSite = sitesData[i];
+                count++;
+                if(count > 1){
+                    break;
+                }
+            }else if(sitesData[i].siteId == newSiteId){
+                newSite = sitesData[i];
+                count++;
+                if(count > 1){
+                    break;
+                }
+            }
+        }
+        if(oldSite == null){// 删除选中地址时,会触发这个check方法,但全局的site信息已被splice
+            return true;
+        }
+        var oldLocationCode = oldSite.spmLocation.countryCode+oldSite.spmLocation.stateCode+oldSite.spmLocation.cityCode;
+        var newLocationCode = newSite.spmLocation.countryCode+newSite.spmLocation.stateCode+newSite.spmLocation.cityCode;
+        if(oldLocationCode != newLocationCode) return true;
+        return false;
+    }
+    /*******************************************************/
+    /* 增删改 -                                                /
+    /*******************************************************/
+    //保存地址
+    function saveSite(e){
+        var formData = mergeAndObjectify(
+                $("#editSite").serializeArray(),
+                [{name:"defaultFlag", value:$("input[name='defaultFlag']").prop("checked")==true?"Y":"N"}]
+        );
+        //必输校验-6个字段不能为空
+        if(!(formData.countryCode && formData.stateCode && formData.cityCode && formData.addressLine1 && formData.name && formData.areaCode && formData.phone)){
+            //处理报错信息
+            var errorMsg = "<@spring.message 'msg.error.mws.required_fields_is_empty'/>\n";
+            if(!formData.name){
+                errorMsg += "<@spring.message 'mws.addressbook.name'/>\n";
+            }
+            if(!formData.countryCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.country'/>\n";
+            }
+            if(!formData.stateCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.state'/>\n";
+            }
+            if(!formData.cityCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.city'/>\n";
+            }
+            if(!formData.addressLine1){
+                errorMsg += "<@spring.message 'mws.addressbook.address1'/>\n";
+            }
+            if(!formData.areaCode){
+                errorMsg += "<@spring.message 'mws.addressbook.areacode'/>\n";
+            }
+            if(!formData.phone){
+                errorMsg += "<@spring.message 'mws.addressbook.phone'/>\n";
+            }
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", errorMsg);
+            e = e||window.event;
+            if(e.stopPropagation){
+                e.stopPropagation();
+            }else{
+                e.cancelBubble = true;
+            }
+            return;
+        }
+        //格式校验
+        if (formData.zipCode) {
+            if (zipCodeReg.test(formData.zipCode) == false) {
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.zipcode.format.incorrect'/>");
+                e = e||window.event;
+                if(e.stopPropagation){
+                    e.stopPropagation();
+                }else{
+                    e.cancelBubble = true;
+                }
+                return;
+            }
+        }
+        if (phoneReg.test(formData.phone) == false) {
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.phone.format.incorrect'/>");
+            e = e||window.event;
+            if(e.stopPropagation){
+                e.stopPropagation();
+            }else{
+                e.cancelBubble = true;
+            }
+            return;
+        }
+        var memSite = {
+            siteUseCode:createSiteType,
+            spmLocation:{}
+        };
+        //如果是编辑已存在的地址,检查是否做过变更
+        if(isEditingSite != null){
+            memSite = isEditingSite;
+            var needSaveFlag = false;
+            if(formData.name != isEditingSite.name){
+                needSaveFlag = true;
+            }
+            if(formData.areaCode != isEditingSite.areaCode){
+                needSaveFlag = true;
+            }
+            if(formData.phone != isEditingSite.phone){
+                needSaveFlag = true;
+            }
+            if(formData.countryCode != isEditingSite.spmLocation.countryCode){
+                needSaveFlag = true;
+            }
+            if(formData.stateCode != isEditingSite.spmLocation.stateCode){
+                needSaveFlag = true;
+            }
+            if(formData.cityCode != isEditingSite.spmLocation.cityCode){
+                needSaveFlag = true;
+            }
+            if(formData.addressLine1 != isEditingSite.spmLocation.addressLine1){
+                needSaveFlag = true;
+            }
+            if(formData.addressLine2 != isEditingSite.spmLocation.addressLine2){
+                needSaveFlag = true;
+            }
+            if(formData.addressLine3 != isEditingSite.spmLocation.addressLine3){
+                needSaveFlag = true;
+            }
+            if(formData.zipCode != isEditingSite.spmLocation.zipCode){
+                needSaveFlag = true;
+            }
+            if(formData.defaultFlag != isEditingSite.defaultFlag){
+                needSaveFlag = true;
+            }
+            if(!needSaveFlag){
+                $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", "<@spring.message 'msg.error.mws.nothing_changed'/>");
+                e = e||window.event;
+                if(e.stopPropagation){
+                    e.stopPropagation();
+                }else{
+                    e.cancelBubble = true;
+                }
+                return;
+            }
+        }
+        //准备memSite传到后台
+        memSite._token = formData._token;
+        memSite.name = formData.name;
+        memSite.areaCode = formData.areaCode;
+        memSite.phone = formData.phone;
+        memSite.defaultFlag = formData.defaultFlag;
+        memSite.address = $("#countryCode>option[value='"+formData.countryCode+"']").text()+
+                          $("#stateCode>option[value='"+formData.stateCode+"']").text()+
+                          $("#cityCode>option[value='"+formData.cityCode+"']").text()+
+                          (formData.addressLine1?formData.addressLine1:"")+
+                          (formData.addressLine2?formData.addressLine2:"")+
+                          (formData.addressLine3?formData.addressLine3:"");//保存后页面要用到
+        memSite.spmLocation.countryCode = formData.countryCode;
+        memSite.spmLocation.stateCode = formData.stateCode;
+        memSite.spmLocation.cityCode = formData.cityCode;
+        memSite.spmLocation.addressLine1 = formData.addressLine1;
+        memSite.spmLocation.addressLine2 = formData.addressLine2;
+        memSite.spmLocation.addressLine3 = formData.addressLine3;
+        memSite.spmLocation.zipCode = formData.zipCode;
+        //发送保存请求
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            contentType : "application/json",
+            url : "${base.contextPath}/account/saveAddress",
+            data : JSON2.stringify(memSite),
+            success : function(data) {
+                if(data.success){
+                    // 保存后更新界面
+                    pageAfterSave(data.rows[0]);
+                }
+            }
+        });
+    }
+    // 编辑按钮
+    function editSite(siteId,type){//此处多传个type是为了title更快展现给用户
+        if("SHIP" == type){
+            $("#siteModalLabel").text("<@spring.message 'mws.addressbook.editdelivery'/>");
+
+        }else if("BILL" == type){
+            $("#siteModalLabel").text("<@spring.message 'mws.addressbook.editbilling'/>");
+
+        }
+        //初始化模态框
+        initModel(siteId);
+        //打开模态框
+        $("#siteModal").modal("show");
+    }
+    //为下拉框areaCode设值
+    function areaCodeSetData(){
+        $("select[name='areaCode']").empty();
+        $("select[name='areaCode']").append("<option value='' selected></option>");
+        for(var i=0; i<telAreaCode.length; i++){
+            $("select[name='areaCode']").append("<option value='"+telAreaCode[i].value+"'>"+telAreaCode[i].meaning+"</option>");
+        }
+    }
+    // 删除按钮
+    function deleteSite(siteId,_token){
+        $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", "<@spring.message 'msg.warning.system.delete_or_not'/>",
+            function(){
+                $.ajax({
+                    type : "POST",
+                    dataType : "json",
+                    url : "${base.contextPath}/account/deleteAddress",
+                    data : { siteId : siteId, _token: _token },
+                    success : function(data) {
+                        if(data.success){//删除成功
+                            // 更新页面-如果非默认直接删除这条地址,如果默认,更新默认地址显示
+                            pageAfterDelete(siteId, data.rows[0].defaultSiteId);
+                        }else{//删除失败
+                            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+$.escapeHtml(data.message)+"'/>");
+                        }
+                    },
+                    error : function(err){
+                        //console.log(err);
+                    }
+                });
+            }                
+        );
+    }
+    // 新增地址
+    function addSite(type){
+        createSiteType = type;
+        if("SHIP" == type){
+            $("#siteModalLabel").text("<@spring.message 'mws.addressbook.createdelivery'/>");
+
+        }else if("BILL" == type){
+            $("#siteModalLabel").text("<@spring.message 'mws.addressbook.createbilling'/>");
+
+        }
+        //显示defaultFlag的复选框
+        $("#defaultCheckBox").removeClass("hide");
+        $("#defaultCheckBox").addClass("show");
+        $("#siteModal").modal("show");
+    }
+    
+    /*******************************************************/
+    /* 增删改- 子函数实现 -                                       /
+    /*******************************************************/
+    //编辑时-初始化模态框
+    function initModel(siteId){
+        //从全局匹配到地址详细信息
+        var site = null;
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == siteId){
+                site = sitesData[i];
+                break;
+            }
+        }
+        //编辑时,存一个全局,这样既可以区别新建和编辑状态,又可以不用传递而得到正在编辑的数据
+        isEditingSite = site;
+        //填入到模态框
+        $("input[name='name']").val(site.name);
+        queryCountry(function(){
+            $("#countryCode").val(site.spmLocation.countryCode);
+            queryState(function(){
+                $("#stateCode").val(site.spmLocation.stateCode);
+                queryCity(function(){
+                    $("#cityCode").val(site.spmLocation.cityCode);
+                });
+            });
+        });
+        $("#editSite input[name='_token']").val(site._token);
+        $("input[name='addressLine1']").val(site.spmLocation.addressLine1);
+        $("input[name='addressLine2']").val(site.spmLocation.addressLine2);
+        $("input[name='addressLine3']").val(site.spmLocation.addressLine3);
+        $("input[name='zipCode']").val(site.spmLocation.zipCode);
+        $("select[name='areaCode']").val(site.areaCode);
+        $("input[name='phone']").val(site.phone);
+        //隐藏defaultFlag的复选框
+        $("#defaultCheckBox").removeClass("show");
+        $("#defaultCheckBox").addClass("hide");
+    }
+    //取消编辑时,清空
+    function cancelEditSite(){
+        //清空数据
+        queryCountry(function(){
+            $("#stateCode").empty();
+            $("#cityCode").empty();
+        });
+        $("input[name='name']").val("");
+        $("input[name='addressLine1']").val("");
+        $("input[name='addressLine2']").val("");
+        $("input[name='addressLine3']").val("");
+        $("input[name='zipCode']").val("");
+        $("select[name='areaCode']").val("");
+        $("input[name='phone']").val("");
+        //默认标记默认是true
+        $("input[name='defaultFlag']").prop("checked", true);
+        //如果是编辑已存在的,更新相应全局的值
+        isEditingSite = null;
+        //如果是新增,同样更新相应全局的值
+        createSiteType = null;
+    }
+    /*******************************************************/
+    /* 增删改 - 之后页面更新-                                      /
+    /*******************************************************/
+    // 保存后更新界面
+    function pageAfterSave(newSite){
+        if(createSiteType){//如果是新增地址
+            //新地址加到全局变量
+            sitesData.push(newSite);
+            //页面新增一个div-row -- 新增地址时，如果设为默认地址，选中并显示；如果不是默认地址，也选中并显示
+            if("SHIP" == newSite.siteUseCode){
+                pageAddRow(newSite);
+            }else if("BILL" == newSite.siteUseCode){
+                pageAddRow(newSite);
+            }
+        }else{//如果是编辑地址
+            //覆盖新地址到全局变量
+            for(var i=0; i<sitesData.length; i++){
+                if(sitesData[i].siteId == newSite.siteId){
+                    $.extend(true, sitesData[i], newSite);
+                    break;
+                }
+            }
+            //页面修改div-row
+            pageChangeRow(newSite);
+        }
+        // 更新全局变量
+        isEditingSite = null;
+        createSiteType = null;
+        // 清空模态框
+        cancelEditSite();
+    }
+    //新增地址时，页面新增行
+    function pageAddRow(newSite){
+        var siteName = null;
+        if(newSite.siteUseCode == "SHIP"){
+            siteName = "shipSite";
+        }else if(newSite.siteUseCode == "BILL"){
+            siteName = "billSite";
+        }
+        var html = ""+
+            "<div name='"+siteName+"' class='col-sm-12 site show' id='"+newSite.siteId+"' attr_location='"+newSite.locationId+"'>"+
+                 "<div class='col-sm-2 no-wrap col-small-margin' onclick='chooseSite(this)'>"+
+                     "<span><@spring.message 'mws.autoship.address.checked'/></span>"+
+                 "</div>"+
+                 "<div class='col-sm-2 no-wrap col-small-margin'>"+
+                     "<span>"+$.escapeHtml(newSite.name)+"</span>"+
+                 "</div>"+
+                 "<div class='col-sm-4 no-wrap col-small-margin' title='"+$.escapeHtml(newSite.attribute1+newSite.attribute2+newSite.attribute3+newSite.spmLocation.addressLine1+newSite.spmLocation.addressLine2+newSite.spmLocation.addressLine3)+"'>"+
+                     "<span>"+$.escapeHtml(newSite.attribute1+newSite.attribute2+newSite.attribute3+newSite.spmLocation.addressLine1+newSite.spmLocation.addressLine2+newSite.spmLocation.addressLine3)+"</span>"+
+                 "</div>"+
+                 "<div class='col-sm-2 no-wrap col-small-margin' title='"+$.escapeHtml(newSite.phone)+"'>"+
+                     "<span>"+$.escapeHtml(newSite.phone)+"</span>"+
+                 "</div>"+
+                 "<div class='col-sm-2 col-small-margin just-no-wrap'>"+
+                     "<a class='a-link' onclick=\"editSite("+newSite.siteId+",'"+$.escapeHtml(newSite.siteUseCode)+"')\"><@spring.message 'sys.hand.btn.edit'/></a>&nbsp;&nbsp;"+
+                     "<a class='a-link' onclick='deleteSite("+newSite.siteId+",\""+newSite._token+"\")'><@spring.message 'sys.hand.btn.delete'/></a>"+
+                 "</div>"+
+             "</div>";
+        $(html).insertBefore($("div[name='"+siteName+"']:first").next());
+        $("div[name='"+siteName+"']:first").next().hover(function(){
+            $(this).addClass('row-hover');
+        },function(){
+            $(this).removeClass('row-hover');
+        });
+        chooseSite($("#"+newSite.siteId).children("div:first"));
+        //新增行后，展开地址列表
+        unfoldSite(newSite.siteUseCode.toLowerCase());
+    }
+    //编辑地址时，更新页面的行
+    function pageChangeRow(newSite){
+        var siteRow = $("#"+newSite.siteId);
+        //修改姓名-eq(index)从0开始
+        siteRow.children("div:eq(1)").find("span").html($.escapeHtml(newSite.name));
+        //修改地址
+        siteRow.children("div:eq(2)").attr("title", $.escapeHtml(newSite.attribute1+newSite.attribute2+newSite.attribute3+newSite.spmLocation.addressLine1+newSite.spmLocation.addressLine2+newSite.spmLocation.addressLine3));
+        siteRow.children("div:eq(2)").find("span").html($.escapeHtml(newSite.attribute1+newSite.attribute2+newSite.attribute3+newSite.spmLocation.addressLine1+newSite.spmLocation.addressLine2+newSite.spmLocation.addressLine3));
+        //修改电话
+        siteRow.children("div:eq(3)").find("span").html($.escapeHtml(newSite.phone));
+    }
+    //删除地址后更新页面
+    function pageAfterDelete(siteId, defaultSiteId){
+        var curType = null;
+        var type = null;
+        //删除对应的全局变量
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == siteId){
+                curType = sitesData[i].siteUseCode
+                sitesData.splice(i, 1);
+            }else if(sitesData[i].siteId == defaultSiteId){//没有直接break而是直接在这里提前更新defaultFlag是为了避免循环嵌套
+                sitesData[i].defaultFlag = "Y";
+                type = sitesData[i].siteUseCode;
+            }
+        }
+        //如果删除的是选中地址更新界面选中当前地址
+        if($("#"+siteId).hasClass("checkSite")){
+            if(curType == "SHIP"){
+                chooseSite($("#shipHistory").children("div:first"));
+            }else if(curType == "BILL"){
+                chooseSite($("#billHistory").children("div:first"));
+            }
+            unfoldSite(type.toLowerCase());
+        }
+        $("#"+siteId).remove();
+    }
+    /*******************************************************/
+    /* 下拉框联动实现 -                                          /
+    /*******************************************************/
+    //查询country下拉框
+    function queryCountry(callback){//callback就是函数套函数而已~
+        $.ajax({
+            url: '${base.contextPath}/account/queryCountry',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+            data : {},
+            success : function(data) {
+                if(data.success){
+                    countrySetData(data.rows);
+                }
+                if(callback){
+                    callback();
+                }
+            },
+            error : function() {
+                //alert("获取country下拉框失败");
+            }
+        })
+    }
+    //查询state下拉框
+    function queryState(callback){
+        $.ajax({
+            url: '${base.contextPath}/account/queryState',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+            data : {countryCode:$("#countryCode").val()},
+            success : function(data) {
+                if(data.success){
+                    stateSetData(data.rows);
+                }
+                if(callback){
+                    callback();
+                }
+            },
+            error : function() {
+                //alert("获取state下拉框失败");
+            }
+        })
+    }
+    //查询city下拉框
+    function queryCity(callback){
+        $.ajax({
+            url: '${base.contextPath}/account/queryCity',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+               data : {stateCode:$("#stateCode").val()},
+               success : function(data) {
+                   if(data.success){
+                       citySetData(data.rows);
+                   }
+                   if(callback) callback();
+               },
+               error : function() {
+                   //alert("获取state下拉框失败");
+               }
+        })
+    }
+    //为下拉框countryCode设值
+    function countrySetData(options){
+        $("#countryCode").empty();
+        $("#countryCode").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("#countryCode").append("<option value='"+$.escapeHtml(options[i].countryCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    //为下拉框stateCode设值
+    function stateSetData(options){
+        $("#stateCode").empty();
+        $("#stateCode").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("#stateCode").append("<option value='"+$.escapeHtml(options[i].stateCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    //为下拉框cityCode设值
+    function citySetData(options){
+        $("#cityCode").empty();
+        $("#cityCode").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("#cityCode").append("<option value='"+$.escapeHtml(options[i].cityCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    
+    //工具函数-合并多个serialize数组为一个对象(Map)
+    function mergeAndObjectify(){
+        var argsLength = arguments.length;
+        if(argsLength < 1){
+            return null;
+        }
+        var obj = {};
+        for(var i=0; i<argsLength; i++){
+            for(var j=0; j<arguments[i].length; j++){
+                obj[arguments[i][j].name] = arguments[i][j].value;
+            }
+        }
+        return obj;
+    }
+</script>
+
+<!-- SCRIPT-物流信息 -->
+<script type="text/javascript">
+    //动态获取物流公司信息
+    function queryShippingTier(){
+        //1.准备选中地址
+        var location = {};
+        //console.log($("div[name='shipSite']").filter(".checkSite").length)
+        if (/* !$("div[name='shipSite']").filter(".checkSite") &&  */
+        		$("div[name='shipSite']").filter(".checkSite").length == 0) {
+            $("#expressCompany").empty();
+            allowSubmit = false;
+        	return location;
+        }
+	    var siteId = $("div[name='shipSite']").filter(".checkSite")[0].id;
+        if(siteId){
+            if(siteId == "shipHistory"){
+                siteId = 0;
+            }
+            for(var i=0; i<sitesData.length; i++){
+                if(sitesData[i].siteId == siteId){
+                    site = sitesData[i];
+                    location.countryCode = site.spmLocation.countryCode;
+                    location.stateCode = site.spmLocation.stateCode;
+                    location.cityCode = site.spmLocation.cityCode;
+                    break;
+                }
+            }
+            //2.发送ajax实时查询物流
+            $.ajax({
+                type : "POST",
+                dataType : "json",
+                url : "${base.contextPath}/account/queryShippingTier",
+                data : {
+                    countryCode : location.countryCode,
+                    stateCode : location.stateCode,
+                    cityCode : location.cityCode,
+                    currencyCode : currencyCode
+                },
+                success : function(data) {
+                    if(data.success) reRenderExpressCompany(data.rows);// 更新界面
+                    else  $.dialog.error("<@spring.message 'mws.dialog.error'/>", '<@spring.message "mws.autoship.logistics.geterror"/>');
+                }
+            });
+        }else{
+            $("#expressCompany").empty();
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", '<@spring.message "mws.autoship.address.no.valid.receipt_address"/>');
+        }
+    }
+    //重新渲染选择物流公司下拉框
+    function reRenderExpressCompany(opts){
+        shippingTier = new Array();
+        //计算运费-并排除无用选项（总额不在该区间）
+        var total = null;
+        for(var i=0; i<opts.length; i++){
+            if("PRTAX" == opts[i].calculationType && "N" == opts[i].privilegeFlag){//税前不含优惠
+                total = pretax - discountAmt;
+            }else if("PRTAX" == opts[i].calculationType && "Y" == opts[i].privilegeFlag){//税前含优惠
+                total = pretax;
+            }else if("AFTAX" == opts[i].calculationType && "N" == opts[i].privilegeFlag){//税后不含优惠
+                total = subtotal - discountAmt;
+            }else if("AFTAX" == opts[i].calculationType && "Y" == opts[i].privilegeFlag){//税后含优惠
+                total = subtotal;
+            }
+            var dtls = opts[i].shippingTierDtls;
+            for(var j=0; j<dtls.length; j++){
+                if(dtls[j].invAmountFrom < total && dtls[j].invAmountTo > total){
+                    var obj = {
+                            shippingTierId:opts[i].shippingTierId,
+                            shippingTierName:opts[i].shippingTierName,
+                            shippingFee:dtls[j].shippingFee
+                    };
+                    shippingTier.push(obj);
+                    break;
+                }
+            }
+        }
+        //自动应用最低运费的项-采用冒泡方式对fee排序
+        for(var i=0; i<shippingTier.length; i++){
+            for(var j=0; j<shippingTier.length; j++){
+                if(shippingTier[i].shippingFee < shippingTier[j].shippingFee){
+                    var temp = shippingTier[i];
+                    shippingTier[i] = shippingTier[j];
+                    shippingTier[j] = temp;
+                }
+            }
+        }
+        $("#expressCompany").empty();
+        for(var i=0; i<shippingTier.length; i++){
+            $("#expressCompany").append("<option fee='"+shippingTier[i].shippingFee+"' value='"+shippingTier[i].shippingTierId+"'>"+$.escapeHtml(shippingTier[i].shippingTierName)+"</option>");
+        }
+        //触发物流公司改变事件
+        $("#expressCompany").trigger("change");
+        // 判断是否采用历史物流
+        var historyLogistic = null
+        <#if historyLogistics??>
+            historyLogistic = ${historyLogistics.shippingTierId};
+        </#if>
+        var autoApply = true;
+        if(historyLogistic){
+            for(var i=0; i<shippingTier.length; i++){
+                if(shippingTier[i].shippingTierId == historyLogistic){
+                    autoApply = false;
+                    break;
+                }
+            }
+        }
+        if(!autoApply){//使用历史物流
+            $("#expressCompany").val(historyLogistic);
+            $("#expressCompany").trigger("change");
+        }
+
+    }
+</script>
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

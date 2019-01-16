@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.delivery.mapper.DeliveryMapper">
+    <resultMap type="com.lkkhpg.dsis.common.delivery.dto.OrderDelivery" id="baseMap" extends="com.lkkhpg.dsis.common.delivery.mapper.OrderDeliveryMapper.BaseResultMap" >
+        <result column="MEMBER_ID" property="memberId" jdbcType="VARCHAR" />
+        <result column="INV_NAME" property="invOrgName" jdbcType="VARCHAR" />
+        <!--<result column="HEADER_ID" property="headerId" jdbcType="DECIMAL"/>-->
+        <!--<result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />-->
+        <!--<result column="DELIVERY_STATUS" property="deliveryStatus" jdbcType="VARCHAR"/>-->
+        <!--<result column="ORDER_HEADER_ID" property="orderHeaderId" jdbcType="DECIMAL"/>-->
+    </resultMap>
+    <resultMap type="java.util.Map" id="comboxMap">
+        <result column="ID" property="id" jdbcType="DECIMAL" />
+        <result column="VALUE" property="value" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="queryDelivery" resultMap="baseMap" parameterType="com.lkkhpg.dsis.common.delivery.dto.DeliveryForQuery">
+        SELECT d.delivery_id,
+       d.delivery_number,
+       d.inv_org_id,
+       siot.name as inv_name,
+       o.order_number,
+       m.member_code,
+       case
+         when m.member_type = 'COMP' then
+          M.REF_COMPANY_EN
+         else
+          m.member_name
+       end member_name,
+       d.delivery_type,
+       d.delivery_status,
+       d.creation_date,
+       d.delivery_date,
+       d.logistics_company,
+       d.tracker_number
+  FROM dm_order_delivery d
+  LEFT JOIN SPM_INV_ORGANIZATION_B sio
+    ON d.inv_org_id = sio.inv_org_id
+  LEFT JOIN SPM_INV_ORGANIZATION_TL siot
+    ON sio.inv_org_id = siot.inv_org_id
+   and siot.lang = #{request.locale,jdbcType=VARCHAR}
+  LEFT JOIN om_sales_order o
+    ON d.order_header_id = o.header_id
+  LEFT JOIN mm_member_v m
+    ON m.member_id = o.member_id
+        <trim prefix="WHERE" suffixOverrides="AND | OR">
+            1=1
+              AND d.inv_org_id =#{invOrgId,jdbcType=DECIMAL}
+            <if test="deliveryNumber!=null and deliveryNumber != ''">
+                AND d.delivery_number like concat('%',concat(Upper(#{deliveryNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="orderNumber !=null and orderNumber !=''">
+                AND Upper(o.order_number) like concat('%',concat(Upper(#{orderNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            
+            <if test="logisticsCompany !=null and logisticsCompany !=''">
+                AND d.logistics_company like concat('%',concat(#{logisticsCompany,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="trackerNumber !=null and trackerNumber !=''">
+                AND d.tracker_number like concat('%',concat(#{trackerNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            
+            
+            <if test="deliveryType !=null and deliveryType !=''">
+                AND d.delivery_type =#{deliveryType,jdbcType=VARCHAR}
+            </if>
+            <if test="memberCode !=null ">
+                AND Upper(m.MEMBER_CODE) like concat('%',concat(Upper(#{memberCode,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test=" deliveryStatusList !=null and deliveryStatusList.size() > 0">
+                AND d.delivery_status in
+                 <foreach collection="deliveryStatusList" open="(" separator="," close=")" item="status" index="index">
+                    #{status,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <if test="creationBegin !=null ">
+                <![CDATA[AND trunc(d.creation_date) >= #{creationBegin,jdbcType=DATE}]]>
+            </if>
+            <if test="creationEnd !=null ">
+                 <![CDATA[AND trunc(d.creation_date) <= #{creationEnd,jdbcType=DATE}]]>
+            </if>
+            <if test="deliveryDateBegin !=null ">
+                 <![CDATA[AND trunc(d.delivery_date) >= #{deliveryDateBegin,jdbcType=DATE}]]>
+            </if>
+            <if test="deliveryDateEnd !=null ">
+                 <![CDATA[AND trunc(d.delivery_date) <= #{deliveryDateEnd,jdbcType=DATE}]]>
+            </if>
+        </trim>
+        <if test="sortname == null and sortorder == null">
+        order by d.delivery_number desc
+       </if>
+       <if test="sortname == 'deliveryNumber'">
+        order by d.delivery_number ${sortorder}
+       </if>
+       <if test="sortname == 'orderNumber'">
+        order by o.order_number ${sortorder}
+       </if>
+       <if test="sortname == 'creationDate'">
+        order by d.creation_date ${sortorder}
+       </if>
+       <if test="sortname == 'deliveryDate'">
+        order by d.delivery_date ${sortorder}
+       </if>
+    </select>
+    <select id="orderComboxQuery" resultMap="comboxMap">
+        SELECT osr.header_id as ID, osr.order_number as VALUE FROM
+        OM_SALES_ORDER osr
+    </select>
+    <select id="invComboxQuery" resultMap="comboxMap">
+        SELECT sio.inv_org_id as ID, sio.name as VALUE FROM
+        SPM_INV_ORGANIZATION_B sio
+    </select>
+
+
+    <select id="queryDeliveryStatus" resultMap="baseMap" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDelivery">
+ SELECT
+	d.DELIVERY_STATUS
+FROM
+	DM_ORDER_DELIVERY d
+WHERE
+	d.ORDER_HEADER_ID IN (
+		SELECT
+			o.HEADER_ID
+		FROM
+			OM_SALES_ORDER o
+		WHERE
+			o.ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR})
+    </select>
+</mapper>

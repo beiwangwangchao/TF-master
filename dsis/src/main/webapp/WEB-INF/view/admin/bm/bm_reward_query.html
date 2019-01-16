@@ -1,0 +1,368 @@
+<#-- 
+ * description: 查询奖金调整 
+ * version: 1.0 
+ * author: li.peng 
+ * Copyright LKK Health Products Group Limited. 
+ * 
+--> 
+<#include "../include/head.html">
+<style>
+</style>
+<script
+	src="${base.contextPath}/common/code?adjustmentreason=BM.ADJUSTMENT_REASON&adjustmenttype=BM.ADJUSTMENT_TYPE&adjustmentstatus=BM.ADJUSTMENT_STATUS&createdate=BM.CREAT_TIME"
+	type="text/javascript"></script>
+
+<body style="padding: 10px;">
+	<form id="d_bm_002_form"></form>
+	<div id="d_bm_002_grid"></div>
+	
+	<form id="d_bm_001_form"></form>
+	<script type="text/javascript">
+
+    window['d_bm_002_form'] = $("#d_bm_002_form").ligerForm({
+        fields : [ {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjtype"/>',
+            name : "adjType",
+            textField : 'meaning',
+            type : "select",
+            options : {
+                valueField : 'value',
+                textField : 'meaning',
+                data : adjustmenttype
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.periodid"/>',
+            name : "periodId",
+            newline: false,
+            type : 'select',
+            options : {
+                valueField : 'periodId',
+                textField : 'periodName',
+                url : '${base.contextPath}/bm/getBonusPeriod'
+            }
+        } , {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjreason"/>',
+            name : "adjReason",
+            newline: false,
+            type : "select",
+            options : {
+                valueField : 'value',
+                textField : 'meaning',
+                data : adjustmentreason
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjstatus"/>',
+            name : "adjStatus",
+            type : "select",
+            options : {
+                valueField : 'value',
+                textField : 'meaning',
+                data : adjustmentstatus
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.creationdate"/>',
+            name : "createDateCode",
+            newline: false,
+            type : "select",
+            options : {
+                valueField : 'value',
+                textField : 'meaning',
+                data : createdate
+            }
+        }],
+        buttons : [ {
+            text : '<@spring.message "sys.hand.btn.query"/>',
+            disabled : false,
+            width : 60,
+            click : function() {
+            	 Hap.gridQuery({
+                     form : d_bm_002_form,
+                     grid : d_bm_002_grid
+                 })
+            }
+        }]
+    });
+    
+    window['d_bm_002_grid'] = $("#d_bm_002_grid").ligerGrid({
+        columns : [
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjcode"/>',
+                name : 'adjCode',
+                width : 150,
+                render:function(rowdata, index, value){
+                    return '<a href="javascript:void(0);" onclick = "editBounsAdjust('+index+')">'+rowdata.adjCode+'</a>';
+                }
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.membercode"/>',
+                name : 'memberCode',
+                width : 100,
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.company"/>',
+                name : 'companyName',
+                width : 200,
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.market"/>',
+                name : 'marketName',
+                width : 100
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.periodid"/>',
+                name : 'periodName',
+                width : 80
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjustamount"/>',
+                name : 'adjAmt',
+                align : 'right',
+                width : 100
+                
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjstatus"/>',
+                name : 'adjStatus',
+                width : 100,
+                render: function(item) {
+                    for (var i = 0; i < adjustmentstatus.length; i++) {
+                        if (adjustmentstatus[i].value == item.adjStatus) {
+                            return adjustmentstatus[i].meaning;
+                        }
+                    }
+                }
+            },{
+                display :  '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjreason"/>',
+                name : 'adjReason',
+                width : 100,
+                render: function(item) {
+                    for (var i = 0; i < adjustmentreason.length; i++) {
+                        if (adjustmentreason[i].value == item.adjReason) {
+                            return adjustmentreason[i].meaning;
+                        }
+                    }
+                }
+            },{
+                name : "creationDate" ,
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.creationdate"/>',
+                width : 80,
+                type :"date",
+                format:"yyyy-MM-dd"
+            },{
+                name : 'description',
+                display :'<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.description"/>',
+                align : 'left',
+                width : 200
+            }
+        ],
+        url : '${base.contextPath}/bm/queryBonusAdjust',
+        enabledEdit : false,
+        width : '100%',
+        height : '99%',
+        checkbox: true,
+        pageSize :20,
+        toolbar : {
+            items : [
+                    {
+                        text : '<@spring.message "sys.hand.btn.new"/>',
+                        click : function() {
+                        	editBounsAdjust();
+                        	clear001Form();
+                        },
+                        icon : 'add'
+                    }, 
+                    {
+                        text : '<@spring.message "sys.hand.btn.delete"/>',
+                        click : function() {
+                        	 Hap.gridDelete({
+                                 grid : d_bm_002_grid,
+                                 url : '${base.contextPath}/bm/deleteBonusAdjust'
+                             })
+                        },
+                        icon : 'delete'
+                    }
+                    ]
+        }
+    });
+    
+    function initBM01Form(){
+    	window['d_bm_001_form'] = $("#d_bm_001_form").ligerForm({
+            fields : [ {
+                name : "adjId",
+                type : 'hidden'
+            },{
+                display :  '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjcode"/>',
+                name : "adjCode",
+                readonly : true,
+                type : 'text'
+            },{
+                display :  '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjstatus"/>',
+                name : "adjStatus",
+                textField :"adjStatusName",
+                type : "combobox",
+                newline: false,
+                readonly:true,
+                editor : {
+                    value:"NEW",
+                    valueField : 'value',
+                    textField : 'meaning',
+                    data : adjustmentstatus
+                }
+            },{
+                display :  '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.periodid"/>',
+                name : "periodId",
+                textField :"periodIdName",
+                newline: false,
+                type : 'combobox',
+                options : {
+                	valueField : 'periodId',
+                    textField : 'periodName',
+                    url : '${base.contextPath}/bm/getBonusPeriod'
+                },
+                validate:{
+                    required: true,
+                }
+            },{
+                display :  '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.creationdate"/>',
+                name : "creationDate",
+                newline: false,
+                type : "date",
+                format:"yyyy-MM-dd",
+                readonly : true 
+            },{
+                display :  '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.membercode"/>',
+                name : "memberId",
+                type : "popup",
+                textField:'memberCode',
+                validate:{
+                    required: true,
+                },
+                options : ${lovService.getLov(base.contextPath, base.locale, "lov_member")}
+            },{
+                display :  '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjreason"/>',
+                name : "adjReason",
+                newline: false,
+                textField:"adjReasonName",
+                type : "select",
+                options : {
+                    valueField : 'value',
+                    textField : 'meaning',
+                    data : adjustmentreason
+                },
+                validate:{
+                    required: true
+                }
+            },{
+                display :  '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjustamount"/>',
+                name : "adjAmt",
+                newline: false,
+                validate:{
+                    required: true,
+                    number:true
+                }
+            },{
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.adjtype"/>',
+                name : "adjType",
+                newline: false,
+                type : "select",
+                options : {
+                    valueField : 'value',
+                    textField : 'meaning',
+                    data : adjustmenttype
+                },
+                validate:{
+                    required: true
+                }
+            }, {
+                display :  '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.description"/>',
+                name : "description",
+                newline: false,
+                width:495
+            }]
+        });
+    }
+    
+    var lovEditorWin 
+    function editBounsAdjust(index){
+    	if(!lovEditorWin){
+    		initBM01Form();
+    		lovEditorWin = $.ligerDialog.open({
+                height:300,
+                width: 700,
+                allowClose:false,
+                title : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust" />',
+                target: $("#d_bm_001_form"),
+                buttons: [{
+                    text: '<@spring.message "sys.hand.btn.new" />',
+                    onclick: function(item, dialog) {
+                    	clear001Form();
+                    }
+                },{
+                    text: '<@spring.message "sys.hand.btn.ok"/>',
+                    onclick: function(item, dialog) {
+                    	var obj = d_bm_001_form.getData();
+                    	if(Hap.validateForm(d_bm_001_form)){
+                    		$.ajax({
+                                type: "POST",
+                                dataType: "json",
+                                contentType: "application/json",
+                                url: "${base.contextPath}/bm/saveBonusAdjust",
+                                data: JSON2.stringify(obj),
+                                success: function(data) {
+                                	Hap.showSuccess();
+                                	set001Form(data.rows[0]);
+                                }
+                            });
+                    	}
+                    }
+                },
+                {
+                    text: '<@spring.message "sys.hand.btn.cancel"/>',
+                    onclick: function(item, dialog) {
+                    	dialog.hide();
+/*                     	clear001Form();
+                    	 Hap.gridQuery({
+                             form : d_bm_002_form,
+                             grid : d_bm_002_grid
+                         }); */
+                    }
+                }],
+            });
+    	}
+        if(index >= 0){
+        	set001Form(d_bm_002_grid.rows[index]);
+        }
+        set001FormVisible();
+    	lovEditorWin.show();
+    }
+   function clear001Form(){
+	   d_bm_001_form.setData({
+		   adjId:'',
+		   adjCode:'',
+		   adjStatus:'NEW',
+		   periodId:'',
+		   creationDate:'',
+		   memberId:'',
+		   adjType:"",
+		   adjReason :'',
+		   adjAmt :'',
+		   description:'',
+		   memberId : '',
+		   memberCode : ''
+	   });
+   }
+   function set001Form(data){
+	   d_bm_001_form.setData(data);
+   }
+   
+   function set001FormVisible(){
+	   var data = d_bm_001_form.getData();
+	   var formList = ['periodId','memberId','adjType','adjReason','adjAmt','description'];
+       if(data.adjStatus != 'NEW'){
+           d_bm_001_form.setEnabled(formList,false);
+       }else{
+           d_bm_001_form.setEnabled(formList,true);
+       }
+   }
+</script>
+</html>

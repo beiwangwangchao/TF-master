@@ -1,0 +1,90 @@
+<#--
+ * description: 接收人列表
+ * version: 1.0 
+ * author: huangjiajing
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+
+<#include "../include/head.html">
+<body style="padding: 10px;">
+	<script type="text/javascript" src="${base.contextPath}/lib/ckeditor/ckeditor.js"></script>
+    <script src="${base.contextPath}/common/code?messageContentType=SYS.MESSAGE_CONTENT_TYPE&
+                publishTime=SYS.PUBLISH_TIME&
+                messageStatus=SYS.MESSAGE_STATUS&
+                publishChannel=SYS.PUBLISH_CHANNEL&
+                memStauts=MM.MEMBER_STATUS&
+                userStatus=SYS.USER_STATUS" type="text/javascript"></script>
+    <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+    <style>
+	.panel{
+	    margin:20px;
+	}
+	.panel-title {
+	    font-size:16px;
+	    line-height:20px;
+	    padding:5px;
+	    background-color:#f4f4f4;
+	}
+    </style>
+    <form id="form_tool"></form>
+    <form id="message_form" style="width: 300px;"></form>
+    <div class="panel">
+	    <div id="message_mem_grid"  style="margin-top:10px;"></div>
+    </div>
+    <script type="text/javascript">
+    
+    window['message_form'] = $("#message_form").ligerForm({
+        fields : [
+            
+            { name : 'memberCode',type:'text', label : '<@spring.message "type.com.lkkhpg.dsis.common.user.dto.userinfo.memberid"/>', newline : false}
+        ],
+        buttons : [
+                   {
+                       text : '<@spring.message "sys.hand.btn.query"/>',
+                       disabled : false,
+                       newline : false,
+                       width : 60,
+                       click : function() {
+                           Hap.gridQuery({
+                               form : message_form,
+                               grid : message_mem_grid
+                           })
+                       }
+                   }
+               ]
+        
+    });
+    
+    var message_mem_grid;
+    message_mem_grid = window['message_mem_grid'] = $("#message_mem_grid").ligerGrid({
+       columns : [
+           {
+               display : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.member"/>',
+               name : 'memberCode',
+               align : 'center',
+               width : 200,
+                type:'text'
+           },
+           {
+               display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.status"/>',
+               name : 'publishStatus',
+               align : 'center',
+               width : 200,
+               render: function (row){
+                   if(row.publishStatus == 'Y'){
+                       return "<@spring.message "mws.dialog.success"/>";
+                   }else{
+                       return '<@spring.message "mws.payment.result.status"/>'
+                   }
+               }
+           }
+       ],
+       url : '${base.contextPath}/sys/publicmessage/query?msMessageId=${RequestParameters.msMessageId!}',
+       enabledEdit : true,
+       width : '99%',
+       height : '98%'
+   });
+</script>
+</body>
+</html>

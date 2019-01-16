@@ -1,0 +1,48 @@
+<#--
+ * description: RPT-00172报表.
+ * version: 1.0
+ * author: huangjiajing 
+ * .
+ *
+-->
+<#include "../include/head.html">
+
+<body style="padding: 10px;">
+	<script
+		src="${base.contextPath}/common/code?exportTypeData=SYS.REPORT_EXPORT_TYPE&reportType=SYS.NHI_REPORT_TYPE"></script>
+    <form id="down_form"></form>
+    <form id="down" method="POST" target="_blank"></form>
+    <script type="text/javascript">
+    $(function() {
+    	window['down_form'] = $('#down_form').ligerForm({
+    		fields : [{
+    			label : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.exporttype"/>',
+    			name : "docType",
+    			newline : true,
+    			type : 'select',
+    			labelwidth : 120,
+    			options : {
+    				valueField: 'value',
+    				textField: 'meaning',
+    				data:exportTypeData
+    			},
+    			validate:{
+    				required:true
+    			}
+    		}],
+    		buttons : [{
+    			text : '<@spring.message "type.com.lkkhpg.dsis.common.order.download"/>',
+    			disabled : false,
+    			width : 60,
+    			click : downLoadpopConfirm
+    		}]
+    	});
+    });
+    function downLoadpopConfirm(){
+    	var doHeaderId = ${RequestParameters.doHeaderId};
+    	var docType = liger.get('docType').getValue();
+    	$("#down").attr("action","${base.contextPath}/report/run?docType="+docType+"&doHeaderId="+doHeaderId+"&reportProgramCode=RPT-DO-HEADER").submit();
+    }
+    </script>
+</body>
+</html>

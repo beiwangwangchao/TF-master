@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.delivery.mapper.OrderDeliveryLineMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLine" >
+    <id column="LINE_ID" property="lineId" jdbcType="DECIMAL" />
+    <result column="DELIVERY_ID" property="deliveryId" jdbcType="DECIMAL" />
+    <result column="INV_ORG_ID" property="invOrgId" jdbcType="DECIMAL" />
+    <result column="ORDER_LINE_ID" property="orderLineId" jdbcType="DECIMAL" />
+    <result column="OUTSTANDING_QTY" property="outstandingQty" jdbcType="DECIMAL" />
+    <result column="RETURN_QTY" property="returnQty" jdbcType="DECIMAL" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="PICK_RELEASE_ID" property="pickReleaseId" jdbcType="DECIMAL" />
+    <result column="PICK_RELEASE_LINE_ID" property="pickReleaseLineId" jdbcType="DECIMAL" />
+    <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL" />
+    <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR" />
+    <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+    <result column="UOM_CODE" property="uomCode" jdbcType="VARCHAR" />
+    <result column="UOM_NAME" property="uomName" jdbcType="VARCHAR" />
+    <result column="ORDER_LINE_QUANTITY" property="orderLineQuantity" jdbcType="DECIMAL" />
+    <result column="SHIPPED_QUANTITY" property="shippedQuantity" jdbcType="DECIMAL" />
+    <result column="PICK_QUANTITY" property="pickQuantity" jdbcType="DECIMAL" />
+    <result column="ORDER_LINE_STATUS" property="orderLineStatus" jdbcType="VARCHAR" />
+    <result column="ORDER_LINE_STATUS_DESC" property="orderLineStatusDesc" jdbcType="VARCHAR" />
+    <result column="BATCH_CTRL_FLAG" property="batchCtrlFlag" jdbcType="VARCHAR" />
+    <result column="ONHAND_QUANTITY" property="onhandQuantity" jdbcType="DECIMAL" />
+    
+    <result column="COUNT_ITEM_ID" property="countItemId" jdbcType="DECIMAL" />
+    <result column="COUNT_ITEM_NUMBER" property="countItemNumber" jdbcType="VARCHAR" />
+    <result column="COUNT_ITEM_NAME" property="countItemName" jdbcType="VARCHAR" />
+    <result column="PACKAGE_ITEM_ID" property="packageItemId" jdbcType="DECIMAL" />
+    <result column="PACKAGE_ITEM_NAME" property="packageItemName" jdbcType="VARCHAR" />
+    <!--add by furong.tang-->
+    <result column="unit_price" property="unitPrice" jdbcType="DECIMAL"/>
+    <result column="total_money" property="totalMoney" jdbcType="DECIMAL"/>
+
+  </resultMap>
+  <sql id="Base_Column_List" >
+    LINE_ID, DELIVERY_ID, INV_ORG_ID, ORDER_LINE_ID, OUTSTANDING_QTY, RETURN_QTY, OBJECT_VERSION_NUMBER, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, PICK_RELEASE_ID, PICK_RELEASE_LINE_ID,
+    ITEM_ID, COUNT_ITEM_ID ,PACKAGE_ITEM_ID
+  </sql>
+  <select id="selectByOrderId" resultType="java.lang.Integer" parameterType="java.lang.Long" >
+	SELECT nvl(SUM(dodl.outstanding_qty), 0)
+	  FROM om_sales_line osl, dm_order_delivery dod, dm_order_delivery_line dodl
+	 WHERE dod.order_header_id = osl.header_id
+	   AND dod.delivery_id = dodl.delivery_id
+	   AND dodl.order_line_id = osl.line_id
+	   AND dod.inv_org_id = dodl.inv_org_id
+   	   AND dod.order_header_id = #{orderId,jdbcType=DECIMAL}
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from DM_ORDER_DELIVERY_LINE
+    where LINE_ID = #{lineId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from DM_ORDER_DELIVERY_LINE
+    where LINE_ID = #{lineId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLine" >
+    <selectKey resultType="java.lang.Long" keyProperty="lineId" order="BEFORE">
+            select DM_ORDER_DELIVERY_LINE_S.nextval from dual
+    </selectKey>
+    insert into DM_ORDER_DELIVERY_LINE (LINE_ID, DELIVERY_ID, INV_ORG_ID, 
+      ORDER_LINE_ID, OUTSTANDING_QTY, RETURN_QTY, 
+      REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, 
+      PICK_RELEASE_ID, PICK_RELEASE_LINE_ID,
+      ITEM_ID, COUNT_ITEM_ID ,PACKAGE_ITEM_ID
+      )
+    values (#{lineId,jdbcType=DECIMAL}, #{deliveryId,jdbcType=DECIMAL}, #{invOrgId,jdbcType=DECIMAL}, 
+      #{orderLineId,jdbcType=DECIMAL}, #{outstandingQty,jdbcType=DECIMAL}, #{returnQty,jdbcType=DECIMAL}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, 
+      #{pickReleaseId,jdbcType=DECIMAL}, #{pickReleaseLineId,jdbcType=DECIMAL},
+      #{itemId,jdbcType=DECIMAL}, #{countItemId,jdbcType=DECIMAL}, #{packageItemId,jdbcType=DECIMAL}
+       )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLine" >
+    <selectKey resultType="java.lang.Long" keyProperty="lineId" order="BEFORE">
+            select DM_ORDER_DELIVERY_LINE_S.nextval from dual
+    </selectKey>
+    insert into DM_ORDER_DELIVERY_LINE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="lineId != null" >
+        LINE_ID,
+      </if>
+      <if test="deliveryId != null" >
+        DELIVERY_ID,
+      </if>
+      <if test="invOrgId != null" >
+        INV_ORG_ID,
+      </if>
+      <if test="orderLineId != null" >
+        ORDER_LINE_ID,
+      </if>
+      <if test="outstandingQty != null" >
+        OUTSTANDING_QTY,
+      </if>
+      <if test="returnQty != null" >
+        RETURN_QTY,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="pickReleaseId != null" >
+        PICK_RELEASE_ID,
+      </if>
+      <if test="pickReleaseLineId != null" >
+        PICK_RELEASE_LINE_ID,
+      </if>
+      <if test="itemId != null ">
+        ITEM_ID,
+      </if>
+      <if test="countItemId != null">
+        COUNT_ITEM_ID,
+      </if>
+      <if test="packageItemId != null">
+        PACKAGE_ITEM_ID,
+      </if>
+       
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="lineId != null" >
+        #{lineId,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryId != null" >
+        #{deliveryId,jdbcType=DECIMAL},
+      </if>
+      <if test="invOrgId != null" >
+        #{invOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="orderLineId != null" >
+        #{orderLineId,jdbcType=DECIMAL},
+      </if>
+      <if test="outstandingQty != null" >
+        #{outstandingQty,jdbcType=DECIMAL},
+      </if>
+      <if test="returnQty != null" >
+        #{returnQty,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="pickReleaseId != null" >
+        #{pickReleaseId,jdbcType=DECIMAL},
+      </if>
+      <if test="pickReleaseLineId != null" >
+        #{pickReleaseLineId,jdbcType=DECIMAL},
+      </if>
+      <if test="itemId != null ">
+        #{itemId,jdbcType=DECIMAL},
+      </if>
+      <if test="countItemId != null">
+        #{countItemId,jdbcType=DECIMAL},
+      </if>
+      <if test="packageItemId != null">
+        #{packageItemId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLine" >
+    update DM_ORDER_DELIVERY_LINE
+    <set >
+      <if test="deliveryId != null" >
+        DELIVERY_ID = #{deliveryId,jdbcType=DECIMAL},
+      </if>
+      <if test="invOrgId != null" >
+        INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="orderLineId != null" >
+        ORDER_LINE_ID = #{orderLineId,jdbcType=DECIMAL},
+      </if>
+      <if test="outstandingQty != null" >
+        OUTSTANDING_QTY = #{outstandingQty,jdbcType=DECIMAL},
+      </if>
+      <if test="returnQty != null" >
+        RETURN_QTY = #{returnQty,jdbcType=DECIMAL},
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="pickReleaseId != null" >
+        PICK_RELEASE_ID = #{pickReleaseId,jdbcType=DECIMAL},
+      </if>
+      <if test="pickReleaseLineId != null" >
+        PICK_RELEASE_LINE_ID = #{pickReleaseLineId,jdbcType=DECIMAL},
+      </if>
+      <if test="itemId != null ">
+        ITEM_ID = #{itemId,jdbcType=DECIMAL},
+      </if>
+      <if test="countItemId != null">
+        COUNT_ITEM_ID = #{countItemId,jdbcType=DECIMAL},
+      </if>
+      <if test="packageItemId != null">
+        PACKAGE_ITEM_ID = #{packageItemId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where LINE_ID = #{lineId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLine" >
+    update DM_ORDER_DELIVERY_LINE
+    set DELIVERY_ID = #{deliveryId,jdbcType=DECIMAL},
+      INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+      ORDER_LINE_ID = #{orderLineId,jdbcType=DECIMAL},
+      OUTSTANDING_QTY = #{outstandingQty,jdbcType=DECIMAL},
+      RETURN_QTY = #{returnQty,jdbcType=DECIMAL},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = CURRENT_TIMESTAMP,
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      PICK_RELEASE_ID = #{pickReleaseId,jdbcType=DECIMAL},
+      PICK_RELEASE_LINE_ID = #{pickReleaseLineId,jdbcType=DECIMAL},
+      ITEM_ID = #{itemId,jdbcType=DECIMAL},
+      COUNT_ITEM_ID = #{countItemId,jdbcType=DECIMAL},
+      PACKAGE_ITEM_ID = #{packageItemId,jdbcType=DECIMAL}
+    where LINE_ID = #{lineId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="selectByDeleveryId" resultMap="BaseResultMap" >
+  SELECT dodl.line_id
+      ,dodl.delivery_id
+      ,dodl.inv_org_id
+      ,dodl.order_line_id
+      ,dodl.outstanding_qty
+      ,dodl.return_qty
+      ,dodl.object_version_number
+      ,dodl.request_id
+      ,dodl.program_id
+      ,dodl.creation_date
+      ,dodl.created_by
+      ,dodl.last_updated_by
+      ,dodl.last_update_date
+      ,dodl.last_update_login
+      ,dodl.attribute_category
+      ,dodl.attribute1
+      ,dodl.attribute2
+      ,dodl.attribute3
+      ,dodl.attribute4
+      ,dodl.attribute5
+      ,dodl.attribute6
+      ,dodl.attribute7
+      ,dodl.attribute8
+      ,dodl.attribute9
+      ,dodl.attribute10
+      ,dodl.attribute11
+      ,dodl.attribute12
+      ,dodl.attribute13
+      ,dodl.attribute14
+     <!--  ,dodl.attribute15 -->
+      ,dodl.pick_release_id
+      ,dodl.pick_release_line_id
+      ,dodl.count_item_id
+      ,dodl.package_item_id
+      ,(select item_number from inv_item_b where item_id = dodl.count_item_id) count_item_number
+      ,(select item_name from inv_item_tl where item_id = dodl.count_item_id and lang = #{request.locale,jdbcType=VARCHAR} ) count_item_name
+      ,(select item_name from inv_item_tl where item_id = dodl.package_item_id and lang = #{request.locale,jdbcType=VARCHAR} ) package_item_name
+      ,iib.item_id
+      ,iib.item_number
+      ,iit.item_name
+      ,iib.uom_code
+      ,osl.quantity order_line_quantity
+      ,coalesce((SELECT SUM(coalesce(dodl2.outstanding_qty, 0))
+                  FROM dm_order_delivery dod2
+                  LEFT JOIN dm_order_delivery_line dodl2
+                    ON dod2.delivery_id = dodl2.delivery_id
+                 WHERE dod2.delivery_status IN ('SHIPP', 'PCKUP')
+                   AND dodl2.order_line_id = dodl.order_line_id)
+               ,0) shipped_quantity
+      ,coalesce(dprl.pick_quantity, 0) pick_quantity
+      ,osl.status order_line_status
+      ,coalesce((SELECT pv.lot_control_flag 
+                        FROM INV_ITEM_PROPERTY_V pv
+                        where pv.item_id = dodl.count_item_id
+                        and pv.organization_id = dodl.inv_org_id
+                          )
+               ,'N') batch_ctrl_flag
+      ,(case osl.item_type
+      when 'VI' then 9999999999 
+      else 
+           coalesce((SELECT sum(ioqv.quantity)
+                  FROM inv_onhand_quantity ioqv
+                 WHERE ioqv.item_id = dodl.count_item_id
+                   AND ioqv.organization_id = dodl.inv_org_id)
+               ,0)  
+       end) onhand_quantity
+             
+      ,(SELECT tl.meaning
+              FROM sys_code_b       scb,
+                   sys_code_value_b scvb,
+                   sys_code_value_tl tl
+             WHERE scb.code = 'DM.SO_LINE_DELIVERY_STATUS'
+               AND scb.code_id = scvb.code_id
+               AND tl.code_value_id = scvb.code_value_id
+               AND tl.lang = #{request.locale,jdbcType=VARCHAR}
+               AND scvb.value = osl.status) order_line_status_desc
+        ,(select name
+          from INV_UNIT_OF_MEASURE_TL iuom
+         where iuom.uom_code = iib.uom_code
+           and iuom.lang = #{request.locale,jdbcType=VARCHAR}) uom_name
+           ,CONCAT(osl.PARENT_LINE_ID, osl.LINE_ID) attribute15
+  FROM dm_order_delivery_line dodl
+  LEFT JOIN om_sales_line osl
+    ON osl.line_id = dodl.order_line_id
+  LEFT JOIN inv_item_b iib
+    ON iib.item_id = osl.item_id
+  LEFT JOIN inv_item_tl iit
+    ON iit.item_id = iib.item_id
+   AND iit.lang =  #{request.locale,jdbcType=VARCHAR}
+  LEFT JOIN dm_pick_release_line dprl
+    ON dprl.pick_release_line_id = dodl.pick_release_line_id
+   AND dprl.pick_release_id = dprl.pick_release_id
+ WHERE dodl.delivery_id = #{deliveryId,jdbcType=DECIMAL}
+ order by attribute15
+  </select>
+
+  <!--add by furong.tang-->
+  <select id="selectByDeleveryIdAndOrderHeaderId" resultMap="BaseResultMap" >
+    SELECT dodl.line_id
+    ,dodl.delivery_id
+    ,dodl.inv_org_id
+    ,dodl.order_line_id
+    ,dodl.outstanding_qty
+    ,dodl.return_qty
+    ,dodl.object_version_number
+    ,dodl.request_id
+    ,dodl.program_id
+    ,dodl.creation_date
+    ,dodl.created_by
+    ,dodl.last_updated_by
+    ,dodl.last_update_date
+    ,dodl.last_update_login
+    ,dodl.attribute_category
+    ,dodl.attribute1
+    ,dodl.attribute2
+    ,dodl.attribute3
+    ,dodl.attribute4
+    ,dodl.attribute5
+    ,dodl.attribute6
+    ,dodl.attribute7
+    ,dodl.attribute8
+    ,dodl.attribute9
+    ,dodl.attribute10
+    ,dodl.attribute11
+    ,dodl.attribute12
+    ,dodl.attribute13
+    ,dodl.attribute14
+    <!--  ,dodl.attribute15 -->
+    ,dodl.pick_release_id
+    ,dodl.pick_release_line_id
+    ,dodl.count_item_id
+    ,dodl.package_item_id
+    ,(select item_number from inv_item_b where item_id = dodl.count_item_id) count_item_number
+    ,(select item_name from inv_item_tl where item_id = dodl.count_item_id and lang = #{request.locale,jdbcType=VARCHAR} ) count_item_name
+    ,(select item_name from inv_item_tl where item_id = dodl.package_item_id and lang = #{request.locale,jdbcType=VARCHAR} ) package_item_name
+    ,(SELECT opld.UNIT_PRICE FROM OM_PRICE_LIST opl,OM_PRICE_LIST_DETAIL opld
+    WHERE opl.PRICE_LIST_ID = opld.PRICE_LIST_ID
+    AND opld.ITEM_ID = dodl.count_item_id
+    AND opl.SALES_ORG_ID IN (SELECT oso.SALES_ORG_ID FROM OM_SALES_ORDER oso WHERE oso.HEADER_ID =#{orderHeaderId,jdbcType=DECIMAL})
+    and  opld.LAST_UPDATE_DATE in (SELECT MAX(opld.LAST_UPDATE_DATE) FROM OM_PRICE_LIST opl,OM_PRICE_LIST_DETAIL opld
+    WHERE opl.PRICE_LIST_ID = opld.PRICE_LIST_ID
+    AND opld.ITEM_ID = dodl.count_item_id
+    AND opl.SALES_ORG_ID IN (SELECT oso.SALES_ORG_ID FROM OM_SALES_ORDER oso WHERE oso.HEADER_ID =#{orderHeaderId,jdbcType=DECIMAL}))) unit_price
+    ,iib.item_id
+    ,iib.item_number
+    ,iit.item_name
+    ,iib.uom_code
+    ,osl.quantity order_line_quantity
+    ,(SELECT opld.UNIT_PRICE*osl.quantity FROM OM_PRICE_LIST opl,OM_PRICE_LIST_DETAIL opld
+    WHERE opl.PRICE_LIST_ID = opld.PRICE_LIST_ID
+    AND opld.ITEM_ID = dodl.count_item_id
+    AND opl.SALES_ORG_ID IN (SELECT oso.SALES_ORG_ID FROM OM_SALES_ORDER oso WHERE oso.HEADER_ID =#{orderHeaderId,jdbcType=DECIMAL})
+    and  opld.LAST_UPDATE_DATE in (SELECT MAX(opld.LAST_UPDATE_DATE) FROM OM_PRICE_LIST opl,OM_PRICE_LIST_DETAIL opld
+    WHERE opl.PRICE_LIST_ID = opld.PRICE_LIST_ID
+    AND opld.ITEM_ID = dodl.count_item_id
+    AND opl.SALES_ORG_ID IN (SELECT oso.SALES_ORG_ID FROM OM_SALES_ORDER oso WHERE oso.HEADER_ID =#{orderHeaderId,jdbcType=DECIMAL}))) total_money
+    ,coalesce((SELECT SUM(coalesce(dodl2.outstanding_qty, 0))
+    FROM dm_order_delivery dod2
+    LEFT JOIN dm_order_delivery_line dodl2
+    ON dod2.delivery_id = dodl2.delivery_id
+    WHERE dod2.delivery_status IN ('SHIPP', 'PCKUP')
+    AND dodl2.order_line_id = dodl.order_line_id)
+    ,0) shipped_quantity
+    ,coalesce(dprl.pick_quantity, 0) pick_quantity
+    ,osl.status order_line_status
+    ,coalesce((SELECT pv.lot_control_flag
+    FROM INV_ITEM_PROPERTY_V pv
+    where pv.item_id = dodl.count_item_id
+    and pv.organization_id = dodl.inv_org_id
+    )
+    ,'N') batch_ctrl_flag
+    ,(case osl.item_type
+    when 'VI' then 9999999999
+    else
+    coalesce((SELECT sum(ioqv.quantity)
+    FROM inv_onhand_quantity ioqv
+    WHERE ioqv.item_id = dodl.count_item_id
+    AND ioqv.organization_id = dodl.inv_org_id)
+    ,0)
+    end) onhand_quantity
+
+    ,(SELECT tl.meaning
+    FROM sys_code_b       scb,
+    sys_code_value_b scvb,
+    sys_code_value_tl tl
+    WHERE scb.code = 'DM.SO_LINE_DELIVERY_STATUS'
+    AND scb.code_id = scvb.code_id
+    AND tl.code_value_id = scvb.code_value_id
+    AND tl.lang = #{request.locale,jdbcType=VARCHAR}
+    AND scvb.value = osl.status) order_line_status_desc
+    ,(select name
+    from INV_UNIT_OF_MEASURE_TL iuom
+    where iuom.uom_code = iib.uom_code
+    and iuom.lang = #{request.locale,jdbcType=VARCHAR}) uom_name
+    ,CONCAT(osl.PARENT_LINE_ID, osl.LINE_ID) attribute15
+    FROM dm_order_delivery_line dodl
+    LEFT JOIN om_sales_line osl
+    ON osl.line_id = dodl.order_line_id
+    LEFT JOIN inv_item_b iib
+    ON iib.item_id = osl.item_id
+    LEFT JOIN inv_item_tl iit
+    ON iit.item_id = iib.item_id
+    AND iit.lang =  #{request.locale,jdbcType=VARCHAR}
+    LEFT JOIN dm_pick_release_line dprl
+    ON dprl.pick_release_line_id = dodl.pick_release_line_id
+    AND dprl.pick_release_id = dprl.pick_release_id
+    WHERE dodl.delivery_id = #{deliveryId,jdbcType=DECIMAL}
+    order by attribute15
+  </select>
+
+  <!-- 退货单-根据订单行获取已发运的总数量 -->
+  <select id="selectQtySumByOrderLineId" resultType="java.math.BigDecimal">
+	  select coalesce(sum(dl.OUTSTANDING_QTY),0) OUTSTANDING_QTY
+	  from DM_ORDER_DELIVERY_LINE dl
+	  where dl.order_line_id = #{orderLineId, jdbcType=DECIMAL}
+  </select>
+  
+  <!-- dapp-根据订单行id,发运类型获取已发运的总数量 -->
+  <select id="getQtySumByOrderLineIdForDapp" resultType="java.math.BigDecimal" parameterType="java.util.Map">
+	  select coalesce(sum(l.OUTSTANDING_QTY),0) from DM_ORDER_DELIVERY_LINE l
+		where l.ORDER_LINE_ID = #{orderLineId, jdbcType=DECIMAL}
+		and EXISTS(
+		select 1 from DM_ORDER_DELIVERY d where d.DELIVERY_ID = l.DELIVERY_ID 
+		and d.DELIVERY_TYPE = #{deliveryType,jdbcType=VARCHAR}
+		and (d.DELIVERY_STATUS = 'SHIPP' or d.DELIVERY_STATUS = 'PCKUP')
+		)
+  </select>
+  
+  <select id="getDeliveryQtyForPackg" resultType="java.math.BigDecimal" parameterType="java.util.Map">
+		  SELECT DISTINCT
+	       coalesce(SUM(dodl.outstanding_qty), 0) /
+	       (SELECT iih.quantity
+	          FROM inv_item_hierarchy iih
+	         WHERE iih.parent_item_id = oslp.item_id 
+	           AND iih.item_id = osl.item_id) AS shippedqty
+	  FROM dm_order_delivery_line dodl,
+				 DM_ORDER_DELIVERY dod,
+	       om_sales_line          osl,
+	       om_sales_line          oslp
+	 WHERE dodl.order_line_id = osl.line_id
+	   AND osl.parent_line_id = oslp.line_id
+		 and DOD.DELIVERY_ID = DODL.DELIVERY_ID
+	   AND osl.parent_line_id IS NOT NULL 
+	   AND EXISTS (SELECT 'x'
+	          FROM inv_item_b ii
+	         WHERE ii.quantity_count_type = 'IDV'
+	           AND ii.item_type = 'PACKG'
+	           AND oslp.item_id = ii.item_id)
+			   and (dod.DELIVERY_STATUS = 'SHIPP' or dod.DELIVERY_STATUS = 'PCKUP')
+	   		and oslp.LINE_ID = #{orderLineId, jdbcType=DECIMAL}
+	 	GROUP BY oslp.item_id,
+	          osl.item_id,
+	          osl.line_id
+  </select>
+  
+  
+</mapper>

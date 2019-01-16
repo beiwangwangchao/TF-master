@@ -1,0 +1,981 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmInvOrganizationMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    <id column="INV_ORG_ID" property="invOrgId" jdbcType="DECIMAL" />
+    <id column="COST_ORG_ID" property="costOrgId" jdbcType="DECIMAL" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="COST_ORG_NAME" property="costOrgName" jdbcType="VARCHAR" />
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="LOCATION_ID" property="locationId" jdbcType="DECIMAL" />
+    <result column="DEFAULT_FLAG" property="defaultFlag" jdbcType="VARCHAR" />
+    <result column="OPERATION_UNIT_ID" property="operationUnitId" jdbcType="DECIMAL" />
+    <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+    <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="SelectionResultMap" type="com.lkkhpg.dsis.common.config.dto.OrgSelection" >
+    <result column="INV_ORG_ID" property="invOrgId" jdbcType="DECIMAL" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="OPERATION_UNIT_ID" property="operationUnitId" jdbcType="DECIMAL" />
+    <result column="OPERATION_UNIT_CODE" property="operationUnitCode" jdbcType="VARCHAR" />
+    <result column="OPERATION_UNIT_NAME" property="operationUnitName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INV_ORG_ID, NAME, CODE, DESCRIPTION, LOCATION_ID, DEFAULT_FLAG, OPERATION_UNIT_ID, 
+    ENABLED_FLAG, START_ACTIVE_DATE, END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+    CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+    ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+    ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+    ATTRIBUTE14, ATTRIBUTE15, COST_ORG_ID
+  </sql>
+  
+  <select id="queryOrg" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    select IB.INV_ORG_ID,
+       IB.CODE,
+       IB.LOCATION_ID,
+       IB.DEFAULT_FLAG,
+       IB.OPERATION_UNIT_ID,
+       IB.ENABLED_FLAG,
+       IB.START_ACTIVE_DATE,
+       IB.END_ACTIVE_DATE,
+       IT.NAME,
+       IT.DESCRIPTION
+  from spm_inv_organization_b ib 
+  left join spm_inv_organization_tl it
+    on (it.inv_org_id = ib.inv_org_id and it.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+    <if test="invOrgId != null">
+    ib.INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+    </if>
+    <if test="code != null">
+    AND Upper(ib.CODE) like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="name != null">
+    AND Upper(it.NAME) like concat('%',concat(Upper(#{name,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="description != null">
+    AND it.DESCRIPTION like concat('%',concat(#{description,jdbcType=VARCHAR},'%'))
+    </if>
+    AND coalesce(ib.END_ACTIVE_DATE,CURRENT_TIMESTAMP) &gt;= CURRENT_TIMESTAMP
+    </where>
+     <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+    
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from SPM_INV_ORGANIZATION_B
+    where INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.math.BigDecimal" >
+    delete from SPM_INV_ORGANIZATION_B
+    where INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    <selectKey resultType="java.lang.Long" keyProperty="invOrgId" order="BEFORE" >
+      select SPM_INV_ORGANIZATION_S.nextval from dual
+    </selectKey>
+    insert into SPM_INV_ORGANIZATION_B (INV_ORG_ID, NAME, CODE, 
+      DESCRIPTION, LOCATION_ID, DEFAULT_FLAG, 
+      OPERATION_UNIT_ID, ENABLED_FLAG, START_ACTIVE_DATE, 
+      END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+      PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+      ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+      ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, 
+      ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+      ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+      ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+      ATTRIBUTE15)
+    values (#{invOrgId,jdbcType=DECIMAL}, #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, #{locationId,jdbcType=DECIMAL}, #{defaultFlag,jdbcType=VARCHAR}, 
+      #{operationUnitId,jdbcType=DECIMAL}, #{enabledFlag,jdbcType=VARCHAR}, #{startActiveDate,jdbcType=TIMESTAMP}, 
+      #{endActiveDate,jdbcType=TIMESTAMP}, 1, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL},CURRENT_TIMESTAMP, -1, 
+      -1, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, 
+      #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, 
+      #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, 
+      #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, 
+      #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, 
+      #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    <selectKey resultType="java.lang.Long" keyProperty="invOrgId" order="BEFORE" >
+      select SPM_INV_ORGANIZATION_S.nextval from dual
+    </selectKey>
+    insert into SPM_INV_ORGANIZATION_B
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INV_ORG_ID,
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="code != null" >
+        CODE,
+      </if>
+      <if test="description != null" >
+        DESCRIPTION,
+      </if>
+      <if test="locationId != null" >
+        LOCATION_ID,
+      </if>
+      <if test="defaultFlag != null" >
+        DEFAULT_FLAG,
+      </if>
+      <if test="operationUnitId != null" >
+        OPERATION_UNIT_ID,
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG,
+      </if>
+        START_ACTIVE_DATE,
+        
+        
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="costOrgId != null" >
+        COST_ORG_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{invOrgId,jdbcType=DECIMAL},
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="locationId != null" >
+        #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="defaultFlag != null" >
+        #{defaultFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="operationUnitId != null" >
+        #{operationUnitId,jdbcType=DECIMAL},
+      </if>
+      <if test="enabledFlag != null" >
+        #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+        CURRENT_TIMESTAMP,
+      
+      
+      <if test="endActiveDate != null" >
+        #{endActiveDate,jdbcType=TIMESTAMP},
+      </if> 
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+       CURRENT_TIMESTAMP,
+       
+       
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+        
+        
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="costOrgId != null" >
+        #{costOrgId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    update SPM_INV_ORGANIZATION_B
+    <set >
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        CODE = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="locationId != null" >
+        LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="defaultFlag != null" >
+        DEFAULT_FLAG = #{defaultFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="operationUnitId != null" >
+        OPERATION_UNIT_ID = #{operationUnitId,jdbcType=DECIMAL},
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+        
+       OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="costOrgId != null" >
+        COST_ORG_ID = #{costOrgId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    update SPM_INV_ORGANIZATION_B
+    set NAME = #{name,jdbcType=VARCHAR},
+      CODE = #{code,jdbcType=VARCHAR},
+      DESCRIPTION = #{description,jdbcType=VARCHAR},
+      LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+      DEFAULT_FLAG = #{defaultFlag,jdbcType=VARCHAR},
+      OPERATION_UNIT_ID = #{operationUnitId,jdbcType=DECIMAL},
+      ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      COST_ORG_ID = #{costOrgId,jdbcType=DECIMAL}
+    where INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="querySpmInvOrganizations" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    select sio.inv_org_id,t.name,sio.code,sio.description
+    from SPM_INV_ORGANIZATION_B sio
+     LEFT OUTER JOIN spm_inv_organization_tl t on (
+    sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR}
+    )
+    <where>
+        <if test="code != null">
+              Upper(sio.code) like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+          </if>
+          <if test="name != null">
+              sio.name like concat('%',concat(#{name,jdbcType=VARCHAR},'%'))
+          </if>
+      </where>
+      <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+
+  </select>
+<!--创建商品页面库存组织进行数据屏蔽-->
+  <select id="querySpmInvOrganizations2" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    select sio.inv_org_id,t.name,sio.code,sio.description
+    from SPM_INV_ORGANIZATION_B sio
+    LEFT OUTER JOIN spm_inv_organization_tl t on (
+    sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR}
+    )
+    LEFT OUTER JOIN  SPM_ORG_DEFINATION_B sod on SIO.INV_ORG_ID=SOD.INV_ORG_ID
+    left outer join SPM_COMPANY_B sc on sod.COMPANY_ID=sc.COMPANY_ID
+    <where>
+      (sc.COMPANY_ID = (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+       OR sc.GST_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+      )
+      <if test="code != null">
+        AND Upper(sio.code) like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="name != null">
+        AND sio.name like concat('%',concat(#{name,jdbcType=VARCHAR},'%'))
+      </if>
+    </where>
+    <if test="sortname != null">
+      <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+      ORDER BY ${_colName} ${sortorder}
+    </if>
+
+  </select>
+
+  <!--2018/01/23 by15750 商品详情界面 库存组织lov-->
+  <select id="querySpmInvOrganizations3" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    select sio.inv_org_id,t.name,sio.code,sio.description
+    from SPM_INV_ORGANIZATION_B sio
+    LEFT OUTER JOIN spm_inv_organization_tl t on (
+    sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+    LEFT JOIN SYS_USER_ROLE_ASSIGN sura on (sio.INV_ORG_ID=sura.ASSIGN_VALUE)
+    <where>
+       sura.USER_ID = #{request.userId,jdbcType=VARCHAR}
+      AND sura.ROLE_ID = #{request.roleId,jdbcType=VARCHAR}
+      AND sura.ASSIGN_TYPE = 'INV'
+      <if test="code != null">
+       AND Upper(sio.code) like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="name != null">
+        AND sio.name like concat('%',concat(#{name,jdbcType=VARCHAR},'%'))
+      </if>
+    </where>
+    <if test="sortname != null">
+      <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+      ORDER BY ${_colName} ${sortorder}
+    </if>
+  </select>
+
+
+  <select id="getValidOrg" resultMap="BaseResultMap">
+     SELECT 
+         sio.INV_ORG_ID,
+         t.NAME NAME,
+         sio.CODE,
+         sio.DESCRIPTION,
+         sio.LOCATION_ID,
+         sio.DEFAULT_FLAG,
+         sio.OPERATION_UNIT_ID,
+         sio.ENABLED_FLAG,
+         sio.START_ACTIVE_DATE,
+         sio.END_ACTIVE_DATE,
+         sio.OBJECT_VERSION_NUMBER,
+         sio.REQUEST_ID,
+         sio.PROGRAM_ID,
+         sio.CREATION_DATE,
+         sio.CREATED_BY,
+         sio.LAST_UPDATED_BY,
+         sio.LAST_UPDATE_DATE,
+         sio.LAST_UPDATE_LOGIN
+     FROM SPM_INV_ORGANIZATION_B sio
+     LEFT OUTER JOIN spm_inv_organization_tl t on (
+        sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR}
+        )
+     WHERE sio.END_ACTIVE_DATE is null 
+     OR sio.END_ACTIVE_DATE > CURRENT_TIMESTAMP
+  </select>
+
+  <select id="getInvByMarkedId" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization">
+    SELECT
+    sio.INV_ORG_ID,
+    t.NAME NAME,
+    sio.CODE,
+    sio.DESCRIPTION,
+    sio.LOCATION_ID,
+    sio.DEFAULT_FLAG,
+    sio.OPERATION_UNIT_ID,
+    sio.ENABLED_FLAG,
+    sio.START_ACTIVE_DATE,
+    sio.END_ACTIVE_DATE,
+    sio.OBJECT_VERSION_NUMBER,
+    sio.REQUEST_ID,
+    sio.PROGRAM_ID,
+    sio.CREATION_DATE,
+    sio.CREATED_BY,
+    sio.LAST_UPDATED_BY,
+    sio.LAST_UPDATE_DATE,
+    sio.LAST_UPDATE_LOGIN
+    FROM SPM_INV_ORGANIZATION_B sio
+    LEFT OUTER JOIN spm_inv_organization_tl t on (
+    sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR}
+    )
+    LEFT OUTER JOIN SPM_ORG_DEFINATION_B sod on sio.INV_ORG_ID=SOD.INV_ORG_ID
+    left outer join SPM_COMPANY_B sc on sod.COMPANY_ID=sc.COMPANY_ID
+    <where>
+      (sio.end_active_date > current_timestamp or sio.end_active_date is null)
+      AND (sc.COMPANY_ID = (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID
+      =#{request.marketId,jdbcType=DECIMAL})
+      OR sc.GST_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID
+      =#{request.marketId,jdbcType=DECIMAL})
+      )
+      <if test="code != null">
+        AND Upper(sio.code) like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="name != null">
+        AND sio.name like concat('%',concat(#{name,jdbcType=VARCHAR},'%'))
+      </if>
+    </where>
+  </select>
+
+
+  <select id="getValidOrg2" resultMap="BaseResultMap">
+    SELECT
+    sio.INV_ORG_ID,
+    t.NAME NAME,
+    sio.CODE,
+    sio.DESCRIPTION,
+    sio.LOCATION_ID,
+    sio.DEFAULT_FLAG,
+    sio.OPERATION_UNIT_ID,
+    sio.ENABLED_FLAG,
+    sio.START_ACTIVE_DATE,
+    sio.END_ACTIVE_DATE,
+    sio.OBJECT_VERSION_NUMBER,
+    sio.REQUEST_ID,
+    sio.PROGRAM_ID,
+    sio.CREATION_DATE,
+    sio.CREATED_BY,
+    sio.LAST_UPDATED_BY,
+    sio.LAST_UPDATE_DATE,
+    sio.LAST_UPDATE_LOGIN
+    FROM SPM_INV_ORGANIZATION_B sio
+    LEFT OUTER JOIN spm_inv_organization_tl t on (
+    sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR}
+    )
+    LEFT OUTER JOIN SPM_ORG_DEFINATION_B sod on sio.INV_ORG_ID=SOD.INV_ORG_ID
+    left outer join SPM_COMPANY_B sc on sod.COMPANY_ID=sc.COMPANY_ID
+    <where>
+    (sio.end_active_date > current_timestamp or sio.end_active_date is null)
+    AND (sc.COMPANY_ID = (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID
+              =#{request.marketId,jdbcType=DECIMAL})
+        OR sc.GST_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID
+              =#{request.marketId,jdbcType=DECIMAL})
+        OR SC.COMPANY_ID=(SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+             (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+        OR SC.GST_ID=(SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+             (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL})))
+    </where>
+  </select>
+  
+  <!-- 库存组织下拉框(附带库存组织对应业务实体信息,当前用户能访问的库存组织) -->
+  <select id="getOrgSelection" resultMap="SelectionResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization">
+    select org.INV_ORG_ID,
+       org.CODE,
+       orgt.NAME,
+       org.OPERATION_UNIT_ID,
+       ou.CODE               as OPERATION_UNIT_CODE,
+       out.NAME              as OPERATION_UNIT_NAME
+  from SPM_INV_ORGANIZATION_B org
+  LEFT JOIN SPM_INV_ORGANIZATION_TL orgt
+    ON (orgt.inv_org_id = org.inv_org_id and orgt.lang = #{request.locale,jdbcType=VARCHAR})
+  LEFT JOIN SPM_OPERATING_UNIT_B ou
+    ON (org.OPERATION_UNIT_ID = ou.OPERATING_UNIT_ID)
+  LEFT JOIN SPM_OPERATING_UNIT_TL out
+    ON (out.OPERATING_UNIT_ID = org.OPERATION_UNIT_ID and out.lang = #{request.locale,jdbcType=VARCHAR})
+ where org.INV_ORG_ID = #{invOrgId, jdbcType=DECIMAL}
+  </select>
+  
+  <select id="getCurrentOrganization" resultMap="BaseResultMap">
+      SELECT o.INV_ORG_ID,orgt.NAME from SPM_INV_ORGANIZATION_B o LEFT JOIN SPM_INV_ORGANIZATION_TL orgt
+    ON (orgt.inv_org_id = o.inv_org_id and orgt.lang = #{request.locale,jdbcType=VARCHAR})
+        where o.INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+  </select>
+  
+   <select id="queryByUserAndRole" resultMap="BaseResultMap">
+     SELECT 
+     sio.INV_ORG_ID,
+	 t.NAME NAME,
+	sio.CODE,
+	sio.DESCRIPTION,
+	sio.LOCATION_ID,
+	sio.DEFAULT_FLAG,
+	sio.OPERATION_UNIT_ID,
+	sio.ENABLED_FLAG,
+	sio.START_ACTIVE_DATE,
+	sio.END_ACTIVE_DATE,
+	sio.OBJECT_VERSION_NUMBER,
+	sio.REQUEST_ID,
+	sio.PROGRAM_ID,
+	sio.CREATION_DATE,
+	sio.CREATED_BY,
+	sio.LAST_UPDATED_BY,
+	sio.LAST_UPDATE_DATE,
+	sio.LAST_UPDATE_LOGIN
+  FROM SPM_INV_ORGANIZATION_B sio
+  LEFT OUTER JOIN spm_inv_organization_tl t on (
+    sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR}
+  )
+ WHERE (sio.END_ACTIVE_DATE is null OR sio.END_ACTIVE_DATE > CURRENT_TIMESTAMP)
+  AND EXISTS (SELECT 1
+          FROM sys_user_role_assign sura
+         WHERE sura.assign_type = 'INV'
+           AND sura.assign_value = sio.inv_org_id
+           AND sura.user_id = #{request.userId, jdbcType=DECIMAL}
+           AND sura.role_id = #{request.roleId, jdbcType=DECIMAL})
+  </select>
+  <!-- 根据业务实体ID查询库存组织 -->
+  <select id="queryOrgByOperationUnitId" resultMap="BaseResultMap"  parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization">
+    select sio.inv_org_id,t.name,sio.code,sio.description
+    from spm_inv_organization_b sio
+    LEFT OUTER JOIN spm_inv_organization_tl t on 
+    (sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR}) 
+    where sio.OPERATION_UNIT_ID = #{operationUnitId,jdbcType=DECIMAL}
+  </select>
+  <!-- 根据业务实体ID关联库存组织 -->
+  <update id="updateOrgByOperationUnitId" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    update SPM_INV_ORGANIZATION_B
+    <set >
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        CODE = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="locationId != null" >
+        LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="defaultFlag != null" >
+        DEFAULT_FLAG = #{defaultFlag,jdbcType=VARCHAR},
+      </if>
+        OPERATION_UNIT_ID = #{operationUnitId,jdbcType=DECIMAL},
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      </if> 
+       OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where CODE = #{code,jdbcType=VARCHAR}
+  </update>
+    <!-- 查询业务实体Id为空的库存组织 -->
+  <select id="queryOrgByNullOperationUnitId" resultMap="BaseResultMap" >
+    select sio.inv_org_id,t.name,sio.code,sio.description
+    from spm_inv_organization_b sio
+    LEFT OUTER JOIN spm_inv_organization_tl t on 
+    (sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR}) 
+    where sio.OPERATION_UNIT_ID is null
+    AND (sio.END_ACTIVE_DATE is null OR sio.END_ACTIVE_DATE >= CURRENT_TIMESTAMP)
+    <if test="name != null" >
+        AND t.NAME = #{name,jdbcType=VARCHAR}
+      </if>
+      <if test="code != null" >
+        AND sio.CODE = #{code,jdbcType=VARCHAR}
+      </if>
+     <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+     </if>
+      
+  </select>
+  
+  <select id="queryBaseInfo" resultMap="BaseResultMap" >
+  SELECT siob.inv_org_id
+      ,siot.name
+      ,siob.operation_unit_id
+      ,sout.name operation_unit_name
+  FROM spm_inv_organization_b siob
+  LEFT JOIN spm_inv_organization_tl siot
+    ON siob.inv_org_id = siot.inv_org_id
+   AND siot.lang =  #{request.locale,jdbcType=VARCHAR}
+  LEFT JOIN spm_operating_unit_b soub
+    ON soub.operating_unit_id = siob.operation_unit_id
+  LEFT JOIN spm_operating_unit_tl sout
+    ON sout.operating_unit_id = soub.operating_unit_id
+   AND sout.lang =  #{request.locale,jdbcType=VARCHAR}
+where siob.inv_org_id =  #{invOrgId,jdbcType=DECIMAL}
+  
+  </select>
+  
+  <select id="getCurrentSupplyInvOrgs" resultMap="BaseResultMap">
+    SELECT siob.INV_ORG_ID,siot.NAME,ss.DEFAULT_FLAG
+    FROM (spm_inv_organization_b siob
+    LEFT OUTER JOIN spm_inv_organization_tl siot
+    ON siob.INV_ORG_ID = siot.INV_ORG_ID
+    AND siot.lang =  #{request.locale,jdbcType=VARCHAR})
+    LEFT OUTER JOIN SPM_SUPPlY ss on(ss.INV_ORG_ID=siot.INV_ORG_ID)
+   WHERE ss.SALES_ORG_ID=#{request.salesOrgId,jdbcType=DECIMAL} AND ss.SUPPLY_TYPE='ORG'
+  </select>
+   <select id="getSupplyInvOrgsBySalesOrg" resultMap="BaseResultMap">
+    SELECT siob.INV_ORG_ID,siot.NAME,ss.DEFAULT_FLAG
+    FROM (spm_inv_organization_b siob
+    LEFT OUTER JOIN spm_inv_organization_tl siot
+    ON siob.INV_ORG_ID = siot.INV_ORG_ID
+    AND siot.lang =  #{request.locale,jdbcType=VARCHAR})
+    LEFT OUTER JOIN SPM_SUPPlY ss on(ss.INV_ORG_ID=siot.INV_ORG_ID)
+   WHERE ss.SALES_ORG_ID=#{salesOrgId,jdbcType=DECIMAL} AND ss.SUPPLY_TYPE='ORG'
+  </select>
+   <select id="getSupplyInvOrgsByOrderId" resultMap="BaseResultMap">
+    SELECT siob.INV_ORG_ID,siot.NAME,ss.DEFAULT_FLAG
+    FROM (spm_inv_organization_b siob
+    LEFT OUTER JOIN spm_inv_organization_tl siot
+    ON siob.INV_ORG_ID = siot.INV_ORG_ID
+    AND siot.lang =  #{request.locale,jdbcType=VARCHAR})
+    LEFT OUTER JOIN SPM_SUPPlY ss on(ss.INV_ORG_ID=siot.INV_ORG_ID)
+   WHERE ss.SALES_ORG_ID= (select sales_org_id from om_sales_order where header_id = #{orderId,jdbcType=DECIMAL} ) AND ss.SUPPLY_TYPE='ORG'
+  </select>
+  
+  <select id="queryInvOrgsByRole" resultMap="BaseResultMap">
+    select siob.inv_org_id, siot.name, siob.code, siob.OPERATION_UNIT_ID, out. NAME operationUnitName
+      from spm_inv_organization_b siob
+      left outer join spm_inv_organization_tl siot
+        on siob.inv_org_id = siot.inv_org_id
+       and siot.lang = #{request.locale,jdbcType=VARCHAR}
+      LEFT JOIN SPM_OPERATING_UNIT_B
+        ou ON (siob.OPERATION_UNIT_ID = ou.OPERATING_UNIT_ID)
+      LEFT JOIN SPM_OPERATING_UNIT_TL out
+        ON (out.OPERATING_UNIT_ID = siob.OPERATION_UNIT_ID
+	   AND out.lang = #{request.locale,jdbcType=VARCHAR})
+     where siot.inv_org_id in (select assign_value
+                                 from sys_user_role_assign
+                                where role_id = #{roleId,jdbcType=DECIMAL}
+                                  and user_id = #{userId,jdbcType=DECIMAL}
+                                  and assign_type = 'INV') order by inv_org_id asc
+  </select>
+  
+  <!-- 维护组织中，库存归集中心-库存组织lov查询(限制不能成链状) -->
+  <select id="queryCostOrgId" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    select IB.INV_ORG_ID AS COST_ORG_ID,
+       IB.CODE,
+       IB.LOCATION_ID,
+       IB.DEFAULT_FLAG,
+       IB.OPERATION_UNIT_ID,
+       IB.ENABLED_FLAG,
+       IB.START_ACTIVE_DATE,
+       IB.END_ACTIVE_DATE,
+       IT.NAME COST_ORG_NAME,
+       IT.DESCRIPTION
+  from spm_inv_organization_b ib 
+  	left join spm_inv_organization_tl it
+    	on (it.inv_org_id = ib.inv_org_id and it.lang = #{request.locale,jdbcType=VARCHAR})
+    <trim prefix="WHERE" prefixOverrides="AND|OR">
+    	and coalesce(ib.end_active_date,current_timestamp) &gt;= current_timestamp
+    	and (ib.inv_org_id = ib.cost_org_id or ib.inv_org_id = #{invOrgId,jdbcType=DECIMAL})
+    	and not exists (
+				    select 'x'
+					from inv_cost_details icd
+					where icd.inv_org_id = #{invOrgId,jdbcType=DECIMAL} and icd.status != 'C'
+				)
+    	<if test="code != null">
+	    	and Upper(ib.CODE) like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+	    </if>
+	    <if test="name != null">
+	    	and Upper(it.NAME) like concat('%',concat(Upper(#{name,jdbcType=VARCHAR}),'%'))
+	    </if>
+	    <if test="description != null">
+	    	and it.DESCRIPTION like concat('%',concat(#{description,jdbcType=VARCHAR},'%'))
+	    </if>
+	    order by IB.INV_ORG_ID
+    </trim>
+  </select>
+  <!-- 当前用户下可访问的库存归集中心 -->
+  <select id="queryCostOrgsByRole" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvOrganization" >
+    select 
+       IB.INV_ORG_ID,
+       IT.NAME,
+       IB.CODE,
+       IT.DESCRIPTION,
+       IB.LOCATION_ID,
+       IB.DEFAULT_FLAG,
+       IB.OPERATION_UNIT_ID,
+       IB.ENABLED_FLAG,
+       IB.START_ACTIVE_DATE,
+       IB.END_ACTIVE_DATE
+  	from spm_inv_organization_b ib 
+  		left join spm_inv_organization_tl it
+    		on (it.inv_org_id = ib.inv_org_id and it.lang = #{request.locale,jdbcType=VARCHAR})
+  	where coalesce(ib.END_ACTIVE_DATE,CURRENT_TIMESTAMP) &gt;= CURRENT_TIMESTAMP
+		and ib.inv_org_id = ib.cost_org_id
+		and exists (
+	    		SELECT 'X'
+          		FROM sys_user_role_assign sura
+         		WHERE sura.assign_type = 'INV'
+           			AND sura.assign_value = ib.inv_org_id
+           			AND sura.user_id = #{request.userId, jdbcType=DECIMAL}
+           			AND sura.role_id = #{request.roleId, jdbcType=DECIMAL})
+	order by inv_org_id asc
+  </select>
+  
+</mapper>

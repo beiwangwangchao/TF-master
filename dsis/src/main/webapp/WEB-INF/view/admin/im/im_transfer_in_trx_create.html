@@ -1,0 +1,529 @@
+<#--
+ * description: 转入单详情界面
+ * version: 1.0
+ * author:chuangsheng.zhang
+ * Copyright LKK Health Products Group Limited.
+ *
+-->
+<#include "../include/head.html">
+<body style="padding: 10px">
+	<form id="mainform" method="post"
+		enctype="application/json;charset=UTF-8">
+		<input type="hidden" name="transferTrxDetails" id="transferTrxDetails"
+			value="" />
+	</form>
+	<div id="codeValueGrid" style="margin-left: 2px; margin-top: 2px;"></div>
+	<script
+		src="${base.contextPath}/common/code?overallStatusData=INV.TRANSFER_OVERALL_STATUS&inStatusData=INV.TRANSFER_IN_STATUS&lineStatusData=INV.TRANSFER_IN_LINE_STATUS"
+		type="text/javascript"></script>
+   <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+	<script type="text/javascript">
+    jQuery.validator.addMethod("stringMaxLength", function(value, element, param) {  
+        var length = value.length;  
+        for(var i = 0; i < value.length; i++){  
+            if(value.charCodeAt(i) > 127){  
+                length = length + 2;  
+            }  
+        }  
+        return this.optional(element) || ( length <= param );  
+    }, "<@spring.message "sys.hand.btn.string240"/>"); 
+	  /*------设置grid产品行数据--------*/
+	 function p_setLine(row,selectRow){
+		  var data =codeValueGrid.getData();
+		  
+		
+	     if(!row||!selectRow){
+	         return;
+	     }
+	     var newData=selectRow;
+	     newData.__id=row.__id;
+	     newData.__previd=row.__previd;
+	     newData.__index=row.__index;
+	     newData.__nextid=row.__nextid;
+	   
+	     codeValueGrid.updateRow(row,newData);
+	 }
+	
+	function f_generate() {
+		$.ligerDialog.open({
+            title: '<@spring.message "type.com.lkkhpg.dsis.report.type.choosing"/>',
+            width:400,
+            height:200,
+            slide: false,
+            url: "${base.contextPath}/sys/report/sys_report_type_dialog.html",
+            buttons: [{
+                text: '<@spring.message "sys.hand.btn.ok" />',
+                onclick: function(i, d) {
+                    if($('#trxId').val() == null || $('#trxId').val() == ""){
+                    	return;
+                    }else{
+                    	var form = d.frame.report_type_form;
+        				if (form.valid()) {
+        					d.close();
+        					window.open('${base.contextPath}/report/run?docType='+ form.getData().docType +'&reportProgramCode=RPT-00044&TrxId='+$('#trxId').val());
+        				}
+                    }
+                }
+            },
+            {
+                text: '<@spring.message "sys.hand.btn.cancel" />',
+                onclick: function(i, d) {
+                    d.hide();
+                }
+            }]
+        });
+	}
+	  
+    function f_save() {
+    	var curstatus=$("#inStatus").val();
+    	if(curstatus =='COMP'){
+       	 $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+       	return;
+       };
+    	 Hap.submitForm({
+             form:form,
+             grid:codeValueGrid,
+             gridName:'transferTrxDetails',
+             wrapArray: false,
+             url:'${base.contextPath}/im/transferInTrx/save',
+             success:function(json,opt){
+                 $.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>', '<@spring.message "sys.hand.tip.info"/>', function(yes) {
+   	                location.href = "${base.contextPath}/im/im_transfer_in_trx_create.html?isedit=1&trxId=" + json.message;
+   	            });
+             }
+         });
+    }
+    
+   
+    
+    function f_submit() {
+    	var curstatus=$("#inStatus").val();
+    	if(curstatus =='COMP'){
+       	 $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+       	return;
+       };
+       
+       $.ligerDialog.confirm('<@spring.message "msg.warning.system.commit_or_not"/>', $l('sys.hand.tip.info'),function(yes) {
+           if(yes){
+               Hap.submitForm({
+                   form:form,
+                   grid:codeValueGrid,
+                   wrapArray: false,
+                   gridName:'transferTrxDetails',
+                   url:'${base.contextPath}/im/transferInTrx/submit',
+                   success:function(json,opt){
+                       $.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>', '<@spring.message "sys.hand.tip.info"/>', function(yes) {
+                          location.href = "${base.contextPath}/im/im_transfer_in_trx_create.html?isedit=1&trxId=" + json.message;
+                      });
+                     
+                   }
+               });
+           }
+       })
+    }
+    
+    var buttons = [];
+ 	buttons.push({
+      text :  $l('sys.hand.btn.save'),
+      onclick : f_save
+    });
+    buttons.push({
+        text : $l('<@spring.message "sys.hand.btn.submit"/>'),
+        onclick : f_submit
+    });
+    <#if accessService.access("REPORT_EDITABLE") != false>
+    buttons.push({
+        text :  $l('<@spring.message "sys.hand.btn.rpt.generate" />'),
+        onclick : f_generate
+    });
+    </#if>
+
+    <#assign isedit = (RequestParameters.isedit!'0')/> 
+    
+    Hap.addFormButtons(buttons);
+    var mainform = $("#mainform");    
+    var form  = mainform.ligerForm({
+        fields : [{
+            name:'trxId',
+            type:'hidden'
+        },
+        {
+            name:'sourceTrxId',
+            type : "hidden"
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.in.trxnumber"/>',
+            name : "trxNumber",
+            disabled:true,
+            type : "text",
+            readonly:true,
+            newline:false   
+        } , {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.trxnumber"/>',
+            name : "outTrxNumber",
+            disabled:true,
+            type : "text",
+            readonly:true,
+            newline:false   
+        } ,{
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.in.status"/>',
+            name : "inStatus",
+            type : "combobox",
+            options : 
+            	{
+	  			valueField : 'value',
+	  		    textField: 'meaning',
+				data : inStatusData,
+				disabled:true
+				},
+            newline:false
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.organizationid"/>',
+            name : "organizationId",
+            type : "select",
+            options : {
+				 valueField:'invOrgId',
+				 textField:'name',
+				 url:'${base.contextPath}/spm/organization/query',
+				 disabled:true
+			}
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.transferorgid"/>',
+            name : "transferOrgId",
+            type : "combobox",
+            options : {
+				 valueField:'invOrgId',
+				 textField:'name',
+				 disabled:true,
+				 url:'${base.contextPath}/spm/assignOrg/get'
+			},	
+			newline:false,
+			 validate : {
+                required : true
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.overallstatus"/>',
+            name : "overallStatus",
+            type : "combobox",
+            options : 
+            	{
+	  			valueField : 'value',
+	  		    textField: 'meaning',
+				data : overallStatusData,
+				disabled:true
+				},
+            newline:false
+        },
+        {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.creationdate"/>',
+            name : "creationDate",
+            type : "date",
+            newline:true,
+            options:{
+            	 disabled:true ,
+            	 format: "yyyy-MM-dd"
+            } 
+        },
+        {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.in.trxdate"/>',
+            name : "trxDate",
+            type : "date",
+            newline:false ,
+            options:{
+             showTime:true,
+             format: "yyyy-MM-dd hh:mm:ss",
+             onChangeDate : function(value) {
+                 var now = new Date(${.now?long});
+                 var trxDate = new Date(value);
+                 if (trxDate > now) {
+                     $.ligerDialog.warn('<@spring.message "msg.warning.inventory.trx_date_must_less_than_now_date"/>', null, function(){$.ligerui.get('trxDate').setValue(now);});
+                 }
+             }
+           },
+		    validate : {
+               required : true
+            } 
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.remark"/>',
+            name : "remark",
+            type : "text",
+            newline:false,
+            disabled:true,
+            validate: {
+                stringMaxLength : 240
+           }
+        }]
+    });
+    var codeValueGrid;
+    codeValueGrid=$("#codeValueGrid").ligerGrid({
+        columns : [{
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>',
+            name : 'itemId',
+            textField : 'itemNumber',
+            align : 'left',
+	    	validate : {
+           		required : true
+        	},
+            editor : {
+                type : 'popup',
+                valueField : 'itemId',
+                textField : 'itemNumber',
+    		    grid: {
+    		    	    columns: [
+                        { display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>', name: 'itemNumber', align: 'left', "autocompleteField": true},
+                        { display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>', name: 'itemName',align: 'left', "autocompleteField": true},
+                        { display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.itemuomcode"/>',    name : 'itemUomCode',align : 'left'},
+                        { display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.lotnumber"/>',  name : 'lotNumber',align : 'left', "autocompleteField": true},
+                        { display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.out.trxqty"/>',  name : 'outTrxQty',align : 'left', "autocompleteField": true} ],
+                		url:'${base.contextPath}/im/transferInDetail/add',
+                		onLoadData:function(){
+                				 var sourceTrxId= form.getData().sourceTrxId;
+                				 var trxId= form.getData().trxId;
+                        	     var data = codeValueGrid.getData();
+                        	     var outTrxDetailIds="";
+                        	     for(var i=0;i<data.length;i++){
+                        	    	 if(data[i].sourceLineId != null){
+                        	    	    outTrxDetailIds=outTrxDetailIds+","+data[i].sourceLineId;
+                        	    	 }
+                        	     }
+                    	         this.set('parms',{sourceTrxId:sourceTrxId,trxId:trxId ,outTrxDetailIds:outTrxDetailIds});
+                             },
+    		    },
+    		    autocomplete: true,
+    		    readonly: false,
+    		    popup: true,
+    		    autocompleteField: 'itemNumber',
+                onSelect:function(data){
+                    var selected = codeValueGrid.editor.editParm.record;
+                    if (!selected) { return; }     
+                    p_setLine(selected,data.data[0]);
+                }
+              	
+            }
+        }, {
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+            name : 'itemName',
+            align : 'left'
+        }, {
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.itemuomcode"/>',
+            name : 'itemUomCode',
+            textField:'itemUomName',
+            align : 'left'
+        }, {
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.lotnumber"/>',
+            name : 'lotNumber',
+            align : 'left'
+        }, {
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.expirydate"/>',
+            name : 'expiryDate',
+            align : 'left'
+        }, {
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.packingtype"/>',
+            name : 'packingType',
+            textField:'name',
+            align : 'left'
+        },/*  {
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.numberOfCarton"/>',
+            name : 'numberOfCarton',
+            align : 'left'
+        } */,{
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.numberofindcarton"/>',
+            name : 'numberOfIndCarton',
+            align : 'left'
+        }, {
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.out.trxqty"/>',
+            name : 'outTrxQty',
+            align : 'left'
+        }, {
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.in.trxqty"/>',
+            name : 'trxQty',
+            align : 'left',
+            editor : {
+                type : 'int',
+                sign:false
+            } ,
+	    	validate : {
+           		required : true
+        	} 
+        }, {
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.remainingqty"/>',
+            name : 'remainingQty',
+            align : 'left'
+        },{
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.status"/>',
+            name : 'status',
+            align : 'left',
+            editor : {
+            
+                 type : "select",
+             	 valueField : 'value',
+	  		     textField: 'meaning',
+    			 isMultiSelect:false,
+    		     data:lineStatusData
+            } ,
+            render : function(item) {
+            	
+               for(var k = 0; k < lineStatusData.length;  k++){
+             	  if(item.status == lineStatusData[k].value) {
+             		  return lineStatusData[k].meaning;
+             	  }
+               }
+               return item.status;
+            }
+        },{
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.remark"/>',
+            name : 'remark',
+            align : 'left',
+            editor : {
+                type : 'text'
+            }
+        }],
+        showToggleColBtn : false,
+        width : '99%',
+        height : '98%',
+        rowHeight : 24,
+        columnWidth : 100,
+        checkbox : true,
+        usePager : false,
+        mouseoverRowCssClass : null,
+        enabledEdit : true,
+        rownumbers:true,
+        <#if isedit == '1'>
+         url: '${base.contextPath}/im/transferInDetail/query?trxId=${RequestParameters.trxId!}', 
+        </#if>
+        toolbar : {
+        	id : 'transfer_create_grid_tool_bar',
+            items : [ {
+                text : '<@spring.message "sys.hand.btn.new"/>',
+                //disable : false,
+                <#if accessService.access("EDITABLE") == false>
+                disable:true, 
+                </#if> 
+                id : 'newbtn',
+                click : function() {
+                	var curstatus=$("#inStatus").val();
+                	if(curstatus =='COMP'){
+                   	 $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+                   	return;
+                   };
+                	codeValueGrid.addRow({});
+                	
+                },
+                icon : 'add'
+            }, {
+                line : true
+            }, {
+                text : '<@spring.message "sys.hand.btn.delete"/>',
+                <#if accessService.access("EDITABLE") == false>
+                disable:true, 
+                </#if> 
+                id : 'delbtn',
+                click : function() {
+                	var curstatus=$("#inStatus").val();
+                	if(curstatus =='COMP'){
+                   	 $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+                   	return;
+                   };
+                    Hap.gridDelete({
+                        grid : codeValueGrid,
+                        url : '${base.contextPath}/im/transferInDetailTrx/remove'
+                    })
+
+                },
+                icon : 'delete'
+            } , {
+                line : true
+            }, {
+                text : '<@spring.message "sys.hand.btn.release"/>',
+                <#if accessService.access("EDITABLE") == false>
+                disable:true, 
+                </#if> 
+                click : function() {
+                	var curstatus=$("#inStatus").val();
+                	if(curstatus !='COMP'){
+                   	 $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+                   	return;
+                   };
+                  
+                   var releaseData = codeValueGrid.getSelectedRows();
+                   if(releaseData==null || releaseData.length==0){
+                	   return;
+                   }
+                   <!-- 判断当前行状态是否是取消状态-->
+                   for(var i=0;i<releaseData.length;i++){
+                	   if(releaseData[i].status != 'CANCL'){
+                		   $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+                		   return;
+                	   }
+                   }
+                    Hap.gridDelete({
+                        grid : codeValueGrid,
+                        confirmTip:'<@spring.message "sys.hand.tip.release_confirm"/>',
+                        url : '${base.contextPath}/im/transferInDetailTrx/release',
+                        success : function(json) {
+                        	$.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(yes) {
+                                window.location.reload();
+                        	});
+                        }
+                    });
+                   
+         },
+                icon : 'release'
+            } ]
+        },
+        onAfterEdit:function(editParam){
+	        if(editParam.column.name == 'trxQty'){
+	        	var record = editParam.record;
+	        	var trxQty = record.trxQty;
+	        	var data = {};
+	        	data.trxId = $("#trxId").val();
+	        	data.sourceTrxId = $("#sourceTrxId").val();
+	        	data.itemId = record.itemId;
+	        	data.lotNumber = record.lotNumber;
+	        	data.packingType = record.packingType;
+	        	var lastRmQty = record.outTrxQty;
+	        	$.ajax({
+	        		url: '${base.contextPath}/im/transferInDetail/getRemainingIndAftCar',
+	        		data: data,
+	        		type: 'post',
+	        		dataType: 'json',
+	        		async: false,
+	        		success: function(reData){
+	        			var row = reData.rows[0];
+	        			if (row) {
+	        				if (row.trxQty != null && row.trxQty != "") {
+	        					lastRmQty -= row.trxQty;
+	        				}
+	        			}
+	        		}
+	        	});
+	        	var nowRmQty = lastRmQty - trxQty;
+	        	this.updateCell("remainingQty", nowRmQty, record);
+	        }
+	    }
+    });
+    <#if isedit == '1'>
+    Hap.loadForm({form:form,
+    		      url:'${base.contextPath}/im/transferInTrx/query',
+    		      para:{trxId:${RequestParameters.trxId}},
+    		    	callback: function(data) {
+    					/* 加载表格数据 */
+    					
+    					//如果状态为完成，表单和表格均不能编辑
+    					if($.ligerui.get("inStatus").getValue() == 'COMP'){
+    						liger.get('mainform').setEditable(false);
+    		   			 	liger.get('transfer_create_grid_tool_bar').setDisabled('newbtn');
+    		    			liger.get('transfer_create_grid_tool_bar').setDisabled('delbtn');
+    		    			codeValueGrid.options.enabledEdit=false;
+    					}
+    					 
+    					
+    				}
+    		      })
+   </#if>
+    
+    <#if accessService.access("EDITABLE") == false>
+	    form.setEditable(false);
+	</#if>
+    </script>
+</body>
+</html>

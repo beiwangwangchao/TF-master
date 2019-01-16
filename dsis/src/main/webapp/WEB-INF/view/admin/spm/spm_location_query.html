@@ -1,0 +1,170 @@
+<#-- 
+ * description: 地址查询界面 
+ * version: 1.0 
+ * author: shenqiubin 
+ * Copyright LKK Health Products Group Limited. 
+ * 
+--> 
+<#include "../include/head.html">
+<script src="${base.contextPath}/resources/js/spm/location_edit.min.js"
+	type="text/javascript"></script>
+<body>
+	<form id="spm_location_form"></form>
+
+	<div id="spm_location_grid" style="margin: 0; padding: 0"></div>
+
+	<script type="text/javascript">
+    //var obj_location = {};
+    $l('sys.hand.title.addressinfo','<@spring.message "sys.hand.title.addressinfo"/>');
+    $(function(){
+    		window['spm_location_form'] = $("#spm_location_form").ligerForm({
+                fields: [
+					{     display : "locationId",     name : "locationId",     type : "popup",     newline : false,     textField:'name', 
+							group : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcountry.baseinfo" />',     options:${lovService.getLov(base.contextPath,base.locale, "lov_location")} },     
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.locationcode" />', newline:false, name: 'locationCode',valueField : 'text'},
+					{ type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.name" />', newline:false, name: 'name' },
+					{ type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.code.description" />', newline:true, name: 'description' },
+					{ type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.getlocation" />', newline:true, name: 'getLocation',
+					  options:{						  
+						onFocus: function(){
+							var e = this;
+							var location = {
+									countryCode:'EN',
+									stateCode:'LD',
+									cityCode:'LD',
+									addressLine1:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.guangzhou" />',
+									addressLine2:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.panyu.district" />',
+									addressLine3:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.energy.saving.science.and.technology.park" />',
+									zipCode:'111111'
+							}
+							location_edit('${base.contextPath}',{},function(data){
+								e.setValue(data.address)
+							})
+						}
+					}	 
+					},
+					{ type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.omlocation" />', newline:true, name: 'omLocation',
+						options:{						  
+							onFocus: function(){
+								var e = this;
+								var location = {
+									    countryCode:'EN',
+										stateCode:'LD',
+										cityCode:'LD',
+										addressLine1:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.guangzhou" />',
+										addressLine2:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.panyu.district" />',
+										addressLine3:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.energy.saving.science.and.technology.park" />',
+										zipCode:'111111' , 
+										memberId:1 
+								}
+								om_location_edit('${base.contextPath}',location,function(data){
+									//debugger
+									e.setValue(data.address)
+								})
+							}
+						}	 
+						}
+                ], 
+                buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                    	var datas = spm_location_form.getData();
+                    	var is_empty = true;
+                    	
+                        Hap.gridQuery({
+                            form:spm_location_form,
+                            grid:spm_location_grid
+                        })
+                       
+                    }}
+                ]
+            });
+    		/*  liger.get('getLocation').bind('change',fucntion(){
+    			// liger.get('description').setValue(liger.get('getLocation').getValue())
+                alert('a')   		 
+    		 });  */
+    		 
+    		 
+            window['spm_location_grid'] = $("#spm_location_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [ {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.test" />',
+                    name : 'testPop',
+                    width : '10%',
+                    textField:'roleName2',
+                    align: 'left',
+                    editor : {
+                        type : 'popup',
+                        onButtonClick:function(){
+                        	var pop = this.options;
+                        	location_edit('${base.contextPath}',pop.host_grid_row.locationId,function(data){
+								pop.host_grid_row.locationId2=data.locationId;
+                        		pop.host_grid.updateCell('name',data.location_text,pop.host_grid_row);
+							})
+                        	}
+                    }
+                },{
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.citycode" />',
+                	name: 'cityCode', align: 'left', width: '10%', editor: { type: 'text' }
+                  }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmstate.statecode" />',
+                	name: 'stateCode', align: 'left', width: '10%', editor: { type: 'text' }
+                  }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcountry.countrycode" />',
+                	name: 'countryCode', align: 'left', width: '10%', editor: { type: 'text' }
+                  }, {
+                	display:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.locationcode" />',
+                	name: 'locationCode', align: 'left', width: '10%', editor: { type: 'text' }
+                  }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.name" />',
+                	name: 'name', align: 'left', width: '10%', editor: { type: 'text' }
+                  }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.code.description" />',
+                	name: 'description', align: 'left', width: '10%', editor: { type: 'text' }
+                  }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.spmlocation.zipcode" />',
+                	name: 'zipCode', align: 'left', width: '10%', editor: { type: 'text' }
+                  }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.enabledflag" />',
+                	name: 'enabledFlag', align: 'left', width: '10%', editor: { type: 'text' }
+                  }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.startactivedate" />',
+                	name: 'startDate', align: 'left', width: '10%', editor: { type: 'text' }
+                  }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.endactivedate" />',
+                	name: 'endDate', align: 'left', width: '10%', editor: { type: 'text' }
+                  }
+                ],
+                url:'${base.contextPath}/spm/location/query',
+                toolbar: { items: [
+                                   { text: '<@spring.message "sys.hand.btn.new" />',disable:false, click: function(){spm_location_grid.addRow({})}, icon: 'add' },
+                                   { line: true },
+                                   { text: '<@spring.message "sys.hand.btn.delete" />', click: function(){
+                                        Hap.gridDelete({
+                                           grid:spm_location_grid
+                                       })
+
+                                   }, icon: 'delete'},
+                                   { line: true },
+                                   { text: '<@spring.message "sys.hand.btn.save" />', click: function(){
+                                       Hap.gridSave({
+                                           grid:spm_location_grid,
+                                           url:'${base.contextPath}/spm/location/save'
+                                       })
+                                   }, icon: 'save'}
+                     ]
+                     },
+                enabledEdit: true,
+                //usePager:true,
+                width: '100%',
+                height: '99%',
+                checkbox: true,
+                rownumbers: true,
+                pageSizeOptions:[10,20],
+                pageSize:'10'
+            });
+
+           
+    	});//$function
+    </script>
+</body>
+</html>

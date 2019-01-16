@@ -1,0 +1,167 @@
+<#--
+ * description: 地址查询界面
+ * version: 1.0
+ * author: shenqiubin
+ * .
+ *
+-->
+<#include "../include/head.html">
+
+<body>
+<style>
+.l-form .l-fieldcontainer {
+padding-top:10px;
+}
+</style>
+	
+	<form id="gst_location_form" ></form>  
+	
+    <script type="text/javascript">
+    var locationObj = frameElement.dialog.get('data');
+    var marketCode;
+    $.getJSON(_basePath + "/spm/market/getCompAndMarket?salesOrgId="+${Session._salesOrgId}, function(data) {
+        marketCode = data.rows[0].marketCode;
+    });
+    function updateStateList(callback){
+    	$.ajax({
+   			url: '${base.contextPath}/spm/state/queryforlocation',
+   			type:"GET",
+   			dataType:"json",
+   			contentType : "application/json",
+            data : {countryCode:liger.get('countryCode').selectedValue},
+            success : function(json) {
+                if(json.success){
+                	liger.get('stateCode').setData(json.rows)                	
+                }
+                if(callback){
+                	callback();
+                }
+            },
+            error : function() {
+                $.ligerDialog.closeWaitting();
+            }
+   		})
+    }
+    
+    function updateCityList(callback){
+    	$.ajax({
+   			url: '${base.contextPath}/spm/city/queryforlocation',
+   			type:"GET",
+   			dataType:"json",
+   			contentType : "application/json",
+               data : {stateCode:liger.get('stateCode').selectedValue},
+               success : function(json) {
+                   if(json.success){
+                   	liger.get('cityCode').setData(json.rows)
+                   }
+                   if(callback) callback();
+               },
+               error : function() {
+                   $.ligerDialog.closeWaitting();
+               }
+   		})
+    }
+    
+    function init_return_data(){
+    	var d = gst_location_form_o.getData();
+    	if(d.countryName == undefined){
+        	d.countryName = '';
+        }
+        if(d.stateName == undefined){
+        	d.stateName = '';
+        }
+    	if(d.cityName == undefined){
+        	d.cityName = '';
+        }
+    	if(marketCode != 'MY'){
+    		d['address'] = d.countryName+d.stateName+d.cityName;
+    	} else {
+            d['address'] = d.countryName+d.cityName;
+    	}
+    	$.ajax({
+            url: '${base.contextPath}/spm/country/getLocale',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+               data : '',
+               async:false,
+               success : function(json) {
+                   if(json.success){
+                    var locale=json.rows[0];
+                    if(locale == 'en_GB'){
+                    	if(marketCode != 'MY'){
+                    		d['address'] = d.cityName+','+d.stateName+','+d.countryName;
+                    	} else {
+                    		d['address'] = d.cityName+','+d.countryName;
+                    	}
+                    }
+                   }
+               },
+               error : function() {
+                   $.ligerDialog.closeWaitting();
+               }
+        })
+    	return d;
+    }
+ 	var sf = this;
+ 	window['gst_location_form_o'] = $("#gst_location_form").ligerForm({
+ 			space:5,
+             fields: [
+		{ type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.country"/>', newline:true, name: 'countryCode', textField:'countryName', width:90,
+	
+			options : {
+				valueField : 'countryCode',
+				textField:'name',
+				url:'${base.contextPath}/spm/country/queryDetail?countryCode='+locationObj.countryCode,
+				data:{countryCode:locationObj.countryCode},
+				onSelected:function(){
+					liger.get('stateCode').clear();
+			    	liger.get('cityCode').clear();
+					liger.get('cityCode').setData([])
+			    	sf.updateStateList();
+				},
+				onSuccess:function(d){
+				
+					if(locationObj){
+						
+			    		this.setValue(locationObj.countryCode);
+			    		if(locationObj.stateCode){
+			    		sf.updateStateList(function(){
+			    			$.ligerui.get('stateCode').setValue(locationObj.stateCode);			    			
+			    			if(locationObj.cityCode){
+			    				sf.updateCityList(function(){
+				    				$.ligerui.get('cityCode').setValue(locationObj.cityCode);
+				    			})
+			    			}
+			    			
+			    		})
+					}
+			    	}
+				}
+			}	
+		},
+		{ type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtlseg.statecode"/>', newline:false, name: 'stateCode',textField:'stateName',width:90,labelWidth:40,
+			
+			options : {
+				valueField : 'stateCode',
+				textField:'name',
+				onSelected:function(){
+					liger.get('cityCode').clear();
+					liger.get('cityCode').setData([])
+					sf.updateCityList()
+				}
+			}
+		},
+		{ type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtlseg.citycode"/>', newline:false, name: 'cityCode',textField:'cityName',width:90,labelWidth:40,
+
+			options : {
+				valueField : 'cityCode',
+				textField:'name'
+			}	
+		}
+        ]     
+         });
+ 	  
+    </script>
+</body>
+</html>

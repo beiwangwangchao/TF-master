@@ -1,0 +1,56 @@
+<#include "../include/head.html">
+<body style="padding: 10px; overflow: hidden;">
+<form id="diff_check_form"></form>
+<script type="text/javascript"> 
+    $(function() {
+    	
+        window['diff_check_form'] = $("#diff_check_form").ligerForm({
+            fields : [ {
+                label   : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.member"/>',
+                name    : "distributorID",
+                type    : 'text',
+                validate: {
+                    required: true
+                },
+                newline : true
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.password"/>',
+                name : 'password',
+                newline : true
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.messageaccount.market"/>',
+                name : 'market',
+                newline : true
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.result"/>',
+                name : 'result',
+                newline : true
+            } ],
+            buttons : [ {
+                text : '<@spring.message "sys.hand.btn.Query"/>',
+                disabled : false,
+                 width : 60,
+                click : function(){
+                	$.ajax({
+            			url: "${base.contextPath}/sys/integration/dapp/verifyDistributor",
+            			type:"GET",
+            			dataType:"json",
+            			contentType : "application/json",
+                        data : {distributorID:liger.get('distributorID').getValue(),password:liger.get('password').getValue(),market:liger.get('market').getValue()},//{distributorID:"960000001",password:"960000001",market:"HG"}
+                        success : function(json) {
+                            liger.get('result').setValue(json.status.message)
+                        },
+                        error : function() {
+                        	liger.get('result').setValue('error')
+                        }
+            		})
+                }
+            }]
+        });
+        
+    });
+</script>
+</body>

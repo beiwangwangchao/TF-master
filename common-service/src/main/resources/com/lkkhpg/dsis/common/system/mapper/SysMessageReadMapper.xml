@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.system.mapper.SysMessageReadMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.system.dto.SysMessageRead">
+        <id column="READ_ID" property="readId" jdbcType="DECIMAL" />
+        <result column="MESSAGE_ID" property="messageId" jdbcType="DECIMAL" />
+        <result column="ACCOUNT_ID" property="accountId" jdbcType="DECIMAL" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    </resultMap>
+    <resultMap id="SiteMessageMap" type="com.lkkhpg.dsis.common.system.dto.SiteMessageRead">
+        <id column="READ_ID" property="readId" jdbcType="DECIMAL" />
+        <result column="MESSAGE_ID" property="messageId" jdbcType="DECIMAL" />
+        <result column="ACCOUNT_ID" property="accountId" jdbcType="DECIMAL" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="subject" property="subject" jdbcType="VARCHAR" />
+        <result column="content" property="content" jdbcType="VARCHAR" />
+        <result column="user_name" property="userName" jdbcType="VARCHAR" />
+        <result column="creation_date" property="publishDate" jdbcType="TIMESTAMP" />
+        <result column="sender" property="userId" jdbcType="DECIMAL" />
+        <result column="sort" property="sort" jdbcType="VARCHAR"/>
+        <result column="sortname" property="sortname" jdbcType="VARCHAR"/>
+        <result column="sortorder" property="sortorder" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        READ_ID, MESSAGE_ID, ACCOUNT_ID, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN
+    </sql>
+    <sql id="Site_Message">
+        READ_ID, ACCOUNT_ID,subject,sender,rm.status
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from SYS_MESSAGE_READ
+        where READ_ID = #{readId,jdbcType=DECIMAL}
+    </select>
+
+    <select id="selectMessageByAccount" resultMap="SiteMessageMap" parameterType="com.lkkhpg.dsis.common.system.dto.SiteMessageRead">
+        select
+        <include refid="Site_Message" />
+        , rm.creation_date,rm.MESSAGE_ID,su.user_name
+        from SYS_MESSAGE_READ rm,SYS_MESSAGE sm , sys_user su
+        where
+        account_id = #{accountId,jdbcType=DECIMAL}
+        and
+        rm.message_id = sm.message_id
+        and rm.sender = su.user_id
+
+        <if test="status != null">
+            and rm.status = #{status,jdbcType=VARCHAR}
+        </if>
+        <if test="status == null">
+            and
+            rm.status !='D'
+        </if>
+        <if test="userName != null">
+            and Upper(su.user_name) like concat('%',concat(Upper(#{userName,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="publishDateFromTo != null">
+            and rm.creation_date &gt; #{publishDateFromTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="publishEDate != null">
+            and rm.creation_date &lt;= #{publishEDate,jdbcType=TIMESTAMP}
+        </if>
+        <if test="sortname =='publishDate' and sortorder == 'asc'">
+            order by rm.creation_date asc
+        </if>
+        <if test="sortname =='publishDate' and sortorder == 'desc'">
+            order by rm.creation_date desc
+        </if>
+        <!-- <if test="sort == null">
+            order by rm.creation_date desc
+        </if>
+        <if test="sort != null">
+            order by rm.creation_date 
+        </if> -->
+        <!-- <if test="publishDate != null">
+            and rm.creation_date &lt; #{publishEDate,jdbcType=TIMESTAMP}
+            and rm.creation_date &gt;
+            #{publishDate,jdbcType=TIMESTAMP}
+        </if> -->
+
+    </select>
+
+    <select id="selectMessageByReadID" resultMap="SiteMessageMap" parameterType="java.lang.Long">
+        select
+        <include refid="Site_Message" />
+        , rm.creation_date,rm.MESSAGE_ID,su.user_name,content
+        from SYS_MESSAGE_READ rm,SYS_MESSAGE sm , sys_user su
+        where
+        rm.read_id = #{readId,jdbcType=DECIMAL}
+        and
+        rm.message_id = sm.message_id
+        and rm.sender = su.user_id
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from SYS_MESSAGE_READ
+        where READ_ID =
+        #{readId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.system.dto.SysMessageRead">
+        <selectKey resultType="java.lang.Long" keyProperty="readId" order="BEFORE">
+            select SYS_MESSAGE_READ_S.nextval
+            from dual
+        </selectKey>
+        insert into SYS_MESSAGE_READ (READ_ID, MESSAGE_ID, ACCOUNT_ID,
+        OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID,
+        CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,SENDER,STATUS)
+        values
+        (#{readId,jdbcType=DECIMAL}, #{messageId,jdbcType=DECIMAL}, #{accountId,jdbcType=DECIMAL},
+        #{objectVersionNumber,jdbcType=DECIMAL}, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},
+        #{creationDate,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL},
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+        #{lastUpdateLogin,jdbcType=DECIMAL},#{sender,jdbcType=DECIMAL},#{status,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.system.dto.SysMessageRead">
+        <selectKey resultType="java.lang.Long" keyProperty="readId" order="BEFORE">
+            select SYS_MESSAGE_READ_S.nextval
+            from dual
+        </selectKey>
+        insert into SYS_MESSAGE_READ
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            READ_ID,
+            <if test="messageId != null">
+                MESSAGE_ID,
+            </if>
+            <if test="accountId != null">
+                ACCOUNT_ID,
+            </if>
+            <if test="sender != null">
+                sender,
+            </if>
+            <if test="objectVersionNumber != null">
+                OBJECT_VERSION_NUMBER,
+            </if>
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            <if test="creationDate != null">
+                CREATION_DATE,
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            <if test="lastUpdateDate != null">
+                LAST_UPDATE_DATE,
+            </if>
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{readId,jdbcType=DECIMAL},
+            <if test="messageId != null">
+                #{messageId,jdbcType=DECIMAL},
+            </if>
+            <if test="accountId != null">
+                #{accountId,jdbcType=DECIMAL},
+            </if>
+            <if test="accountId != null">
+                #{sender,jdbcType=DECIMAL},
+            </if>
+            <if test="objectVersionNumber != null">
+                #{objectVersionNumber,jdbcType=DECIMAL},
+            </if>
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="creationDate != null">
+                #{creationDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateDate != null">
+                #{lastUpdateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.system.dto.SysMessageRead">
+        update SYS_MESSAGE_READ
+        <set>
+            <if test="messageId != null">
+                MESSAGE_ID = #{messageId,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="accountId != null">
+                ACCOUNT_ID = #{accountId,jdbcType=DECIMAL},
+            </if>
+            <if test="objectVersionNumber != null">
+                OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+            </if>
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="creationDate != null">
+                CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateDate != null">
+                LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where READ_ID = #{readId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.system.dto.SysMessageRead">
+        update SYS_MESSAGE_READ
+        set MESSAGE_ID =
+        #{messageId,jdbcType=DECIMAL},
+        ACCOUNT_ID = #{accountId,jdbcType=DECIMAL},
+        OBJECT_VERSION_NUMBER =
+        #{objectVersionNumber,jdbcType=DECIMAL},
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID =
+        #{programId,jdbcType=DECIMAL},
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+        CREATED_BY =
+        #{createdBy,jdbcType=DECIMAL},
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE =
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL}
+        where READ_ID =
+        #{readId,jdbcType=DECIMAL}
+    </update>
+    <select id="queryNext" resultMap="SiteMessageMap" parameterType="com.lkkhpg.dsis.common.system.dto.SiteMessageRead">
+    select rownum,
+       mm.read_id,
+       mm.account_id,
+       mm.subject,
+       mm.sender,
+       mm.status,
+       mm.creation_date,
+       mm.MESSAGE_ID,
+       mm.user_name
+  from (select READ_ID,
+               ACCOUNT_ID,
+               subject,
+               sender,
+               rm.status,
+               rm.creation_date,
+               rm.MESSAGE_ID,
+               su.user_name
+          from SYS_MESSAGE_READ rm, SYS_MESSAGE sm, sys_user su
+         where account_id = #{accountId,jdbcType=DECIMAL}
+           and rm.message_id = sm.message_id
+           and rm.sender = su.user_id
+           <if test="status != null">
+            and rm.status = #{status,jdbcType=VARCHAR}
+        </if>
+        <if test="status == null">
+            and
+            rm.status !='D'
+        </if>
+         <if test="sort == null">
+            order by rm.creation_date
+        </if>
+        <if test="sort != null">
+            order by rm.creation_date desc
+        </if>) mm
+ where 
+        <if test="sort == null">
+            mm.creation_date &gt; #{publishDate,jdbcType=TIMESTAMP}
+        </if>
+        <if test="sort != null">
+            mm.creation_date &lt; #{publishDate,jdbcType=TIMESTAMP}
+        </if>
+   and rownum = 1
+    </select>
+    
+    <select id="selectMessageByMwsAccount" resultMap="SiteMessageMap" parameterType="com.lkkhpg.dsis.common.system.dto.SiteMessageRead">
+        select
+        <include refid="Site_Message" />
+        , rm.creation_date,rm.MESSAGE_ID,su.user_name
+        from SYS_MESSAGE_READ rm,SYS_MESSAGE sm , sys_user su
+        where
+        account_id = #{accountId,jdbcType=DECIMAL}
+        and
+        rm.message_id = sm.message_id
+        and rm.sender = su.user_id
+
+        <if test="status != null">
+            and rm.status = #{status,jdbcType=VARCHAR}
+        </if>
+        <if test="status == null">
+            and
+            rm.status !='D'
+        </if>
+        <if test="userName != null">
+            and Upper(su.user_name) like concat('%',concat(Upper(#{userName,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="publishDateFromTo != null">
+            and rm.creation_date &gt; #{publishDateFromTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="publishDateFromDo != null">
+        <![CDATA[and rm.creation_date <= #{publishDateFromDo,jdbcType=TIMESTAMP}]]>
+        </if>
+        <if test="sort == null">
+            order by rm.creation_date desc
+        </if>
+        <if test="sort != null">
+            order by rm.creation_date 
+        </if>
+
+    </select>
+    
+    <select id="getMessageUnreadCount" resultType="java.lang.Integer" parameterType="java.lang.Long">
+        SELECT
+           COUNT(1)
+        FROM SYS_MESSAGE_READ rm,SYS_MESSAGE sm , sys_user su
+        WHERE
+            rm.message_id = sm.message_id
+        AND rm.sender = su.user_id
+        AND rm.status='N'
+        AND account_id = #{accountId,jdbcType=DECIMAL}
+    </select>
+</mapper>

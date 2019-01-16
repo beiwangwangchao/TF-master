@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.member.mapper.MemberAuditMapper">
+    <!--会员主表-->
+    <select id="selectAuditHistory" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+        SELECT
+        M .*,
+        mmaa.account_number account_number,
+        MMAA.ACCOUNT_HOLDER ACCOUNT_HOLDER,
+        MMAA.ID_NUMBER account_id_number,
+        sbt.bank_name bank_name,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .member_type AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_TYPE' AND ROWNUM = 1) member_type_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .member_role AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_ROLE' AND ROWNUM = 1) member_role_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .status AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_STATUS' AND ROWNUM = 1) status_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .gender AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_GENDER' AND ROWNUM = 1) gender_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .id_type AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_ID_TYPE' AND ROWNUM = 1) id_type_,
+        ( SELECT market. NAME FROM spm_market_tl market WHERE market.market_id = M .market_id AND market.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND ROWNUM = 1) market_id_,
+        ( SELECT company. NAME FROM spm_company_tl company WHERE company.company_id = M .company_id AND company.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND ROWNUM = 1) company_id_,
+        ( SELECT T .description FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .nationality AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_NATIONALITY' AND ROWNUM = 1) nationality_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .country AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_COUNTRY' AND ROWNUM = 1) country_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .race AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_RACE' AND ROWNUM = 1) RACE_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .language AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_LANGUAGE' AND ROWNUM = 1) language_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .EDUCATION AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_EDUCATION' AND ROWNUM = 1) EDUCATION_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .CITIZEN_TYPE AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_CITIZEN_TYPE' AND ROWNUM = 1) CITIZEN_TYPE_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .AD_OPT_IN AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO' AND ROWNUM = 1) AD_OPT_IN_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .SYS_MSG_IN AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO' AND ROWNUM = 1) SYS_MSG_IN_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .ACCEPT_BONUS AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO' AND ROWNUM = 1) ACCEPT_BONUS_,
+        ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T .code_value_id AND cb. VALUE = M .BONUS_RCV_METHOD AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_BONUS_RECEIVE_METHOD' AND ROWNUM = 1) BONUS_RCV_METHOD_,
+        ( select a.login_name from sys_account a where a.account_id = m.last_updated_by AND ROWNUM = 1) audit_by,
+
+	       (SELECT (select t.name from spm_country_tl t where t.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and  t.country_code = sla.country_code) ||
+	               (select sst.name from spm_state_tl sst where sst.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and sst.state_code = sla.state_code) ||
+	               (select sct.name from spm_city_tl sct where sct.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and sct.city_code = sla.city_code) ||
+	               sla.address_line1 || sla.address_line2 || sla.address_line3 || sla.address_line4 || sla.address_line5
+	        FROM SPM_LOCATION_Archive sla
+	       where sla.location_id = (select t.Location_Id
+	                         from MM_MEM_SITE t
+	                        where t.member_id = M.member_id
+	                          and t.site_use_code = 'HOME')
+	         and sla.audit_session_id = M.audit_session_id and rownum = 1)home_address,
+
+	        (SELECT (select t.name from spm_country_tl t where t.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and  t.country_code = sla.country_code) ||
+	                (select sst.name from spm_state_tl sst where sst.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and sst.state_code = sla.state_code) ||
+	                (select sct.name from spm_city_tl sct where sct.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and sct.city_code = sla.city_code) ||
+	                sla.address_line1 || sla.address_line2 || sla.address_line3 || sla.address_line4 || sla.address_line5
+	         FROM SPM_LOCATION_Archive sla
+	        where sla.location_id = (select t.Location_Id
+	                          from MM_MEM_SITE t
+	                         where t.member_id = M.member_id
+	                           and t.site_use_code = 'CTACT')
+	          and sla.audit_session_id = M.audit_session_id and rownum = 1) ctact_address,
+       (select T.meaning from MM_MEM_ATTRIBUTE_ARCHIVE mmaa, sys_code_b c, sys_code_value_b cb, sys_code_value_tl T where mmaa.member_id = M.member_id and mmaa.audit_session_id = M.audit_session_id and mmaa.attribute = 'confidentiality_agreement' AND cb.code_value_id = T.code_value_id AND cb.VALUE = mmaa.value AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO' and c.code_id = cb.code_id) confidentiality_agreement_v,
+       (select T.meaning from MM_MEM_ATTRIBUTE_ARCHIVE mmaa, sys_code_b c, sys_code_value_b cb, sys_code_value_tl T where mmaa.member_id = M.member_id and mmaa.audit_session_id = M.audit_session_id and mmaa.attribute = 'id_copy' AND cb.code_value_id = T.code_value_id AND cb.VALUE = mmaa.value AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO' and c.code_id = cb.code_id) id_copy_v,
+       (select T.meaning from MM_MEM_ATTRIBUTE_ARCHIVE mmaa, sys_code_b c, sys_code_value_b cb, sys_code_value_tl T where mmaa.member_id = M.member_id and mmaa.audit_session_id = M.audit_session_id and mmaa.attribute = 'application_form' AND cb.code_value_id = T.code_value_id AND cb.VALUE = mmaa.value AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO' and c.code_id = cb.code_id) application_form_v,
+       (select T.meaning from MM_MEM_ATTRIBUTE_ARCHIVE mmaa, sys_code_b c, sys_code_value_b cb, sys_code_value_tl T where mmaa.member_id = M.member_id and mmaa.audit_session_id = M.audit_session_id and mmaa.attribute = 'banck_account_copy' AND cb.code_value_id = T.code_value_id AND cb.VALUE = mmaa.value AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO' and c.code_id = cb.code_id) banck_account_copy_v,
+       (select mmaa.value from MM_MEM_ATTRIBUTE_ARCHIVE mmaa where mmaa.member_id = M.member_id and mmaa.audit_session_id = M.audit_session_id and mmaa.attribute = 'card_pass') card_pass_v
+
+        FROM
+            MM_MEMBER_Archive M
+        left outer join MM_MEM_ACCOUNT_ARCHIVE mmaa
+          on mmaa.audit_session_id = M.audit_session_id
+        left outer join spm_bank_tl sbt
+          on sbt.bank_id = mmaa.bank_id
+         and sbt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+
+        WHERE
+            1 = 1
+            <if test="memberId!=null">
+                and M .member_id = #{memberId,jdbcType=DECIMAL}
+            </if>
+            <if test="auditBy!=null">
+                and m.last_updated_by = ( select a.account_id from sys_account a where a.login_name = #{auditBy,jdbcType=VARCHAR})
+            </if>
+            <if test="auditTransactionType!=null">
+                and m.audit_transaction_type = #{auditTransactionType,jdbcType=VARCHAR}
+            </if>
+            <if test="auditTimestampFrom!=null">
+                and m.audit_timestamp >= #{auditTimestampFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="auditTimestampTo!=null">
+                and m.audit_timestamp &lt;= #{auditTimestampTo,jdbcType=TIMESTAMP}
+            </if>
+
+            <if test="auditSessionId!=null">
+                and m.audit_session_id = #{auditSessionId,jdbcType=VARCHAR}
+            </if>
+        ORDER BY
+            M .audit_id DESC
+    </select>
+
+    <select id="selectHomeSite" resultType="com.lkkhpg.dsis.common.config.dto.SpmLocation">
+        select l.*
+        from spm_location l,mm_mem_site s
+         where l.location_id = s.location_id
+          and s.site_use_code = 'HOME'
+          and s.member_id=#{memberId,jdbcType=DECIMAL}
+    </select>
+
+    <!--账单信息-->
+    <select id="selectSiteHistory" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+        select s.*
+        from MM_MEM_SITE_Archive s
+        where s.site_use_code = #{siteUseCode,jdbcType=VARCHAR,javaType=java.lang.String}
+        <if test="siteId!=null">
+            and s.site_id = #{siteId,jdbcType=DECIMAL,javaType=java.lang.Long}
+        </if>
+        <if test="auditSessionId!=null">
+            and s.audit_session_id = #{auditSessionId,jdbcType=VARCHAR}
+        </if>
+
+        order by s.audit_id desc
+    </select>
+    
+    <!-- 相关人信息 -->
+    <select id="selectRelationshipAuditHistoryPrev" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+        select a.*,
+              ( select sa.login_name from sys_account sa where sa.account_id = a.last_updated_by) audit_by,
+              ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.id_type AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_ID_TYPE') id_type_,
+              ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.rel_type AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.RELATIONSHIP_TYPE') rel_type_
+        from MM_MEM_RELATIONSHIP_Archive a
+        where a.audit_id in
+        (select max(t.audit_id)
+         from MM_MEM_RELATIONSHIP_Archive t
+         where t.mem_rel_id in
+             (select t.mem_rel_id
+               from MM_MEM_RELATIONSHIP_Archive t
+                where t.audit_session_id = #{auditSessionId,jdbcType=VARCHAR})
+         and t.audit_session_id != #{auditSessionId,jdbcType=VARCHAR}
+         and t.audit_timestamp &lt;=
+               (select tt.audit_timestamp
+                  from MM_MEM_RELATIONSHIP_Archive tt
+                 where tt.audit_session_id = #{auditSessionId,jdbcType=VARCHAR}
+                   and t.mem_rel_id = tt.mem_rel_id)
+         group by t.mem_rel_id)
+    </select>
+    <!-- 相关人信息 -->
+    <select id="selectRelationshipAuditHistoryThis" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+        select a.*,
+               ( select sa.login_name from sys_account sa where sa.account_id = a.last_updated_by) audit_by,
+               ( SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.id_type AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_ID_TYPE') id_type_,
+               ( SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.rel_type AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.RELATIONSHIP_TYPE') rel_type_
+        from MM_MEM_RELATIONSHIP_Archive a
+        where a.audit_session_id = #{auditSessionId,jdbcType=VARCHAR}
+    </select>
+    
+    <!-- 信用卡信息 -->
+    <select id="selectCardAuditHistoryPrev" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+        select a.*,
+               ( select sa.login_name from sys_account sa where sa.account_id = a.last_updated_by) audit_by,
+               (SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.status AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.CARD_STATUS') status_,
+               (SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.card_type AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.CARD_TYPE') card_type_,
+               (SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.card_sub_type AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.CREDIT_CARD_TYPE') card_sub_type_,
+               (SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.default_flag AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO') default_flag_
+        from MM_MEM_CARD_Archive a
+        where a.audit_id in
+       (select max(t.audit_id)
+          from MM_MEM_CARD_Archive t
+         where t.card_id in
+               (select t.card_id
+                  from MM_MEM_CARD_Archive t
+                 where t.audit_session_id = #{auditSessionId,jdbcType=VARCHAR})
+           and t.audit_session_id != #{auditSessionId,jdbcType=VARCHAR}
+           and t.audit_timestamp &lt;=
+               (select tt.audit_timestamp
+                  from MM_MEM_CARD_Archive tt
+                 where tt.audit_session_id = #{auditSessionId,jdbcType=VARCHAR}
+                   and t.card_id = tt.card_id)
+         group by t.card_id)
+    </select>
+    <!-- 信用卡信息 -->
+    <select id="selectCardAuditHistoryThis" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+        select a.*,
+               ( select sa.login_name from sys_account sa where sa.account_id = a.last_updated_by) audit_by,
+               (SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.status AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.CARD_STATUS') status_,
+               (SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.card_type AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.CARD_TYPE') card_type_,
+               (SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.card_sub_type AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.CREDIT_CARD_TYPE') card_sub_type_,
+               (SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = a.default_flag AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO') default_flag_
+        from MM_MEM_CARD_Archive a
+        where a.audit_session_id = #{auditSessionId,jdbcType=VARCHAR}
+    </select>
+    
+    <!-- 地址信息 -->
+    <select id="selectSiteAuditHistoryPrev" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+        select mmsa.*,
+               (select sa.login_name from sys_account sa where sa.account_id = mmsa.last_updated_by) audit_by,
+               (SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = mmsa.default_flag AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO') default_flag_,
+               (SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = mmsa.site_use_code AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_ADDRESS') site_use_code_,
+               ((select t.name from spm_country_tl t where t.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and  t.country_code = sla.country_code) ||
+               (select sst.name from spm_state_tl sst where sst.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and sst.state_code = sla.state_code) ||
+               (select sct.name from spm_city_tl sct where sct.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and sct.city_code = sla.city_code) ||
+               sla.address_line1 || sla.address_line2 || sla.address_line3 || sla.address_line4 || sla.address_line5) SITE_
+          from MM_MEM_SITE_Archive mmsa
+          left outer join SPM_LOCATION_Archive sla
+            on sla.location_id = mmsa.location_id
+           and sla.audit_session_id = mmsa.audit_session_id
+         where mmsa.audit_id in
+               (select max(t.audit_id)
+                  from MM_MEM_SITE_Archive t
+                 where t.site_id in
+                       (select t.site_id
+                          from MM_MEM_SITE_Archive t
+                         where t.audit_session_id = #{auditSessionId,jdbcType=VARCHAR})
+                           and t.audit_session_id != #{auditSessionId,jdbcType=VARCHAR}
+                           and t.audit_timestamp &lt;=
+                               (select tt.audit_timestamp
+                                  from MM_MEM_SITE_Archive tt
+                                 where tt.audit_session_id = #{auditSessionId,jdbcType=VARCHAR}
+                                   and t.site_id = tt.site_id)
+         group by t.site_id)
+           and mmsa.site_use_code != 'CTACT'
+    </select>  
+    <!-- 地址信息 -->
+    <select id="selectSiteAuditHistoryThis" resultType="org.apache.commons.collections.map.CaseInsensitiveMap">
+        select mmsa.*,
+               (select sa.login_name from sys_account sa where sa.account_id = mmsa.last_updated_by) audit_by,
+               (SELECT T.meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = mmsa.default_flag AND T.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'SYS.YES_NO') default_flag_,
+               (SELECT T .meaning FROM sys_code_b c, sys_code_value_b cb, sys_code_value_tl T WHERE c.code_id = cb.code_id AND cb.code_value_id = T.code_value_id AND cb.VALUE = mmsa.site_use_code AND T .lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} AND c.code = 'MM.MEMBER_ADDRESS') site_use_code_,
+               ((select t.name from spm_country_tl t where t.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and  t.country_code = sla.country_code) ||
+               (select sst.name from spm_state_tl sst where sst.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and sst.state_code = sla.state_code) ||
+               (select sct.name from spm_city_tl sct where sct.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String} and sct.city_code = sla.city_code) ||
+               sla.address_line1 || sla.address_line2 || sla.address_line3 || sla.address_line4 || sla.address_line5) SITE_
+          from MM_MEM_SITE_Archive mmsa
+          left outer join SPM_LOCATION_Archive sla
+            on sla.location_id = mmsa.location_id
+           and sla.audit_session_id = mmsa.audit_session_id 
+         where mmsa.audit_session_id = #{auditSessionId,jdbcType=VARCHAR}
+           and mmsa.site_use_code != 'CTACT'
+    </select>
+
+</mapper>

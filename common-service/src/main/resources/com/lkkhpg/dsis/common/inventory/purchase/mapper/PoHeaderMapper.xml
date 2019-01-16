@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.inventory.purchase.mapper.PoHeaderMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.inventory.purchase.dto.PoHeader" >
+    <id column="PO_HEADER_ID" property="poHeaderId" jdbcType="DECIMAL" />
+    <result column="PO_NUMBER" property="poNumber" jdbcType="VARCHAR" />
+    <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+    <result column="ORDER_DATE" property="orderDate" jdbcType="TIMESTAMP" />
+    <result column="PO_TO" property="poTo" jdbcType="VARCHAR" />
+    <result column="VENDOR_NAME" property="vendorName" jdbcType="VARCHAR" />
+    <result column="DELIVERY_TO" property="deliveryTo" jdbcType="VARCHAR" />
+    <result column="CONTACTS" property="contacts" jdbcType="VARCHAR" />
+    <result column="FAX" property="fax" jdbcType="VARCHAR" />
+    <result column="PHONE" property="phone" jdbcType="VARCHAR" />
+    <result column="EXPECTED_DATE" property="expectedDate" jdbcType="TIMESTAMP" />
+    <result column="INCOTERM" property="incoterm" jdbcType="VARCHAR" />
+    <result column="CURRENCY" property="currency" jdbcType="VARCHAR" />
+    <result column="DELIVERY_ADDRESS" property="deliveryAddress" jdbcType="VARCHAR" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR"/>
+    <result column="CURRENCY_NAME" property="currencyName" jdbcType="VARCHAR"/>
+    <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR"/>
+    <result column="TRX_NUMBER" property="trxNumber" jdbcType="VARCHAR"/>
+    <result column="STATUS" property="status" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ph.PO_HEADER_ID, ph.PO_NUMBER, ph.MARKET_ID, ph.ORDER_DATE, ph.PO_TO, ph.VENDOR_NAME, ph.DELIVERY_TO, 
+    ph.CONTACTS, ph.FAX, ph.PHONE, ph.EXPECTED_DATE, ph.INCOTERM, ph.CURRENCY, ph.DELIVERY_ADDRESS, ph.REMARK, 
+    ph.OBJECT_VERSION_NUMBER, ph.REQUEST_ID, ph.PROGRAM_ID, ph.CREATION_DATE, ph.CREATED_BY, ph.LAST_UPDATED_BY, 
+    ph.LAST_UPDATE_DATE, ph.LAST_UPDATE_LOGIN, ph.ATTRIBUTE_CATEGORY, ph.ATTRIBUTE1, ph.ATTRIBUTE2, 
+    ph.ATTRIBUTE3, ph.ATTRIBUTE4, ph.ATTRIBUTE5, ph.ATTRIBUTE6, ph.ATTRIBUTE7, ph.ATTRIBUTE8, ph.ATTRIBUTE9, 
+    ph.ATTRIBUTE10, ph.ATTRIBUTE11, ph.ATTRIBUTE12, ph.ATTRIBUTE13, ph.ATTRIBUTE14, ph.ATTRIBUTE15,ph.AREA_CODE,ph.TRX_NUMBER
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />,ist.STATUS
+    from PO_HEADER ph,INV_STOCK_TRX ist
+    where PO_HEADER_ID = #{poHeaderId,jdbcType=DECIMAL}
+    and ph.TRX_NUMBER = ist.TRX_NUMBER
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from PO_HEADER
+    where PO_HEADER_ID = #{poHeaderId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.purchase.dto.PoHeader" >
+    <selectKey resultType="java.lang.Long" keyProperty="poHeaderId" order="BEFORE" >
+      select PO_HEADER_S.nextval from dual
+    </selectKey>
+    insert into PO_HEADER (PO_HEADER_ID, PO_NUMBER, MARKET_ID, 
+      ORDER_DATE, PO_TO, VENDOR_NAME, 
+      DELIVERY_TO, CONTACTS, FAX, 
+      PHONE, EXPECTED_DATE, INCOTERM, 
+      CURRENCY, DELIVERY_ADDRESS, REMARK, 
+      OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,AREA_CODE
+      )
+    values (#{poHeaderId,jdbcType=DECIMAL}, #{poNumber,jdbcType=VARCHAR}, #{marketId,jdbcType=DECIMAL}, 
+      #{orderDate,jdbcType=TIMESTAMP}, #{poTo,jdbcType=VARCHAR}, #{vendorName,jdbcType=VARCHAR}, 
+      #{deliveryTo,jdbcType=VARCHAR}, #{contacts,jdbcType=VARCHAR}, #{fax,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{expectedDate,jdbcType=TIMESTAMP}, #{incoterm,jdbcType=VARCHAR}, 
+      #{currency,jdbcType=VARCHAR}, #{deliveryAddress,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      -1, -1, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.inventory.purchase.dto.PoHeader" >
+    <selectKey resultType="java.lang.Long" keyProperty="poHeaderId" order="BEFORE" >
+      select PO_HEADER_S.nextval from dual
+    </selectKey>
+    insert into PO_HEADER
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      PO_HEADER_ID,
+      <if test="poNumber != null" >
+        PO_NUMBER,
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID,
+      </if>
+      <if test="orderDate != null" >
+        ORDER_DATE,
+      </if>
+      <if test="poTo != null" >
+        PO_TO,
+      </if>
+      <if test="vendorName != null" >
+        VENDOR_NAME,
+      </if>
+      <if test="deliveryTo != null" >
+        DELIVERY_TO,
+      </if>
+      <if test="contacts != null" >
+        CONTACTS,
+      </if>
+      <if test="fax != null" >
+        FAX,
+      </if>
+      <if test="phone != null" >
+        PHONE,
+      </if>
+      <if test="expectedDate != null" >
+        EXPECTED_DATE,
+      </if>
+      <if test="incoterm != null" >
+        INCOTERM,
+      </if>
+      <if test="currency != null" >
+        CURRENCY,
+      </if>
+      <if test="deliveryAddress != null" >
+        DELIVERY_ADDRESS,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+        OBJECT_VERSION_NUMBER,
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{poHeaderId,jdbcType=DECIMAL},
+      <if test="poNumber != null" >
+        #{poNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="marketId != null" >
+        #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="orderDate != null" >
+        #{orderDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="poTo != null" >
+        #{poTo,jdbcType=VARCHAR},
+      </if>
+      <if test="vendorName != null" >
+        #{vendorName,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTo != null" >
+        #{deliveryTo,jdbcType=VARCHAR},
+      </if>
+      <if test="contacts != null" >
+        #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null" >
+        #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="expectedDate != null" >
+        #{expectedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="incoterm != null" >
+        #{incoterm,jdbcType=VARCHAR},
+      </if>
+      <if test="currency != null" >
+        #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryAddress != null" >
+        #{deliveryAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+        1,
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.inventory.purchase.dto.PoHeader" >
+    update PO_HEADER
+    <set >
+      <if test="poNumber != null" >
+        PO_NUMBER = #{poNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="areaCode != null" >
+        AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="orderDate != null" >
+        ORDER_DATE = #{orderDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="poTo != null" >
+        PO_TO = #{poTo,jdbcType=VARCHAR},
+      </if>
+      <if test="vendorName != null" >
+        VENDOR_NAME = #{vendorName,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTo != null" >
+        DELIVERY_TO = #{deliveryTo,jdbcType=VARCHAR},
+      </if>
+      <if test="contacts != null" >
+        CONTACTS = #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null" >
+        FAX = #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        PHONE = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="expectedDate != null" >
+        EXPECTED_DATE = #{expectedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="incoterm != null" >
+        INCOTERM = #{incoterm,jdbcType=VARCHAR},
+      </if>
+      <if test="currency != null" >
+        CURRENCY = #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryAddress != null" >
+        DELIVERY_ADDRESS = #{deliveryAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="trxNumber != null" >
+        TRX_NUMBER = #{trxNumber,jdbcType=VARCHAR},
+      </if>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+        CREATION_DATE = CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where PO_HEADER_ID = #{poHeaderId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.inventory.purchase.dto.PoHeader" >
+    update PO_HEADER
+    set PO_NUMBER = #{poNumber,jdbcType=VARCHAR},
+      MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      ORDER_DATE = #{orderDate,jdbcType=TIMESTAMP},
+      PO_TO = #{poTo,jdbcType=VARCHAR},
+      AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+      VENDOR_NAME = #{vendorName,jdbcType=VARCHAR},
+      DELIVERY_TO = #{deliveryTo,jdbcType=VARCHAR},
+      CONTACTS = #{contacts,jdbcType=VARCHAR},
+      FAX = #{fax,jdbcType=VARCHAR},
+      PHONE = #{phone,jdbcType=VARCHAR},
+      EXPECTED_DATE = #{expectedDate,jdbcType=TIMESTAMP},
+      INCOTERM = #{incoterm,jdbcType=VARCHAR},
+      CURRENCY = #{currency,jdbcType=VARCHAR},
+      DELIVERY_ADDRESS = #{deliveryAddress,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = CURRENT_TIMESTAMP,
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where PO_HEADER_ID = #{poHeaderId,jdbcType=DECIMAL}
+  </update>
+  
+    <select id="queryByPoHeader" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.purchase.dto.PoHeader" >
+    select 
+   <include refid="Base_Column_List" />,ist.STATUS,
+   sb.name,
+   sc.CURRENCY_NAME
+    from PO_HEADER ph
+    left OUTER join INV_STOCK_TRX ist
+      on(ph.TRX_NUMBER = ist.TRX_NUMBER)
+    left outer join SPM_MARKET_TL sb
+    on(ph.MARKET_ID=sb.MARKET_ID and sb.LANG = #{request.locale,jdbcType=VARCHAR})
+    left outer join SPM_CURRENCY sc
+    on(ph.currency = sc.currency_code)
+    <where>
+        <if test="poHeaderId != null">
+            ph.PO_HEADER_ID=#{poHeaderId,jdbcType=DECIMAL}
+        </if>
+        <if test="status != null">
+          ist.STATUS = #{status,jdbcType=VARCHAR},
+        </if>
+        <if test="poNumber != null">
+            AND Upper(ph.PO_NUMBER) like concat('%',concat(Upper(#{poNumber,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="vendorName != null">
+            AND Upper(ph.VENDOR_NAME) like concat('%',concat(Upper(#{vendorName,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="marketName != null">
+            AND Upper(sb.name) like concat('%',concat(Upper(#{marketName,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="marketId != null">
+            AND ph.market_id=#{marketId,jdbcType=DECIMAL}
+        </if>
+        <if test="orderDateTo != null">
+            AND ph.ORDER_DATE <![CDATA[ >= #{orderDateTo,jdbcType=TIMESTAMP} ]]>
+        </if>
+        <if test="orderDateDo != null">
+            AND ph.ORDER_DATE <![CDATA[ <= #{orderDateDo,jdbcType=TIMESTAMP} ]]>
+        </if>
+    </where>
+    <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+     </if>
+        
+    </select>
+</mapper>

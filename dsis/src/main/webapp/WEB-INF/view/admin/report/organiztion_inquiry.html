@@ -1,0 +1,88 @@
+ <#--  
+ * description: 树结构
+ * version: 1.0 
+ * author: huangjiajing
+ * Copyright LKK Health Products Group Limited.    
+ * 
+-->  
+<#include "../include/head.html">
+<style>
+    .tree-block {
+        width: 80%;
+        height: 600px;
+        float: left;
+        margin: 10px;
+        padding: 10px 20px;
+        background: white;
+        /* border: 1px solid #ccc; */
+        overflow: auto;
+    }
+    .title-text {
+        font-weight: bold;
+    }
+     .l-button {
+    line-height: 10px;
+    }
+</style>
+<body style="padding: 10px">
+<script type="text/javascript">
+    
+    $(function() {
+    	window['organization_form'] = $("#organization_form").ligerForm({
+    		 fields: [
+    	                { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.user.dto.userinfo.memberid"/>',newline:false,  name: 'memberNo',
+    	                	validate : {
+                                required : true
+                            }
+    	                }
+    	            ]
+    	})
+    	
+    	
+    });
+</script>
+<script type="text/javascript">
+function select(){
+	if(Hap.validateForm(organization_form)){
+		var memberNo = liger.get('memberNo').getValue();
+	    var manager = null;
+		manager=$("#organization_tree").ligerTree({
+			
+			nodeWidth : 800,
+            url:'${base.contextPath}/sys/rttree/query?memberNo='+memberNo,
+            isLeaf : function(data) {//判断是否是叶子
+                if(data.isleaf == 1){
+                    return true;
+                }
+                return false;
+            },
+            delay : function(e) {
+                var data = e.data;
+                return {
+                	url:'${base.contextPath}/sys/rttree/query?memberNo='+memberNo+'&sponsorNo='+data.dealerNo
+                };
+            }, 
+            checkbox : false,
+            slide : false,
+            render : function(data, text, level) {
+                return "<" + (level-1) + ">" + data.dealerNo + " / " + data.dealerPostCode + " / " + data.dealername + " / " + data.ps + " / " + data.gpv + " / " + data.lastgv + " / " + data.typeeffectivedate;
+            },
+	         idFieldName:'dealerNo',
+	         parentIDFieldName:'sponsorNo',
+	         textFieldName:'concat' 
+	     });
+	}
+}
+</script>
+	<div style="height: 60px;height: 100px;width:500px;">
+	    <form id="organization_form" style="float: left;"></form>
+	    <button class="l-button" onclick="select()" style="top:15%;width: 60px;"><@spring.message "sys.hand.btn.submit"/></button> 
+	</div>
+    <div class="tree-block">
+        <p class="title-text">Organization Inquiry</p>
+        <p class="title-text">(Pattern : CardNo / Rank / Name / PPV / GPV / OV / JoinPeriod)</p>
+        <p class="title-text">格式 : (經銷商編號 / 級別 / 姓名 / 個人銷售業績 / 小組業績 / 無限代組織積分 / 入會年份及月份)</p>
+        <ul id="organization_tree"></ul>
+    </div>
+</body>
+</html>

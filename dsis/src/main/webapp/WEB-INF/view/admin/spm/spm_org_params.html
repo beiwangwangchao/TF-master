@@ -1,0 +1,228 @@
+<#--
+ * description: 
+ * version: 1.0 
+ * author:chenjingxiong
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../include/head.html">
+<!-- Editor Data -->
+<script src="${base.contextPath}/common/code?PAYMENT_GATEWAY_CODE_OP=MWS.BANK_PAYMENT&YES_NO_OP=SYS.YES_NO&SALES_ORG_TYPE_OP=SPM.SALES_ORG_TYPE
+	&SELECT_POS_OP=OM.SELECT_POS&BANK_OP=OM.BANK_BELONG_TO&INVOICE_TEMPLETE_OP=SPM.INVOICE_TEMPLETE&DELIVERY_TYPE_OP=DM.DELIVERY_TYPE&SALES_CHANNEL_OP=OM.SALES_CHANNEL
+	&COST_METHOD_OP=INV.COST_METHOD&CURRENCY_OP=SPM.CURRENCY&EXECUTE_TYPE_OP=OM.EXECUTE_TYPE&PRESENT_REBATE_OP=OM.SALES_PRESENT_REBATE&RETURN_TYPE_OP=RM.RETURN_TYPE
+	&EXEC_DATE_OP=SPM.DATE&REFUND_WAY_OP=RM_REFUND_WAY&PAY_METHOD_MODIFY=OM.PAY_METHOD_MODIFY&MEMBER_TYPE=MM.MEMBER_TYPE" type="text/javascript"></script>
+<!-- Lov -->
+<script type="text/javascript">
+var noted_warehouseman_op = ${lovService.getLov(base.contextPath,base.locale, "sys_user")};
+var tax_op = ${lovService.getLov(base.contextPath,base.locale, "lov_tax")};
+var user_op = ${lovService.getLov(base.contextPath,base.locale, "sys_user")};
+
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.add_fee_freight','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.add_fee_freight"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.add_fee_payment','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.add_fee_payment"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.allow_back_order','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.allow_back_order"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.auto_write_off','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.auto_write_off"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.autoship_min_sum','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.autoship_min_sum"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bank','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bank"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_percentage_ipoint_center','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_percentage_ipoint_center"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_percentage_service_center','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_percentage_service_center"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_ratio_service_center','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_ratio_service_center"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_ratio_sipoint_center','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_ratio_sipoint_center"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_release_threshold','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_release_threshold"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.cost_method','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.cost_method"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.currency','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.currency"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.defaul_shop','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.defaul_shop"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.delivery_type','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.delivery_type"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.enable_tax','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.enable_tax"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.execute_date','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.execute_date"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.execute_type','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.execute_type"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.invoice_temp','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.invoice_temp"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.ipoint_bonus_record_approver','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.ipoint_bonus_record_approver"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.max_pv_service_center','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.max_pv_service_center"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.max_sales_ipoint_center','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.max_sales_ipoint_center"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_age_alert','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_age_alert"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_applicition_list','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_applicition_list"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_auto_approved','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_auto_approved"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_home_address','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_home_address"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_home_citizen_type','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_home_citizen_type"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_id_prefix','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_id_prefix"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_nhi_tax_excluded','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_nhi_tax_excluded"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_race','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_race"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.merchantid','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.merchantid"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.merid','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.merid"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.noted_warehouseman','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.noted_warehouseman"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.pay_by_rb','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.pay_by_rb"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.pos_num','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.pos_num"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.present_rebate','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.present_rebate"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.price_include_tax','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.price_include_tax"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.refund_to_rb','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.refund_to_rb"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.return_date','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.return_date"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.return_limit','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.return_limit"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.return_type','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.return_type"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.refund_method','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.refund_method"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.sales_channel','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.sales_channel"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.sales_point_limit','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.sales_point_limit"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.sales_point_rate','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.sales_point_rate"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.shop_visible','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.shop_visible"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.slaeorg_type','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.slaeorg_type"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.spm_editable','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.spm_editable"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.tax_code','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.tax_code"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.terminalid','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.terminalid"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.payment_gateway_code','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.payment_gateway_code"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.autoship_min_pv','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.autoship_min_pv"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.mws_allow_back_order','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.mws_allow_back_order"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_bank_branch','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_bank_branch"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.change_market_auditer','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.change_market_auditer"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_month_date','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.bonus_month_date"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.enable_conversion_rate','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.enable_conversion_rate"/>');
+$l('type.com.lkkhpg.dsis.common.order.dto.orderpayment.paymentmethod','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.paymentmethod" />');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_vip_sponsor','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_vip_sponsor"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.rebaterate','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.rebaterate"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.autoship_creditcard','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.autoship_creditcard"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_type','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_type" />');
+$l('type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.counterfee','<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.counterfee"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.shipping_date_default','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.shipping_date_default"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.max_order_weight','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.max_order_weight"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.max_order_amount','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.max_order_amount"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.first_order_check','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.first_order_check"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.special_product','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.special_product"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.zipcode_tax','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.zipcode_tax"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.auto_min_amount','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.auto_min_amount"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.enable_einvoice','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.enable_einvoice"/>');
+$l('type.com.lkkhpg.dsis.common.member.dto.memberdetails.bonusrcvmethod','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.bonusrcvmethod"/>');
+$l('type.com.lkkhpg.dsis.common.member.dto.memberdetails.bonusreceive','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.bonusreceive"/>');
+$l('type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_bank_account','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.member_bank_account"/>');
+$l('com.lkkhpg.dsis.common.coupon.dto.coupon.termandcondition','<@spring.message "com.lkkhpg.dsis.common.coupon.dto.coupon.termandcondition"/>');
+</script>
+<script type="text/javascript" src="${base.contextPath}/resources/js/spm/org_param_editor.js"></script>
+<body>
+    <form id="paramsForm" ></form>
+    
+    <script type="text/javascript">
+       var orgType = '${RequestParameters.orgType!}';
+       var orgId = '${RequestParameters.orgId!}';
+//       var orgId = '1';
+       // 初始化界面
+       $.get('${base.contextPath}/spm/paramDef/get?orgType='+orgType, function(result){
+    	   var items = result.rows;
+//           var fields = getParamFields(items);
+            //console.log(items);
+           //console.log(orgType);
+           var fields = [];
+           for(var i = 0; i < items.length; i++) {
+               var item = items[i];
+               var varName = item.paramName.replace('SPM.','').toLowerCase();
+               if(varName !== 'item_tax_type' && varName != 'bonus_method') {
+                   var op = $.extend({}, eval(varName));
+               }
+               var itemOptions = $.extend(op, item.options);
+               if ( (i % 3) == 0) {
+                   itemOptions.newline = true;
+               } else {
+                   itemOptions.newline = false;
+               }
+               itemOptions.group = item.categoryDesc;
+               itemOptions.labelWidth = 150;
+               itemOptions.disabled=true;
+               fields[i] = itemOptions;
+
+           }
+
+           window['paramsForm'] = $("#paramsForm").ligerForm({
+                   fields: fields,
+                   buttons: [{ text: '<@spring.message "sys.hand.btn.save"/>', click:save}],
+                   onAfterSetFields:function(){
+                       // 获取设置参数值
+                       $.ligerDialog.waitting('<@spring.message "sys.hand.tip.processing"/>');
+                       $.ajax({
+                           url : '${base.contextPath}/spm/orgParam/query',
+                           type : "POST",
+                           data : {
+                               orgType : orgType,
+                               orgId : orgId,
+                           },
+                           success : function(json) {
+                               if(json.success){
+                                  //console.log("the data is "+JSON.stringify(json));
+                                   setValues(json.rows);
+                               }
+                               $.ligerDialog.closeWaitting();
+                           }
+                       });
+                   }
+           });
+       })
+
+       function setValues(values) {
+           for(var i = 0; i < values.length; i++) {
+               var value = values[i], paramName = value.paramName,paramValue = value.paramValue, paramText = value.paramText;
+               var itemName = paramName.replace('SPM.','').toLowerCase();
+               if (liger.get(itemName)) {
+	               liger.get(itemName).setValue(paramValue);
+	               if (paramText) {
+	                   liger.get(itemName).setText(paramText);
+	               }
+               }
+           }
+       }
+
+       function getValues() {
+    	   var fields = paramsForm.options.fields;
+
+    	   var data = [];
+
+    	   for(var i = 0; i < fields.length; i++) {
+    		   var field = fields[i];
+    		   var value = liger.get(field.name).getValue();
+
+
+    		   if (value) {
+    			  if (typeof(value) == 'string' && value.indexOf(";") >= 0) {
+    				  var values = value.split(";");
+    				  values.forEach(function(val){
+                          data.push({
+                        	  orgType : orgType,
+                        	  orgId : orgId,
+                              paramName : "SPM." + field.name.toUpperCase(),
+                              paramValue : val
+                          })
+    				  });
+    			  } else {
+                      data.push({
+                          orgType : orgType,
+                          orgId : orgId,
+                          paramName : "SPM." + field.name.toUpperCase(),
+                          paramValue : value
+                      })
+    			  }
+    		   }
+    	   }
+    	   return data;
+       }
+
+       function save() {
+
+           $.ligerDialog.waitting('<@spring.message "sys.hand.tip.processing"/>');
+    	   if(Hap.validateForm(paramsForm)) {
+               var submitData = getValues();
+	    	   $.ajax({
+	               url : "${base.contextPath}/spm/orgParam/save",
+	               type : "POST",
+	               dataType : "json",
+	               contentType : "application/json",
+	               data : JSON2.stringify(submitData),
+	               success : function(json) {
+	            	   var options = {};
+	                   options.json = json;
+	                   Hap.defaultSuccessHandler(options);
+	               },
+	               error : function() {
+	                   $.ligerDialog.closeWaitting();
+	               }
+	           });
+           }
+       }
+    </script>
+
+
+</body>
+</html> 

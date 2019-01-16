@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.system.mapper.AttachmentsMapper">
+    <resultMap id="AttachmentFileResultMap"
+        type="com.lkkhpg.dsis.common.system.dto.AttachmentFile">
+        <result column="category_id" property="categoryId" jdbcType="DECIMAL"/>
+        <result column="category_name" property="categoryName"
+            jdbcType="VARCHAR" />
+        <result column="file_id" property="fileId" jdbcType="DECIMAL" />
+        <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+        <result column="market_code" property="marketCode" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 查找MWS下所有分类 -->
+    <select id="selectMWSAttachCategory"
+        resultMap="com.lkkhpg.dsis.platform.mapper.attachment.AttachCategoryMapper.BaseResultMap" parameterType="java.lang.String">
+        select * from SYS_ATTACH_CATEGORY_B t 
+        where t.source_type like 'MWS_CMS%' 
+        AND t.source_type like concat('%',#{marketCode,jdbcType=VARCHAR})
+        AND T.LEAF_FLAG=1 order by t.category_name
+    </select>
+
+    <!-- 查找MWS所有附件 -->
+    <select id="selectAttachmentFiles" resultMap="AttachmentFileResultMap"
+        parameterType="com.lkkhpg.dsis.common.system.dto.AttachmentFile">
+        select ac.category_name,f.file_id,f.file_name
+        from sys_file f
+        left join sys_attachment a
+        on f.attachment_id = a.attachment_id
+        left join SYS_ATTACH_CATEGORY_B ac
+        on a.category_id = ac.category_id
+        <where>
+            <if test="categoryId != null">
+                a.category_id = #{categoryId,jdbcType=DECIMAL}
+            </if>
+            <if test="categoryId == null">
+                a.source_type like 'MWS_CMS%' and a.source_type like concat('%',#{marketCode,jdbcType=VARCHAR})
+            </if>
+            <if test="fileName != null">
+                and f.file_name like concat('%',concat(#{fileName,jdbcType=VARCHAR},'%')) 
+            </if>
+        </where>
+    </select>
+    
+    <select id="queryCategory" resultMap="AttachmentFileResultMap" parameterType="java.util.Map">
+        SELECT 
+            subline.category_id,
+            tl.category_name,
+            tl.description
+        FROM SYS_ATTACH_CATEGORY_B head,
+           SYS_ATTACH_CATEGORY_B line left join sys_attach_category_tl tl on line.category_id = tl.category_id and tl.lang=#{request.locale,jdbcType=VARCHAR},
+           SYS_ATTACH_CATEGORY_B subline
+        WHERE head.source_type = 'MWS_CMS'
+       AND line.parent_category_id = head.category_id
+       AND subline.parent_category_id = line.category_id
+       <if test="code !=null">
+           AND line.source_type ||'_'|| #{code,jdbcType=VARCHAR} = subline.source_type
+       </if>
+       <if test="categoryId !=null">
+           AND subline.category_id = #{categoryId,jdbcType=DECIMAL}
+       </if>
+    </select>
+</mapper>

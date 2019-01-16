@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgMarketChangeDeleteMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMarketChangeDelete" >
+    <id column="INTERFACE_ID" property="interfaceId" jdbcType="DECIMAL" />
+    <result column="GDS_ID" property="gdsId" jdbcType="DECIMAL" />
+    <result column="FLAG" property="flag" jdbcType="VARCHAR" />
+    <result column="PROCESS_STATUS" property="processStatus" jdbcType="VARCHAR" />
+    <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP" />
+    <result column="PROCESS_MESSAGE" property="processMessage" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INTERFACE_ID, GDS_ID, FLAG, PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, REQUEST_ID, 
+    PROGRAM_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.math.BigDecimal" >
+    select 
+    <include refid="Base_Column_List" />
+    from ISG_MARKET_CHANGE_DELETE
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.math.BigDecimal" >
+    delete from ISG_MARKET_CHANGE_DELETE
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMarketChangeDelete" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      select ISG_MARKET_CHANGE_DELETE_S.nextval from dual
+    </selectKey>
+    insert into ISG_MARKET_CHANGE_DELETE (INTERFACE_ID, GDS_ID, FLAG, 
+      PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+      REQUEST_ID, PROGRAM_ID)
+    values (#{interfaceId,jdbcType=DECIMAL}, #{gdsId,jdbcType=DECIMAL}, #{flag,jdbcType=VARCHAR}, 
+      #{processStatus,jdbcType=VARCHAR}, current_timestamp, #{processMessage,jdbcType=VARCHAR}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMarketChangeDelete" >
+    <selectKey resultType="java.math.BigDecimal" keyProperty="interfaceId" order="BEFORE" >
+      select ISG_MARKET_CHANGE_DELETE_S.nextval from dual
+    </selectKey>
+    insert into ISG_MARKET_CHANGE_DELETE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INTERFACE_ID,
+      <if test="gdsId != null" >
+        GDS_ID,
+      </if>
+      <if test="flag != null" >
+        FLAG,
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS,
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE,
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{interfaceId,jdbcType=DECIMAL},
+      <if test="gdsId != null" >
+        #{gdsId,jdbcType=DECIMAL},
+      </if>
+      <if test="flag != null" >
+        #{flag,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMarketChangeDelete" >
+    update ISG_MARKET_CHANGE_DELETE
+    <set >
+      <if test="gdsId != null" >
+        GDS_ID = #{gdsId,jdbcType=DECIMAL},
+      </if>
+      <if test="flag != null" >
+        FLAG = #{flag,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMarketChangeDelete" >
+    update ISG_MARKET_CHANGE_DELETE
+    set GDS_ID = #{gdsId,jdbcType=DECIMAL},
+      FLAG = #{flag,jdbcType=VARCHAR},
+      PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL}
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </update>
+  
+    <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select *
+      from ISG_MARKET_CHANGE_DELETE
+    <where>
+        PROCESS_DATE &gt; #{processDateFrom,jdbcType=TIMESTAMP}
+        <if test="requestDateTo != null" >
+            AND PROCESS_DATE &lt; #{processDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="processStatus != null" >
+            AND PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="advoiseNo != null" >
+            AND ADVISE_NO = #{advoiseNo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by interface_id desc
+  </select>
+</mapper>

@@ -1,0 +1,751 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmServiceCenterMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		<id column="SERVICE_CENTER_ID" property="serviceCenterId" jdbcType="DECIMAL" />
+		<result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+		<result column="CODE" property="code" jdbcType="VARCHAR" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="STATUS" property="status" jdbcType="VARCHAR" />
+		<result column="PHONE" property="phone" jdbcType="VARCHAR" />
+		<result column="CHARGE_MEMBER_ID" property="chargeMemberId"
+			jdbcType="DECIMAL" />
+		<result column="JOIN_DATE" property="joinDate" jdbcType="TIMESTAMP" />
+		<result column="APPROVED_DATE" property="approvedDate"
+			jdbcType="TIMESTAMP" />
+		<result column="LOCATION_ID" property="locationId" jdbcType="DECIMAL" />
+		<result column="REMARK" property="remark" jdbcType="VARCHAR" />
+		<result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber"
+			jdbcType="DECIMAL" />
+		<result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+		<result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+		<result column="CREATION_DATE" property="creationDate"
+			jdbcType="TIMESTAMP" />
+		<result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+		<result column="LAST_UPDATED_BY" property="lastUpdatedBy"
+			jdbcType="DECIMAL" />
+		<result column="LAST_UPDATE_DATE" property="lastUpdateDate"
+			jdbcType="TIMESTAMP" />
+		<result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin"
+			jdbcType="DECIMAL" />
+		<result column="ATTRIBUTE_CATEGORY" property="attributeCategory"
+			jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+		<result column="CHARGE_MEMBER_CODE" property="chargeMemberCode"
+			jdbcType="VARCHAR" />
+		<result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR" />
+		<result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+		<result column="TERMINATE_DATE" property="terminateDate" jdbcType="TIMESTAMP" />
+        <result column="salesOrgName" property="salesOrgName" jdbcType="VARCHAR" />
+        <result column="marketName" property="marketName" jdbcType="VARCHAR" />
+	</resultMap>
+
+
+	<sql id="Base_Column_List">
+		SERVICE_CENTER_ID, MARKET_ID, CODE, NAME, STATUS, PHONE, CHARGE_MEMBER_ID, JOIN_DATE,
+		APPROVED_DATE, LOCATION_ID, REMARK, OBJECT_VERSION_NUMBER, REQUEST_ID,
+		PROGRAM_ID,
+		CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+		ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+		ATTRIBUTE5, ATTRIBUTE6,
+		ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12,
+		ATTRIBUTE13,
+		ATTRIBUTE14, ATTRIBUTE15, AREA_CODE,SALES_ORG_ID,TERMINATE_DATE
+	</sql>
+	
+	<select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+		select <include refid="Base_Column_List" />
+		from SPM_SERVICE_CENTER ssc
+		where ssc.SERVICE_CENTER_ID = #{serviceCenterId,jdbcType=DECIMAL}
+	</select>
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		select
+		sc.service_center_id,
+		sc.market_id,
+		sc.code,
+		sc.name,
+		sc.status,
+		sc.phone,
+		sc.charge_member_id,
+		(select m.member_code from mm_member_v m where m.member_id =
+		sc.charge_member_id) as charge_member_code,
+		sc.join_date,
+		sc.approved_date,
+		sc.location_id,
+		sc.remark,
+		sc.area_code,
+		sc.sales_org_id,
+		sc.terminate_date,
+        ssob.name salesOrgName,
+        smp.name marketName
+		from SPM_SERVICE_CENTER sc
+        left join spm_sales_organization_b ssob on ssob.sales_org_id = sc.sales_org_id
+        left join spm_market_b smp on smp.market_id = sc.market_id
+		where sc.service_center_id = #{serviceCenterId,jdbcType=DECIMAL}
+		and sc.sales_org_id = #{salesOrgId,jdbcType=DECIMAL}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from SPM_SERVICE_CENTER
+		where SERVICE_CENTER_ID = #{serviceCenterId,jdbcType=DECIMAL}
+	</delete>
+
+	<insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		<selectKey resultType="java.lang.Long" keyProperty="serviceCenterId"
+			order="BEFORE">
+			select SPM_SERVICE_CENTER_S.nextval from dual
+		</selectKey>
+		insert into SPM_SERVICE_CENTER (SERVICE_CENTER_ID, MARKET_ID, CODE,
+		NAME, STATUS, PHONE,
+		CHARGE_MEMBER_ID, JOIN_DATE, APPROVED_DATE,
+		LOCATION_ID, REMARK, OBJECT_VERSION_NUMBER,
+		REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+		CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE,
+		LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+		ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+		ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+		ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10,
+		ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+		ATTRIBUTE14, ATTRIBUTE15, AREA_CODE, SALES_ORG_ID, TERMINATE_DATE)
+		values (#{serviceCenterId,jdbcType=DECIMAL}, #{marketId,jdbcType=DECIMAL},
+		#{code,jdbcType=VARCHAR},
+		#{name,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR},
+		#{chargeMemberId,jdbcType=DECIMAL}, #{joinDate,jdbcType=TIMESTAMP},
+		#{approvedDate,jdbcType=TIMESTAMP},
+		#{locationId,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 1,
+		#{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, current_timestamp,
+		#{createdBy,jdbcType=DECIMAL}, 
+        #{lastUpdatedBy,jdbcType=DECIMAL}, current_timestamp,
+		#{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR},
+		#{attribute1,jdbcType=VARCHAR},
+		#{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR},
+		#{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR},
+		#{attribute7,jdbcType=VARCHAR},
+		#{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR},
+		#{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR},
+		#{attribute13,jdbcType=VARCHAR},
+		#{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR},
+		#{salesOrgId,jdbcType=DECIMAL}, #{terminateDate,jdbcType=TIMESTAMP})
+	</insert>
+	<insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		<selectKey resultType="java.lang.Long" keyProperty="serviceCenterId" order="BEFORE">
+			select SPM_SERVICE_CENTER_S.nextval from dual
+		</selectKey>
+		insert into SPM_SERVICE_CENTER
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+				SERVICE_CENTER_ID,
+			<if test="marketId != null">
+				MARKET_ID,
+			</if>
+			<if test="code != null">
+				CODE,
+			</if>
+			<if test="name != null">
+				NAME,
+			</if>
+			<if test="status != null">
+				STATUS,
+			</if>
+			<if test="phone != null">
+				PHONE,
+			</if>
+			<if test="chargeMemberId != null">
+				CHARGE_MEMBER_ID,
+			</if>
+			<if test="joinDate != null">
+				JOIN_DATE,
+			</if>
+			<if test="approvedDate != null">
+				APPROVED_DATE,
+			</if>
+			<if test="locationId != null">
+				LOCATION_ID,
+			</if>
+			<if test="remark != null">
+				REMARK,
+			</if>
+				OBJECT_VERSION_NUMBER,
+			<if test="requestId != null">
+				REQUEST_ID,
+			</if>
+			<if test="programId != null">
+				PROGRAM_ID,
+			</if>
+				CREATION_DATE,
+			<if test="createdBy != null">
+				CREATED_BY,
+			</if>
+			<if test="lastUpdatedBy != null">
+				LAST_UPDATED_BY,
+			</if>
+				LAST_UPDATE_DATE,
+			<if test="lastUpdateLogin != null">
+				LAST_UPDATE_LOGIN,
+			</if>
+			<if test="attributeCategory != null">
+				ATTRIBUTE_CATEGORY,
+			</if>
+			<if test="attribute1 != null">
+				ATTRIBUTE1,
+			</if>
+			<if test="attribute2 != null">
+				ATTRIBUTE2,
+			</if>
+			<if test="attribute3 != null">
+				ATTRIBUTE3,
+			</if>
+			<if test="attribute4 != null">
+				ATTRIBUTE4,
+			</if>
+			<if test="attribute5 != null">
+				ATTRIBUTE5,
+			</if>
+			<if test="attribute6 != null">
+				ATTRIBUTE6,
+			</if>
+			<if test="attribute7 != null">
+				ATTRIBUTE7,
+			</if>
+			<if test="attribute8 != null">
+				ATTRIBUTE8,
+			</if>
+			<if test="attribute9 != null">
+				ATTRIBUTE9,
+			</if>
+			<if test="attribute10 != null">
+				ATTRIBUTE10,
+			</if>
+			<if test="attribute11 != null">
+				ATTRIBUTE11,
+			</if>
+			<if test="attribute12 != null">
+				ATTRIBUTE12,
+			</if>
+			<if test="attribute13 != null">
+				ATTRIBUTE13,
+			</if>
+			<if test="attribute14 != null">
+				ATTRIBUTE14,
+			</if>
+			<if test="attribute15 != null">
+				ATTRIBUTE15,
+			</if>
+			<if test="areaCode != null">
+				AREA_CODE,
+			</if>
+			<if test="salesOrgId != null">
+				SALES_ORG_ID,
+			</if>
+			<if test="terminateDate != null">
+				TERMINATE_DATE
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+				#{serviceCenterId,jdbcType=DECIMAL},
+			<if test="marketId != null">
+				#{marketId,jdbcType=DECIMAL},
+			</if>
+			<if test="code != null">
+				#{code,jdbcType=VARCHAR},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null">
+				#{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="chargeMemberId != null">
+				#{chargeMemberId,jdbcType=DECIMAL},
+			</if>
+			<if test="joinDate != null">
+				#{joinDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="approvedDate != null">
+				#{approvedDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="locationId != null">
+				#{locationId,jdbcType=DECIMAL},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			1,
+			<if test="requestId != null">
+				#{requestId,jdbcType=DECIMAL},
+			</if>
+			<if test="programId != null">
+				#{programId,jdbcType=DECIMAL},
+			</if>
+			current_timestamp,
+			<if test="createdBy != null">
+				#{createdBy,jdbcType=DECIMAL},
+			</if>
+			<if test="lastUpdatedBy != null">
+				#{lastUpdatedBy,jdbcType=DECIMAL},
+			</if>
+			current_timestamp,
+			<if test="lastUpdateLogin != null">
+				#{lastUpdateLogin,jdbcType=DECIMAL},
+			</if>
+			<if test="attributeCategory != null">
+				#{attributeCategory,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute1 != null">
+				#{attribute1,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute2 != null">
+				#{attribute2,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute3 != null">
+				#{attribute3,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute4 != null">
+				#{attribute4,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute5 != null">
+				#{attribute5,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute6 != null">
+				#{attribute6,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute7 != null">
+				#{attribute7,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute8 != null">
+				#{attribute8,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute9 != null">
+				#{attribute9,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute10 != null">
+				#{attribute10,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute11 != null">
+				#{attribute11,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute12 != null">
+				#{attribute12,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute13 != null">
+				#{attribute13,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute14 != null">
+				#{attribute14,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute15 != null">
+				#{attribute15,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute15 != null">
+				#{areaCode,jdbcType=VARCHAR},
+			</if>
+			<if test="salesOrgId != null">
+				#{salesOrgId,jdbcType=DECIMAL},
+			</if>
+			<if test="terminateDate != null">
+				#{terminateDate,jdbcType=TIMESTAMP}
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		update SPM_SERVICE_CENTER
+		<set>
+			<if test="marketId != null">
+				MARKET_ID = #{marketId,jdbcType=DECIMAL},
+			</if>
+			<if test="code != null">
+				CODE = #{code,jdbcType=VARCHAR},
+			</if>
+			<if test="name != null">
+				NAME = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				STATUS = #{status,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null">
+				PHONE = #{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="chargeMemberId != null">
+				CHARGE_MEMBER_ID = #{chargeMemberId,jdbcType=DECIMAL},
+			</if>
+			<if test="joinDate != null">
+				JOIN_DATE = #{joinDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="approvedDate != null">
+				APPROVED_DATE = #{approvedDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="locationId != null">
+				LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+			</if>
+			<if test="remark != null">
+				REMARK = #{remark,jdbcType=VARCHAR},
+			</if>
+				OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+			<if test="requestId != null">
+				REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+			</if>
+			<if test="programId != null">
+				PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+			</if>
+			<if test="lastUpdatedBy != null">
+				LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+			</if>
+				LAST_UPDATE_DATE = current_timestamp,
+			<if test="lastUpdateLogin != null">
+				LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+			</if>
+			<if test="attributeCategory != null">
+				ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute1 != null">
+				ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute2 != null">
+				ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute3 != null">
+				ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute4 != null">
+				ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute5 != null">
+				ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute6 != null">
+				ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute7 != null">
+				ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute8 != null">
+				ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute9 != null">
+				ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute10 != null">
+				ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute11 != null">
+				ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute12 != null">
+				ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute13 != null">
+				ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute14 != null">
+				ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+			</if>
+			<if test="attribute15 != null">
+				ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+			</if>
+			<if test="areaCode != null">
+				AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+			</if>
+			<if test="salesOrgId != null">
+				SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+			</if>
+			<if test="terminateDate != null">
+				TERMINATE_DATE = current_timestamp
+			</if>
+		</set>
+		where SERVICE_CENTER_ID = #{serviceCenterId,jdbcType=DECIMAL}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		update SPM_SERVICE_CENTER
+		set MARKET_ID = #{marketId,jdbcType=DECIMAL},
+		CODE = #{code,jdbcType=VARCHAR},
+		NAME = #{name,jdbcType=VARCHAR},
+		STATUS = #{status,jdbcType=VARCHAR},
+		PHONE = #{phone,jdbcType=VARCHAR},
+		CHARGE_MEMBER_ID = #{chargeMemberId,jdbcType=DECIMAL},
+		JOIN_DATE = #{joinDate,jdbcType=TIMESTAMP},
+		APPROVED_DATE = #{approvedDate,jdbcType=TIMESTAMP},
+		LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+		REMARK = #{remark,jdbcType=VARCHAR},
+		OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+		REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+		PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+		CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+		LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+		LAST_UPDATE_DATE = current_timestamp,
+		LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+		ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+		ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+		ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+		ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+		ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+		ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+		ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+		ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+		ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+		ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+		ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+		ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+		ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+		ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+		ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+		ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+		AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+		SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+		where SERVICE_CENTER_ID = #{serviceCenterId,jdbcType=DECIMAL}
+	</update>
+	
+	<update id="closeServiceCenter" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		update SPM_SERVICE_CENTER
+		set MARKET_ID = #{marketId,jdbcType=DECIMAL},
+		CODE = #{code,jdbcType=VARCHAR},
+		NAME = #{name,jdbcType=VARCHAR},
+		STATUS = #{status,jdbcType=VARCHAR},
+		PHONE = #{phone,jdbcType=VARCHAR},
+		CHARGE_MEMBER_ID = #{chargeMemberId,jdbcType=DECIMAL},
+		JOIN_DATE = #{joinDate,jdbcType=TIMESTAMP},
+		APPROVED_DATE = #{approvedDate,jdbcType=TIMESTAMP},
+		LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+		REMARK = #{remark,jdbcType=VARCHAR},
+		OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+		REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+		PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+		CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+		LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+		LAST_UPDATE_DATE = current_timestamp,
+		LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+		ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+		ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+		ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+		ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+		ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+		ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+		ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+		ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+		ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+		ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+		ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+		ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+		ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+		ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+		ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+		ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+		AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+		SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+		TERMINATE_DATE = current_timestamp
+		where SERVICE_CENTER_ID = #{serviceCenterId,jdbcType=DECIMAL}
+	</update>
+
+	<update id="submitServiceCenter" parameterType="java.lang.Long">
+		update SPM_SERVICE_CENTER
+		set status = 'ALING',
+			LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+			OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1
+		where service_center_id = #{serviceCenterId,jdbcType=DECIMAL}
+	</update>
+
+	<update id="approveServiceCenter" parameterType="java.lang.Long">
+		update SPM_SERVICE_CENTER
+		set
+		status = 'ALED',
+		approved_date = current_timestamp,
+		LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+		OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1
+		where service_center_id = #{serviceCenterId,jdbcType=DECIMAL}
+	</update>
+
+	<update id="rejectServiceCenter" parameterType="java.lang.Long">
+		update SPM_SERVICE_CENTER
+		set status = 'RJED',
+			LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+			OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1
+		where service_center_id = #{serviceCenterId,jdbcType=DECIMAL}
+	</update>
+
+	<!-- 查询服务中心 author: hanrui.huang -->
+	<select id="queryServiceCenter" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		select
+		ssc.SERVICE_CENTER_ID, ssc.MARKET_ID, ssc.CODE, ssc.NAME, ssc.STATUS, ssc.PHONE,
+		ssc.CHARGE_MEMBER_ID, ssc.JOIN_DATE,
+		ssc.APPROVED_DATE, ssc.LOCATION_ID, ssc.REMARK, ssc.OBJECT_VERSION_NUMBER,
+		ssc.REQUEST_ID, ssc.PROGRAM_ID,
+		ssc.CREATION_DATE, ssc.CREATED_BY, ssc.LAST_UPDATED_BY, ssc.LAST_UPDATE_DATE,
+		ssc.LAST_UPDATE_LOGIN,
+		ssc.ATTRIBUTE_CATEGORY, ssc.ATTRIBUTE1, ssc.ATTRIBUTE2, ssc.ATTRIBUTE3, ssc.ATTRIBUTE4,
+		ssc.ATTRIBUTE5, ssc.ATTRIBUTE6,
+		ssc.ATTRIBUTE7, ssc.ATTRIBUTE8, ssc.ATTRIBUTE9, ssc.ATTRIBUTE10, ssc.ATTRIBUTE11,
+		ssc.ATTRIBUTE12, ssc.ATTRIBUTE13,
+		ssc.ATTRIBUTE14, ssc.ATTRIBUTE15,ssc.SALES_ORG_ID,mm.MEMBER_CODE CHARGE_MEMBER_CODE
+		from SPM_SERVICE_CENTER ssc,
+		MM_MEMBER mm
+		<where>
+			ssc.CHARGE_MEMBER_ID = mm.MEMBER_ID
+			AND ssc.SALES_ORG_ID = #{serviceCenter.salesOrgId,jdbcType=DECIMAL}
+			<if test="serviceCenter.serviceCenterId != null">
+				AND ssc.SERVICE_CENTER_ID =#{serviceCenter.serviceCenterId,jdbcType=DECIMAL}
+			</if>
+			<if test="serviceCenter.code != null">
+				AND Upper(ssc.CODE) like concat('%',concat(Upper(
+				#{serviceCenter.code,jdbcType=VARCHAR}),'%'))
+			</if>
+			<if test="serviceCenter.name != null">
+				AND Upper(ssc.NAME) like concat('%',concat(Upper(
+				#{serviceCenter.name,jdbcType=VARCHAR}),'%'))
+			</if>
+			<if test="statusList != null">
+			    AND ssc.STATUS in
+                 <foreach collection="statusList" open="(" separator="," close=")" item="status" index="index">
+                     #{status,jdbcType=VARCHAR}
+                 </foreach>
+			</if>
+			<if test="serviceCenter.phone != null">
+				AND ssc.PHONE = #{serviceCenter.phone,jdbcType=VARCHAR}
+			</if>
+			<if test="serviceCenter.chargeMemberCode != null">
+				AND Upper(mm.MEMBER_CODE) like concat('%',concat(Upper(
+				#{serviceCenter.chargeMemberCode,jdbcType=VARCHAR}),'%'))
+			</if>
+			<if test="serviceCenter.joinDate != null">
+				AND ssc.JOIN_DATE = #{serviceCenter.joinDate,jdbcType=TIMESTAMP}
+			</if>
+			<if test="serviceCenter.approvedDate != null">
+				AND ssc.APPROVED_DATE = #{serviceCenter.approvedDate,jdbcType=TIMESTAMP}
+			</if>
+			<if test="serviceCenter.locationId != null">
+				AND ssc.LOCATION_ID = #{serviceCenter.locationId,jdbcType=DECIMAL}
+			</if>
+			<if test="serviceCenter.remark != null">
+				AND ssc.REMARK = #{serviceCenter.remark,jdbcType=VARCHAR}
+			</if>
+		</where>
+		<if test="serviceCenter.sortname =='code' and serviceCenter.sortorder == 'asc'">
+			order by ssc.code asc
+		</if>
+		<if test="serviceCenter.sortname =='code' and serviceCenter.sortorder == 'desc'">
+			order by ssc.code desc
+		</if>
+	</select>
+
+ <select id="queryServiceCenterForOrder" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter" >
+    select 
+    ssc.SERVICE_CENTER_ID, ssc.MARKET_ID, ssc.CODE, ssc.NAME, ssc.STATUS, ssc.PHONE, ssc.CHARGE_MEMBER_ID, ssc.JOIN_DATE, 
+    ssc.APPROVED_DATE, ssc.LOCATION_ID, ssc.REMARK, ssc.OBJECT_VERSION_NUMBER, ssc.REQUEST_ID, ssc.PROGRAM_ID, 
+    ssc.CREATION_DATE, ssc.CREATED_BY, ssc.LAST_UPDATED_BY, ssc.LAST_UPDATE_DATE, ssc.LAST_UPDATE_LOGIN, 
+    ssc.ATTRIBUTE_CATEGORY, ssc.ATTRIBUTE1, ssc.ATTRIBUTE2, ssc.ATTRIBUTE3, ssc.ATTRIBUTE4, ssc.ATTRIBUTE5, ssc.ATTRIBUTE6, 
+    ssc.ATTRIBUTE7, ssc.ATTRIBUTE8, ssc.ATTRIBUTE9, ssc.ATTRIBUTE10, ssc.ATTRIBUTE11, ssc.ATTRIBUTE12, ssc.ATTRIBUTE13, 
+    ssc.ATTRIBUTE14, ssc.ATTRIBUTE15
+    from SPM_SERVICE_CENTER ssc,
+    MM_MEMBER mm
+    <where>
+      ssc.CHARGE_MEMBER_ID = mm.MEMBER_ID
+      <if test="serviceCenterId != null" >
+        AND ssc.SERVICE_CENTER_ID =#{serviceCenterId,jdbcType=DECIMAL}
+      </if>
+      <if test="marketId != null" >
+        AND ssc.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+      </if>
+      <if test="code != null" >
+        AND Upper(ssc.CODE) like concat('%',concat(Upper( #{code,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="name != null" >
+        AND Upper(ssc.NAME) like concat('%',concat(Upper( #{name,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="status != null" >
+        AND ssc.STATUS = #{status,jdbcType=VARCHAR}
+      </if>
+      <if test="phone != null" >
+        AND ssc.PHONE = #{phone,jdbcType=VARCHAR}
+      </if>
+      <if test="joinDate != null" >
+        AND ssc.JOIN_DATE = #{joinDate,jdbcType=TIMESTAMP}
+      </if>
+      <if test="approvedDate != null" >
+        AND ssc.APPROVED_DATE = #{approvedDate,jdbcType=TIMESTAMP}
+      </if>
+      <if test="locationId != null" >
+        AND ssc.LOCATION_ID = #{locationId,jdbcType=DECIMAL}
+      </if>
+      <if test="remark != null" >
+        AND ssc.REMARK = #{remark,jdbcType=VARCHAR}
+      </if>
+    </where>
+    </select>
+    
+	<select id="queryServiceCenterByCode" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		select count(0)
+		from spm_service_center
+		<where>
+			    CODE = #{code,jdbcType=VARCHAR}
+			<if test="serviceCenterId != null">
+				AND SERVICE_CENTER_ID != #{serviceCenterId,jdbcType=DECIMAL}
+			</if>
+		</where>
+	</select>
+	
+	<select id="queryServiceCenterLov" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		select <include refid="Base_Column_List" />
+		from SPM_SERVICE_CENTER ssc
+		<where>
+			<if test="code != null">
+			    Upper(ssc.code) like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+			</if>
+			<if test="name != null">
+				AND Upper(ssc.name) like concat('%',concat(Upper(
+				#{name,jdbcType=VARCHAR}),'%'))
+			</if>
+			<if test="status != null">
+                AND ssc.STATUS = #{status,jdbcType=VARCHAR}
+            </if>
+		</where>
+        <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        
+	</select>
+	
+	<select id="queryServiceCenterByMember" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.config.dto.SpmServiceCenter">
+		select
+		ssc.SERVICE_CENTER_ID, ssc.MARKET_ID, ssc.CODE, ssc.NAME, ssc.STATUS, ssc.PHONE,
+		ssc.CHARGE_MEMBER_ID, ssc.JOIN_DATE,
+		ssc.APPROVED_DATE, ssc.LOCATION_ID, ssc.REMARK, ssc.OBJECT_VERSION_NUMBER,
+		ssc.REQUEST_ID, ssc.PROGRAM_ID,
+		ssc.CREATION_DATE, ssc.CREATED_BY, ssc.LAST_UPDATED_BY, ssc.LAST_UPDATE_DATE,
+		ssc.LAST_UPDATE_LOGIN,
+		ssc.ATTRIBUTE_CATEGORY, ssc.ATTRIBUTE1, ssc.ATTRIBUTE2, ssc.ATTRIBUTE3, ssc.ATTRIBUTE4,
+		ssc.ATTRIBUTE5, ssc.ATTRIBUTE6,
+		ssc.ATTRIBUTE7, ssc.ATTRIBUTE8, ssc.ATTRIBUTE9, ssc.ATTRIBUTE10, ssc.ATTRIBUTE11,
+		ssc.ATTRIBUTE12, ssc.ATTRIBUTE13,
+		ssc.ATTRIBUTE14, ssc.ATTRIBUTE15,ssc.SALES_ORG_ID,mm.MEMBER_CODE CHARGE_MEMBER_CODE
+		from SPM_SERVICE_CENTER ssc,
+		MM_MEMBER mm
+		<where>
+			ssc.CHARGE_MEMBER_ID = mm.MEMBER_ID
+			AND Upper(mm.MEMBER_CODE) like concat('%',concat(Upper(
+				#{chargeMemberCode,jdbcType=VARCHAR}),'%'))
+		    AND ssc.market_id = #{marketId,jdbcType=DECIMAL}
+			<if test="serviceCenterId != null">
+				AND ssc.SERVICE_CENTER_ID !=#{serviceCenterId,jdbcType=DECIMAL}
+			</if>
+		</where>
+	</select>
+</mapper>

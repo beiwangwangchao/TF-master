@@ -1,0 +1,173 @@
+<#--
+ * description: 报表-BonusDetailInquiry-界面
+ * version: 1.0 
+ * author:guanghui.liu
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../include/head.html">
+<style>
+    .tree-block {
+        width: 80%;
+        height: 300px;
+        float: left;
+        margin: 10px;
+        padding: 10px 20px;
+        background: white;
+        border: 1px solid #ccc;
+        overflow: auto;
+    }
+    .title-text {
+        font-weight: bold;
+    }
+</style>
+<body style="padding: 10px;">
+    <form id="form" autocomplete="off"></form>
+	<div class="tree-block">
+	    <p class="title-text">Basic Sales Bonus (Pattern : CardNo / OrgCode / PV / GV / TitleRate / GDCAMT)</p>
+		<ul id="tree1"></ul>
+	</div>
+	<div class="tree-block">
+	    <p class="title-text">Extra Sales Bonus (Pattern : CardNo / OrgCode / PV / GV / LBCNT / LBGV / LBAMT)</p>
+        <ul id="tree2"></ul>
+    </div>
+    <div class="tree-block">
+        <p class="title-text">Performance Bonus (Pattern : CardNo / OrgCode / PV / GV / PbRate / PBAMT)</p>
+        <ul id="tree3"></ul>
+    </div>
+    <div class="tree-block">
+        <p class="title-text">Leadership Bonus (Pattern : CardNo / OrgCode / PV / BBCNT / BBGV / BBLEVELNO / BBAMT)</p>
+        <ul id="tree4"></ul>
+    </div>
+    
+  <script type="text/javascript">
+    $(function(){
+        window['form'] = $("#form").ligerForm({
+            fields: [
+                {
+                    name : "period",
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.periodid"/>',
+                    type : "select",
+                    newline : false,
+                    options : {
+                        valueField : "periodName",
+                        textField : "periodName",
+                        url : "${base.contextPath}/spm/period/getSpmPeriodNameBySalesOrgId?param=No"
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                {
+                    name : "dealerNo",
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.user.dto.userinfo.memberid"/>',
+                    type : "text",
+                    newline: false,
+                    validate : {
+                        required : true
+                    }
+                }
+            ], buttons: [
+                { 
+                    text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60,
+                    click: loadRoot
+                }
+            ]
+        });
+    });
+    //load四棵树的根节点
+    function loadRoot(){
+        if(!Hap.validateForm(form)) return;
+        var formData = form.getData();
+        //第一棵-BasicSalesBonus
+        window['tree1'] = $("#tree1").ligerTree({
+            nodeWidth : 800,
+            url:'${base.contextPath}/report/queryBasicSalesBonusRoot?period='+formData.period+'&dealerNo='+formData.dealerNo,
+            isLeaf : function(data) {//判断是否是叶子
+                if(data){
+                    return data.isLeaf == 'Y';
+                }
+                return false;
+            },
+            delay : function(e) {
+                var data = e.data;
+                return {
+                    url : "${base.contextPath}/report/queryBasicSalesBonusLeaf?sponsorNo=" + data.dealerNo + '&period='+formData.period+'&dealerNo='+formData.dealerNo
+                };
+            },
+            checkbox : false,
+            slide : false,
+            render : function(data, text, level) {
+                return "<" + (level-1) + ">" + data.dealerNo + " / " + data.saleOrgCode + " / " + data.pv + " / " + data.gv + " / " + data.parsedTitlerate + " / " + data.gdcamt;
+            }
+        });
+        //第二棵-ExtraSalesBonus
+        window['tree2'] = $("#tree2").ligerTree({
+            nodeWidth : 800,
+            url:'${base.contextPath}/report/queryExtraSalesBonusRoot?period='+formData.period+'&dealerNo='+formData.dealerNo,
+            isLeaf : function(data) {//判断是否是叶子
+                if(data){
+                    return data.isLeaf == 'Y';
+                }
+                return false;
+            },
+            delay : function(e) {
+                var data = e.data;
+                return {
+                    url : "${base.contextPath}/report/queryExtraSalesBonusLeaf?sponsorNo=" + data.dealerNo + '&period='+formData.period+'&dealerNo='+formData.dealerNo
+                };
+            },
+            checkbox : false,
+            slide : false,
+            render : function(data, text, level) {
+                return "<" + (level-1) + ">" + data.dealerNo + " / " + data.saleOrgCode + " / " + data.pv + " / " + data.gv + " / " + data.lbcnt + " / " + data.lbgv + " / " + data.lbamt;
+            }
+        });
+        //第三棵-PerformanceBonus
+        window['tree3'] = $("#tree3").ligerTree({
+            nodeWidth : 800,
+            url:'${base.contextPath}/report/queryPerformanceBonusRoot?period='+formData.period+'&dealerNo='+formData.dealerNo,
+            isLeaf : function(data) {//判断是否是叶子
+                if(data){
+                    return data.isLeaf == 'Y';
+                }
+                return false;
+            },
+            delay : function(e) {
+                var data = e.data;
+                return {
+                    url : "${base.contextPath}/report/queryPerformanceBonusLeaf?sponsorNo=" + data.dealerNo + '&period='+formData.period+'&dealerNo='+formData.dealerNo
+                };
+            },
+            checkbox : false,
+            slide : false,
+            render : function(data, text, level) {
+                return "<" + (level-1) + ">" + data.dealerNo + " / " + data.saleOrgCode + " / " + data.pv + " / " + data.gv + " / " + data.parsedPbrate + " / " + data.pbamt;
+            }
+        });
+        //第四棵-LeadershipBonus
+        window['tree4'] = $("#tree4").ligerTree({
+            nodeWidth : 800,
+            url:'${base.contextPath}/report/queryLeadershipBonusRoot?period='+formData.period+'&dealerNo='+formData.dealerNo,
+            isLeaf : function(data) {//判断是否是叶子
+                if(data){
+                    return data.isLeaf == 'Y';
+                }
+                return false;
+            },
+            delay : function(e) {
+                var data = e.data;
+                return {
+                    url : "${base.contextPath}/report/queryLeadershipBonusLeaf?bbRefno=" + data.dealerNo + '&period='+formData.period+'&dealerNo='+formData.dealerNo
+                };
+            },
+            checkbox : false,
+            slide : false,
+            render : function(data, text, level) {
+                return "<" + (level-1) + ">" + data.dealerNo + " / " + data.saleOrgCode + " / " + data.pv + " / " + data.bbcnt + " / " + data.bbgv + " / " + data.bblevelno + " / " + data.bbamt;
+            }
+        });
+    }
+  </script>
+</body>
+</html> 

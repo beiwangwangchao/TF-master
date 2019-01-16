@@ -1,0 +1,713 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmCityMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    <id column="CITY_CODE" property="cityCode" jdbcType="VARCHAR" />
+    <result column="STATE_CODE" property="stateCode" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="TIMEZONE_CODE" property="timezoneCode" jdbcType="VARCHAR" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+    <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="LANGUAGE" property="language" jdbcType="VARCHAR" />
+    <result column="CURRENCY_CODE" property="currencyCode" jdbcType="VARCHAR" />
+    <result column="TAX_TYPE" property="taxType" jdbcType="VARCHAR" />
+    <result column="TAX_LEVEL" property="taxLevel" jdbcType="VARCHAR" />
+    <result column="TAX_RATE" property="taxRate" jdbcType="DECIMAL" />
+    
+    <result column="SORT_NUM" property="sortNum" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    CITY_CODE, STATE_CODE, TIMEZONE_CODE, NAME, REMARK, ENABLED_FLAG, START_ACTIVE_DATE, 
+    END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+    LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+    ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+    ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,
+    LANGUAGE,CURRENCY_CODE,TAX_TYPE,TAX_LEVEL,TAX_RATE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    b.CITY_CODE, b.STATE_CODE, b.TIMEZONE_CODE, t.NAME, t.REMARK, b.ENABLED_FLAG, b.START_ACTIVE_DATE, 
+    b.END_ACTIVE_DATE, b.OBJECT_VERSION_NUMBER, b.REQUEST_ID, b.PROGRAM_ID, b.CREATION_DATE, b.CREATED_BY, 
+    b.LAST_UPDATED_BY, b.LAST_UPDATE_DATE, b.LAST_UPDATE_LOGIN, b.ATTRIBUTE_CATEGORY, b.ATTRIBUTE1, 
+    b.ATTRIBUTE2, b.ATTRIBUTE3, b.ATTRIBUTE4, b.ATTRIBUTE5, b.ATTRIBUTE6, b.ATTRIBUTE7, b.ATTRIBUTE8, 
+    b.ATTRIBUTE9, b.ATTRIBUTE10, b.ATTRIBUTE11, b.ATTRIBUTE12, b.ATTRIBUTE13, b.ATTRIBUTE14, b.ATTRIBUTE15,
+    b.LANGUAGE,b.CURRENCY_CODE,b.TAX_TYPE,b.TAX_LEVEL,b.TAX_RATE,b.SORT_NUM
+    from SPM_CITY_B b LEFT OUTER JOIN SPM_CITY_TL t on 
+    (b.CITY_CODE = t.CITY_CODE AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+    where b.CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    delete from SPM_CITY_B
+    where CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    insert into SPM_CITY_B (CITY_CODE, STATE_CODE, TIMEZONE_CODE, 
+      NAME, REMARK, ENABLED_FLAG, 
+      START_ACTIVE_DATE, END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15,
+      LANGUAGE,CURRENCY_CODE,TAX_TYPE,TAX_LEVEL,TAX_RATE,SORT_NUM)
+    values (#{cityCode,jdbcType=VARCHAR}, #{stateCode,jdbcType=VARCHAR}, #{timezoneCode,jdbcType=VARCHAR}, 
+      #{name,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{enabledFlag,jdbcType=VARCHAR}, 
+      CURRENT_TIMESTAMP, #{endActiveDate,jdbcType=TIMESTAMP}, 1, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      -1, -1, CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR},
+      #{language,jdbcType=VARCHAR},#{currencyCode,jdbcType=VARCHAR},#{taxType,jdbcType=VARCHAR},
+      #{taxLevel,jdbcType=VARCHAR},#{taxRate,jdbcType=DECIMAL},#{sortNum,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    insert into SPM_CITY_B
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cityCode != null" >
+        CITY_CODE,
+      </if>
+      <if test="stateCode != null" >
+        STATE_CODE,
+      </if>
+      <if test="timezoneCode != null" >
+        TIMEZONE_CODE,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG,
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE,
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="language != null" >
+       LANGUAGE,
+      </if>
+      <if test="currencyCode != null" >
+       CURRENCY_CODE,
+      </if>
+      <if test="taxType != null" >
+       TAX_TYPE,
+      </if>
+      <if test="taxLevel != null" >
+       TAX_LEVEL,
+      </if>
+      <if test="taxRate != null" >
+       TAX_RATE
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cityCode != null" >
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateCode != null" >
+        #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="timezoneCode != null" >
+        #{timezoneCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledFlag != null" >
+        #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="endActiveDate != null" >
+        #{endActiveDate,jdbcType=TIMESTAMP},
+      </if> 
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+       CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+       <if test="language != null" >
+       #{language,jdbcType=VARCHAR},
+      </if>
+      <if test="currencyCode != null" >
+       #{currencyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="taxType != null" >
+       #{taxType,jdbcType=VARCHAR},
+      </if>
+      <if test="taxLevel != null" >
+       #{taxLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="taxRate != null" >
+       #{taxRate,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    update SPM_CITY_B
+    <set >
+      <if test="stateCode != null" >
+        STATE_CODE = #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="timezoneCode != null" >
+        TIMEZONE_CODE = #{timezoneCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      </if> 
+       OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+       <if test="language != null" >
+       language = #{language,jdbcType=VARCHAR},
+      </if>
+      <if test="currencyCode != null" >
+       CURRENCY_CODE = #{currencyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="taxType != null" >
+       TAX_TYPE =  #{taxType,jdbcType=VARCHAR},
+      </if>
+      <if test="taxLevel != null" >
+       TAX_LEVEL = #{taxLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="taxRate != null" >
+       TAX_RATE = #{taxRate,jdbcType=DECIMAL},
+      </if>
+      SORT_NUM = #{sortNum,jdbcType=DECIMAL},
+    </set>
+    where CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    update SPM_CITY_B
+    set STATE_CODE = #{stateCode,jdbcType=VARCHAR},
+      TIMEZONE_CODE = #{timezoneCode,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      language = #{language,jdbcType=VARCHAR},
+      CURRENCY_CODE = #{currencyCode,jdbcType=VARCHAR},
+      TAX_TYPE =  #{taxType,jdbcType=VARCHAR},
+      TAX_LEVEL = #{taxLevel,jdbcType=VARCHAR},
+      TAX_RATE = #{taxRate,jdbcType=DECIMAL}
+    where CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateByCity" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    update SPM_CITY_B
+    set STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+    where CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+  </update>
+  <select id="queryByCity" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    select 
+    b.CITY_CODE, b.STATE_CODE, b.TIMEZONE_CODE, t.NAME, b.REMARK, b.ENABLED_FLAG, b.START_ACTIVE_DATE, 
+    b.END_ACTIVE_DATE, b.OBJECT_VERSION_NUMBER, b.REQUEST_ID, b.PROGRAM_ID, b.CREATION_DATE, b.CREATED_BY, 
+    b.LAST_UPDATED_BY, b.LAST_UPDATE_DATE, b.LAST_UPDATE_LOGIN, b.ATTRIBUTE_CATEGORY, b.ATTRIBUTE1, 
+    b.ATTRIBUTE2, b.ATTRIBUTE3, b.ATTRIBUTE4, b.ATTRIBUTE5, b.ATTRIBUTE6, b.ATTRIBUTE7, b.ATTRIBUTE8, 
+    b.ATTRIBUTE9, b.ATTRIBUTE10, b.ATTRIBUTE11, b.ATTRIBUTE12, b.ATTRIBUTE13, b.ATTRIBUTE14, b.ATTRIBUTE15,
+    b.LANGUAGE,b.CURRENCY_CODE,b.TAX_TYPE,b.TAX_LEVEL,b.TAX_RATE
+    from SPM_CITY_B b LEFT OUTER JOIN SPM_CITY_TL t on 
+    (b.CITY_CODE = t.CITY_CODE AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+    where b.state_code is not null
+    <if test="cityCode != null">
+    AND b.CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+    </if>
+    <if test="name != null">
+    AND t.NAME like concat('%',concat(#{name,jdbcType=VARCHAR},'%'))
+    </if>
+    <if test="remark != null">
+    and b.REMARK like concat('%',concat(#{remark,jdbcType=VARCHAR},'%'))
+    </if>
+    <if test="stateCode != null" >
+    and  b.STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+    </if>
+    <if test="timezoneCode != null" >
+     and b.TIMEZONE_CODE = #{timezoneCode,jdbcType=VARCHAR}
+    </if>
+    <if test="endActiveDate != null" >
+     and b.END_ACTIVE_DATE = #{endActiveDate,jdbcType=VARCHAR}
+    </if>
+    <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+     </if>
+    
+  </select>
+  
+  <select id="queryNullByCity" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    select 
+    b.city_code,tl.name,
+    b.sort_num
+    from SPM_CITY_B b
+    left outer join SPM_CITY_TL tl
+    on(b.city_code=tl.city_code AND tl.LANG = #{request.locale,jdbcType=VARCHAR})
+    where state_code is null
+    AND ( b.END_ACTIVE_DATE > CURRENT_DATE or b.END_ACTIVE_DATE is null )
+    <if test="cityCode != null">
+    and b.CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+    </if>
+    <if test="name != null">
+    AND tl.NAME like concat('%',concat(#{name,jdbcType=VARCHAR},'%'))
+    </if>
+    <if test="remark != null">
+    and tl.REMARK like concat('%',concat(#{remark,jdbcType=VARCHAR},'%'))
+    </if>
+  </select>
+  <select id="selectByName" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    select 
+    b.CITY_CODE, b.STATE_CODE, b.TIMEZONE_CODE, t.NAME, b.REMARK, b.ENABLED_FLAG, b.START_ACTIVE_DATE, 
+    b.END_ACTIVE_DATE, b.OBJECT_VERSION_NUMBER, b.REQUEST_ID, b.PROGRAM_ID, b.CREATION_DATE, b.CREATED_BY, 
+    b.LAST_UPDATED_BY, b.LAST_UPDATE_DATE, b.LAST_UPDATE_LOGIN, b.ATTRIBUTE_CATEGORY, b.ATTRIBUTE1, 
+    b.ATTRIBUTE2, b.ATTRIBUTE3, b.ATTRIBUTE4, b.ATTRIBUTE5, b.ATTRIBUTE6, b.ATTRIBUTE7, b.ATTRIBUTE8, 
+    b.ATTRIBUTE9, b.ATTRIBUTE10, b.ATTRIBUTE11, b.ATTRIBUTE12, b.ATTRIBUTE13, b.ATTRIBUTE14, b.ATTRIBUTE15,
+    b.LANGUAGE,b.CURRENCY_CODE,b.TAX_TYPE,b.TAX_LEVEL,b.TAX_RATE,b.SORT_NUM
+    from SPM_CITY_B b LEFT OUTER JOIN SPM_CITY_TL t on 
+    (b.CITY_CODE = t.CITY_CODE AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+    <where>
+    <if test="cityCode != null">
+    Upper(b.CITY_CODE)
+    like concat('%',concat(Upper(#{cityCode,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="name != null">
+    AND Upper(t.NAME) like concat('%',concat(Upper(#{name,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="remark != null">
+    and b.REMARK like concat('%',concat(#{remark,jdbcType=VARCHAR},'%'))
+    </if>
+    <if test="stateCode != null" >
+    and  b.STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+    </if>
+    <if test="timezoneCode != null" >
+     and b.TIMEZONE_CODE = #{timezoneCode,jdbcType=VARCHAR}
+    </if>
+    <if test="endActiveDate != null" >
+     and b.END_ACTIVE_DATE = #{endActiveDate,jdbcType=VARCHAR}
+    </if>
+    </where> 
+    order by b.sort_num
+    <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             , ${_colName} ${sortorder}
+      </if>
+  </select>
+  <!-- 更改城市信息（无效日期为空也可以更改） -->
+  <update id="updateSpmCity" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    update SPM_CITY_B
+    <set >
+      <if test="stateCode != null" >
+        STATE_CODE = #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="timezoneCode != null" >
+        TIMEZONE_CODE = #{timezoneCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP}, 
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+       <if test="language != null" >
+       language = #{language,jdbcType=VARCHAR},
+      </if>
+      <if test="currencyCode != null" >
+       CURRENCY_CODE = #{currencyCode,jdbcType=VARCHAR},
+      </if>
+      
+       SORT_NUM = #{sortNum,jdbcType=DECIMAL},
+      
+       TAX_TYPE =  #{taxType,jdbcType=VARCHAR},
+       TAX_LEVEL = #{taxLevel,jdbcType=VARCHAR},
+       TAX_RATE = #{taxRate,jdbcType=DECIMAL},
+    </set>
+    where CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="queryCityForLocation" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCity" >
+    select 
+    b.CITY_CODE, b.STATE_CODE, t.NAME
+    from SPM_CITY_B b LEFT OUTER JOIN SPM_CITY_TL t on 
+    (b.CITY_CODE = t.CITY_CODE AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+    where b.state_code is not null
+    AND ( b.END_ACTIVE_DATE >= CURRENT_DATE or b.END_ACTIVE_DATE is null )
+    <if test="stateCode != null" >
+    and  b.STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+    </if>
+    ORDER BY b.SORT_NUM
+  </select>
+  
+  <!-- 获取默认语言的城市名称 -->
+  <select id="queryNameByCityCode" resultType="java.lang.String" >
+    SELECT cct.name
+      FROM spm_city_tl cct
+     WHERE cct.city_code = #{cityCode,jdbcType=VARCHAR}
+       AND cct.lang = #{lang,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="queryCityByStateCode" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    SELECT sc.city_code, sct.name
+	  FROM spm_city_b sc, spm_city_tl sct
+	 WHERE sc.city_code = sct.city_code
+	   AND sc.enabled_flag = 'Y'
+	   AND sct.lang = #{lang,jdbcType=VARCHAR}
+	   AND sc.state_code = #{stateCode,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="queryCityByStateAndCity" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    SELECT sc.city_code 
+      FROM spm_city_b sc
+     WHERE sc.enabled_flag = 'Y'
+       AND sc.state_code = #{stateCode,jdbcType=VARCHAR}
+       AND sc.city_code = #{cityCode,jdbcType=VARCHAR}
+  </select>
+</mapper>

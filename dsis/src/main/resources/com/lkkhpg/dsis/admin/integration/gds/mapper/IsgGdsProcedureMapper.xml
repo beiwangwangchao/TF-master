@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgGdsProcedureMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgGdsProcedureParam" >
+    <id column="x_return_status" property="returnStatus" jdbcType="VARCHAR" />
+    <result column="x_return_message" property="returnMessage" jdbcType="VARCHAR" />
+    <result column="p_int_code" property="intCode" jdbcType="VARCHAR" />
+    <result column="p_full_or_offset" property="fullOrOffset" jdbcType="VARCHAR" />
+    <result column="p_period_code" property="periodCode" jdbcType="VARCHAR" />
+    <result column="p_date_fr" property="dateFrom" jdbcType="VARCHAR" />
+    <result column="p_date_to" property="dateTo" jdbcType="VARCHAR" />
+    <result column="p_timezone" property="timeZone" jdbcType="VARCHAR" />
+    <result column="p_lang_code" property="langCode" jdbcType="VARCHAR" />
+    <result column="p_retry_flay" property="retryFlag" jdbcType="VARCHAR" />
+    <result column="p_clear_flag" property="clearFlag" jdbcType="VARCHAR" />
+  </resultMap>
+  <parameterMap type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgGdsProcedureParam" id="IsgGdsProcedureParamMap">
+    <parameter property="returnStatus" jdbcType="VARCHAR" mode="OUT" />
+    <parameter property="returnMessage" jdbcType="VARCHAR" mode="OUT" />
+    <parameter property="intCode" jdbcType="VARCHAR" mode="IN" />
+    <parameter property="fullOrOffset" jdbcType="VARCHAR" mode="IN" />
+    <parameter property="periodCode" jdbcType="VARCHAR" mode="IN" />
+    <parameter property="dateFrom" jdbcType="VARCHAR" mode="IN" />
+    <parameter property="dateTo" jdbcType="VARCHAR" mode="IN" />
+    <parameter property="timeZone" jdbcType="VARCHAR" mode="IN" />
+    <parameter property="langCode" jdbcType="VARCHAR" mode="IN" />
+    <parameter property="retryFlag" jdbcType="VARCHAR" mode="IN" />
+    <parameter property="clearFlag" jdbcType="VARCHAR" mode="IN" />
+  </parameterMap>
+
+  <update id="invokeGdsProcedure" statementType="CALLABLE" parameterType="java.util.Map">
+    {call isg_interface_processer.invoke(x_return_status  => #{returnStatus, mode=OUT, jdbcType=VARCHAR},
+                                         x_return_message => #{returnMessage, mode=OUT, jdbcType=VARCHAR},
+                                         p_int_code       => #{intCode, mode=IN, jdbcType=VARCHAR},
+                                         p_full_or_offset => #{fullOrOffset, mode=IN, jdbcType=VARCHAR},
+                                         p_period_code    => #{periodCode, mode=IN, jdbcType=VARCHAR},
+                                         p_date_fr        => #{dateFrom, mode=IN, jdbcType=VARCHAR},
+                                         p_date_to        => #{dateTo, mode=IN, jdbcType=VARCHAR},
+                                         p_timezone       => #{timeZone, mode=IN, jdbcType=VARCHAR},
+                                         p_lang_code      => #{langCode, mode=IN, jdbcType=VARCHAR},
+                                         p_retry_flay     => #{retryFlag, mode=IN, jdbcType=VARCHAR},
+                                         p_clear_flag     => #{clearFlag, mode=IN, jdbcType=VARCHAR})}
+  </update>
+  
+  <update id="invokeGdsProcedureTest" statementType="CALLABLE" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgGdsProcedureParam">
+    {call isg_interface_processer.invoke(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}
+  </update>
+
+</mapper>

@@ -1,0 +1,163 @@
+<#-- * description: 奖金发放lov. * version: 1.0 * author: li.peng *
+CopyrightLKK Health Products Group Limited. * * --> <#include
+"../include/head.html">
+<style>
+</style>
+<script
+	src="${base.contextPath}/common/code?retransferstatus=BM.RE_TRANSFER_STATUS&bonusThreshold=SPM.BONUS_RELEASE_THRESHOLD"
+	type="text/javascript"></script>
+<body style="padding: 10px;">
+
+	<div id="navtab1" style="overflow: hidden; border: 1px solid #D3D3d3;"
+		class="liger-tab">
+		<div tabid="home" title='Re_transfer' lselected="true">
+			<div id="retransfer_grid"></div>
+		</div>
+		<div tabid="tab1" title='<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.writeoff.balance"/>'>
+			<div id="remain_grid"></div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var combineObj = frameElement.dialog.get('data');
+	debugger;
+		window['retransfer_grid'] = $("#retransfer_grid").ligerGrid({
+			columns : [ {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.retranscode"/>',
+				name : "retransCode",
+				width : 150,
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.memberid"/>',
+				name : 'memberCode',
+				width : 100,
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.membername"/>',
+				name : 'memberName',
+				width : 200
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.companyname"/>',
+				name : 'companyName',
+				width : 200
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.marketname"/>',
+				name : 'marketName',
+				width : 100
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.period"/>',
+				name : 'periodName',
+				width : 80
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.retransamt"/>',
+				name : 'retransAmt',
+				align : 'right',
+				width : 100
+
+			}, {
+				display :'<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.status"/>',
+				name : 'status',
+				width : 100,
+				render : function(item) {
+					for (var i = 0; i < retransferstatus.length; i++) {
+						if (retransferstatus[i].value == item.status) {
+							return retransferstatus[i].meaning;
+						}
+					}
+				}
+			}, {
+				name : 'creationDate',
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.creationdate"/>',
+				width : 80,
+				type : "date",
+				format : "yyyy-MM-dd"
+			} ],
+			url : '${base.contextPath}/bm/retransfer/query',
+			parms :{status:'NEW'},
+			enabledEdit : false,
+			checkbox : true,
+			width : '100%',
+			height : 500,
+			pageSize : 20
+		});
+		
+		window['remain_grid'] = $("#remain_grid").ligerGrid({
+			columns: [{ 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.withdrawid"/>', 
+                name: 'withdrawId', align: 'middle', width: 110
+              }, { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>', 
+                name: 'memberCode', align: 'middle', width: 110,
+                isAllowHide: false,
+                editor : {
+                    type : 'text'
+                }
+              }, { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.membername"/>', 
+                name: 'memberName', align: 'left', width: 110
+              }, { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongcompany"/>',
+                name: 'refCompany', align: 'left', width: 100
+              },{ 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+                name: 'marketBelong', align: 'left', width: 100
+              }, { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.period"/>',
+                name: 'periodName', align: 'middle', width: 100
+              }, { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.writeofftype"/>',
+                name: 'writeoffType', align: 'middle', width: 110 
+              }, { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.adjustmenttype"/>',
+                name: 'adjustmentType', align: 'middle', width: 110 
+              }, { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.amount"/>',
+                name: 'amount', align: 'left', width: 100 
+              }, { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.status"/>',
+                name: 'status', align: 'middle', width: 100 
+              }, { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.remarks"/>',
+                name: 'remark', align: 'left', width: 130 
+              }
+            ], 
+            url:'${base.contextPath}/bm/release/withdraw',
+            parms :{status:'NEW'},
+            width: '99%', 
+            height: 500, 
+            checkbox : true,
+            pageSize : 20
+        });
+
+		function f_save() {
+			var retransfers = retransfer_grid.getSelectedRows();
+			var withdraws = remain_grid.getSelectedRows();
+			combineObj.retransfers = retransfers;
+			combineObj.memWithdraws = withdraws;
+			var options = {
+					url:"${base.contextPath}/bm/release/export",
+					data:combineObj,
+					success:function(){
+						parent.$.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>');
+						/* var url ="${base.contextPath}/bm/bonusfinal/download?periodId=" + combineObj.periodId+"&bonusType="+combineObj.bonusType;
+						parent.$("#downCSV").attr("action",url).submit(); */
+						f_cancel();
+						
+					}
+			}
+			 Hap.ajax(options);
+        }
+        function f_cancel() {
+            var dialog = frameElement.dialog;
+            dialog.close();
+        }
+        //表单底部按钮 
+        Hap.addFormButtons([{
+        	text:'<@spring.message "sys.hand.btn.cancel"/>',
+        	onclick : f_cancel
+        },{
+        	text:'<@spring.message "mws.orderconfirm.ensure"/>',
+        	onclick : f_save
+        }]);
+        
+        
+	</script>
+</html>

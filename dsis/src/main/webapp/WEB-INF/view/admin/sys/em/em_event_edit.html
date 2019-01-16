@@ -1,0 +1,822 @@
+<#-- 
+* description: 事件详情界面
+* version: 1.0 
+* author: wangc 
+* Copyright LKK Health Products Group Limited.
+* --> 
+<#include "../../include/head.html">
+<body style="padding: 10px;">
+<style>
+.webuploader-container {
+	position: relative;
+}
+
+.webuploader-element-invisible {
+	position: absolute !important;
+	clip: rect(1px, 1px, 1px, 1px); /* IE6, IE7 */
+	clip: rect(1px, 1px, 1px, 1px);
+}
+
+.webuploader-pick {
+	position: relative;
+	display: inline-block;
+	cursor: pointer;
+	background: #00b7ee;
+	padding: 3px 7px;
+	color: #fff;
+	text-align: center;
+	border-radius: 1px;
+	overflow: hidden;
+}
+
+.webuploader-pick-hover {
+	background: #00a2d4;
+}
+
+.webuploader-pick-disable {
+	opacity: 0.6;
+	pointer-events: none;
+}
+/* #em_event_edit_form textarea {
+	background-color:#FFF9C2
+} */
+</style>
+	<script
+		src="${base.contextPath}/common/code?eventType=SYS.EVENT_TYPE&eventSecret=SYS.EVENT_PRIVACY
+		&eventStatus=SYS.EVENT_STATUS&memStatus=MM.MEMBER_STATUS"
+		type="text/javascript"></script>
+	<script type="text/javascript"
+		src="${base.contextPath}/sys/org/current"></script>
+    <script type="text/javascript"
+		src="${base.contextPath}/resources/js/attach/webuploader.js"></script>
+	<div id="event_edit_btn"></div>
+	<form id="em_event_edit_form"></form>
+	<div style="clear: both"></div>
+	<div style="margin-top: 0px; margin-left: 8%" id="picker" onclick="f_upload()"><@spring.message "type.com.lkkhpg.dsis.common.event.btn.upload"/></div>
+	<div id="em_event_edit_grid" style="margin: 0; padding: 0"></div>
+	<script type="text/javascript">
+<#assign isedit = (RequestParameters.isedit!'0')/> 
+var endDate=1;
+//会员表分页多选数据
+var checkedCustomerMem = [];
+$(function() {
+	//顶部按钮
+	window['em_event_edit_form'] = $("#em_event_edit_form").ligerForm({
+		buttons: [{
+			text: '<@spring.message "sys.hand.btn.save"/>',
+            id: 'btn_save',
+            align: 'right',
+            width: 60,
+            click: f_save
+		},
+		{
+			text: '<@spring.message "type.com.lkkhpg.dsis.common.event.btn.invalid"/>',
+            id: 'btn_delete',
+            disabled: true,
+            width: 60,
+            click: f_invalid
+		},
+		{
+			text: '<@spring.message "type.com.lkkhpg.dsis.common.event.btn.publish"/>',
+            id: 'btn_publish',
+            disabled: true,
+            width: 60,
+            click: f_publish
+		},
+		{
+			text: '<@spring.message "type.com.lkkhpg.dsis.common.event.btn.unpublish"/>',
+            id: 'btn_close',
+            disabled: true,
+            width: 60,
+            click: f_close
+		}]
+	})
+	
+    window['em_event_edit_form'] = $("#em_event_edit_form").ligerForm({
+        fields: [{
+        	 type : 'text',
+        	 label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.salesmarket" />',
+             name : 'marketName',
+             options : {
+            	 value: _marketName,
+                 readonly: true
+             }
+        },
+        {
+        	type: 'hidden',
+            name: 'marketId',
+            options : {
+           	     value: _marketId,
+            }
+        },
+        {
+        	type : 'hidden',
+        	name : 'eventId',	
+        	hidden : true
+        },
+        {
+            type: 'text',
+            name: 'eventNumber',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventnumber"/>',
+            newline: false,
+            readonly : true
+        },
+        {
+            type: 'text',
+            name: 'eventName',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventname"/>',
+            newline: true,
+            validate : {
+            	required : true
+            }
+        },
+        {
+            type: 'text',
+            name: 'eventAddress',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.locationname" />',
+            newline: false,
+            width : 498,
+            validate : {
+            	required : true
+            }
+        },
+        {
+            type: 'select',
+            name: 'eventSecret',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventsecret"/>',
+            newline: true,
+            options: {
+            	  valueField: 'value',
+                  textField: 'meaning',
+                  data: eventSecret ,
+            },
+            validate : {
+            	required : true
+            }
+        },
+        {
+        	label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventtype"/>',
+            type: 'select',
+            name: 'eventType',
+            options: {
+                valueField: 'value',
+                textField: 'meaning',
+                data: eventType
+            },
+            newline : false,
+            validate : {
+            	required : true
+            }
+        },
+        {
+        	label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventdate"/>',
+        	type : 'date',
+        	name : 'eventDate',
+        	newline : false,
+        	options: {
+                format: 'yyyy-MM-dd',
+                onChangeDate : function(data){
+                	<#if isedit != '1'>
+	                	var eventDate = new Date(data);
+	                    var date = new Date();
+	                    if (eventDate < new Date(date.getFullYear(),date.getMonth(),date.getDate())) {
+	                        liger.get('eventDate').setValue("");
+	                        $.ligerDialog.warn('<@spring.message "msg.error.sys.event.tip.dateinvalid"/>');
+	                        return false;
+	                    }
+	                    if (endDate ==0 && eventDate < new Date(date.getFullYear(),date.getMonth(),date.getDate())) {
+	                        liger.get('eventDate').setValue("");
+	                        $.ligerDialog.warn('<@spring.message "msg.error.sys.event.tip.dateinvalid"/>');
+	                        return false;
+	                    }			                		
+                	</#if>
+                }
+            },
+            validate : {
+            	required : true
+            }
+        },
+        {
+        	label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventstatus"/>',
+            type: 'select',
+            name: 'status',
+            options: {
+                valueField: 'value',
+                textField: 'meaning',
+                data: eventStatus,
+            },
+            newline : true,
+            readonly : true
+        },
+        {
+        	label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.maxmember"/>',
+            type: 'int',
+            name: 'maxMember',
+            newline : false,
+            validate : {
+            	digits: true,
+            	min : 0
+            }
+        },
+        {
+        	label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.participants"/>',
+            type: 'text',
+            name: 'participants',
+            newline : false,
+            readonly : true
+        },
+        {
+        	type : 'hidden',
+        	name : 'fileId',
+        	hidden: true
+        },
+        {
+        	height : 40,
+        	label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.image"/>',
+            type: 'html',
+            name: 'fileIdImage',
+            id : 'fileIdImage',
+            newline : true,
+            render : function(v){
+            	var fileId = $('#fileId').val();
+            	return '<img id="eventImg" width="180px" height="100px" src="${base.contextPath}/sys/attach/file/view?fileId=' + fileId + '"/>';
+            },
+            validate : {
+            	required : true
+            }
+        },
+        {
+            type: 'textarea',
+            name: 'description',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.description"/>',
+            width : 500,
+            newline: false,
+            validate : {
+            	required : true
+            }
+        }],
+    });
+    
+    window['em_event_edit_grid'] = $("#em_event_edit_grid").ligerGrid({
+        unSetValidateAttr: false,
+        columns: [{
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.memberid" />',
+            name: 'memberCode',
+            width: '150',
+            validate : {
+            	required : true
+            }
+        },
+        {
+        	display: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.mem.name"/>',
+            name: 'memberName',
+            width: '150'
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.phone" />',
+            name: 'phoneNo',
+            width: '150'
+        },
+        {
+        	display: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.mem.email"/>',
+            name: 'email',
+            width: '150'
+        },
+        {
+        	display: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.mem.status"/>',
+            name: 'status',
+            width: '150',
+            render : function(item){
+            	for(var i=0;i<memStatus.length;i++){
+            		if(item.status==memStatus[i].value){
+            			return memStatus[i].meaning;
+            		}
+            	}
+            }
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.participants"/>',
+            name: 'attendance',
+            width: '150'
+        }],
+        <#if isedit =='1'>
+        url : '${base.contextPath}/em/event/getMemsByEventId',
+        parms : {
+    	      eventId: '${RequestParameters.eventId}'
+        },
+        </#if>
+        toolbar: {
+        	id : 'member_grid_tool',
+            items: [{
+            	id : 'member_grid_add',
+                text: '<@spring.message "sys.hand.btn.new"/>',
+                disable: false,
+                click: function() {
+                	f_import_member();
+                },
+                icon: 'add'
+            },
+            {
+            	id : 'member_grid_del',
+                text: '<@spring.message "sys.hand.btn.delete"/>',
+                click: function() {
+                	memberDelete({
+                        grid: em_event_edit_grid,
+                        url: '${base.contextPath}/em/event/removeMember'
+                    })
+                },
+                icon: 'delete'
+            },
+            {
+            	id : 'btn_import',
+                text: '<@spring.message "msg.info.event.btn.import"/>',
+                click: f_import,
+                icon: 'add'
+            }
+            ]
+        },
+        <#if isedit == '1'>
+        url : '${base.contextPath}/em/event/getMemsByEventId',
+        parms : {
+        	 eventId: '${RequestParameters.eventId}'
+        },
+        </#if>
+        enabledEdit: false,
+        width: '99%',
+        height: '310',
+        checkbox: true,
+        rownumbers: true,
+        usePager: false,
+        onSuccess: function(data){
+        	$.ligerui.get('participants').setValue(data.total);
+        },
+        onBeforeEdit : function(e) {
+        	var status = liger.get("status").getValue();
+        	if (status != "ACTV") {
+        		return false;
+        	}
+        }
+    });
+    
+    <#if isedit == '0'>
+    liger.get('member_grid_tool').setDisabled('btn_import');
+    </#if>
+    
+    Hap.loadForm({
+        form: em_event_edit_form,
+        url: '${base.contextPath}/em/event/getEventById',
+        <#if isedit == '1'>
+        para: {
+            eventId: '${RequestParameters.eventId}'
+        },
+        </#if>
+        callback: function(data) {
+        	if(data.marketId == null){
+        		$('#marketId').attr('value',_marketId);
+        	}
+        	$('#eventImg').attr('src', '${base.contextPath}/sys/attach/file/view?fileId=' + data.fileId);
+        	var status = $('#status').val();
+        	if(status == 'VOID' || status == 'PUB'){
+        		$.ligerui.get('em_event_edit_form')
+        		.setEnabled(["eventName","eventAddress","eventSecret","eventType","eventDate","maxMember","description"], false);
+        		$('#picker').hide();
+        		liger.get('member_grid_tool').setDisabled('member_grid_add');
+        		liger.get('member_grid_tool').setDisabled('member_grid_del');
+        		liger.get('member_grid_tool').setDisabled('btn_import');
+        		$.ligerui.get('btn_save').setDisabled(true);
+        	}
+        	//未保存发布按钮不能点击
+        	var eventNumber = liger.get("eventNumber").getValue();
+        	if(status == 'ACTV' && eventNumber){
+        		$.ligerui.get('btn_delete').setEnabled(true);
+        		$.ligerui.get('btn_publish').setEnabled(true);
+        	}
+        	if(status == 'PUB'){
+        		$.ligerui.get('btn_close').setEnabled(true);
+        	}
+        	var endDates=$.ligerui.get('eventDate').getValue();
+            if(endDates == null){
+            	endDate = 0;
+            }
+        }
+    });
+});
+
+/*新增会员弹窗*/
+function f_import_member(){
+	var options = ${lovService.getLov(base.contextPath,base.locale, "lov_event_member")};
+    options.grid.checkbox = true;
+    options.grid.isSingleCheck = false;
+    options.grid.isChecked = m_isChecked; 
+    options.grid.onCheckRow = m_onCheckRow; 
+    options.grid.onCheckAllRow = m_onCheckAllRow;
+    
+    options.condition.fields.push({
+		name: 'marketId',
+		type : "text",
+		style : 'display:none',
+		options : {
+			value :_marketId
+		}
+	});
+    var fn = $.ligerui.getPopupFn({
+		onSelect : function(e){
+			f_select_member(e);
+			var eventId = $('#eventId').val();
+			var maxMember = $.ligerui.get('maxMember').getValue();
+			<#if isedit == '1'>
+			memberAdd({
+		        grid: em_event_edit_grid,
+		        url:'${base.contextPath}/em/event/addMembers?eventId='+eventId + '&maxMember='+maxMember
+		    });
+			</#if>
+		},
+		condition: options.condition,
+		grid: options.grid,
+		title: options.title,
+		delayLoad : true,
+	});
+	fn();
+}
+
+function f_select_member(e){
+	var selectRows;
+    if(e.data.length == 1){
+        selectRows = e.data;
+    }else{
+        selectRows = checkedCustomerMem;
+    }
+	if(selectRows == null || selectRows == undefined || selectRows.length < 1){
+		Hap.showError('<@spring.message "msg.error.config.country.selectrecord" />');
+	}
+	var gridRows = em_event_edit_grid.getData();
+	if(gridRows.length > 0){
+		for(var i = 0; i< selectRows.length; i++){
+			var memCodeSel = selectRows[i].memberCode;
+			for(var j=0;j<gridRows.length;j++){
+				var memCodeGrid = gridRows[j].memberCode;
+				if(memCodeSel == memCodeGrid){
+					Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.member.error"/>');
+					return;
+				}
+			}
+		}
+	}
+	if(e.data.length == 1){
+		em_event_edit_grid.addRows(e.data);
+	}else{
+		em_event_edit_grid.addRows(checkedCustomerMem);
+	}
+	checkedCustomerMem = [];
+}
+
+//分配会员表多选
+function m_onCheckAllRow(checked)
+{
+    for (var rowid in this.records)
+    {
+        if(checked)
+            addMember(this.records[rowid]);
+        else
+            removeMember(this.records[rowid]);
+    }
+}
+function findMember(member)
+{
+    for(var i =0;i<checkedCustomerMem.length;i++)
+    {
+        if(checkedCustomerMem[i] == member) return i;
+    }
+    return -1;
+}
+function addMember(member)
+{
+    //debugger;
+    if(findMember(member) == -1)
+        checkedCustomerMem.push(member);
+}
+function removeMember(member)
+{
+    var i = findMember(member);
+    if(i==-1) return;
+    checkedCustomerMem.splice(i,1);
+}
+
+function m_isChecked(rowdata)
+{
+    if (checkedCustomerMem(rowdata) == -1)
+        return false;
+    return true;
+}
+function m_onCheckRow(checked, data)
+{
+	if (checked) addMember(data);
+    else removeMember(data);
+}
+
+function f_save(){
+	  var participants = $.ligerui.get('participants').getValue();
+	  if(participants == null || participants == ''){
+		  $.ligerui.get('participants').setValue(0);
+	  }
+	  
+	  /* var eventSecret = em_event_edit_form.getData().eventSecret;
+	  var num = em_event_edit_grid.getData();
+	  var maxmember = $.ligerui.get('maxMember').getValue();	  
+	  if(eventSecret == 'PRI'){		  
+		  if(maxmember != null && num.length > maxmember){
+			  $.ligerDialog.error('<spring.message "msg.error.event.paticipants_must_more_than_attendance"/>');
+			 return ;
+		  }
+	  } */
+	  
+	  var forms = liger.get("em_event_edit_form");
+		    if(!Hap.validateForm(forms)) return;
+	    	if(!Hap.validateGrid(em_event_edit_grid)) return;
+	    	
+	        var event = forms.getData();
+	        event["eventAssigns"] = em_event_edit_grid.getChanges();
+	        event["eventAssignsAll"] = em_event_edit_grid.getData();
+	        $.ajax({
+	            type: "POST",
+	            dataType: "json",
+	            contentType: "application/json",
+	            data: JSON2.stringify([event]),
+	            url: _basePath + "/em/event/save",
+	            error: function(data) {
+	                Hap.showError(data);
+	            },
+	            success: function(response) {
+	                if (response.success) {
+	                	var eventId = response.rows[0].eventId;
+	                    $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+	                    	window.location = '${base.contextPath}/sys/em/em_event_edit.html?isedit=1&eventId='+eventId
+	                    });    
+	                }
+	            }
+	        });
+}
+
+/*失效*/
+function f_invalid(){
+
+	  /* var eventSecret = em_event_edit_form.getData().eventSecret;
+	  var num = em_event_edit_grid.getData();
+	  var maxmember = $.ligerui.get('maxMember').getValue();	  
+	  if(eventSecret == 'PRI'){		  
+		  if(maxmember != null && num.length > maxmember){
+			  $.ligerDialog.error('<spring.message "msg.error.event.paticipants_must_more_than_attendance"/>');
+			 return ;
+		  }
+	  } */
+	  
+	  var forms = liger.get("em_event_edit_form");
+	    	if(!Hap.validateForm(forms)) return;
+	    	if(!Hap.validateGrid(em_event_edit_grid)) return;
+	    	
+	        var event = forms.getData();
+	        event["eventAssigns"] = em_event_edit_grid.getChanges();
+	        event["eventAssignsAll"] = em_event_edit_grid.getData();
+	        
+	        $.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.event.dto.tip.invalidsure"/>',function(yes){
+				if(yes){
+					$.ajax({
+			            type: "POST",
+			            dataType: "json",
+			            contentType: "application/json",
+			            data: JSON2.stringify([event]),
+			            url: _basePath + "/em/event/invalid",
+			            error: function(data) {
+			                Hap.showError(data);
+			            },
+			            success: function(response) {
+			                if (response.success) {
+			                	var eventId = response.rows[0].eventId;
+			                    $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+			                    	window.location = '${base.contextPath}/sys/em/em_event_edit.html?isedit=1&eventId='+eventId
+			                    });    
+			                }
+			            }
+			        });
+				}
+	   });
+}
+
+/*发布*/
+function f_publish(){
+	 /* var eventSecret = em_event_edit_form.getData().eventSecret;
+	  var num = em_event_edit_grid.getData();
+	  var maxmember = $.ligerui.get('maxMember').getValue();	  
+	  if(eventSecret == 'PRI'){		  
+		  if(maxmember != null && num.length > maxmember){
+			  $.ligerDialog.error('<spring.message "msg.error.event.paticipants_must_more_than_attendance"/>');
+			 return ;
+		  }
+	  } */
+	  var forms = liger.get("em_event_edit_form");
+	  if(!Hap.validateForm(forms)) return;
+	  if(!Hap.validateGrid(em_event_edit_grid)) return;
+	    	
+	  var event = forms.getData();
+	  event["eventAssigns"] = em_event_edit_grid.getChanges();
+	  event["eventAssignsAll"] = em_event_edit_grid.getData();
+	        
+	  $.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.event.dto.tip.publishsure"/>',function(yes){
+				if(yes){
+					$.ajax({
+			            type: "POST",
+			            dataType: "json",
+			            contentType: "application/json",
+			            data: JSON2.stringify([event]),
+			            url: _basePath + "/em/event/publish",
+			            error: function(data) {
+			                Hap.showError(data);
+			            },
+			            success: function(response) {
+			                if (response.success) {
+			                	var eventId = response.rows[0].eventId;
+			                    $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+			                    	window.location = '${base.contextPath}/sys/em/em_event_edit.html?isedit=1&eventId='+eventId
+			                    });    
+			                }
+			            }
+			        });
+				}
+	   });
+	        
+}
+
+/*关闭*/
+function f_close(){
+	$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.event.dto.tip.closesure"/>',function(yes){
+		if(yes){
+			$.ajax({
+				url : '${base.contextPath}/em/event/close',
+				data : {
+					eventId : $('#eventId').val()
+				},
+				success : function(){
+					var eventId = $('#eventId').val();
+		            $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+		            	window.location = '${base.contextPath}/sys/em/em_event_edit.html?isedit=1&eventId='+eventId
+		            }); 
+				}
+			});
+		}
+	});
+}
+
+function f_import(){
+	var eventId = $('#eventId').val();
+	var marketId = $('#marketId').val();
+	var maxMember = $.ligerui.get('maxMember').getValue();
+	var url;
+	if(maxMember){
+		url = '${base.contextPath}/mm/mm_member_import.html?idType=EVENT&mentionId='+eventId+'&marketId='+_marketId+'&maxMember='+maxMember
+	}else{
+		url = '${base.contextPath}/mm/mm_member_import.html?idType=EVENT&mentionId='+eventId+'&marketId='+_marketId+'&maxMember=null'
+	}
+	$.ligerDialog.open({
+        height: 550,
+        width: 700,
+        title: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.title.memimport"/>',
+        url : url,
+    });
+}
+var uploader = WebUploader.create({
+    swf : '${base.contextPath}/js/Uploader.swf',
+    server : '${base.contextPath}/sys/attach/upload',
+    pick : '#picker',
+    auto : true,
+    accept: {
+        title: 'Images',
+        extensions: 'gif,jpg,jpeg,bmp,png',
+        mimeTypes: 'image/*'
+    },
+    onUploadSuccess : function(file, response) {
+        if(response.message=='UPLOAD_SUCCESS'){
+        	$('#fileId').attr('value',response.file.fileId);
+        	$('#eventImg').attr('src', '${base.contextPath}/sys/attach/file/view?fileId=' + response.file.fileId);
+        }else{
+        }
+    }
+}); 
+
+function f_upload(){
+        uploader.option('formData', {
+            sourceType: 'PACKAGE_IMAGE',
+            sourceKey: $('#eventId').val() 
+        });
+        uploader.upload();
+}
+
+memberAdd = function(options) {
+    var grid = options.grid;
+    if (!grid) $.ligerDialog.alert('"grid" not found in options!', $l('sys.hand.tip.info'), 'error');
+    if(!Hap.validateGrid(grid)) return;
+    
+    grid.endEdit();
+    var rows = grid.getChanges();
+    if(rows.length==0 || grid.conn) return;
+    $.ligerDialog.waitting(options.waitingTip || $l('sys.hand.tip.processing'));
+    grid.conn = $.ajax({
+        url : options.url || '',
+        type : "POST",
+        dataType : "json",
+        contentType : "application/json",
+        data : JSON2.stringify(rows),
+        success : function(json) {
+            options = $.extend(options,{
+                json:json,
+                grid:grid,
+                callback:function(json){
+                    var rs = $.isArray(json.rows) ? json.rows :[];
+                    if(rs.length >0)
+                    $.each(rs,function(i,n){
+                        if(n['__status'] == 'delete') return true;
+                       var r = grid.records[n['__id']];
+                       if(r) r = $.extend(r,n,{'__status':'nochanged'})
+                    })
+                    grid.deletedRows = [];
+                    grid.reRender();
+                }
+            })
+            grid.conn = null;
+            Hap.defaultSuccessHandler(options);
+            em_event_edit_grid.reload();
+        },
+        error : function() {
+            grid.conn = null;
+            $.ligerDialog.closeWaitting();
+        }
+    });
+}
+
+memberDelete = function memberDelete(options) {
+    var grid = options.grid;
+    if (!grid)$.ligerDialog.alert('"grid" not found in options!', $l('sys.hand.tip.info'), 'error');
+    grid.endEdit();
+    var rows = grid.getSelectedRows(),dls = [];            
+    if(rows.length>0)
+    $.ligerDialog.confirm(options.confirmTip || $l('sys.hand.tip.delete_confirm'), $l('sys.hand.tip.info'),function(yes) {
+        if (yes) {
+            if(options.url){ 
+                var adds = [];
+                $.each(rows,function(i,d){
+                    if(d['__status'] == 'add'){
+                        adds.push(d);
+                        grid.remove(d);
+                    }
+                });
+                
+                dls = $.grep(rows,function(item){
+                    var isL = false;
+                    $.each(adds,function(i,data){
+                        if(item['__id'] == data['__id']){
+                            isL = true;
+                            return false;
+                        }
+                    })
+                    return !isL;
+                })
+                
+                if (dls.length == 0) return;
+                $.ligerDialog.waitting(options.waitingTip || $l('sys.hand.tip.processing'));
+                $.ajax({
+                    url : options.url || '',
+                    type : "POST",
+                    dataType : "json",
+                    async: false,
+                    contentType : "application/json",
+                    data : JSON2.stringify(dls),
+                    success : function(json) {
+                        options = $.extend(options,{
+                            json:json,
+                            grid:grid,
+                            callback:function(json){
+                                $.each(dls,function(i,n){
+                                    grid.remove(grid.records[n['__id']]);
+                                })
+                            }
+                        })
+                        Hap.defaultSuccessHandler(options);
+                        em_event_edit_grid.reload();
+                    },
+                    error : function() {
+                        $.ligerDialog.closeWaitting();
+                    }
+                });
+            }else{
+                $.each(rows,function(i,d){
+                    if(d['__status'] == 'add'){
+                        grid._removeData(grid.getRow(d));
+                    }
+                });
+                grid.deleteSelectedRow();
+            }
+        }
+    });
+}
+</script>
+</body>
+</html>

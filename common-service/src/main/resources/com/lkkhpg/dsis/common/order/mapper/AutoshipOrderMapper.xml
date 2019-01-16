@@ -1,0 +1,730 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.AutoshipOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.AutoshipOrder" >
+    <id column="AUTOSHIP_ID" property="autoshipId" jdbcType="DECIMAL" />
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="AUTOSHIP_NUMBER" property="autoshipNumber" jdbcType="VARCHAR" />
+    <result column="AUTOSHIP_STATUS" property="autoshipStatus" jdbcType="VARCHAR" />
+    <result column="AUTOSHIP_CREATE_DATE" property="autoshipCreateDate" jdbcType="TIMESTAMP" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="CREATE_USER_ID" property="createUserId" jdbcType="DECIMAL" />
+    <result column="EXECUTE_TYPE" property="executeType" jdbcType="VARCHAR" />
+    <result column="EXECUTE_DATE" property="executeDate" jdbcType="VARCHAR" />
+    <result column="EXECUTE_STATUS" property="executeStatus" jdbcType="VARCHAR" />
+    
+    <result column="CURRENCY" property="currency" jdbcType="VARCHAR" />
+    <result column="ORDER_AMT" property="orderAmt" jdbcType="DECIMAL" />
+    <result column="DISCOUNT_AMT" property="discountAmt" jdbcType="DECIMAL" />
+    <result column="TAX_AMT" property="taxAmt" jdbcType="DECIMAL" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="DELIVERY_TYPE" property="deliveryType" jdbcType="VARCHAR" />
+    <result column="DELIVERY_LOCATION_ID" property="deliveryLocationId" jdbcType="DECIMAL" />
+    <result column="DELIVERY_TO" property="deliveryTo" jdbcType="VARCHAR" />
+    <result column="BILLING_LOCATION_ID" property="billingLocationId" jdbcType="DECIMAL" />
+    <result column="BILLING_TO" property="billingTo" jdbcType="VARCHAR" />
+    <result column="CREDIT_CARD_ID" property="creditCardId" jdbcType="DECIMAL" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="MEMBER_NUMBER" property="memberNumber" jdbcType="DECIMAL"/>
+    <result column="pv_sum" property="pvSum" jdbcType="DECIMAL"/>
+    <result column="SALES_SCORE" property="salesScore" jdbcType="DECIMAL"/>
+    <result column="USER_NAME" property="userName" jdbcType="VARCHAR"/>
+    <result column="create_user_name" property="createUserName" jdbcType="VARCHAR"/>
+    <result column="LATEST_BATCH_NUMBER" property="latestBatchNumber" jdbcType="VARCHAR"/>
+    <result column="LATEST_EXECUTE_DATE" property="latestExecuteDate" jdbcType="TIMESTAMP"/>
+    <result column="LAST_UPDATED_NAME" property="lastUpdatedName" jdbcType="VARCHAR"/>
+    <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR" />
+    <result column="LAST_ORDER_NUMBER" property="lastOrderNumber" jdbcType="VARCHAR" />
+    <result column="LAST_ORDER_ID" property="lastOrderId" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    AUTOSHIP_ID, SALES_ORG_ID, AUTOSHIP_NUMBER, AUTOSHIP_STATUS, AUTOSHIP_CREATE_DATE, 
+    MEMBER_ID, CREATE_USER_ID, EXECUTE_TYPE, EXECUTE_DATE,EXECUTE_STATUS, CURRENCY, ORDER_AMT, DISCOUNT_AMT, 
+    TAX_AMT, REMARK, DELIVERY_TYPE, DELIVERY_LOCATION_ID, DELIVERY_TO, BILLING_LOCATION_ID, 
+    BILLING_TO, CREDIT_CARD_ID, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15,SALES_SCORE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />,
+    ( SELECT  su.user_name
+     FROM (sys_user su left outer join
+            sys_acc_rel sar  on (su.user_id=sar.rel_party_id and sar.ACCOUNT_TYPE = 'USER'))
+            left outer join sys_account sa on(sar.account_id = sa.account_id)
+       where sa.account_id = OM_AUTOSHIP_ORDER.LAST_UPDATED_BY) LAST_UPDATED_NAME,
+    (select LOGIN_NAME  from SYS_ACCOUNT WHERE ACCOUNT_ID = create_user_id)   create_user_name
+    ,(SELECT MAX(t.creation_date) FROM om_sales_order t WHERE t.source_type = 'AUTOS' AND T.SOURCE_KEY=autoship_number) LATEST_EXECUTE_DATE
+    ,(SELECT MAX(t.batch_number) FROM om_sales_order t WHERE t.source_type = 'AUTOS' AND T.SOURCE_KEY=autoship_number) LATEST_BATCH_NUMBER
+    from OM_AUTOSHIP_ORDER 
+    where AUTOSHIP_ID = #{autoshipId,jdbcType=DECIMAL} 
+  </select>
+  <select id="selectByAutoshipNumber" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,(SELECT MAX(t.creation_date) FROM om_sales_order t WHERE t.source_type = 'AUTOS' AND T.SOURCE_KEY=autoship_number) LATEST_EXECUTE_DATE
+    ,(SELECT MAX(t.batch_number) FROM om_sales_order t WHERE t.source_type = 'AUTOS' AND T.SOURCE_KEY=autoship_number) LATEST_BATCH_NUMBER
+    from OM_AUTOSHIP_ORDER 
+    where AUTOSHIP_NUMBER = #{autoshipNumber,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from OM_AUTOSHIP_ORDER
+    where AUTOSHIP_ID = #{autoshipId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.AutoshipOrder" >
+    <selectKey resultType="java.lang.Long" keyProperty="autoshipId" order="BEFORE" >
+      SELECT OM_AUTOSHIP_ORDER_S.nextval from dual
+    </selectKey>
+    insert into OM_AUTOSHIP_ORDER (AUTOSHIP_ID, SALES_ORG_ID, AUTOSHIP_NUMBER, 
+      AUTOSHIP_STATUS, AUTOSHIP_CREATE_DATE, MEMBER_ID, 
+      CREATE_USER_ID, EXECUTE_TYPE, EXECUTE_DATE,EXECUTE_STATUS, 
+      CURRENCY, ORDER_AMT, DISCOUNT_AMT, 
+      TAX_AMT, REMARK, DELIVERY_TYPE, 
+      DELIVERY_LOCATION_ID, DELIVERY_TO, BILLING_LOCATION_ID, 
+      BILLING_TO, CREDIT_CARD_ID, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15,SALES_SCORE)
+    values (#{autoshipId,jdbcType=DECIMAL}, #{salesOrgId,jdbcType=DECIMAL}, #{autoshipNumber,jdbcType=VARCHAR}, 
+      #{autoshipStatus,jdbcType=VARCHAR}, #{autoshipCreateDate,jdbcType=TIMESTAMP}, #{memberId,jdbcType=DECIMAL}, 
+      #{createUserId,jdbcType=DECIMAL}, #{executeType,jdbcType=VARCHAR}, #{executeDate,jdbcType=VARCHAR}, #{executeStatus,jdbcType=VARCHAR},
+      #{currency,jdbcType=VARCHAR}, #{orderAmt,jdbcType=DECIMAL}, #{discountAmt,jdbcType=DECIMAL}, 
+      #{taxAmt,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{deliveryType,jdbcType=VARCHAR}, 
+      #{deliveryLocationId,jdbcType=DECIMAL}, #{deliveryTo,jdbcType=VARCHAR}, #{billingLocationId,jdbcType=DECIMAL}, 
+      #{billingTo,jdbcType=VARCHAR}, #{creditCardId,jdbcType=DECIMAL}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{salesScore,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.AutoshipOrder" >
+    <selectKey resultType="java.lang.Long" keyProperty="autoshipId" order="BEFORE" >
+      SELECT OM_AUTOSHIP_ORDER_S.nextval from dual
+    </selectKey>
+    insert into OM_AUTOSHIP_ORDER
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      AUTOSHIP_ID,
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID,
+      </if>
+      <if test="autoshipNumber != null" >
+        AUTOSHIP_NUMBER,
+      </if>
+      <if test="autoshipStatus != null" >
+        AUTOSHIP_STATUS,
+      </if>
+      <if test="autoshipCreateDate != null" >
+        AUTOSHIP_CREATE_DATE,
+      </if>
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="createUserId != null" >
+        CREATE_USER_ID,
+      </if>
+      <if test="executeType != null" >
+        EXECUTE_TYPE,
+      </if>
+      <if test="executeDate != null" >
+        EXECUTE_DATE,
+      </if>
+      <if test="executeStatus != null" >
+        EXECUTE_STATUS,
+      </if>
+      <if test="currency != null" >
+        CURRENCY,
+      </if>
+      <if test="orderAmt != null" >
+        ORDER_AMT,
+      </if>
+      <if test="discountAmt != null" >
+        DISCOUNT_AMT,
+      </if>
+      <if test="taxAmt != null" >
+        TAX_AMT,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="deliveryType != null" >
+        DELIVERY_TYPE,
+      </if>
+      <if test="deliveryLocationId != null" >
+        DELIVERY_LOCATION_ID,
+      </if>
+      <if test="deliveryTo != null" >
+        DELIVERY_TO,
+      </if>
+      <if test="billingLocationId != null" >
+        BILLING_LOCATION_ID,
+      </if>
+      <if test="billingTo != null" >
+        BILLING_TO,
+      </if>
+      <if test="creditCardId != null" >
+        CREDIT_CARD_ID,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="salesScore !=null">
+        SALES_SCORE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{autoshipId,jdbcType=DECIMAL},
+      <if test="salesOrgId != null" >
+        #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="autoshipNumber != null" >
+        #{autoshipNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="autoshipStatus != null" >
+        #{autoshipStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="autoshipCreateDate != null" >
+        #{autoshipCreateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="createUserId != null" >
+        #{createUserId,jdbcType=DECIMAL},
+      </if>
+      <if test="executeType != null" >
+        #{executeType,jdbcType=VARCHAR},
+      </if>
+      <if test="executeDate != null" >
+        #{executeDate,jdbcType=VARCHAR},
+      </if>
+      <if test="executeStatus != null" >]
+        #{executeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="currency != null" >
+        #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmt != null" >
+        #{orderAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="discountAmt != null" >
+        #{discountAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="taxAmt != null" >
+        #{taxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryType != null" >
+        #{deliveryType,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryLocationId != null" >
+        #{deliveryLocationId,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryTo != null" >
+        #{deliveryTo,jdbcType=VARCHAR},
+      </if>
+      <if test="billingLocationId != null" >
+        #{billingLocationId,jdbcType=DECIMAL},
+      </if>
+      <if test="billingTo != null" >
+        #{billingTo,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCardId != null" >
+        #{creditCardId,jdbcType=DECIMAL},
+      </if> 
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+       CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="salesScore !=null">
+        #{salesScore,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.order.dto.AutoshipOrder" >
+    update OM_AUTOSHIP_ORDER
+    <set >
+        LAST_UPDATE_DATE =CURRENT_TIMESTAMP,
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="autoshipNumber != null" >
+        AUTOSHIP_NUMBER = #{autoshipNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="autoshipStatus != null" >
+        AUTOSHIP_STATUS = #{autoshipStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="autoshipCreateDate != null" >
+        AUTOSHIP_CREATE_DATE = #{autoshipCreateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="createUserId != null" >
+        CREATE_USER_ID = #{createUserId,jdbcType=DECIMAL},
+      </if>
+      <if test="executeType != null" >
+        EXECUTE_TYPE = #{executeType,jdbcType=VARCHAR},
+      </if>
+      <if test="executeDate != null" >
+        EXECUTE_DATE = #{executeDate,jdbcType=VARCHAR},
+      </if>
+       <if test="executeStatus != null" >
+        EXECUTE_STATUS = #{executeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="currency != null" >
+        CURRENCY = #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmt != null" >
+        ORDER_AMT = #{orderAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="discountAmt != null" >
+        DISCOUNT_AMT = #{discountAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="taxAmt != null" >
+        TAX_AMT = #{taxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryType != null" >
+        DELIVERY_TYPE = #{deliveryType,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryLocationId != null" >
+        DELIVERY_LOCATION_ID = #{deliveryLocationId,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryTo != null" >
+        DELIVERY_TO = #{deliveryTo,jdbcType=VARCHAR},
+      </if>
+      <if test="billingLocationId != null" >
+        BILLING_LOCATION_ID = #{billingLocationId,jdbcType=DECIMAL},
+      </if>
+      <if test="billingTo != null" >
+        BILLING_TO = #{billingTo,jdbcType=VARCHAR},
+      </if>
+      <if test="creditCardId != null" >
+        CREDIT_CARD_ID = #{creditCardId,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="salesScore != null" >
+        SALES_SCORE=#{salesScore,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where AUTOSHIP_ID = #{autoshipId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.order.dto.AutoshipOrder" >
+    update OM_AUTOSHIP_ORDER
+    set SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      AUTOSHIP_NUMBER = #{autoshipNumber,jdbcType=VARCHAR},
+      AUTOSHIP_STATUS = #{autoshipStatus,jdbcType=VARCHAR},
+      AUTOSHIP_CREATE_DATE = #{autoshipCreateDate,jdbcType=TIMESTAMP},
+      MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      CREATE_USER_ID = #{createUserId,jdbcType=DECIMAL},
+      EXECUTE_TYPE = #{executeType,jdbcType=VARCHAR},
+      EXECUTE_DATE = #{executeDate,jdbcType=VARCHAR},
+      EXECUTE_STATUS = #{executeStatus,jdbcType=VARCHAR},
+      CURRENCY = #{currency,jdbcType=VARCHAR},
+      ORDER_AMT = #{orderAmt,jdbcType=DECIMAL},
+      DISCOUNT_AMT = #{discountAmt,jdbcType=DECIMAL},
+      TAX_AMT = #{taxAmt,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      DELIVERY_TYPE = #{deliveryType,jdbcType=VARCHAR},
+      DELIVERY_LOCATION_ID = #{deliveryLocationId,jdbcType=DECIMAL},
+      DELIVERY_TO = #{deliveryTo,jdbcType=VARCHAR},
+      BILLING_LOCATION_ID = #{billingLocationId,jdbcType=DECIMAL},
+      BILLING_TO = #{billingTo,jdbcType=VARCHAR},
+      CREDIT_CARD_ID = #{creditCardId,jdbcType=DECIMAL},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE =CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      SALES_SCORE=#{salesScore,jdbcType=DECIMAL}
+    where AUTOSHIP_ID = #{autoshipId,jdbcType=DECIMAL}
+  </update>
+  
+   <select id="selectAutoshipOrdersByParas" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.order.dto.AutoshipOrder">
+        SELECT oao.autoship_number,
+               mmm.MEMBER_CODE as MEMBER_NUMBER,
+               oao.SALES_SCORE,
+               oao.execute_type, 
+               oao.autoship_status, 
+               oao.execute_status,
+               mmn.MEMBER_NAME,
+               (SELECT SUM(oal.pv * oal.QUANTITY)
+                  FROM om_autoship_line oal
+                 WHERE oao.autoship_id = oal.autoship_id) pv_sum,
+               (oao.order_amt + coalesce((SELECT logistics.SHIPPING_FEE FROM OM_SALES_LOGISTICS logistics where logistics.HEADER_ID =oao.AUTOSHIP_ID  and autoship_flag='Y'),0)) order_amt,
+               oao.creation_date,
+               su.user_name,
+               (CASE
+	            WHEN oao.AUTOSHIP_STATUS = 'TER' THEN
+	            ( SELECT  su1.user_name
+     FROM (sys_user su1 left outer join
+            sys_acc_rel sar1  on (su1.user_id=sar1.rel_party_id and sar1.ACCOUNT_TYPE = 'USER'))
+            left outer join sys_account sa1 on(sar1.account_id = sa1.account_id)
+       where sa1.account_id = oao.LAST_UPDATED_BY)
+	            ELSE '' 
+	            END) LAST_UPDATED_NAME,
+	            
+	            (CASE
+	            WHEN oao.AUTOSHIP_STATUS = 'TER' THEN
+	            oao.LAST_UPDATE_DATE
+	            ELSE null 
+	            END) LAST_UPDATE_DATE,
+                oao.autoship_id
+                   ,(SELECT MAX(t.creation_date) FROM om_sales_order t WHERE t.source_type = 'AUTOS' AND T.SOURCE_KEY=autoship_number) LATEST_EXECUTE_DATE
+    ,(SELECT MAX(t.batch_number) FROM om_sales_order t WHERE t.source_type = 'AUTOS' AND T.SOURCE_KEY=autoship_number) LATEST_BATCH_NUMBER,
+    (SELECT t2.ORDER_NUMBER from om_sales_order t2 where t2.CREATION_DATE = 
+(SELECT MAX(t1.CREATION_DATE) FROM om_sales_order t1 WHERE t1.source_type = 'AUTOS' AND t1.SOURCE_KEY= oao.AUTOSHIP_NUMBER)
+and t2.SOURCE_KEY = oao.AUTOSHIP_NUMBER) last_order_number,
+    (SELECT t2.HEADER_ID from om_sales_order t2 where t2.CREATION_DATE = 
+    (SELECT MAX(t1.CREATION_DATE) FROM om_sales_order t1 WHERE t1.source_type = 'AUTOS' AND t1.SOURCE_KEY= oao.AUTOSHIP_NUMBER)
+    and t2.SOURCE_KEY = oao.AUTOSHIP_NUMBER) LAST_ORDER_ID
+          FROM om_autoship_order oao
+       LEFT OUTER JOIN
+	  (SELECT mm.MEMBER_ID, 
+        (CASE MM.MEMBER_TYPE  WHEN  'COMP' THEN COALESCE(CASE
+                WHEN MM.REF_COMPANY IS NULL THEN
+                MM.REF_COMPANY_EN
+                ELSE
+                MM.REF_COMPANY
+                END ,'')
+            ELSE
+       CONCAT(CASE
+                WHEN MM.ENGLISH_NAME IS NULL THEN
+                 ''
+                WHEN MM.CHINESE_NAME IS NULL THEN
+                 MM.ENGLISH_NAME
+                ELSE
+                 CONCAT(MM.ENGLISH_NAME, '/')
+              END,
+              MM.CHINESE_NAME)  END )AS MEMBER_NAME from MM_MEMBER_V mm ) mmn on mmn.MEMBER_ID = oao.MEMBER_ID,
+               mm_member         mmm,
+               sys_account       sa,
+               sys_acc_rel       sar,
+               sys_user          su
+         WHERE oao.member_id = mmm.member_id
+           AND oao.created_by = sa.account_id
+           AND sar.account_id = sa.account_id
+           AND su.user_id = sar.rel_party_id
+   
+         AND oao.SALES_ORG_ID =  #{salesOrgId,jdbcType=DECIMAL}
+        <if test="autoshipNumber != null">
+            AND oao.AUTOSHIP_NUMBER like concat('%',concat(#{autoshipNumber,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="autoshipStatus != null">
+            AND oao.AUTOSHIP_STATUS in 
+            <foreach item="status" index="index" collection="autoShipStatusList" open="(" separator=","
+                    close=")">
+                    #{status}
+                </foreach>
+        </if>
+        <if test="memberNumber != null">
+            AND mmm.MEMBER_CODE like concat('%',concat(#{memberNumber,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="memberName != null">
+            AND mmn.MEMBER_NAME like concat('%',concat(#{memberName,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="executeStatus != null">
+            AND oao.execute_status = #{executeStatus,jdbcType=VARCHAR}
+        </if>   
+        <if test="autoshipCreateDateForm != null">
+            AND oao.creation_date &gt; #{autoshipCreateDateForm,jdbcType=TIMESTAMP}
+        </if>
+        <if test="autoshipCreateDateTo != null">
+            AND oao.creation_date &lt;
+            #{autoshipCreateDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="sortname =='autoshipNumber'">
+            order by oao.AUTOSHIP_NUMBER ${sortorder}
+        </if>
+        <if test="sortname =='creationDate'">
+            order by oao.CREATION_DATE ${sortorder}
+        </if>            
+    </select>
+    
+    <update id="updateStatusByPrimaryKey">
+       update OM_AUTOSHIP_ORDER SET OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,AUTOSHIP_STATUS = #{autoshipStatus,jdbcType=VARCHAR},
+        LAST_UPDATE_DATE =CURRENT_TIMESTAMP
+        where AUTOSHIP_ID = #{autoshipId,jdbcType=DECIMAL}
+    </update>
+    
+    <select id="checkByMemberId" resultType="java.lang.Long">
+        select AUTOSHIP_ID from OM_AUTOSHIP_ORDER where MEMBER_ID=#{memberId,jdbcType=DECIMAL}
+        AND (AUTOSHIP_STATUS='ACV' OR AUTOSHIP_STATUS='SUS')
+    </select>
+    
+    <select id="checkById" resultType="java.lang.Long">
+        select AUTOSHIP_ID from OM_AUTOSHIP_ORDER where (AUTOSHIP_STATUS='ACV' OR AUTOSHIP_STATUS='SUS')
+        AND MEMBER_ID=(SELECT MEMBER_ID FROM OM_AUTOSHIP_ORDER WHERE AUTOSHIP_ID=#{autoshipId,jdbcType=DECIMAL})
+        AND AUTOSHIP_ID != #{autoshipId,jdbcType=DECIMAL}   
+    </select>
+    
+    <select id="selectAutoShipOrderByMember" resultMap="BaseResultMap">
+        select 
+        <include refid="Base_Column_List" />
+    ,(SELECT MAX(t.creation_date) FROM om_sales_order t WHERE t.source_type = 'AUTOS' AND T.SOURCE_KEY=autoship_number) LATEST_EXECUTE_DATE
+    ,(SELECT MAX(t.batch_number) FROM om_sales_order t WHERE t.source_type = 'AUTOS' AND T.SOURCE_KEY=autoship_number) LATEST_BATCH_NUMBER
+        from OM_AUTOSHIP_ORDER oao
+        where
+        oao.AUTOSHIP_STATUS='ACV'
+        <if test="memberId != null">
+        and oao.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+        </if>
+        and oao.SALES_ORG_ID = #{request.salesOrgId,jdbcType=DECIMAL}
+    </select>
+</mapper>

@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.member.mapper.MemDistributorMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.member.dto.MemDistributor" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD" >
+    <result column="RECORD_ID" property="recordId" jdbcType="DECIMAL" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="MESSAGE_DATE" property="messageDate" jdbcType="TIMESTAMP" />
+    <result column="RECORD_DATE" property="recordDate" jdbcType="TIMESTAMP" />    
+  </resultMap>
+    <sql id="Base_Column_List" >
+    RECORD_ID, MEMBER_ID, MESSAGE_DATE, RECORD_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+    PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+    ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+    ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+    ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemDistributor" >
+    <selectKey resultType="java.lang.Long" keyProperty="recordId" order="BEFORE" >
+      SELECT mm_mem_distributor_S.NEXTVAL FROM DUAL
+    </selectKey>
+    insert into MM_MEM_DISTRIBUTOR (RECORD_ID, MEMBER_ID, MESSAGE_DATE, 
+      RECORD_DATE,  CREATION_DATE, CREATED_BY, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+      ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+      ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, 
+      ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+      ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+      ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+      ATTRIBUTE15)
+    values (#{recordId,jdbcType=DECIMAL}, #{memberId,jdbcType=DECIMAL}, #{messageDate,jdbcType=TIMESTAMP}, 
+      #{recordDate,jdbcType=TIMESTAMP}, CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, 
+      #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, 
+      #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, 
+      #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, 
+      #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, 
+      #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, 
+      #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  
+  <update id="update" parameterType="com.lkkhpg.dsis.common.member.dto.MemDistributor" >
+    update MM_MEM_DISTRIBUTOR
+    set 
+      MEMBER_ID = #{record.memberId,jdbcType=DECIMAL},
+      MESSAGE_DATE = #{record.messageDate,jdbcType=TIMESTAMP},
+      RECORD_DATE = #{record.recordDate,jdbcType=TIMESTAMP},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      REQUEST_ID = #{record.requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{record.programId,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{record.lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{record.lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{record.attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{record.attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{record.attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{record.attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{record.attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{record.attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{record.attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{record.attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{record.attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{record.attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{record.attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{record.attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{record.attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{record.attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{record.attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{record.attribute15,jdbcType=VARCHAR}
+    where RECORD_ID = #{record.recordId,jdbcType=DECIMAL}
+  </update>
+  
+  
+  
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemDistributor" >
+    <selectKey resultType="java.lang.Short" keyProperty="recordId" order="BEFORE" >
+      SELECT mm_mem_distributor_S.NEXTVAL FROM DUAL
+    </selectKey>
+    insert into MM_MEM_DISTRIBUTOR
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      RECORD_ID,
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="messageDate != null" >
+        MESSAGE_DATE,
+      </if>
+      <if test="recordDate != null" >
+        RECORD_DATE,
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{recordId,jdbcType=DECIMAL},
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="messageDate != null" >
+        #{messageDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="recordDate != null" >
+        #{recordDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="objectVersionNumber != null" >
+        #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  
+    <select id="selectByAttributes" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.member.dto.MemDistributor" >
+    select
+    <include refid="Base_Column_List" />
+    from MM_MEM_DISTRIBUTOR
+    where 1=1
+      <if test="memberId != null" >
+        AND MEMBER_ID =#{memberId,jdbcType=DECIMAL}
+      </if>
+  </select>
+</mapper>

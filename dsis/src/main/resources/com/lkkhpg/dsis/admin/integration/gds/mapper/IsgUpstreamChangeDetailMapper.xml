@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgUpstreamChangeDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgUpstreamChangeDetail" >
+    <id column="INTERFACE_DETAIL_ID" property="interfaceDetailId" jdbcType="DECIMAL" />
+    <result column="INTERFACE_ID" property="interfaceId" jdbcType="DECIMAL" />
+    <result column="ALTER_NO" property="alterNo" jdbcType="VARCHAR" />
+    <result column="TRAN_PERIOD" property="tranPeriod" jdbcType="VARCHAR" />
+    <result column="TRAN_ORG_CODE" property="tranOrgCode" jdbcType="VARCHAR" />
+    <result column="TRAN_DEALER_NO" property="tranDealerNo" jdbcType="VARCHAR" />
+    <result column="TRAN_BASE" property="tranBase" jdbcType="VARCHAR" />
+    <result column="TRAN_MODE" property="tranMode" jdbcType="VARCHAR" />
+    <result column="TRAN_FROM_SPONSOR_NO" property="tranFromSponsorNo" jdbcType="VARCHAR" />
+    <result column="TRAN_FROM_DEALER_TYPE" property="tranFromDealerType" jdbcType="VARCHAR" />
+    <result column="TRAN_TO_SPONSOR_NO" property="tranToSponsorNo" jdbcType="VARCHAR" />
+    <result column="TRAN_TO_DEALER_TYPE" property="tranToDealerType" jdbcType="VARCHAR" />
+    <result column="ORG_SYN" property="orgSyn" jdbcType="VARCHAR" />
+    <result column="ORG_SYN_TIME" property="orgSynTime" jdbcType="VARCHAR" />
+    <result column="ORG_SYN_BY" property="orgSynBy" jdbcType="VARCHAR" />
+    <result column="GDS_RECHECK_FLAG" property="gdsRecheckFlag" jdbcType="VARCHAR" />
+    <result column="GDS_RECHECK_TIME" property="gdsRecheckTime" jdbcType="VARCHAR" />
+    <result column="GDS_RECHECK_BY" property="gdsRecheckBy" jdbcType="VARCHAR" />
+    <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_TIME" property="lastUpdatedTime" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+    <result column="UPLOAD_FLAG" property="uploadFlag" jdbcType="VARCHAR" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="APP_NO" property="appNo" jdbcType="VARCHAR" />
+    <result column="PROCESS_STATUS" property="processStatus" jdbcType="VARCHAR" />
+    <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP" />
+    <result column="PROCESS_MESSAGE" property="processMessage" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INTERFACE_DETAIL_ID, INTERFACE_ID, ALTER_NO, TRAN_PERIOD, TRAN_ORG_CODE, TRAN_DEALER_NO, 
+    TRAN_BASE, TRAN_MODE, TRAN_FROM_SPONSOR_NO, TRAN_FROM_DEALER_TYPE, TRAN_TO_SPONSOR_NO, 
+    TRAN_TO_DEALER_TYPE, ORG_SYN, ORG_SYN_TIME, ORG_SYN_BY, GDS_RECHECK_FLAG, GDS_RECHECK_TIME, 
+    GDS_RECHECK_BY, COMMENTS, LAST_UPDATED_TIME, LAST_UPDATED_BY, UPLOAD_FLAG, ADVISE_NO, 
+    APP_NO, PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, REQUEST_ID, PROGRAM_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from ISG_UPSTREAM_CHANGE_DETAIL
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from ISG_UPSTREAM_CHANGE_DETAIL
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgUpstreamChangeDetail" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceDetailId" order="BEFORE" >
+      select ISG_UPSTREAM_CHANGE_DETAIL_S.nextval from dual
+    </selectKey>
+    insert into ISG_UPSTREAM_CHANGE_DETAIL (INTERFACE_DETAIL_ID, INTERFACE_ID, ALTER_NO, 
+      TRAN_PERIOD, TRAN_ORG_CODE, TRAN_DEALER_NO, 
+      TRAN_BASE, TRAN_MODE, TRAN_FROM_SPONSOR_NO, 
+      TRAN_FROM_DEALER_TYPE, TRAN_TO_SPONSOR_NO, TRAN_TO_DEALER_TYPE, 
+      ORG_SYN, ORG_SYN_TIME, ORG_SYN_BY, 
+      GDS_RECHECK_FLAG, GDS_RECHECK_TIME, GDS_RECHECK_BY, 
+      COMMENTS, LAST_UPDATED_TIME, LAST_UPDATED_BY, 
+      UPLOAD_FLAG, ADVISE_NO, APP_NO, 
+      PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+      REQUEST_ID, PROGRAM_ID)
+    values (#{interfaceDetailId,jdbcType=DECIMAL}, #{interfaceId,jdbcType=DECIMAL}, #{alterNo,jdbcType=VARCHAR}, 
+      #{tranPeriod,jdbcType=VARCHAR}, #{tranOrgCode,jdbcType=VARCHAR}, #{tranDealerNo,jdbcType=VARCHAR}, 
+      #{tranBase,jdbcType=VARCHAR}, #{tranMode,jdbcType=VARCHAR}, #{tranFromSponsorNo,jdbcType=VARCHAR}, 
+      #{tranFromDealerType,jdbcType=VARCHAR}, #{tranToSponsorNo,jdbcType=VARCHAR}, #{tranToDealerType,jdbcType=VARCHAR}, 
+      #{orgSyn,jdbcType=VARCHAR}, #{orgSynTime,jdbcType=VARCHAR}, #{orgSynBy,jdbcType=VARCHAR}, 
+      #{gdsRecheckFlag,jdbcType=VARCHAR}, #{gdsRecheckTime,jdbcType=VARCHAR}, #{gdsRecheckBy,jdbcType=VARCHAR}, 
+      #{comments,jdbcType=VARCHAR}, #{lastUpdatedTime,jdbcType=VARCHAR}, #{lastUpdatedBy,jdbcType=VARCHAR}, 
+      #{uploadFlag,jdbcType=VARCHAR}, #{adviseNo,jdbcType=VARCHAR}, #{appNo,jdbcType=VARCHAR}, 
+      #{processStatus,jdbcType=VARCHAR}, current_timestamp, #{processMessage,jdbcType=VARCHAR}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgUpstreamChangeDetail" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceDetailId" order="BEFORE" >
+      select ISG_UPSTREAM_CHANGE_DETAIL_S.nextval from dual
+    </selectKey>
+    insert into ISG_UPSTREAM_CHANGE_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INTERFACE_DETAIL_ID,
+      <if test="interfaceId != null" >
+        INTERFACE_ID,
+      </if>
+      <if test="alterNo != null" >
+        ALTER_NO,
+      </if>
+      <if test="tranPeriod != null" >
+        TRAN_PERIOD,
+      </if>
+      <if test="tranOrgCode != null" >
+        TRAN_ORG_CODE,
+      </if>
+      <if test="tranDealerNo != null" >
+        TRAN_DEALER_NO,
+      </if>
+      <if test="tranBase != null" >
+        TRAN_BASE,
+      </if>
+      <if test="tranMode != null" >
+        TRAN_MODE,
+      </if>
+      <if test="tranFromSponsorNo != null" >
+        TRAN_FROM_SPONSOR_NO,
+      </if>
+      <if test="tranFromDealerType != null" >
+        TRAN_FROM_DEALER_TYPE,
+      </if>
+      <if test="tranToSponsorNo != null" >
+        TRAN_TO_SPONSOR_NO,
+      </if>
+      <if test="tranToDealerType != null" >
+        TRAN_TO_DEALER_TYPE,
+      </if>
+      <if test="orgSyn != null" >
+        ORG_SYN,
+      </if>
+      <if test="orgSynTime != null" >
+        ORG_SYN_TIME,
+      </if>
+      <if test="orgSynBy != null" >
+        ORG_SYN_BY,
+      </if>
+      <if test="gdsRecheckFlag != null" >
+        GDS_RECHECK_FLAG,
+      </if>
+      <if test="gdsRecheckTime != null" >
+        GDS_RECHECK_TIME,
+      </if>
+      <if test="gdsRecheckBy != null" >
+        GDS_RECHECK_BY,
+      </if>
+      <if test="comments != null" >
+        COMMENTS,
+      </if>
+      <if test="lastUpdatedTime != null" >
+        LAST_UPDATED_TIME,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="uploadFlag != null" >
+        UPLOAD_FLAG,
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO,
+      </if>
+      <if test="appNo != null" >
+        APP_NO,
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS,
+      </if>
+        PROCESS_DATE,
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{interfaceDetailId,jdbcType=DECIMAL},
+      <if test="interfaceId != null" >
+        #{interfaceId,jdbcType=DECIMAL},
+      </if>
+      <if test="alterNo != null" >
+        #{alterNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tranPeriod != null" >
+        #{tranPeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="tranOrgCode != null" >
+        #{tranOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="tranDealerNo != null" >
+        #{tranDealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tranBase != null" >
+        #{tranBase,jdbcType=VARCHAR},
+      </if>
+      <if test="tranMode != null" >
+        #{tranMode,jdbcType=VARCHAR},
+      </if>
+      <if test="tranFromSponsorNo != null" >
+        #{tranFromSponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tranFromDealerType != null" >
+        #{tranFromDealerType,jdbcType=VARCHAR},
+      </if>
+      <if test="tranToSponsorNo != null" >
+        #{tranToSponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tranToDealerType != null" >
+        #{tranToDealerType,jdbcType=VARCHAR},
+      </if>
+      <if test="orgSyn != null" >
+        #{orgSyn,jdbcType=VARCHAR},
+      </if>
+      <if test="orgSynTime != null" >
+        #{orgSynTime,jdbcType=VARCHAR},
+      </if>
+      <if test="orgSynBy != null" >
+        #{orgSynBy,jdbcType=VARCHAR},
+      </if>
+      <if test="gdsRecheckFlag != null" >
+        #{gdsRecheckFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="gdsRecheckTime != null" >
+        #{gdsRecheckTime,jdbcType=VARCHAR},
+      </if>
+      <if test="gdsRecheckBy != null" >
+        #{gdsRecheckBy,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="lastUpdatedTime != null" >
+        #{lastUpdatedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadFlag != null" >
+        #{uploadFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appNo != null" >
+        #{appNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="processMessage != null" >
+        #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgUpstreamChangeDetail" >
+    update ISG_UPSTREAM_CHANGE_DETAIL
+    <set >
+      <if test="interfaceId != null" >
+        INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL},
+      </if>
+      <if test="alterNo != null" >
+        ALTER_NO = #{alterNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tranPeriod != null" >
+        TRAN_PERIOD = #{tranPeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="tranOrgCode != null" >
+        TRAN_ORG_CODE = #{tranOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="tranDealerNo != null" >
+        TRAN_DEALER_NO = #{tranDealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tranBase != null" >
+        TRAN_BASE = #{tranBase,jdbcType=VARCHAR},
+      </if>
+      <if test="tranMode != null" >
+        TRAN_MODE = #{tranMode,jdbcType=VARCHAR},
+      </if>
+      <if test="tranFromSponsorNo != null" >
+        TRAN_FROM_SPONSOR_NO = #{tranFromSponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tranFromDealerType != null" >
+        TRAN_FROM_DEALER_TYPE = #{tranFromDealerType,jdbcType=VARCHAR},
+      </if>
+      <if test="tranToSponsorNo != null" >
+        TRAN_TO_SPONSOR_NO = #{tranToSponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tranToDealerType != null" >
+        TRAN_TO_DEALER_TYPE = #{tranToDealerType,jdbcType=VARCHAR},
+      </if>
+      <if test="orgSyn != null" >
+        ORG_SYN = #{orgSyn,jdbcType=VARCHAR},
+      </if>
+      <if test="orgSynTime != null" >
+        ORG_SYN_TIME = #{orgSynTime,jdbcType=VARCHAR},
+      </if>
+      <if test="orgSynBy != null" >
+        ORG_SYN_BY = #{orgSynBy,jdbcType=VARCHAR},
+      </if>
+      <if test="gdsRecheckFlag != null" >
+        GDS_RECHECK_FLAG = #{gdsRecheckFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="gdsRecheckTime != null" >
+        GDS_RECHECK_TIME = #{gdsRecheckTime,jdbcType=VARCHAR},
+      </if>
+      <if test="gdsRecheckBy != null" >
+        GDS_RECHECK_BY = #{gdsRecheckBy,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        COMMENTS = #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="lastUpdatedTime != null" >
+        LAST_UPDATED_TIME = #{lastUpdatedTime,jdbcType=VARCHAR},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadFlag != null" >
+        UPLOAD_FLAG = #{uploadFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appNo != null" >
+        APP_NO = #{appNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgUpstreamChangeDetail" >
+    update ISG_UPSTREAM_CHANGE_DETAIL
+    set INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL},
+      ALTER_NO = #{alterNo,jdbcType=VARCHAR},
+      TRAN_PERIOD = #{tranPeriod,jdbcType=VARCHAR},
+      TRAN_ORG_CODE = #{tranOrgCode,jdbcType=VARCHAR},
+      TRAN_DEALER_NO = #{tranDealerNo,jdbcType=VARCHAR},
+      TRAN_BASE = #{tranBase,jdbcType=VARCHAR},
+      TRAN_MODE = #{tranMode,jdbcType=VARCHAR},
+      TRAN_FROM_SPONSOR_NO = #{tranFromSponsorNo,jdbcType=VARCHAR},
+      TRAN_FROM_DEALER_TYPE = #{tranFromDealerType,jdbcType=VARCHAR},
+      TRAN_TO_SPONSOR_NO = #{tranToSponsorNo,jdbcType=VARCHAR},
+      TRAN_TO_DEALER_TYPE = #{tranToDealerType,jdbcType=VARCHAR},
+      ORG_SYN = #{orgSyn,jdbcType=VARCHAR},
+      ORG_SYN_TIME = #{orgSynTime,jdbcType=VARCHAR},
+      ORG_SYN_BY = #{orgSynBy,jdbcType=VARCHAR},
+      GDS_RECHECK_FLAG = #{gdsRecheckFlag,jdbcType=VARCHAR},
+      GDS_RECHECK_TIME = #{gdsRecheckTime,jdbcType=VARCHAR},
+      GDS_RECHECK_BY = #{gdsRecheckBy,jdbcType=VARCHAR},
+      COMMENTS = #{comments,jdbcType=VARCHAR},
+      LAST_UPDATED_TIME = #{lastUpdatedTime,jdbcType=VARCHAR},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=VARCHAR},
+      UPLOAD_FLAG = #{uploadFlag,jdbcType=VARCHAR},
+      ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      APP_NO = #{appNo,jdbcType=VARCHAR},
+      PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL}
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateUploadFlagToY" parameterType="java.util.Map" >
+      update ISG_UPSTREAM_CHANGE_DETAIL
+       set UPLOAD_FLAG = 'Y',
+           PROCESS_DATE = CURRENT_TIMESTAMP
+       where ALTER_NO = #{alterNo,jdbcType=VARCHAR}
+             AND ADVISE_NO = #{adviseNo,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateStatusAndMessage" parameterType="java.util.Map">
+    update ISG_UPSTREAM_CHANGE_DETAIL
+    <set>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      </if>
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+    </set>
+     where ALTER_NO = #{alterNo,jdbcType=VARCHAR}
+           AND ADVISE_NO = #{adviseNo,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select <include refid="Base_Column_List" />
+      from ISG_UPSTREAM_CHANGE_DETAIL
+    <where>
+        PROCESS_DATE &gt; #{processDateFrom,jdbcType=TIMESTAMP}
+        <if test="requestDateTo != null" >
+            AND PROCESS_DATE &lt; #{processDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="processStatus != null" >
+            AND PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="advoiseNo != null" >
+            AND ADVISE_NO = #{advoiseNo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by interface_id desc
+  </select>
+</mapper>

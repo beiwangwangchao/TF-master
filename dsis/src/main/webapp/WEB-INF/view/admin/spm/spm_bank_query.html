@@ -1,0 +1,222 @@
+<#--
+ * description: 银行查询界面
+ * version: 1.0 
+ * author: liuxuan
+ * .
+ * 
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?types=SPM.BANK_TYPE&Typedefs=RM.RETURN_TYPE"
+	type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161107" type="text/javascript"></script>
+<body style="padding: 10px;">
+    <form id="queryForm"></form>
+    <div id="bankGrid" style="margin: 0; padding: 0">
+    </div>
+    <script type="text/javascript">
+    $(function() {
+        window['queryForm'] = $("#queryForm").ligerForm({
+            fields : [
+                /* 
+                {
+                	name : 'marketId',
+                	type: 'hidden'
+                },
+				{ name : 'marketName',
+					type : 'text',
+					label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.marketid"/>',
+					newline : true ,
+					readonly:true
+				}, */
+
+                    {
+	                    label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.marketid"/>',
+	                    newline:false, 
+	                    name: 'marketId',
+	                    type : "combobox",
+	                    options : {
+	                        url: '${base.contextPath}/spm/market/queryMarketsByRole',
+	                        value : _marketId,
+	                        valueField: "marketId",
+	                        textField: "name",
+	                        onSelected : function(marketId,text) {
+                                //alert(marketId+"---"+text);
+                                //window.location = '${base.contextPath}/spm/spm_bank_query.html?sort=1&market='+ marketId +'&marketName='+text;
+	                        	//bankGrid.loadData(null);
+	                        	Hap.gridQuery({
+		                            form : queryForm,
+		                            grid : bankGrid
+		                        })
+                            }
+	                    },
+	                    validate : {
+	                        required : true
+	                    }
+                    },
+                { name : 'bankNumber',
+					label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.banknumber"/>', 
+					newline : false
+					},
+					{ name : 'bankName',
+						label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.bankname"/>', 
+						newline : false ,
+						type:'text'
+					},
+	            { 	 type: 'combobox',
+			            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.banktype"/>',
+			            name: 'bankType',
+			            options: {
+			                data: types,
+			                valueField: "value",
+			                textField: "meaning"
+			            }
+				            
+						},
+	            {
+                	  name : 'startDate',
+  	                label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.startdate"/>',
+  	                type : 'date',
+  	                format: 'YYYY-MM-DD',
+  	                newline:false,
+  	                options:{
+  		                onChangeDate  :function(date){
+  		                	if($("input[name='startDate']").val()<date){
+  		                		if($("input[name='startDate']").val()!=""){
+  			                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+  			                		$.ligerui.get("overDate").setValue("");
+  		                		}
+  		                	}
+  		                }
+  	                }
+  	            },
+	            {
+  	            	 name : 'overDate',
+ 	                label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.overdate"/>',
+ 	                type : 'date',
+ 	                format: 'YYYY-MM-DD',
+ 	                newline:false,
+ 	                options:{
+ 		                onChangeDate : function(date){
+ 		                	if($("input[name='overDate']").val()>date){
+ 		                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+ 		                		$.ligerui.get("startDate").setValue("");
+ 		                	}
+ 		                }
+ 	                }
+ 	            }
+ 	        ],
+            buttons : [
+                {
+	                text : '<@spring.message "sys.hand.btn.query"/>',
+	                disabled : false,
+	                width : 60,
+	                click : function() {
+	                	if(Hap.validateForm(queryForm) == false){
+                            return;
+                        }
+	                    Hap.gridQuery({
+	                        form : queryForm,
+	                        grid : bankGrid
+	                    })
+	                }
+	            },{
+                    text : '<@spring.message "sys.hand.btn.create"/>',
+                    disabled : false,
+                    width : 60,
+                    click: function(){  
+                        /* window.top.f_removeTab('DM_SHIPPING');
+                        window.top.f_addTab('DM_SHIPPING','<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shipping.createshipping"/>','${base.contextPath}/dm/dm_shipping_tier.html'); */
+                     /*   self.location='${base.contextPath}/spm/spm_bank_edit.html'; */
+                    	window.top.f_removeTab('SPM_BANK_B');
+                          window.top.f_addTab('SPM_BANK_B','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.create"/>','${base.contextPath}/spm/spm_bank_edit.html');
+                    }
+                }
+            ]
+        });
+        
+        
+         var bankGrid;
+         bankGrid = window['bankGrid'] = $("#bankGrid").ligerGrid({
+            columns : [
+                {
+   	                display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.banknumber"/>',
+   	                name : 'bankNumber',
+   	                align : 'left',
+   	             render: function (row){
+                     /* return '<a href="spm_bank_edit.html?isedit=1&bankId='+row.bankId+'">'+row.bankNumber+'</a>';  */
+   	            	 return "<a href='javascript:void(0);' onclick='bankEdit(\""+row.bankId+"\")'>" + row.bankNumber + "</a> ";
+
+                 }
+   	               
+    	        },
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.bankname"/>',
+	                name : 'bankName',
+	                type:'tl',editor:{idField:'bankId',dto:'com.lkkhpg.dsis.common.inventory.lading.dto.SpmBank'},
+	                align : 'left'
+	             
+                },
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.startenddate"/>',
+	                name : 'endActiveDate',
+	                align : 'left',
+                    type : 'text'
+                   
+	            },
+	             {
+	                name : 'bankType',
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.banktype"/>',
+	                align : 'left',
+	                 render : function(item) {
+						for (var i = 0; i < types.length; i++) {
+							if (types[i].value == item.bankType) {
+								return types[i].meaning;
+							}
+						}
+					} 
+	            } 
+            ],
+            url : '${base.contextPath}/spm/bank/query',
+            toolbar: {
+            	items: [
+                { line: true },
+            	{                  
+                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                    menu:{ width: 120, items:
+                            [
+                                {                   
+                                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                    click:   function (){exportSelected("queryForm","bankGrid",{"bankType":types,"returnType":Typedefs},_basePath);}
+                                },
+                                { line: true },
+                                {                   
+                                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                    click: function (){exportAll("queryForm","bankGrid",{"bankType":types,"returnType":Typedefs},_basePath);}
+                                    
+                                }
+                          ]
+                    }                        
+                }
+            	]
+            },
+            //enabledEdit : true,
+            width : '99%',
+            height : '98%',
+            delayLoad: true,
+            rownumbers: true,
+            checkbox : true
+        });
+         liger.get('marketId').setText(_marketName);
+         Hap.gridQuery({
+             form: queryForm,
+             grid: bankGrid
+         })
+    });
+    function bankEdit(bankId){
+        window.top.f_removeTab('SPM_BANK_B_edit');
+        window.top.f_addTab('SPM_BANK_B_edit', '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.details"/>', 'spm/spm_bank_edit.html?isedit=1&bankId=' + bankId + '&marketId=' + liger.get('marketId').getValue());
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<#--
+ * description: 优惠券查询.
+ * version: 1.0
+ * author: hanrui.huang
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161110" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?voucherType=PDM.APPLY_CRITERIA&pdmApplyCrieria=PDM.APPLY_CRITERIA" type="text/javascript"></script>
+<body style="padding: 10px;">
+    <!-- 优惠券表单 -->
+    <form id="voucher_form"></form>
+    <!-- 优惠券表格 -->
+    <div id="voucher_grid"></div>
+    <script type="text/javascript">
+    <#assign isedit = (RequestParameters.isedit!'0')/>
+  //优惠券状态
+    var proData =[{value: 'Y', meaning: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.effective"/>'},{value: 'N', meaning: '<@spring.message "type.com.lkkhpg.dsis.common.member.btn.memberdetails.terminate"/>'}];
+    $(function(){
+        initForm();
+        liger.get('salesOrgId').setText(_salesOrgName);
+        initGrid();
+        Hap.gridQuery({
+            form: voucher_form,
+            grid: voucher_grid
+        })
+        if(_salesOrgId == undefined || _salesOrgId ==''){
+        	$.ligerui.get("voucher_form").setEditable(false);
+        	liger.get('voucher_grid_tool').setDisabled('voucher_grid_add');
+        }
+    });
+    function initForm() {
+        window['voucher_form'] = $("#voucher_form").ligerForm({
+            fields: [
+                     {
+                        label: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition"/>',
+                        newline:false, 
+                        name: 'salesOrgId',
+                        type : "combobox",
+                        options : {
+                        	url: '${base.contextPath}/sys/salesOrg/queryOrg',
+                        	value:_salesOrgId,
+                        	valueField: "salesOrgId",
+                            textField: "name",
+                            onSelected : function() {
+                            	Hap.gridQuery({
+                                    form:voucher_form,
+                                    grid:voucher_grid
+                                })
+                            }
+                        },
+                        validate : {
+                            required : true
+                        }
+                    },
+                    /* {
+                        name: 'salesOrgId',
+                        type : "hidden",
+                        options : {
+                            value:_salesOrgId
+                        }
+                    }, */
+                    {
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.couponscode"/>',
+                        newline:false, 
+                        name: 'voucherCode',
+                        type : "text"
+                    },
+                    {
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.couponsname"/>',
+                        newline:false,
+                        name: 'name',
+                        type : "text"
+                    },
+                    {
+                        label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.status"/>',
+                        newline:true,
+                        name: 'enabledFlag',
+                        type : 'select',
+                        options : {
+                            valueField : 'value',
+                            textField : 'meaning',
+                            data : proData
+                        }
+                    },
+                    {
+                        label: '<@spring.message "type.application.conditions"/>',
+                        newline:false,
+                        name : 'applyCriteria',
+                        type : 'select',
+                        options : {
+                            data : pdmApplyCrieria,
+                            valueField : 'value',
+                            textField : 'meaning'
+                        }
+                    },
+                    {
+                        label:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.profile.profiledesc"/>',
+                        newline:false,
+                        name:'description',
+                        type:'text'
+                    },
+                    {
+                        label:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateFrom"/>',
+                        newline:true,
+                        name: 'startActiveDate',
+                        type : "date",
+                        options : {
+                            format : 'yyyy-MM-dd',
+                            onChangeDate : function(data){
+                                var startActiveDate = liger.get('endActiveDate').getValue();
+                                if(new Date(startActiveDate) < new Date(data)){
+                                    $.ligerDialog.error('<@spring.message "typr.com.lkkhpg.dsis.common.promotion.dto.voucher.date.error"/>');
+                                    return false;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        label:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateTo"/>',
+                        newline:false,
+                        name: 'endActiveDate',
+                        type : "date",
+                        options : {
+                            format : 'yyyy-MM-dd',
+                            onChangeDate : function(data){
+                                var startActiveDate = liger.get('startActiveDate').getValue();
+                                if(new Date(startActiveDate) > new Date(data)){
+                                    $.ligerDialog.error('<@spring.message "typr.com.lkkhpg.dsis.common.promotion.dto.voucher.date.error"/>');
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    ],
+           buttons: [
+                     {
+                         text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                        	 if(Hap.validateForm(voucher_form) == false){
+                        		 return;
+                        	 }
+                             Hap.gridQuery({
+                                 form:voucher_form,
+                                 grid:voucher_grid
+                             })
+                         }
+                     }
+                     ]
+       });
+    }
+    function initGrid() {
+        window['voucher_grid'] = $("#voucher_grid").ligerGrid({
+            columns: [
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.couponscode"/>',
+                          name: 'voucherCode', align: 'left', width: '150',isSort : true,
+                          render : function (data) 
+                          {
+                              var html = "<a href='#' onClick='editClick(\"" + data.voucherId +"\",\"" + data.category+ "\")'>" + data.voucherCode + "</a>";
+                              return html;
+                          }
+                      },
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.couponsname"/>',
+                          name: 'name', align: 'left', width: '150'
+                      },
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.remark"/>',
+                          name: 'description', align: 'left', width: '150'
+                      },
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.status"/>',
+                          name: 'enabledFlag', align: 'left', width: '150',
+                          render: function(item) {
+                              return getCodeDesc(proData, item.enabledFlag);
+                          }
+                      },
+                      {
+                          display: '<@spring.message "type.application.conditions"/>',
+                          name: 'applyCriteria', align: 'left', width: '150',
+                          render: function(item) {
+                              return getCodeDesc(pdmApplyCrieria, item.applyCriteria);
+                          }
+                      },
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateFrom"/>',
+                          name: 'startActiveDate', align: 'left', width: '150',isSort : true
+                      },
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateTo"/>',
+                          name: 'endActiveDate', align: 'left', width: '150',isSort : true
+                      }
+                      ],
+            url:'${base.contextPath}/pdm/voucher/query',
+            toolbar: {
+            	id : 'voucher_grid_tool',
+                items: [
+                        {
+                        	id : 'voucher_grid_add',
+                            text: '<@spring.message "sys.hand.btn.create"/>',
+                            <#if accessService.access("CREATE_EDITABLE") == false>
+                            disable:true, 
+                            </#if> 
+                            click: function() {
+                                window.top.f_removeTab('voucher');
+                                parent.f_addTab("voucher","<@spring.message 'com.lkkhpg.dsis.common.promotion.dto.voucher.details'/>","${base.contextPath}/promotion/pdm_voucher_edit.html?category=new");
+                            },
+                            icon: 'add'
+                        },
+                        { line: true },
+
+                        {                   
+                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                            menu:{ width: 120, items:
+                                    [
+                                        {                   
+                                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                            click:   function (){exportSelected("voucher_form","voucher_grid",{"enabledFlag":proData,"applyCriteria":pdmApplyCrieria},_basePath);}
+                                        },
+                                        { line: true },
+                                        {                   
+                                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                            click: function (){exportAll("voucher_form","voucher_grid",{"enabledFlag":proData,"applyCriteria":pdmApplyCrieria},_basePath);}
+                                            
+                                        }
+                                  ]
+                            }
+                        }
+                        ]
+            },
+            //enabledEdit : true, 
+            delayLoad : true, 
+            //isSingleCheck : true, 
+            width: '99%', 
+            height: '98%', 
+            rownumbers: true,
+            checkbox : true
+        });
+    }
+    function editClick(data,category) 
+    {
+        window.top.f_removeTab("voucher");
+        parent.f_addTab("voucher","<@spring.message 'com.lkkhpg.dsis.common.promotion.dto.voucher.details'/>","${base.contextPath}/promotion/pdm_voucher_edit.html?isedit=1&voucherId="+data+"&category="+category);
+    }
+    </script>
+</body>

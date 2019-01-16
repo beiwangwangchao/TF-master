@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.system.MessageMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.system.Message" >
+    <id column="MESSAGE_ID" property="messageId" jdbcType="DECIMAL" />
+    <result column="MESSAGE_TYPE" property="messageType" jdbcType="VARCHAR" />
+    <result column="MESSAGE_HOST" property="messageHost" jdbcType="VARCHAR" />
+    <result column="MESSAGE_FROM" property="messageFrom" jdbcType="VARCHAR" />
+    <result column="SUBJECT" property="subject" jdbcType="VARCHAR" />
+    <result column="PRIORITY_LEVEL" property="priorityLevel" jdbcType="VARCHAR" />
+    <result column="SEND_FLAG" property="sendFlag" jdbcType="VARCHAR" />
+    <result column="MESSAGE_SOURCE" property="messageSource" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.lkkhpg.dsis.platform.dto.system.Message" extends="BaseResultMap" >
+    <result column="CONTENT" property="content" jdbcType="CLOB" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    MESSAGE_ID, MESSAGE_TYPE, MESSAGE_HOST, MESSAGE_FROM, SUBJECT, PRIORITY_LEVEL,
+    OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATED_BY, CREATION_DATE, LAST_UPDATED_BY, 
+    LAST_UPDATE_DATE, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+    ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+    ATTRIBUTE14, ATTRIBUTE15, MESSAGE_SOURCE
+  </sql>
+  <sql id="Blob_Column_List" >
+    CONTENT
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from SYS_MESSAGE
+    where MESSAGE_ID = #{messageId,jdbcType=DECIMAL}
+  </select>
+  <!-- 发送SMS -->
+  <select id="selectSmsToSend" resultMap="ResultMapWithBLOBs">
+    select 
+    msg.MESSAGE_ID, msg.MESSAGE_TYPE, msg.MESSAGE_HOST, msg.MESSAGE_FROM, msg.SUBJECT, msg.PRIORITY_LEVEL,
+    msg.OBJECT_VERSION_NUMBER, msg.REQUEST_ID, msg.PROGRAM_ID, msg.CREATED_BY, msg.CREATION_DATE, msg.LAST_UPDATED_BY, 
+    msg.LAST_UPDATE_DATE, msg.ATTRIBUTE1, msg.ATTRIBUTE2, msg.ATTRIBUTE3, msg.ATTRIBUTE4, msg.ATTRIBUTE5, msg.ATTRIBUTE6, 
+    msg.ATTRIBUTE7, msg.ATTRIBUTE8, msg.ATTRIBUTE9, msg.ATTRIBUTE10, msg.ATTRIBUTE11, msg.ATTRIBUTE12, msg.ATTRIBUTE13, 
+    msg.ATTRIBUTE14, msg.ATTRIBUTE15, msg.CONTENT, msg.MESSAGE_SOURCE
+    from SYS_MESSAGE msg
+    where msg.MESSAGE_TYPE = 'SMS'
+    and (msg.PRIORITY_LEVEL is null or msg.PRIORITY_LEVEL = 'NORMAL')
+    and msg.SEND_FLAG  not in ('Y','F')
+  </select>
+  <!-- 发送SMS,VIP队列 -->
+  <select id="selectVipSmsToSend" resultMap="ResultMapWithBLOBs">
+    select 
+    msg.MESSAGE_ID, msg.MESSAGE_TYPE, msg.MESSAGE_HOST, msg.MESSAGE_FROM, msg.SUBJECT, msg.PRIORITY_LEVEL,
+    msg.OBJECT_VERSION_NUMBER, msg.REQUEST_ID, msg.PROGRAM_ID, msg.CREATED_BY, msg.CREATION_DATE, msg.LAST_UPDATED_BY, 
+    msg.LAST_UPDATE_DATE, msg.ATTRIBUTE1, msg.ATTRIBUTE2, msg.ATTRIBUTE3, msg.ATTRIBUTE4, msg.ATTRIBUTE5, msg.ATTRIBUTE6, 
+    msg.ATTRIBUTE7, msg.ATTRIBUTE8, msg.ATTRIBUTE9, msg.ATTRIBUTE10, msg.ATTRIBUTE11, msg.ATTRIBUTE12, msg.ATTRIBUTE13, 
+    msg.ATTRIBUTE14, msg.ATTRIBUTE15, msg.CONTENT, msg.MESSAGE_SOURCE
+    from SYS_MESSAGE msg
+    where msg.MESSAGE_TYPE = 'SMS'
+    and msg.PRIORITY_LEVEL = 'VIP'
+    and msg.SEND_FLAG  not in ('Y','F')
+  </select>
+  <!-- 发送邮件 -->
+  <select id="selectEmailToSend" resultMap="ResultMapWithBLOBs">
+    select 
+    msg.MESSAGE_ID, msg.MESSAGE_TYPE, msg.MESSAGE_HOST, msg.MESSAGE_FROM, msg.SUBJECT, msg.PRIORITY_LEVEL,
+    msg.OBJECT_VERSION_NUMBER, msg.REQUEST_ID, msg.PROGRAM_ID, msg.CREATED_BY, msg.CREATION_DATE, msg.LAST_UPDATED_BY, 
+    msg.LAST_UPDATE_DATE, msg.ATTRIBUTE1, msg.ATTRIBUTE2, msg.ATTRIBUTE3, msg.ATTRIBUTE4, msg.ATTRIBUTE5, msg.ATTRIBUTE6, 
+    msg.ATTRIBUTE7, msg.ATTRIBUTE8, msg.ATTRIBUTE9, msg.ATTRIBUTE10, msg.ATTRIBUTE11, msg.ATTRIBUTE12, msg.ATTRIBUTE13, 
+    msg.ATTRIBUTE14, msg.ATTRIBUTE15, msg.CONTENT, msg.MESSAGE_SOURCE
+    from SYS_MESSAGE msg
+    where msg.MESSAGE_TYPE = 'EMAIL'
+    and (msg.PRIORITY_LEVEL is null or msg.PRIORITY_LEVEL = 'NORMAL')
+    and msg.SEND_FLAG not in ('Y','F')
+  </select>
+  <!-- 发送邮件,VIP队列 -->
+  <select id="selectVipEmailToSend" resultMap="ResultMapWithBLOBs">
+    select 
+    msg.MESSAGE_ID, msg.MESSAGE_TYPE, msg.MESSAGE_HOST, msg.MESSAGE_FROM, msg.SUBJECT, msg.PRIORITY_LEVEL,
+    msg.OBJECT_VERSION_NUMBER, msg.REQUEST_ID, msg.PROGRAM_ID, msg.CREATED_BY, msg.CREATION_DATE, msg.LAST_UPDATED_BY, 
+    msg.LAST_UPDATE_DATE, msg.ATTRIBUTE1, msg.ATTRIBUTE2, msg.ATTRIBUTE3, msg.ATTRIBUTE4, msg.ATTRIBUTE5, msg.ATTRIBUTE6, 
+    msg.ATTRIBUTE7, msg.ATTRIBUTE8, msg.ATTRIBUTE9, msg.ATTRIBUTE10, msg.ATTRIBUTE11, msg.ATTRIBUTE12, msg.ATTRIBUTE13, 
+    msg.ATTRIBUTE14, msg.ATTRIBUTE15, msg.CONTENT, msg.MESSAGE_SOURCE
+    from SYS_MESSAGE msg
+    where msg.MESSAGE_TYPE = 'EMAIL'
+    and msg.PRIORITY_LEVEL = 'VIP'
+    and msg.SEND_FLAG not in ('Y','F')
+  </select>
+  <!-- 发送站内信 -->
+  <select id="selectSiteToSend" resultMap="ResultMapWithBLOBs">
+    select 
+    msg.MESSAGE_ID, msg.MESSAGE_TYPE, msg.MESSAGE_HOST, msg.MESSAGE_FROM, msg.SUBJECT, msg.PRIORITY_LEVEL,
+    msg.OBJECT_VERSION_NUMBER, msg.REQUEST_ID, msg.PROGRAM_ID, msg.CREATED_BY, msg.CREATION_DATE, msg.LAST_UPDATED_BY, 
+    msg.LAST_UPDATE_DATE, msg.ATTRIBUTE1, msg.ATTRIBUTE2, msg.ATTRIBUTE3, msg.ATTRIBUTE4, msg.ATTRIBUTE5, msg.ATTRIBUTE6, 
+    msg.ATTRIBUTE7, msg.ATTRIBUTE8, msg.ATTRIBUTE9, msg.ATTRIBUTE10, msg.ATTRIBUTE11, msg.ATTRIBUTE12, msg.ATTRIBUTE13, 
+    msg.ATTRIBUTE14, msg.ATTRIBUTE15, msg.CONTENT, msg.MESSAGE_SOURCE
+    from SYS_MESSAGE msg
+    where msg.MESSAGE_TYPE = 'SITE'
+    and (msg.PRIORITY_LEVEL is null or msg.PRIORITY_LEVEL = 'NORMAL')
+    and msg.SEND_FLAG not in ('Y','F')
+  </select>
+  <!-- 发送邮件,VIP队列 -->
+  <select id="selectVipSiteToSend" resultMap="ResultMapWithBLOBs">
+    select 
+    msg.MESSAGE_ID, msg.MESSAGE_TYPE, msg.MESSAGE_HOST, msg.MESSAGE_FROM, msg.SUBJECT, msg.PRIORITY_LEVEL,
+    msg.OBJECT_VERSION_NUMBER, msg.REQUEST_ID, msg.PROGRAM_ID, msg.CREATED_BY, msg.CREATION_DATE, msg.LAST_UPDATED_BY, 
+    msg.LAST_UPDATE_DATE, msg.ATTRIBUTE1, msg.ATTRIBUTE2, msg.ATTRIBUTE3, msg.ATTRIBUTE4, msg.ATTRIBUTE5, msg.ATTRIBUTE6, 
+    msg.ATTRIBUTE7, msg.ATTRIBUTE8, msg.ATTRIBUTE9, msg.ATTRIBUTE10, msg.ATTRIBUTE11, msg.ATTRIBUTE12, msg.ATTRIBUTE13, 
+    msg.ATTRIBUTE14, msg.ATTRIBUTE15, msg.CONTENT, msg.MESSAGE_SOURCE
+    from SYS_MESSAGE msg
+    where msg.MESSAGE_TYPE = 'SITE'
+    and msg.PRIORITY_LEVEL = 'VIP'
+    and msg.SEND_FLAG not in ('Y','F')
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SYS_MESSAGE
+    where MESSAGE_ID = #{messageId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.Message" >
+    <selectKey resultType="java.lang.Long" keyProperty="messageId" order="BEFORE" >
+      select SYS_MESSAGE_S.nextval from dual
+    </selectKey>
+    insert into SYS_MESSAGE (MESSAGE_ID, MESSAGE_TYPE, 
+      MESSAGE_HOST, MESSAGE_FROM, SUBJECT, PRIORITY_LEVEL, 
+      OBJECT_VERSION_NUMBER, REQUEST_ID, 
+      PROGRAM_ID, CREATED_BY, CREATION_DATE, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15, CONTENT, MESSAGE_SOURCE, SEND_FLAG
+      )
+    values (#{messageId,jdbcType=DECIMAL}, #{messageType,jdbcType=VARCHAR}, 
+ 	  #{messageHost,jdbcType=VARCHAR}, #{messageFrom,jdbcType=VARCHAR}, #{subject,jdbcType=VARCHAR}, 
+      #{priorityLevel,jdbcType=VARCHAR}, 
+      #{objectVersionNumber,jdbcType=DECIMAL}, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL}, #{createdBy,jdbcType=DECIMAL}, #{creationDate,jdbcType=TIMESTAMP}, 
+      #{lastUpdatedBy,jdbcType=DECIMAL}, #{lastUpdateDate,jdbcType=TIMESTAMP}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{content,jdbcType=CLOB}, #{messageSource,jdbcType=VARCHAR}, #{sendFlag,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.Message" >
+    <selectKey resultType="java.lang.Long" keyProperty="messageId" order="BEFORE" >
+      select SYS_MESSAGE_S.nextval from dual
+    </selectKey>
+    insert into SYS_MESSAGE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      MESSAGE_ID,
+      <if test="messageType != null" >
+        MESSAGE_TYPE,
+      </if>
+      <if test="messageHost != null" >
+        MESSAGE_HOST,
+      </if>
+      <if test="messageFrom != null" >
+        MESSAGE_FROM,
+      </if>
+      <if test="subject != null" >
+        SUBJECT,
+      </if>
+      <if test="priorityLevel != null" >
+        PRIORITY_LEVEL,
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="content != null" >
+        CONTENT,
+      </if>
+      <if test="messageSource != null" >
+        MESSAGE_SOURCE,
+      </if>
+      <if test="sendFlag != null" >
+        SEND_FLAG,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{messageId,jdbcType=DECIMAL},
+      <if test="messageType != null" >
+        #{messageType,jdbcType=VARCHAR},
+      </if>
+      <if test="messageHost != null" >
+        #{messageHost,jdbcType=VARCHAR},
+      </if>
+      <if test="messageFrom != null" >
+        #{messageFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="subject != null" >
+        #{subject,jdbcType=VARCHAR},
+      </if>
+      <if test="priorityLevel != null" >
+	    #{priorityLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="objectVersionNumber != null" >
+        #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=CLOB},
+      </if>
+      <if test="messageSource != null" >
+        #{messageSource,jdbcType=VARCHAR},
+      </if>
+      <if test="sendFlag != null" >
+        #{sendFlag,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.platform.dto.system.Message" >
+    update SYS_MESSAGE
+    <set >
+      <if test="messageType != null" >
+        MESSAGE_TYPE = #{messageType,jdbcType=VARCHAR},
+      </if>
+      <if test="messageHost != null" >
+        MESSAGE_HOST = #{messageHost,jdbcType=VARCHAR},
+      </if>
+      <if test="messageFrom != null" >
+        MESSAGE_FROM = #{messageFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="subject != null" >
+        SUBJECT = #{subject,jdbcType=VARCHAR},
+      </if>
+      <if test="priorityLevel != null" >
+	    PRIORITY_LEVEL = #{priorityLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        CONTENT = #{content,jdbcType=CLOB},
+      </if>
+      <if test="messageSource != null" >
+        MESSAGE_SOURCE = #{messageSource,jdbcType=VARCHAR},
+      </if>
+      <if test="sendFlag != null" >
+        SEND_FLAG = #{sendFlag,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where MESSAGE_ID = #{messageId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.lkkhpg.dsis.platform.dto.system.Message" >
+    update SYS_MESSAGE
+    set MESSAGE_TYPE = #{messageType,jdbcType=VARCHAR},
+      MESSAGE_HOST = #{messageHost,jdbcType=VARCHAR},
+      MESSAGE_FROM = #{messageFrom,jdbcType=VARCHAR},
+      SUBJECT = #{subject,jdbcType=VARCHAR},
+	  PRIORITY_LEVEL = #{priorityLevel,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      CONTENT = #{content,jdbcType=CLOB},
+	  MESSAGE_SOURCE = #{messageSource,jdbcType=VARCHAR},
+      SEND_FLAG = #{sendFlag,jdbcType=VARCHAR}
+    where MESSAGE_ID = #{messageId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.Message" >
+    update SYS_MESSAGE
+    set MESSAGE_TYPE = #{messageType,jdbcType=VARCHAR},
+      MESSAGE_HOST = #{messageHost,jdbcType=VARCHAR},
+      MESSAGE_FROM = #{messageFrom,jdbcType=VARCHAR},
+      SUBJECT = #{subject,jdbcType=VARCHAR},
+      PRIORITY_LEVEL = #{priorityLevel,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      CONTENT = #{content,jdbcType=CLOB},
+      MESSAGE_SOURCE = #{messageSource,jdbcType=VARCHAR},
+      SEND_FLAG = #{sendFlag,jdbcType=VARCHAR}
+    where MESSAGE_ID = #{messageId,jdbcType=DECIMAL}
+  </update>
+  <select id="selectMessages" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.system.Message" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from SYS_MESSAGE sm
+    <where>
+       <if test="messageId != null">
+           sm.MESSAGE_ID = #{messageId,jdbcType=DECIMAL}
+       </if>
+       <if test="messageType != null">
+           AND sm.MESSAGE_TYPE like concat('%',concat(#{messageHost,jdbcType=VARCHAR},'%')) #{messageType,jdbcType=VARCHAR}
+       </if>
+       <if test="messageHost != null">
+           AND sm.MESSAGE_HOST like concat('%',concat(#{messageHost,jdbcType=VARCHAR},'%'))
+       </if>
+       <if test="messageFrom != null">
+           AND sm.MESSAGE_FROM like concat('%',concat(#{messageFrom,jdbcType=VARCHAR},'%'))
+       </if>
+       <if test="subject != null">
+           AND sm.SUBJECT like concat('%',concat(#{subject,jdbcType=VARCHAR},'%'))
+       </if>
+    </where>
+  </select>
+  
+  <select id="selectMessagesBySubject" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.system.Message" >
+    select distinct sm.MESSAGE_ID,
+       sm.MESSAGE_TYPE,
+       sm.MESSAGE_HOST,
+       sm.MESSAGE_FROM,
+       sm.SUBJECT,
+       to_char(sm.CONTENT) as content,
+       sm.SEND_FLAG as transaction_status
+    from SYS_MESSAGE sm
+    <where>
+       <if test="subject != null">
+           sm.SUBJECT like concat('%',concat(#{subject,jdbcType=VARCHAR},'%'))
+       </if>
+    </where>
+  </select>
+</mapper>

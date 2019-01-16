@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.platform.audit.mapper.AuditMapper">
+    <update id="auditInsert" parameterType="java.util.Map">
+        INSERT INTO ${_auditTableName}
+        SELECT ${_auditTableName}_S.NEXTVAL,#{_auditType},CURRENT_TIMESTAMP,#{_auditSessionId},b.*
+        FROM ${_baseTableName} b
+        <where>
+            <foreach collection="_pks" index="key" item="value" separator="AND">
+                b.${key} = #{value}
+            </foreach>
+        </where>
+    </update>
+
+    <select id="selectAuditHistory" resultType="org.apache.commons.collections.map.CaseInsensitiveMap"
+            parameterType="java.util.Map">
+        select * from ${_auditTableName} a
+        <where>
+            <foreach collection="_pks" index="key" item="value" separator="AND">
+                a.${key} = #{value}
+            </foreach>
+        </where>
+        order by a.audit_id desc
+    </select>
+    
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.audit.dto.Audit" extends="com.lkkhpg.dsis.platform.mapper.system.AccountMapper.BaseResultMap">
+        <result column="ENTITY_ID" property="entityId" jdbcType="DECIMAL" />
+        <result column="ENTITY_CODE" property="entityCode" jdbcType="VARCHAR" />
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+        <result column="AUDIT_FLAG" property="auditFlag" jdbcType="VARCHAR" />
+    </resultMap>
+    <select id="selectAuditEntityAll" resultMap="BaseResultMap">
+        select sae.* from SYS_AUDIT_ENTITY sae
+    </select>
+    
+    <update id="saveAuditEntity" parameterType="com.lkkhpg.dsis.platform.audit.dto.Audit">
+        update SYS_AUDIT_ENTITY sae
+        <set >
+            <if test="entityCode != null" >
+                SAE.ENTITY_CODE = #{entityCode,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null" >
+               SAE.DESCRIPTION = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="auditFlag != null" >
+                SAE.AUDIT_FLAG = #{auditFlag,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where SAE.ENTITY_ID = #{entityId,jdbcType=DECIMAL}
+    </update>
+</mapper>

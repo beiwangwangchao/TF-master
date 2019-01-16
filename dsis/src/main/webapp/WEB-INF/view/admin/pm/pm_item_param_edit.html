@@ -1,0 +1,226 @@
+<#--
+ * description: 商品参数编辑页面 
+ * version: 1.0 
+ * author:wangc
+ * .
+-->  
+<#include "../include/head.html">
+<script type="text/javascript" src="${base.contextPath}/lib/ckeditor/ckeditor.js"></script>
+<style>
+.panel{
+    margin:20px;
+}
+.panel-title {
+    font-size:16px;
+    line-height:20px;
+    padding:5px;
+    background-color:#f4f4f4;
+}
+</style>
+           <div id="panel_product_introduce" class="panel">
+                <textarea id="product_introduce"></textarea>
+           </div>
+           <div style="width: 96%;margin-left: 2.5%;">
+               <label for="hide_product_introduce"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.itemattr.name.hide_flag"/></label>
+               <input type="checkbox" id="hide_product_introduce" class="liger-checkbox" />
+           </div>
+           <div id="panel_use_instruction" class="panel">
+                <textarea id="use_instruction"></textarea>
+           </div>
+           <div style="width: 96%;margin-left: 2.5%;">
+               <label for="hide_use_instruction"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.itemattr.name.hide_flag"/></label>
+               <input type="checkbox" id="hide_use_instruction" class="liger-checkbox" />
+           </div>
+           <div id="panel_standard_param" class="panel">
+                <div class="panel-title"></div>
+                <textarea id="standard_param"></textarea>
+           </div> 
+           <div style="width: 96%;margin-left: 2.5%;">
+               <label for="hide_standard_param"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.itemattr.name.hide_flag"/></label>
+               <input type="checkbox" id="hide_standard_param" class="liger-checkbox" />
+           </div>
+           <div id="panel_dose" class="panel">
+                <textarea id="dose"></textarea>
+           </div>
+           <div style="width: 96%;margin-left: 2.5%;">
+               <label for="hide_dose"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.itemattr.name.hide_flag"/></label>
+               <input type="checkbox" id="hide_dose" class="liger-checkbox" />
+           </div>
+           <form id="btn_form" style="margin: 0px; padding: 10px;"></form> 
+<script type="text/javascript">
+var dialog = frameElement.dialog;
+var paramData = dialog.get('data');
+if(paramData.hideProductIntroduce == null && paramData.hideUseInstruction == null
+		&& paramData.hideStandardParam == null && paramData.hideDose == null){
+    getWhetherHide(paramData.itemId,paramData.language);
+}
+if("Y" == paramData.hideProductIntroduce){
+	document.getElementById("hide_product_introduce").checked=true;
+}
+if("Y" == paramData.hideUseInstruction){
+	document.getElementById("hide_use_instruction").checked=true;
+}
+if("Y" == paramData.hideStandardParam){
+    document.getElementById("hide_standard_param").checked=true;
+}
+if("Y" == paramData.hideDose){
+    document.getElementById("hide_dose").checked=true;
+}
+$("#panel_product_introduce").ligerPanel({
+    title : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.itemattr.name.introduce"/>',
+    checkbox : true,
+    width : '96%',
+});
+$("#panel_standard_param").ligerPanel({
+    title : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.itemattr.name.standard"/>',
+    width : '96%',
+});
+$("#panel_use_instruction").ligerPanel({
+    title : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.itemattr.name.userguide"/>',
+    width : '96%',
+});
+$("#panel_dose").ligerPanel({
+    title : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.itemattr.name.dosage"/>',
+    width : '96%',
+});
+liger.get("panel_product_introduce").collapse();
+liger.get("panel_standard_param").collapse();
+liger.get("panel_use_instruction").collapse();
+liger.get("panel_dose").collapse();
+var productIntroduce = CKEDITOR.replace('product_introduce',{
+	removeButtons : 'Underline,Subscript,Superscript,Source,About',
+	height : '180px',
+	language:'zh-cn'
+}); 
+var standardParam = CKEDITOR.replace('standard_param',{
+	removeButtons : 'Underline,Subscript,Superscript,Source,About',
+	height : '180px',
+	language:'zh-cn'
+}); 
+var useInstruction = CKEDITOR.replace('use_instruction',{
+	removeButtons : 'Underline,Subscript,Superscript,Source,About',
+	height : '180px',
+	language:'zh-cn'
+}); 
+var dose = CKEDITOR.replace('dose',{
+    removeButtons : 'Underline,Subscript,Superscript,Source,About',
+    height : '180px',
+    language:'zh-cn'
+}); 
+
+productIntroduce.setData(paramData.packageIntroduce);
+standardParam.setData(paramData.standardParam);
+useInstruction.setData(paramData.userGuide);
+dose.setData(paramData.dose);
+
+window['btn_form'] = $('#btn_form').ligerForm({
+	buttons: [{
+		id: 'btn_ok',
+		text: '<@spring.message "sys.hand.btn.ok" />',
+		click: f_save
+	},{
+		id: 'btn_cancel',
+		text: '<@spring.message "sys.hand.btn.cancel" />',
+		click: f_close
+	}]
+});
+
+function getWhetherHide(itemId,language){
+	$.ajax({
+        type: "post",
+        data: {
+            itemId: itemId,
+            language : language
+        },
+        dataType: "json",
+        async: false,
+        url: _basePath + "/inv/item/getWhetherHide",
+        success: function(data) {
+        	if(data.success){
+        		var data = data.rows;
+        		if(data.length > 0){
+	        		for(var i=0;i<data.length;i++){
+	        			if("SPJJ" == data[i].name && "Y" == data[i].hide){
+	        				//document.getElementById("hide_product_introduce").checked=true;
+	        				paramData.hideProductIntroduce = "Y";
+	        			}
+	        			if("SYSM" == data[i].name && "Y" == data[i].hide){
+	        				//document.getElementById("hide_use_instruction").checked=true;
+	        				paramData.hideUseInstruction = "Y";
+	        			}
+	        			if("GGCS" == data[i].name && "Y" == data[i].hide){
+	        				paramData.hideStandardParam = "Y";
+	        			}
+	        			if("DOSE" == data[i].name && "Y" == data[i].hide){
+	        				paramData.hideDose = "Y";
+	        			}
+	        		}
+        		}
+        	}
+        }
+	});
+}
+
+function f_save(){
+	var packageIntroduceData = productIntroduce.getData();
+	var standardParamData = standardParam.getData();
+	var userGuideData = useInstruction.getData();
+	var doseData = dose.getData();
+	var hideProductIntroduce = "";
+	var hideUseInstruction = "";
+	var hideStandardParam = "";
+	var hideDose = "";
+	if($("#hide_product_introduce").is(':checked')){ //是否隐藏
+		hideProductIntroduce = "Y"; 
+	}else{
+		if(packageIntroduceData == null || '' == packageIntroduceData){
+			$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.productintroducenull"/>');
+			return;
+		}
+	}
+	if($("#hide_standard_param").is(':checked')){
+		hideStandardParam = "Y";
+	}else{
+		if(standardParamData == null || '' == standardParamData){
+			$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.standardparamnull"/>');
+			return;
+		}
+	}
+	if($("#hide_use_instruction").is(':checked')){
+		hideUseInstruction = "Y";
+    }else{
+		if(userGuideData == null || '' == userGuideData){
+			$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.userguidenull"/>');
+			return;
+		}
+    }
+	if($("#hide_dose").is(':checked')){
+		hideDose = "Y";
+    }else{
+        if(doseData == null || '' == doseData){
+            $.ligerDialog.error('剂量不能为空');
+            return;
+        }
+    }
+	var updateData={
+			'packageIntroduce' : packageIntroduceData,
+			'standardParam' : standardParamData,
+			'userGuide' : userGuideData,
+			'dose' : doseData,
+			'hideProductIntroduce' : hideProductIntroduce,
+			'hideUseInstruction' : hideUseInstruction,
+			'hideStandardParam' : hideStandardParam,
+            'hideDose' : hideDose
+	};
+	var paramGrid = window.parent.param_info_grid_obj;
+	paramGrid.update(paramGrid.getSelectedRow(),updateData);
+	dialog.close();
+}
+
+function f_close(){
+	dialog.close();
+}
+
+</script>
+</body>
+</html>

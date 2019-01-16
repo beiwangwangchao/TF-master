@@ -1,0 +1,137 @@
+<#--
+ * description: 角色界面分配组织模板
+ * version: 1.0 
+ * author:liang.rao@hand-china.com
+ * Copyright LKK Health Products Group Limited 
+ * 
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+    <form id="roleForm"></form>
+    <div id="roleGrid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function() {
+        window['roleForm'] = $("#roleForm").ligerForm({
+            fields : [ {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolecode"/>',
+                name : 'roleCode'
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolename"/>',
+                name : 'roleName',
+                newline : false
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.roledesc"/>',
+                name : 'roleDesc'
+            } ],
+            buttons : [ {
+                text : '<@spring.message "sys.hand.btn.query"/>',
+                disabled : false,
+                width : 60,
+                click : function() {
+                    Hap.gridQuery({
+                        form : roleForm,
+                        grid : roleGrid
+                    })
+                }
+            } ]
+        });
+
+        window['roleGrid'] = $("#roleGrid").ligerGrid({
+            unSetValidateAttr : false,
+            columns : [ {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolecode"/>',
+                name : 'roleCode',
+                align : 'left',
+                width : 120,
+                editor : {
+                    type : 'text'
+                },
+                validate : {
+                    required : true
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolename"/>',
+                name : 'roleName',
+                width: 150,
+                align: 'left',
+                editor : {
+                    type : 'tl',
+                    idField:'roleId',
+                    dto:'com.lkkhpg.dsis.platform.dto.system.Role'
+                },
+                validate : {
+                    required : true
+                }
+            },{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.roledesc"/>',
+                name : 'roleDesc',
+                width: 180,
+                align: 'left',
+                editor : {
+                    type : 'tl',
+                    idField:'roleId',
+                    dto:'com.lkkhpg.dsis.platform.dto.system.Role',
+                },
+                validate : {
+                    required : true
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.orgtemplate"/>',
+                name : 'templateId',
+                align : 'left',
+                width : 100,
+                valueField: 'templateId',
+                textField: 'templateCode',
+                editor : {
+                    valueField: 'templateId',
+                    textField: 'templateCode',
+                    url : '${base.contextPath}/sys/role/querytemplateCode',
+                    type : 'select'
+                }
+            } ],
+            url : '${base.contextPath}/sys/role/queryTemplate',
+            toolbar : {
+                items : [ {
+                    text : '<@spring.message "sys.hand.btn.new"/>',
+                    disable : false,
+                    click : function() {
+                        roleGrid.addRow({})
+                    },
+                    icon : 'add'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click : function() {
+                        Hap.gridDelete({
+                            url : '${base.contextPath}/sys/role/deleteTemplate',
+                            grid : roleGrid
+                        })
+
+                    },
+                    icon : 'delete'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.save"/>',
+                    click : function() {
+                        Hap.gridSave({
+                            grid : roleGrid,
+                            url : '${base.contextPath}/sys/role/submitTemplate'
+                        })
+                    },
+                    icon : 'save'
+                } ]
+            },
+            enabledEdit : true,
+            width : '99%',
+            height : '98%',
+            checkbox : true
+        });
+    });
+    </script>
+</body>
+</html>

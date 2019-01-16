@@ -1,0 +1,155 @@
+<#include "/mws/include/header.html">
+<!-- <link href="${base.contextPath}/resources/css/metro${resource_suffix!}.css" rel="stylesheet"> -->
+<link href="${base.contextPath}/resources/css/date/bootstrap-datetimepicker${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/date/bootstrap-datetimepicker${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/awesomeStyle/awesome${resource_suffix!}.css" rel="stylesheet">
+<style>
+ul.base-info{
+    text-align: center;
+    padding-top: 20px;
+    font-size: 10px;
+}
+ul.base-info li {
+    float: left;
+    list-style: none;
+}
+    
+.ztree li span.button.pIcon01_ico_close{
+    margin-right:2px;
+     background: url(${base.contextPath}/resources/img/myteam/u04.jpg) no-repeat scroll 0 0 transparent; 
+     vertical-align:top;
+      *vertical-align:middle
+      }
+      
+.ztree li span.button.pIcon01_ico_open{
+    margin-right:2px;
+    background: url(${base.contextPath}/resources/img/myteam/04.png) no-repeat scroll 0 0 transparent;
+    vertical-align:top; 
+    *vertical-align:middle
+    }
+.top-name{
+    margin-top:20px;
+    font-weight: bold;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+}
+.table-td{
+    background-color: #CEE2FA;
+}
+.lable{
+    white-space:nowrap;
+    width: 60%;
+    text-align: right;
+    display:inline;
+}
+</style>
+
+<script src="${base.contextPath}/resources/js/jquery.ztree.core${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/jquery.ztree.all${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker.zh-CN${resource_suffix!}.js"></script>
+
+<script type="text/javascript">
+var appendShow ="";
+$(function(){
+	$.ajax({
+        type: "POST",
+        url: "${base.contextPath}/account/selectTeamByMemberId",
+        data: {},
+        async:false,
+        dataType: "json",
+        success: function(data){
+            if(data.success){
+                var data = data.rows[0];
+                appendShow = "<" + (data.levelq-1) + ">" + data.dealerNo + " / " + data.dealerPostCode + " / " + data.dealername + " / " + data.ps + " / " + data.gpv + " / " + data.lastgv + " / " + data.typeeffectivedate;
+            }
+        }
+    });
+var setting = {
+        data : {
+            simpleData : {
+                enable : true
+            }
+        },
+        async : {
+            enable : true,
+            url : "${base.contextPath}/account/getMemberTree",
+            autoParam : [ "id=memberId","memberCode"],
+        //异步返回后经过Filter 
+        },
+        callback : {
+            onAsyncSuccess : zTreeOnAsyncSuccess,//异步加载成功的fun 
+            onAsyncError : zTreeOnAsyncError, //加载错误的fun 
+            onClick : zTreeOnClick
+        //捕获单击节点之前的事件回调函数 
+        }
+        
+};
+function zTreeOnClick(event, treeId, treeNode) {
+    $.ajax({
+        type: "POST",
+        url: "${base.contextPath}/account/query",
+        data: {
+            memberId : treeNode.id,
+            memberCode : treeNode.memberCode
+        },
+        async:false,
+        dataType: "json",
+        success: function(data){
+            if(data.success){
+            	
+            }
+        }
+    });
+}
+var zNodes = [ 
+              { id:${Session.memberId}, pId:0, name:appendShow,memberCode:${Session.memberCode}, open:true, isParent:true, icon:"${base.contextPath}/resources/img/ztree/diy/ccc.png"}
+          ];
+          
+          function zTreeOnAsyncError(event, treeId, treeNode) {
+              alert("异步加载失败!");
+          }
+          function zTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+          }
+          
+          $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+          
+          
+//           f_button(${Session.memberCode});
+});
+</script>
+
+<section id="content">
+<div class="container">
+    
+    <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.nav.myteam"/></li>
+            <li><@spring.message "mws.myteam.current.month.organization.inquiry"/></li>
+    </ol>
+
+    <div class="row">
+                <#include "../include/myteam-menu.html">
+        <div class="col-sm-8 col-md-9" style="margin: 10px 0px 2px 0px; padding: 0;">
+            <div class="form-group" style="padding: 2px;margin-left: 5px;background-color: #CEE2FA;margin-right:0px;height: 10px;"></div>
+            <!-- <div><iframe src="http://www.baidu.com" width=1000px height=1000px frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes"/></div> -->
+            <div class="col-sm-12 col-md-12 sidebar" style="margin: 10px 0px 0px 0px; padding: 0;">
+                <div class="zTreeDemoBackground left" style="overflow: auto;">
+                    <p class="title-text">Organization Inquiry</p>
+                    <p class="title-text">(Pattern : CardNo / Rank / Name / PPV / GPV / OV / JoinPeriod)</p>
+                    <p class="title-text">格式 : (經銷商編號 / 級別 / 姓名 / 個人銷售業績 / 小組業績 / 無限代組織積分 / 入會年份及月份)</p>
+                    <ul id="treeDemo" class="ztree"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="height: 150px" class="hidden-lg hidden-md hidden-sm"></div><!--拉开底边距-->
+</div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<#include "/mws/include/footer.html">

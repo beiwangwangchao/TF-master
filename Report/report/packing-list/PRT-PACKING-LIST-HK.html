@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style type="text/css" >
+        /*竖向*/
+        @page  {
+            size: A4 portrait;
+            mso-page-orientation:portrait;
+            mso-header-margin:42.55pt;
+            mso-footer-margin:49.6pt;
+            mso-paper-source:0;
+            layout-grid:15.6pt;
+        }
+
+        /*页码*/
+        @bottom-right {
+            content:"Page "counter(page)" of "counter(pages);
+            padding-right: 10mm;
+            padding-bottom: 10mm;
+            font-size: 14pt;
+        }
+        body{
+            font-family:'Arial Unicode MS';
+        }
+        td{
+            padding: 2pt;
+        }
+        .bottom_line {
+            border-bottom: 1px solid #000000;
+        }
+        .top_line {
+            border-top: 1px solid #000000;
+        }
+        .font_bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="">
+<div style="">
+    <div style="width: 100%;margin-left: auto;margin-right: auto;height:133mm;">
+        <div style="width: 100%;text-align: center"><h2 >Packing    List</h2></div>
+        <div style="width: 100%;margin-left: auto;margin-right: auto;height:30mm;">
+            <table width="100%">
+                <tr>
+                    <td class="font_bold" style="text-align: right;width: 20%">Sales Org:</td>
+                    <td style="width: 16%">${header.salesOrg!}</td>
+                    <td style="width: 16%"></td>
+                    <td style="width: 16%"></td>
+                    <td style="width: 16%"></td>
+                    <td style="width: 16%"></td>
+                </tr>
+                <tr>
+                    <td class="font_bold" style="text-align: right;width: 20%">Distributor Name:</td>
+                    <td style="width: 16%">${header.distributorName!}</td>
+                    <td class="font_bold" style="width: 16%;text-align: right">Receipt No.:</td>
+                    <td style="width: 16%">${header.receiptNo!}</td>
+                    <td class="font_bold" style="width: 16%;text-align: right">Shipment No.:</td>
+                    <#list shipmentNos as shipmemnt>
+                    <td style="width: 16%">${shipmemnt.shipmentNo!}</td>
+                    </#list>
+                </tr>
+                <tr>
+                    <td class="font_bold" style="text-align: right;width: 20%">Distributor No.:</td>
+                    <td style="width: 16%">${header.distributorNo!}</td>
+                    <td class="font_bold" style="width: 16%;text-align: right">Date:</td>
+                    <td style="width: 16%">${header.printDate!}</td>
+                    <td style="width: 16%"></td>
+                    <td style="width: 16%"></td>
+                </tr>
+            </table>
+        </div>
+        <div style="width: 90%; margin-left: auto;margin-right: auto;margin-top: 5pt;height: 90mm">
+            <table width="100%" style="border-collapse: collapse;table-layout: fixed;min-height: 90mm">
+                <tr>
+                    <td class="bottom_line font_bold" style="text-align: left;width: 10%;height: 10mm">Code No.</td>
+                    <td class="bottom_line font_bold" style="text-align: left;width: 30%;height: 10mm">Description</td>
+                    <td class="bottom_line font_bold" style="text-align: right;width: 10%;height: 10mm">Qty</td>
+                    <td class="bottom_line font_bold" style="text-align: center;width: 20%;height: 10mm">Inventory</td>
+                    <td class="bottom_line font_bold" style="text-align: right;width: 15%;height: 10mm">Shipment Qty</td>
+                    <td class="bottom_line font_bold" style="text-align: right;width: 15%;height: 10mm">Not Shipped Qty</td>
+                </tr>
+                <#list lines as line>
+                    <tr>
+                        <td style="text-align: left;width: 10%">${line.itemNumber!}</td>
+                        <td style="text-align: left;width: 30%">${line.itemName!}</td>
+                        <td style="text-align: right;width: 10%">${line.qty!}</td>
+                        <td style="text-align: center;width: 20%">${line.inventory!}</td>
+                        <td style="text-align: right;width: 15%">${line.shipmentQty!}</td>
+                        <td style="text-align: right;width: 15%">${line.notShippedQty!}</td>
+                    </tr>
+                </#list>
+                <!-- 不足16记录补全-->
+                <!-- <#if lines?size&lt;16>
+                    <#list 1..(16-lines?size) as x>
+                        <tr style="height:9mm"></tr>
+                    </#list>
+                </#if> -->
+            	<#list lines as ln>
+            	<#if ln_index == ln?size-1>
+                <tr>
+                    <td class="top_line" style=" text-align: left;width: 10%"></td>
+                    <td class="top_line" style="text-align: left;width: 30%"></td>
+                    <td class="top_line font_bold" style="text-align: right;width: 15%">Total</td>
+                    <td class="top_line" style="text-align: center;width: 15%"></td>
+                    <td class="top_line" style="text-align: right;width: 15%">${ln.totalShipmentQty!}</td>
+                    <td class="top_line" style="text-align: right;width: 15%">${ln.totalNotShippedQty!}</td>
+                </tr>
+                </#if>
+                </#list>
+            </table>
+        </div>
+        <div style="margin-left:auto;margin-right:auto;width:90%;margin-top:5pt;padding-left:1mm;height: 13mm">
+            <table width="100%">
+                <tr>
+                    <td colspan="2">The above products are received in good codition.</td>
+                    <td></td>
+
+                </tr>
+                <tr>
+                    <td width="15%">Warehouse Signature :</td>
+                    <td width="25%"> ______________________________</td>
+                    <td width="60"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div style="width: 100%;margin-left: auto;margin-right: auto;top: auto;height: 30mm"></div>
+    <!--不同的签名人 -->
+    <div style="width: 100%;margin-left: auto;margin-right: auto;height:133mm;">
+        <div style="width: 100%;text-align: center"><h2 >Packing    List</h2></div>
+        <div style="width: 100%;margin-left: auto;margin-right: auto;height:30mm;">
+            <table width="100%">
+                <tr>
+                    <td class="font_bold" style="text-align: right;width: 20%">Sales Org:</td>
+                    <td style="width: 16%">${header.salesOrg!}</td>
+                    <td style="width: 16%"></td>
+                    <td style="width: 16%"></td>
+                    <td style="width: 16%"></td>
+                    <td style="width: 16%"></td>
+                </tr>
+                <tr>
+                    <td class="font_bold" style="text-align: right;width: 20%">Distributor Name:</td>
+                    <td style="width: 16%">${header.distributorName!}</td>
+                    <td class="font_bold" style="width: 16%;text-align: right">Receipt No.:</td>
+                    <td style="width: 16%">${header.receiptNo!}</td>
+                    <td class="font_bold" style="width: 16%;text-align: right">Shipment No.:</td>
+                    <#list shipmentNos as shipmemnt>
+                    <td style="width: 16%">${shipmemnt.shipmentNo!}</td>
+                    </#list>
+                </tr>
+                <tr>
+                    <td class="font_bold" style="text-align: right;width: 20%">Distributor No.:</td>
+                    <td style="width: 16%">${header.distributorNo!}</td>
+                    <td class="font_bold" style="width: 16%;text-align: right">Date:</td>
+                    <td style="width: 16%">${header.printDate!}</td>
+                    <td style="width: 16%"></td>
+                    <td style="width: 16%"></td>
+                </tr>
+            </table>
+        </div>
+        <div style="width: 90%; margin-left: auto;margin-right: auto;margin-top: 5pt;height: 90mm">
+            <table width="100%" style="border-collapse: collapse;table-layout: fixed;min-height: 90mm">
+                <tr>
+                    <td class="bottom_line font_bold" style="text-align: left;width: 10%;height: 10mm">Code No.</td>
+                    <td class="bottom_line font_bold" style="text-align: left;width: 30%;height: 10mm">Description</td>
+                    <td class="bottom_line font_bold" style="text-align: right;width: 10%;height: 10mm">Qty</td>
+                    <td class="bottom_line font_bold" style="text-align: center;width: 20%;height: 10mm">Inventory</td>
+                    <td class="bottom_line font_bold" style="text-align: right;width: 15%;height: 10mm">Shipment Qty</td>
+                    <td class="bottom_line font_bold" style="text-align: right;width: 15%;height: 10mm">Not Shipped Qty</td>
+                </tr>
+                <#list lines as line>
+                    <tr>
+                        <td style="text-align: left;width: 10%">${line.itemNumber!}</td>
+                        <td style="text-align: left;width: 30%">${line.itemName!}</td>
+                        <td style="text-align: right;width: 10%">${line.qty!}</td>
+                        <td style="text-align: center;width: 20%">${line.inventory!}</td>
+                        <td style="text-align: right;width: 15%">${line.shipmentQty!}</td>
+                        <td style="text-align: right;width: 15%">${line.notShippedQty!}</td>
+                    </tr>
+                </#list> 
+                <!-- 不足16记录补全-->
+               <!--  <#if lines?size&lt;16>
+                    <#list 1..(16-lines?size) as x>
+                        <tr style="height:9mm"></tr>
+                    </#list>
+                </#if> -->
+               <#list lines as ln>
+            	<#if ln_index == ln?size-1>
+                <tr>
+                    <td class="top_line" style=" text-align: left;width: 10%"></td>
+                    <td class="top_line" style="text-align: left;width: 30%"></td>
+                    <td class="top_line font_bold" style="text-align: right;width: 15%">Total</td>
+                    <td class="top_line" style="text-align: center;width: 15%"></td>
+                    <td class="top_line" style="text-align: right;width: 15%">${ln.totalShipmentQty!}</td>
+                    <td class="top_line" style="text-align: right;width: 15%">${ln.totalNotShippedQty!}</td>
+                </tr>
+                </#if>
+                </#list>
+            </table>
+        </div>
+        <div style="margin-left:auto;margin-right:auto;width:90%;margin-top:5pt;padding-left:1mm;height: 13mm">
+            <table width="100%">
+                <tr>
+                    <td colspan="2">The above products are received in good codition.</td>
+                    <td></td>
+
+                </tr>
+                <tr>
+                    <td width="15%">Distributor Signature :</td>
+                    <td width="25%"> ______________________________</td>
+                    <td width="60"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

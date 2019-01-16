@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.delivery.mapper.DeliveryPickHeadMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickHead" >
+    <id column="PICK_RELEASE_ID" jdbcType="DECIMAL" property="pickReleaseId" />
+    <result column="ORDER_ID" jdbcType="DECIMAL" property="orderId" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="OBJECT_VERSION_NUMBER" jdbcType="DECIMAL" property="objectVersionNumber" />
+    <result column="REQUEST_ID" jdbcType="DECIMAL" property="requestId" />
+    <result column="PROGRAM_ID" jdbcType="DECIMAL" property="programId" />
+    <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+    <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+    <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="LAST_UPDATE_LOGIN" jdbcType="DECIMAL" property="lastUpdateLogin" />
+    <result column="ATTRIBUTE_CATEGORY" jdbcType="VARCHAR" property="attributeCategory" />
+    <result column="ATTRIBUTE1" jdbcType="VARCHAR" property="attribute1" />
+    <result column="ATTRIBUTE2" jdbcType="VARCHAR" property="attribute2" />
+    <result column="ATTRIBUTE3" jdbcType="VARCHAR" property="attribute3" />
+    <result column="ATTRIBUTE4" jdbcType="VARCHAR" property="attribute4" />
+    <result column="ATTRIBUTE5" jdbcType="VARCHAR" property="attribute5" />
+    <result column="ATTRIBUTE6" jdbcType="VARCHAR" property="attribute6" />
+    <result column="ATTRIBUTE7" jdbcType="VARCHAR" property="attribute7" />
+    <result column="ATTRIBUTE8" jdbcType="VARCHAR" property="attribute8" />
+    <result column="ATTRIBUTE9" jdbcType="VARCHAR" property="attribute9" />
+    <result column="ATTRIBUTE10" jdbcType="VARCHAR" property="attribute10" />
+    <result column="ATTRIBUTE11" jdbcType="VARCHAR" property="attribute11" />
+    <result column="ATTRIBUTE12" jdbcType="VARCHAR" property="attribute12" />
+    <result column="ATTRIBUTE13" jdbcType="VARCHAR" property="attribute13" />
+    <result column="ATTRIBUTE14" jdbcType="VARCHAR" property="attribute14" />
+    <result column="ATTRIBUTE15" jdbcType="VARCHAR" property="attribute15" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    PICK_RELEASE_ID, ORDER_ID, REMARK, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+    CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+    ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+    ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+    ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  
+  <insert id="insertPick" parameterType="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickHead">
+        <selectKey resultType="java.lang.Long" keyProperty="pickReleaseId" order="BEFORE">
+            select dm_pick_release_s.nextval from dual
+        </selectKey>
+            insert into DM_PICK_RELEASE (PICK_RELEASE_ID, ORDER_ID, REMARK, 
+              OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+              CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+              LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+              ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+              ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+              ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+              ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+              ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+              )
+            values (#{pickReleaseId,jdbcType=DECIMAL}, #{orderId,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
+              1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+              CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+              CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+              #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+              #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+              #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+              #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+              #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+              )
+    </insert>
+</mapper>

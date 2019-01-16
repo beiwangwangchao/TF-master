@@ -1,0 +1,39 @@
+<#-- 
+ * description: 授权文件上传界面
+ * version: 1.0 
+ * author:xiawang.liu@hand-china.com
+ * .
+ * 
+--> 
+<#include "../include/head.html">
+
+<body style="padding: 0px; margin: 25px 10px 0px 10px;">
+	<form id="csvuploadform" action="${base.contextPath}/om/autoship/upcsv"
+		method="post" enctype="multipart/form-data" target="hidden_frame">
+		<input type="file" id="csvFile" name="csvFile" /> <br />
+		<div id="fileUpload" style="display: none;">
+			<span id="fileUploadMsg"></span>
+		</div>
+	</form>
+	<iframe name='hidden_frame' id="hidden_frame" style="display: none;"></iframe>
+	<script type="text/javascript">
+	   Hap.setFormDefaultBtn(f_cancel, f_sumbit);
+	   
+       function f_cancel() {
+           var dialog = frameElement.dialog;
+           dialog.close();
+       }
+       
+       function f_sumbit() {
+           document.getElementById("csvuploadform").submit();
+           $("#fileUploadMsg").html('<@spring.message "msg.csv.upload.uploading"/>');
+           $("#fileUpload").show();
+       }
+       
+       function uploadMessage(msg){
+           $("#fileUploadMsg").html(msg);
+           $("#fileUpload").show();
+       }
+    </script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.system.UserMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.system.User" extends="com.lkkhpg.dsis.platform.mapper.system.AccountMapper.BaseResultMap">
+        <id column="USER_ID" property="userId" jdbcType="DECIMAL" />
+        <result column="LOGIN_NAME" property="loginName" jdbcType="VARCHAR" />
+        <result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
+        <result column="USER_TYPE" property="userType" jdbcType="VARCHAR" />
+        <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+        <result column="PHONE_NO" property="phoneNo" jdbcType="VARCHAR" />
+        <result column="STATUS" property="status" jdbcType="VARCHAR" />
+        <result column="PHONE_EXT_NO" property="phoneExtNo" jdbcType="VARCHAR" />
+        <result column="COUNTRY_CODE" property="countryCode" jdbcType="VARCHAR" />
+        <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <resultMap id="UserAccountMap" type="com.lkkhpg.dsis.platform.dto.system.User" extends="com.lkkhpg.dsis.platform.mapper.system.AccountMapper.BaseResultMap">
+        <id column="USER_ID" property="userId" jdbcType="DECIMAL" />
+        <result column="LOGIN_NAME" property="loginName" jdbcType="VARCHAR" />
+        <result column="USER_TYPE" property="userType" jdbcType="VARCHAR" />
+        <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+        <result column="PHONE_NO" property="phoneNo" jdbcType="VARCHAR" />
+        <result column="STATUS" property="status" jdbcType="VARCHAR" />
+        <result column="PHONE_EXT_NO" property="phoneExtNo" jdbcType="VARCHAR" />
+        <result column="COUNTRY_CODE" property="countryCode" jdbcType="VARCHAR" />
+        <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR" />
+        <result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        USER_ID, USER_NAME, USER_TYPE, EMAIL, PHONE_NO, COUNTRY_CODE,AREA_CODE,PHONE_EXT_NO, STATUS,
+        OBJECT_VERSION_NUMBER, REQUEST_ID,
+        PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14, ATTRIBUTE15
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from SYS_USER
+        where USER_ID = #{userId,jdbcType=DECIMAL}
+    </select>
+    
+    <select id="selectByIdList" resultMap="BaseResultMap">
+        select
+        USER_ID, EMAIL, USER_NAME
+        from SYS_USER
+        where USER_ID in
+        <foreach collection="list" open="(" separator="," close=")" item="userId" index="index">
+            #{userId,jdbcType=DECIMAL}
+        </foreach>
+    </select>
+    
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from SYS_USER
+        where USER_ID = #{userId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.User">
+        <selectKey resultType="java.lang.Long" keyProperty="userId" order="BEFORE">
+            select sys_user_s.nextval from dual
+        </selectKey>
+        insert into SYS_USER (USER_ID, USER_NAME,
+        USER_TYPE, EMAIL, PHONE_NO,COUNTRY_CODE,AREA_CODE,PHONE_EXT_NO, STATUS, OBJECT_VERSION_NUMBER,
+        REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10,
+        ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14, ATTRIBUTE15
+        )
+        values (#{userId,jdbcType=DECIMAL}, #{userName,jdbcType=VARCHAR},
+        #{userType,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR}, #{phoneNo,jdbcType=VARCHAR},#{countryCode,jdbcType=VARCHAR},#{areaCode,jdbcType=VARCHAR},#{phoneExtNo,jdbcType=VARCHAR},
+        #{status,jdbcType=VARCHAR}, 1,
+        #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, #{creationDate,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, #{lastUpdateDate,jdbcType=TIMESTAMP},
+        #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR},
+        #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR},
+        #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.platform.dto.system.User">
+        update SYS_USER
+        <set>
+            <if test="userName != null">
+                USER_NAME = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="userType != null">
+                USER_TYPE = #{userType,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                EMAIL = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="phoneNo != null">
+                PHONE_NO = #{phoneNo,jdbcType=VARCHAR},
+            </if>
+            <if test="phoneExtNo != null">
+                PHONE_EXT_NO = #{phoneExtNo,jdbcType=VARCHAR},
+            </if>
+            <if test="areaCode != null">
+                AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+            </if>
+            <if test="countryCode != null">
+                COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=VARCHAR},
+            </if>
+            OBJECT_VERSION_NUMBER = COALESCE(OBJECT_VERSION_NUMBER,0) + 1,
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where USER_ID = #{userId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.User">
+        update SYS_USER
+        set USER_NAME = #{userName,jdbcType=VARCHAR},
+        USER_TYPE = #{userType,jdbcType=VARCHAR},
+        EMAIL = #{email,jdbcType=VARCHAR},
+        PHONE_NO = #{phoneNo,jdbcType=VARCHAR},
+        PHONE_EXT_NO = #{phoneExtNo,jdbcType=VARCHAR},
+        COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR},
+        AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+        STATUS = #{status,jdbcType=VARCHAR},
+        OBJECT_VERSION_NUMBER = COALESCE(OBJECT_VERSION_NUMBER,0) + 1,
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL}
+        where USER_ID = #{userId,jdbcType=DECIMAL}
+    </update>
+    <!-- 查询用户数据(按照USER类型) -->
+    <select id="selectUsers" resultMap="UserAccountMap" parameterType="com.lkkhpg.dsis.platform.dto.system.User">
+        select sa.account_id,
+               sa.login_name,
+               su.user_id,
+               su.user_name,
+               su.user_type,
+               su.email,
+               su.phone_no,
+               su.phone_ext_no,
+               su.country_code,
+               su.area_code,
+               su.status
+          from sys_user su, sys_acc_rel sar, sys_account sa
+         where su.user_id = sar.rel_party_id
+           and sar.account_id = sa.account_id
+           and sar.account_type = 'USER'
+        <if test="userName != null">
+           and Upper(su.user_name) like concat(concat('%', Upper(#{userName,jdbcType=VARCHAR})), '%')
+        </if>
+        <if test="loginName != null">
+           and Upper(sa.login_name) like concat(concat('%', Upper(#{loginName,jdbcType=VARCHAR})), '%')
+        </if>
+        <if test=" userId != null">
+           and su.user_id  = #{userId,jdbcType=DECIMAL}
+        </if>
+        <if test=" userType != null">
+           and su.user_type  = #{userType,jdbcType=VARCHAR}
+        </if>
+        <if test=" status != null">
+           and su.status  = #{status,jdbcType=VARCHAR}
+        </if>
+        <if test="email != null">
+           and Upper(su.email) like concat(concat('%', Upper(#{email,jdbcType=VARCHAR})), '%')
+        </if>
+        <!-- TODO:排序 -->
+         <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        
+    </select>
+    
+        <!-- 查询用户数据(根据登录名) -->
+    <select id="selectUserByLoginName" resultMap="UserAccountMap" parameterType="com.lkkhpg.dsis.platform.dto.system.User">
+        select sa.account_id,
+               sa.login_name,
+               su.user_id,
+               su.user_name,
+               su.user_type,
+               su.email,
+               su.phone_no,
+               su.phone_ext_no,
+               su.country_code,
+               su.area_code,
+               su.status
+          from sys_user su, sys_acc_rel sar, sys_account sa
+         where su.user_id = sar.rel_party_id
+           and sar.account_id = sa.account_id
+           and sar.account_type = 'USER'
+           and sa.login_name = #{loginName,jdbcType=VARCHAR}
+    </select>
+    
+    <!-- 查询用户ID(按照USER类型) -->
+    <select id="selectUserIdByAccountId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select su.user_id
+          from sys_user su, sys_acc_rel sar
+         where su.user_id = sar.rel_party_id
+           and sar.account_type = 'USER'
+           and sar.account_id = #{0}
+    </select>
+    
+     <!-- 按照账号ID查询用户 -->
+    <select id="selectUserByAccountId" parameterType="java.lang.Long" resultMap="UserAccountMap">
+        select su.*
+          from sys_user su, sys_acc_rel sar
+         where su.user_id = sar.rel_party_id
+           and sar.account_type = 'USER'
+           and sar.account_id = #{0}
+    </select>
+    
+    
+        <select id="selectAccountIdByUserId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select sar.account_id
+          from sys_user su, sys_acc_rel sar
+         where su.user_id = sar.rel_party_id
+           and sar.account_type = 'USER'
+           and su.user_id = #{0}
+    </select>
+    
+    <select id="queryByUser" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.system.User">
+        select 
+        USER_ID, user_name
+        from sys_user
+        <where>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=VARCHAR}
+            </if>
+            <if test="userName != null">
+                and Upper(user_name) like concat('%',concat(Upper(#{userName,jdbcType=VARCHAR}),'%'))
+            </if>
+        </where>
+         <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        
+    </select>
+
+    <!-- add by XinJia.Yao 通过用户名查询用户信息  2017/08/04 -->
+    <select id="queryUserInfoByLoginName" resultMap="BaseResultMap">
+        SELECT sa.account_id,
+        sa.login_name,
+        su.user_id,
+        su.user_name,
+        su.user_type,
+        su.email
+        FROM (sys_user su
+        LEFT OUTER JOIN SYS_USER_ADD SUA
+        ON (sU.USER_ID=SUA.USER_ID )),
+        sys_acc_rel sar,
+        sys_account sa
+        WHERE su.user_id   = sar.rel_party_id
+        AND sar.account_id = sa.account_id
+        AND sar.account_type   = 'USER'
+        AND sa.login_name IN <foreach collection="list" index="index" item="loginName" open="(" separator="," close=")">
+        #{loginName}
+    </foreach>
+    </select>
+
+
+</mapper>

@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.system.mapper.RoleTemplateMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.system.dto.RoleTemplate">
+        <result column="ROLE_ID" property="roleId" jdbcType="DECIMAL"/>
+        <result column="ROLE_CODE" property="roleCode" jdbcType="VARCHAR"/>
+        <result column="ROLE_NAME" property="roleName" jdbcType="VARCHAR"/>
+        <result column="ROLE_DESCRIPTION" property="roleDesc" jdbcType="VARCHAR"/>
+        <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR"/>
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL"/>
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL"/>
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL"/>
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR"/>
+        
+        <result column="TEMPLATE_CODE" property="templateCode" jdbcType="VARCHAR"/>
+        <result column="ORG_TEMPLATE_ID" property="templateId" jdbcType="DECIMAL"/>
+        
+        <result column="USER_ID" property="userId" jdbcType="DECIMAL"/>
+        <result column="DEFAULT_FLAG" property="defaultFlag" jdbcType="VARCHAR"/>
+        <result column="SUR_ID" property="surId" jdbcType="DECIMAL"/>
+        
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List" >
+        ROLE_ID, ROLE_CODE, ROLE_NAME, ROLE_DESCRIPTION, AREA_CODE, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+        PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+        ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+        ATTRIBUTE14, ATTRIBUTE15
+    </sql>
+    
+    <select id="selectRoleNotUserRoles" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate" resultMap="BaseResultMap">
+        select b.role_id, b.role_code, tl.role_name, tl.ROLE_DESCRIPTION
+          from sys_role_tl tl, sys_role_b b
+         <where>
+             b.role_id not in (select role_id from sys_user_role where user_id = #{userId,jdbcType=DECIMAL})
+             and tl.role_id = b.role_id
+             and tl.lang = #{request.locale,jdbcType=VARCHAR}
+            <if test="roleId != null">
+                and b.role_id = #{roleId,jdbcType=DECIMAL}
+            </if>
+            <if test="roleCode != null">
+                AND b.role_code = #{roleCode,jdbcType=VARCHAR}
+            </if>
+            <if test="roleName != null">
+                AND tl.role_name like concat('%',concat(#{roleName,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="roleDesc != null">
+                AND tl.ROLE_DESCRIPTION like concat('%',concat(#{roleDesc,jdbcType=VARCHAR},'%'))
+            </if>
+        </where>
+      </select>
+    <select id="querytemplateCode" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate" resultMap="BaseResultMap">
+        select ORG_TEMPLATE_ID,TEMPLATE_CODE FROM SYS_ORG_TEMPLATE
+    </select>
+    <select id="querytemplate" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate" resultMap="BaseResultMap">
+        select ORG_TEMPLATE_ID
+        from SYS_ROLE_B b
+        <where>
+            <if test="roleId != null">
+                and b.role_id = #{roleId,jdbcType=DECIMAL}
+            </if>
+            <if test="roleCode != null">
+                AND b.role_code = #{roleCode,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="selectUserRoles" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate" resultMap="BaseResultMap">
+    	SELECT srb.ROLE_ID, srb.ROLE_CODE, srb.ORG_TEMPLATE_ID, sot.TEMPLATE_CODE, srtl.ROLE_NAME, srtl.ROLE_DESCRIPTION, sur.SUR_ID, sur.DEFAULT_FLAG
+		FROM sys_role_b srb 
+	        LEFT OUTER JOIN sys_org_template sot on sot.ORG_TEMPLATE_ID = srb.ORG_TEMPLATE_ID
+	        LEFT OUTER JOIN  sys_role_tl srtl ON (srb.ROLE_ID = srtl.ROLE_ID AND srtl.LANG = #{request.locale,jdbcType=VARCHAR})
+	        LEFT OUTER JOIN sys_user_role sur ON (srb.ROLE_ID = sur.ROLE_ID)
+		WHERE sur.USER_ID = #{userId,jdbcType=DECIMAL} 
+      </select>
+    
+    <insert id="insert" useGeneratedKeys="false" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate">
+        <selectKey resultType="long" keyProperty="roleId" order="BEFORE">
+            select sys_role_b_s.nextVal as roldId from dual
+        </selectKey>
+        insert into SYS_ROLE_B (ROLE_ID, ROLE_CODE, ROLE_NAME,
+        ROLE_DESCRIPTION, AREA_CODE,ORG_TEMPLATE_ID,
+        REQUEST_ID, PROGRAM_ID,
+        CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3,
+        ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+        )
+        values (#{roleId,jdbcType=DECIMAL}, #{roleCode,jdbcType=VARCHAR}, #{roleName,jdbcType=VARCHAR},
+        #{roleDesc,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}, #{templateId,jdbcType=DECIMAL},
+        #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},
+        current_timestamp, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL},
+        current_timestamp, #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR},
+        #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR},
+        #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR},
+        #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR},
+        #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR},
+        #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate">
+        <selectKey resultType="java.lang.Integer" keyProperty="roleId" order="BEFORE">
+            select sys_role_b_s.nextVal from dual
+        </selectKey>
+        insert into SYS_ROLE_B
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="roleId != null">
+                ROLE_ID,
+            </if>
+            <if test="roleCode != null">
+                ROLE_CODE,
+            </if>
+            <if test="roleName != null">
+                ROLE_NAME,
+            </if>
+            <if test="roleDesc != null">
+                ROLE_DESCRIPTION,
+            </if>
+            <if test="areaCode != null">
+                AREA_CODE,
+            </if>
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            <if test="creationDate != null">
+                CREATION_DATE,
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            <if test="lastUpdateDate != null">
+                LAST_UPDATE_DATE,
+            </if>
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY,
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1,
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2,
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3,
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4,
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5,
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6,
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7,
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8,
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9,
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10,
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11,
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12,
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13,
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14,
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleId != null">
+                #{roleId,jdbcType=DECIMAL},
+            </if>
+            <if test="roleCode != null">
+                #{roleCode,jdbcType=VARCHAR},
+            </if>
+            <if test="roleName != null">
+                #{roleName,jdbcType=VARCHAR},
+            </if>
+            <if test="roleDesc != null">
+                #{roleDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="areaCode != null">
+                #{areaCode,jdbcType=VARCHAR},
+            </if>
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="creationDate != null">
+                current_timestamp,
+            </if>
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateDate != null">
+                current_timestamp,
+            </if>
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate">
+      select r.ROLE_ID, r.ROLE_CODE, t.ROLE_NAME,
+        t.ROLE_DESCRIPTION, r.AREA_CODE,
+        r.OBJECT_VERSION_NUMBER, r.REQUEST_ID, r.PROGRAM_ID,
+        r.CREATION_DATE, r.CREATED_BY, r.LAST_UPDATED_BY,
+        r.LAST_UPDATE_DATE, r.LAST_UPDATE_LOGIN, r.ATTRIBUTE_CATEGORY,
+        r.ATTRIBUTE1, r.ATTRIBUTE2, r.ATTRIBUTE3,
+        r.ATTRIBUTE4, r.ATTRIBUTE5, r.ATTRIBUTE6,
+        r.ATTRIBUTE7, r.ATTRIBUTE8, r.ATTRIBUTE9,
+        r.ATTRIBUTE10, r.ATTRIBUTE11, r.ATTRIBUTE12,
+        r.ATTRIBUTE13, r.ATTRIBUTE14, r.ATTRIBUTE15
+        from sys_role_b r
+        LEFT OUTER JOIN sys_role_tl t
+          ON (r.role_id = t.role_id
+            AND t.lang = #{request.locale,jdbcType=VARCHAR})
+        WHERE r.role_id = #{roleId,jdbcType=DECIMAL}
+    </select>
+    <select id="selectRoles" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate">
+        select r.ROLE_ID, r.ROLE_CODE, t.ROLE_NAME,
+        t.ROLE_DESCRIPTION, r.AREA_CODE, r.org_template_id, s.template_code,
+        r.OBJECT_VERSION_NUMBER, r.REQUEST_ID, r.PROGRAM_ID,
+        r.CREATION_DATE, r.CREATED_BY, r.LAST_UPDATED_BY,
+        r.LAST_UPDATE_DATE, r.LAST_UPDATE_LOGIN, r.ATTRIBUTE_CATEGORY,
+        r.ATTRIBUTE1, r.ATTRIBUTE2, r.ATTRIBUTE3,
+        r.ATTRIBUTE4, r.ATTRIBUTE5, r.ATTRIBUTE6,
+        r.ATTRIBUTE7, r.ATTRIBUTE8, r.ATTRIBUTE9,
+        r.ATTRIBUTE10, r.ATTRIBUTE11, r.ATTRIBUTE12,
+        r.ATTRIBUTE13, r.ATTRIBUTE14, r.ATTRIBUTE15
+        from sys_role_b r
+        left join sys_org_template s on s.org_template_id = r.org_template_id
+        LEFT OUTER JOIN sys_role_tl t
+        ON (r.role_id = t.role_id
+        AND t.lang = #{request.locale,jdbcType=VARCHAR})
+        <where>
+            <if test="roleId != null">
+                r.role_id = #{roleId,jdbcType=DECIMAL}
+            </if>
+            <if test="roleCode != null">
+                AND upper(r.role_code) like upper(concat('%',concat(#{roleCode,jdbcType=VARCHAR},'%')))
+            </if>
+            <if test="roleName != null">
+                AND upper(t.role_name) like upper(concat('%',concat(#{roleName,jdbcType=VARCHAR},'%')))
+            </if>
+            <if test="roleDesc != null">
+                AND upper(t.ROLE_DESCRIPTION) like upper(concat('%',concat(#{roleDesc,jdbcType=VARCHAR},'%')))
+            </if>
+        </where>
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate">
+        DELETE FROM sys_role_b
+        WHERE role_id = #{roleId,jdbcType=DECIMAL}
+    </delete>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate">
+        UPDATE sys_role_b r
+        SET r.role_code = #{roleCode,jdbcType=VARCHAR},
+            r.role_name = #{roleName,jdbcType=VARCHAR},
+            r.ROLE_DESCRIPTION = #{roleDesc,jdbcType=VARCHAR},
+            r.area_code = #{areaCode,jdbcType=VARCHAR},
+            r.ORG_TEMPLATE_ID = #{templateId,jdbcType=DECIMAL},
+            r.object_version_number = r.object_version_number + 1,
+            r.request_id = #{requestId,jdbcType=DECIMAL},
+            r.program_id = #{programId,jdbcType=DECIMAL},
+            r.last_updated_by = #{lastUpdatedBy,jdbcType=DECIMAL},
+            r.last_update_date = current_timestamp,
+            r.last_update_login = #{lastUpdateLogin,jdbcType=DECIMAL},
+            r.attribute_category = #{attributeCategory,jdbcType=VARCHAR},
+            r.attribute1 = #{attribute1,jdbcType=VARCHAR},
+            r.attribute2 = #{attribute2,jdbcType=VARCHAR},
+            r.attribute3 = #{attribute3,jdbcType=VARCHAR},
+            r.attribute4 = #{attribute4,jdbcType=VARCHAR},
+            r.attribute5 = #{attribute5,jdbcType=VARCHAR},
+            r.attribute6 = #{attribute6,jdbcType=VARCHAR},
+            r.attribute7 = #{attribute7,jdbcType=VARCHAR},
+            r.attribute8 = #{attribute8,jdbcType=VARCHAR},
+            r.attribute9 = #{attribute9,jdbcType=VARCHAR},
+            r.attribute10 = #{attribute10,jdbcType=VARCHAR},
+            r.attribute11 = #{attribute11,jdbcType=VARCHAR},
+            r.attribute12 = #{attribute12,jdbcType=VARCHAR},
+            r.attribute13 = #{attribute13,jdbcType=VARCHAR},
+            r.attribute14 = #{attribute14,jdbcType=VARCHAR},
+            r.attribute15 = #{attribute15,jdbcType=VARCHAR}
+        WHERE r.role_id = #{roleId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate">
+        UPDATE sys_role_b
+        <set>
+            <if test="roleCode != null">
+                role_code = #{roleCode,jdbcType=VARCHAR},
+            </if>
+            <if test="roleName != null">
+                role_name = #{roleName,jdbcType=VARCHAR},
+            </if>
+            <if test="roleDesc != null">
+                ROLE_DESCRIPTION = #{roleDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="areaCode != null">
+                area_code = #{areaCode,jdbcType=VARCHAR},
+            </if>
+            <if test="requestId != null">
+                request_id = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                program_id = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                last_updated_by = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            last_update_date = current_timestamp,
+            <if test="lastUpdateLogin != null">
+                last_update_login = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                attribute_category = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                attribute1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                attribute2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                attribute3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                attribute4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                attribute5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                attribute6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                attribute7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                attribute8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                attribute9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                attribute10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                attribute11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                attribute12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                attribute13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                attribute14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                attribute15 = #{attribute15,jdbcType=VARCHAR}
+            </if>
+        </set>
+        WHERE role_id = #{roleId,jdbcType=DECIMAL}
+    </update>
+    <select id="selectRolesByUser" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.system.dto.RoleTemplate" >
+        SELECT sur.role_id, sr_tl.role_name
+          FROM sys_user_role sur
+          LEFT OUTER JOIN sys_role_tl sr_tl
+            on sur.role_id = sr_tl.role_id
+         WHERE sr_tl.lang = #{request.locale,jdbcType=VARCHAR}
+           AND sur.user_id = #{userId, jdbcType = DECIMAL}
+    </select>
+</mapper>

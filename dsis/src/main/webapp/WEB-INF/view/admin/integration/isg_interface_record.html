@@ -1,0 +1,322 @@
+<#--
+ * description: 接口日志查询界面
+ * version: 1.0
+ * author: frank.li
+ * Copyright LKK Health Products Group Limited.  
+ *
+-->
+<#include "../include/head.html">
+<body style="padding: 10px; overflow: hidden;">
+</body>
+<div id="interface_log_tabs" class="liger-tab">
+    <div tabid="listener_tab" title="Incoming Call (SYS_INTERFACE_LISTENER)" lselected="true">
+        <form id="interface_listener_form"></form>
+        <div id="interface_listener_grid"></div>
+    </div>
+    <div tabid="recorder_tab" title="Outgoing Call (SYS_INTERFACE_RECORD)">
+        <form id="interface_record_form"></form>
+        <div id="interface_record_grid"></div>
+    </div>
+</div>
+
+<script>
+    var todayDate0 = new Date();
+    todayDate0.setHours(0);
+    todayDate0.setMinutes(0);
+    todayDate0.setSeconds(0);
+    todayDate0.setMilliseconds(0);
+    $(function () {
+        window['interface_listener_form'] = $("#interface_listener_form").ligerForm({
+            fields : [{
+                label     : 'Request Date From',
+                name      : "requestDateFrom",
+                type      : 'date',
+                newline   : true,
+                labelWidth: 120,
+                options   : {
+                    value   : todayDate0,
+                    format  : 'yyyy-MM-dd hh:mm:ss',
+                    showTime: true
+                },
+                validate  : {
+                    required: true
+                }
+            }, {
+                label     : 'Request Date To',
+                name      : "requestDateTo",
+                type      : 'date',
+                newline   : false,
+                labelWidth: 120,
+                options   : {
+                    format  : 'yyyy-MM-dd hh:mm:ss',
+                    showTime: true
+                }
+            }, {
+                label     : 'Service Name',
+                name      : "serviceName",
+                type      : 'text',
+                labelWidth: 120,
+                options   : {
+                    placeholder: 'gdsService | dapp'
+                }
+            }, {
+                label     : 'Method(URL)',
+                name      : "methodName",
+                type      : 'text',
+                newline   : false,
+                labelWidth: 120
+            }, {
+                label     : 'Body',
+                name      : "body",
+                type      : 'text',
+                options   : {
+                    placeholder: '%keyword%'
+                },
+                newline   : false,
+                labelWidth: 120
+            }],
+            buttons: [{
+                text    : '<@spring.message "sys.hand.btn.query"/>',
+                disabled: false,
+                width   : 60,
+                click   : function () {
+                    Hap.gridQuery({
+                        form: interface_listener_form,
+                        grid: interface_listener_grid
+                    })
+                }
+            }]
+        });
+
+        window['interface_listener_grid'] = $("#interface_listener_grid").ligerGrid({
+            columns    : [
+                {
+                    type   : 'text',
+                    display: 'Request Id',
+                    name   : 'requestId',
+                    align  : 'left',
+                    width  : 100
+                }, {
+                    type   : 'date',
+                    display: 'Request Date',
+                    name   : 'requestDate',
+                    format : 'yyyy-MM-dd HH:mm:ss',
+                    align  : 'center',
+                    width  : 140
+                }, {
+                    type   : 'text',
+                    display: 'Service Name',
+                    name   : 'serviceName',
+                    align  : 'left',
+                    width  : 100
+                }, {
+                    type   : 'text',
+                    display: 'Method Name',
+                    name   : 'methodName',
+                    align  : 'left',
+                    width  : 200
+                }, {
+                    type   : 'text',
+                    display: 'IP',
+                    name   : 'ip',
+                    align  : 'left',
+                    width  : 100
+                }, {
+                    type   : 'text',
+                    display: 'Query String',
+                    name   : 'queryString',
+                    align  : 'left',
+                    width  : 150
+                }, {
+                    type   : 'text',
+                    display: 'Body',
+                    name   : 'body',
+                    align  : 'left',
+                    width  : 300
+                }, {
+                    type   : 'text',
+                    display: 'Origin',
+                    name   : 'origin',
+                    align  : 'left',
+                    width  : 300
+                }, {
+                    type   : 'text',
+                    display: 'Agent',
+                    name   : 'userAgent',
+                    align  : 'left',
+                    width  : 300
+                }],
+            url        : '${base.contextPath}/integration/log/listener/query',
+            delayLoad  : true,
+            width      : '99%',
+            height     : '98%',
+            //pageSize:'10',
+            enabledEdit: false,
+            rownumbers : true
+        });
+
+        ////--------------
+
+        window['interface_record_form'] = $("#interface_record_form").ligerForm({
+            fields : [{
+                label     : 'Request Date From',
+                name      : "requestDateFrom",
+                type      : 'date',
+                newline   : true,
+                labelWidth: 120,
+                options   : {
+                    value   : todayDate0,
+                    format  : 'yyyy-MM-dd hh:mm:ss',
+                    showTime: true
+                },
+                validate  : {
+                    required: true
+                }
+            }, {
+                label     : 'Request Date To',
+                name      : "requestDateTo",
+                type      : 'date',
+                newline   : false,
+                labelWidth: 120,
+                options   : {
+                    format  : 'yyyy-MM-dd hh:mm:ss',
+                    showTime: true
+                }
+            }, {
+                label     : 'Success',
+                name      : "success",
+                type      : 'select',
+                newline   : false,
+                labelWidth: 120,
+                options   : {
+                    valueField: 'status',
+                    textField : 'statusDesc',
+                    data      : [{status: 'success', statusDesc: 'success'},
+                        {status: 'failed', statusDesc: 'failed'}]
+                }
+            }, {
+                label     : 'Url',
+                name      : "url",
+                type      : 'text',
+                newline   : false,
+                labelWidth: 120
+            }, {
+                label     : 'Body',
+                name      : "body",
+                type      : 'text',
+                newline   : false,
+                labelWidth: 120
+            }, {
+                label     : 'Result',
+                name      : "result",
+                type      : 'text',
+                newline   : false,
+                labelWidth: 120
+            }],
+            buttons: [{
+                text    : '<@spring.message "sys.hand.btn.query"/>',
+                disabled: false,
+                width   : 60,
+                click   : function () {
+                    Hap.gridQuery({
+                        form: interface_record_form,
+                        grid: interface_record_grid
+                    })
+                }
+            }]
+        });
+
+        window['interface_record_grid'] = $("#interface_record_grid").ligerGrid({
+            columns    : [
+                {
+                    type   : 'text',
+                    display: 'Record Id',
+                    name   : 'recordId',
+                    align  : 'left',
+                    width  : 100
+                }, {
+                    type   : 'text',
+                    display: 'Url',
+                    name   : 'url',
+                    align  : 'left',
+                    width  : 270
+                }, {
+                    type   : 'text',
+                    display: 'Query String',
+                    name   : 'queryString',
+                    align  : 'left',
+                    width  : 150
+                }, {
+                    type   : 'text',
+                    display: 'Body',
+                    name   : 'body',
+                    align  : 'left',
+                    width  : 300
+                }, {
+                    type   : 'text',
+                    display: 'Result',
+                    name   : 'result',
+                    align  : 'left',
+                    width  : 300
+                }, {
+                    type   : 'text',
+                    display: 'Success',
+                    name   : 'success',
+                    align  : 'left',
+                    width  : 100
+                }, {
+                    type   : 'text',
+                    display: 'Exception',
+                    name   : 'exception',
+                    align  : 'left',
+                    width  : 100
+                }, {
+                    type   : 'text',
+                    display: 'Request Date',
+                    name   : 'requestDate',
+                    align  : 'center',
+                    width  : 140
+                }, {
+                    type   : 'text',
+                    display: 'Elapse',
+                    name   : 'elapse',
+                    align  : 'left',
+                    width  : 100
+                }, {
+                    type   : 'date',
+                    display: 'Param Start Date',
+                    name   : 'paramStartDate',
+                    align  : 'left',
+                    width  : 100,
+                    options: {
+                        format  : 'yyyy-MM-dd hh:mm:ss',
+                        showTime: true
+                    }
+                }, {
+                    type   : 'date',
+                    display: 'Param End Date',
+                    name   : 'paramEndDate',
+                    align  : 'left',
+                    width  : 100,
+                    options: {
+                        format  : 'yyyy-MM-dd hh:mm:ss',
+                        showTime: true
+                    }
+                }],
+            url        : '${base.contextPath}/integration/log/record/query',
+            delayLoad  : true,
+            width      : '99%',
+            height     : '98%',
+            //pageSize:'10',
+            enabledEdit: false,
+            rownumbers : true
+        });
+
+        //////-----
+
+
+        $('#interface_log_tabs').ligerTab()
+    });
+</script>
+
+</html>

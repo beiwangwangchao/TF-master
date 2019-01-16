@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.SalesVoucherMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.SalesVoucher" >
+    <id column="VOUCHER_APPLY_ID" property="voucherApplyId" jdbcType="DECIMAL" />
+    <result column="HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="VOUCHER_ID" property="voucherId" jdbcType="DECIMAL" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    VOUCHER_APPLY_ID, HEADER_ID, SALES_ORG_ID, VOUCHER_ID, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+    PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+    ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+    ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+    ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from OM_SALES_VOUCHER
+    where VOUCHER_APPLY_ID = #{voucherApplyId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from OM_SALES_VOUCHER
+    where VOUCHER_APPLY_ID = #{voucherApplyId,jdbcType=DECIMAL}
+  </delete>
+   <delete id="deleteByOrderId" parameterType="java.lang.Long" >
+    delete from OM_SALES_VOUCHER
+    where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </delete>
+ 
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.SalesVoucher" >
+    <selectKey resultType="java.lang.Long" keyProperty="voucherApplyId" order="BEFORE" >
+      select OM_SALES_VOUCHER_S.nextval from dual
+    </selectKey>
+    insert into OM_SALES_VOUCHER (VOUCHER_APPLY_ID, HEADER_ID, SALES_ORG_ID, 
+      VOUCHER_ID, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+      PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+      ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+      ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, 
+      ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+      ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+      ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+      ATTRIBUTE15)
+    values (#{voucherApplyId,jdbcType=DECIMAL}, #{headerId,jdbcType=DECIMAL}, #{salesOrgId,jdbcType=DECIMAL}, 
+      #{voucherId,jdbcType=DECIMAL}, 1, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, 
+      #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, 
+      #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, 
+      #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, 
+      #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, 
+      #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, 
+      #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesVoucher" >
+    <selectKey resultType="java.lang.Long" keyProperty="voucherApplyId" order="BEFORE" >
+      select OM_SALES_VOUCHER_S.nextval from dual
+    </selectKey>
+    insert into OM_SALES_VOUCHER
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+        VOUCHER_APPLY_ID,
+      <if test="headerId != null" >
+        HEADER_ID,
+      </if>
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID,
+      </if>
+      <if test="voucherId != null" >
+        VOUCHER_ID,
+      </if>
+        OBJECT_VERSION_NUMBER,
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+        #{voucherApplyId,jdbcType=DECIMAL},
+      <if test="headerId != null" >
+        #{headerId,jdbcType=DECIMAL},
+      </if>
+      <if test="salesOrgId != null" >
+        #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="voucherId != null" >
+        #{voucherId,jdbcType=DECIMAL},
+      </if>
+        1,
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesVoucher" >
+    update OM_SALES_VOUCHER
+    <set >
+      <if test="headerId != null" >
+        HEADER_ID = #{headerId,jdbcType=DECIMAL},
+      </if>
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="voucherId != null" >
+        VOUCHER_ID = #{voucherId,jdbcType=DECIMAL},
+      </if>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+        CREATION_DATE = CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where VOUCHER_APPLY_ID = #{voucherApplyId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.order.dto.SalesVoucher" >
+    update OM_SALES_VOUCHER
+    set HEADER_ID = #{headerId,jdbcType=DECIMAL},
+      SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      VOUCHER_ID = #{voucherId,jdbcType=DECIMAL},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = CURRENT_TIMESTAMP,
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where VOUCHER_APPLY_ID = #{voucherApplyId,jdbcType=DECIMAL}
+  </update>
+  
+  <resultMap id="OrderUseVoucherMap" type="com.lkkhpg.dsis.common.order.dto.SalesVoucher" >
+    <id column="VOUCHER_APPLY_ID" property="voucherApplyId" jdbcType="DECIMAL" />
+    <result column="HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="VOUCHER_ID" property="voucherId" jdbcType="DECIMAL" />
+    <result column="VOUCHER_CODE" property="voucherCode" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="CATEGORY" property="category" jdbcType="VARCHAR" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+    <result column="APP_SCOPE" property="appScope" jdbcType="VARCHAR" />
+    <result column="USAGE_MODE" property="usageMode" jdbcType="VARCHAR" />
+    <result column="APPLY_CRITERIA" property="applyCriteria" jdbcType="VARCHAR" />
+    <result column="APP_TAX" property="appTax" jdbcType="VARCHAR" />
+    <result column="USE_CRITERIA" property="useCriteria" jdbcType="VARCHAR" />
+    <result column="DISCOUNT_TYPE" property="discountType" jdbcType="VARCHAR" />
+    <result column="DISCOUNT_VALUE" property="discountValue" jdbcType="DECIMAL" />
+  </resultMap>
+  
+  <select id="getVouchersByOrderId" resultMap="OrderUseVoucherMap">
+    select osv.VOUCHER_APPLY_ID,osv.HEADER_ID,osv.SALES_ORG_ID,osv.VOUCHER_ID,
+    pv.VOUCHER_CODE,pv.NAME,pv.DESCRIPTION,pv.CATEGORY,pv.TYPE,pv.APP_SCOPE,pv.USAGE_MODE,
+    pv.APPLY_CRITERIA,pv.APP_TAX,pv.USE_CRITERIA,pv.DISCOUNT_TYPE,pv.DISCOUNT_VALUE
+    from OM_SALES_VOUCHER osv LEFT OUTER JOIN PDM_VOUCHER pv ON(pv.VOUCHER_ID=osv.VOUCHER_ID) 
+    WHERE osv.HEADER_ID=#{headerId,jdbcType=DECIMAL}
+  </select>
+</mapper>

@@ -1,0 +1,370 @@
+<#--
+ * description: 库存事务处理查询界面
+ * version: 1.0
+ * author: shenqiubin
+ * .
+ *
+-->
+<#include "../include/head.html">
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/common/code?productInquiry=INV.PRODUCT_TYPE" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?transactionType=INV.TRANSACTION_TYPE&stockReason=INV.STOCK_REASON" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?yesno=SYS.YES_NO&operType=INV.REPACK_TYPE&repackStatus=INV.REPACK_STATUS" type="text/javascript"></script>
+</head>
+
+<body style="padding: 10px;">
+	
+	<form id="inv_transaction_form" ></form>  
+	
+    <div id="inv_transaction_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+	var organizations = [];
+	var currentInvOrgId = '';
+	var currentInvOrgName = '';
+	function getComboBoxData(obj){
+		var array = [];
+		for(var i = 0;i<obj.length;i++){
+			var o = {};
+			o.id = obj[i].ID;
+			o.text = obj[i].TEXT;
+			array.push(o);
+		}
+		return array;
+	}
+	
+	function getComboBoxData_2(obj){
+		var array = [];
+		for(var i = 0;i<obj.length;i++){
+			var o = {};
+			o.id = obj[i].value;
+			o.text = obj[i].meaning;
+			array.push(o);
+		}
+		return array;
+	}
+	
+	function a_click(item){
+		
+	}
+
+    	$(function(){
+    		
+    		$.ajax({
+    			url: '${base.contextPath}/im/trx/queryOrganizations',
+    			type:"GET",
+    			dataType:"json",
+    			contentType : "application/json",
+                data : '',
+                success : function(json) {
+                    if(json.success){
+                    	//$(".l-bar-button.l-bar-btnload",window.parent.document).click();  
+                    	organizations=json.rows;
+                    	organizations = getComboBoxData(organizations);
+                    	//liger.get('organizationId').setData(organizations)
+                    	//liger.get('transferFrom').setData(organizations)
+                    	liger.get('transferOrgId').setData(organizations)
+                    	liger.get('trxType').setData(getComboBoxData_2(transactionType))
+                    }
+                },
+                error : function() {
+                    $.ligerDialog.closeWaitting();
+                }
+    		})
+    		
+    		/* $.ajax({
+    			url: '${base.contextPath}/im/trx/getCurrentOrganization',
+    			type:"GET",
+    			dataType:"json",
+    			contentType : "application/json",
+                data : '',
+                success : function(json) {
+                    if(json.success){
+                    	//$(".l-bar-button.l-bar-btnload",window.parent.document).click();  
+                    	var organization=json.rows[0];
+                    	liger.get('organizationId').setValue(organization.name);
+                    	currentInvOrgId = organization.invOrgId;
+                    	currentInvOrgName = organization.name;
+                    	//liger.get('transferFrom').setData(organizations)                    	
+                    }
+                },
+                error : function() {
+                    $.ligerDialog.closeWaitting();
+                }
+    		}) */
+    		
+    		
+    		window['inv_transaction_form'] = $("#inv_transaction_form").ligerForm({
+                fields: [
+                    {
+						type: 'select', 
+						label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.organizationid"/>',
+						newline:false,
+						name: 'organizationId',
+						options: {
+                    	    textField: 'name',
+                    	    valueField: 'invOrgId',
+                    	    url : "${base.contextPath}/spm/invOrganization/queryInvOrgsByRole",
+                    	    cancelable: false,
+                    	    onSelected: function(newKey, newValue){
+                    	    	//清空查询结果
+                    	    	if (inv_transaction_grid.currentData != null && inv_transaction_grid.currentData.rows.length > 0) {
+        	            	        var rows = inv_transaction_grid.currentData.rows;
+        	            	        rows.splice(0, rows.length);
+        	            	        inv_transaction_grid.reRender();
+        	            	    }
+                    	    }
+	                    },
+	                    validate: {
+	                    	required: true,
+	                    }
+                    },
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname"/>', name : 'itemName',newline:false },
+                    /* {
+                        type : 'popup', label : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemcode"/>', 
+                        name : 'itemNumber', newline : false, rightToken : ' ', 
+                        options : 
+                        {
+                            readonly : false, //是否可编辑
+                            valueField : 'itemNumber', //选中的valueField
+                            textField : 'itemNumber', //选中的textField
+                            grid : 
+                            {
+                                columns : [
+                                {
+                                    display : '<@spring.message "sys.hand.btn.number"/>', name : 'itemId', align : 'left', 
+                                    width : 80
+                                },
+                                {
+                                    display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemNumber"/>', name : 'itemNumber',
+                                    align : 'left', width : 200,
+                                    render : function (item) 
+                                    {
+                                        var html = "<a href='#' onClick='a_click(" + item.itemId + ")'>" + item.itemNumber + "</a>";
+                                        return html;
+                                    }
+                                },
+                                {
+                                    display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname"/>', name : 'itemName',
+                                    align : 'left', width : 200 
+                                },
+                                {
+                                    display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.description"/>',
+                                    name : 'description', align : 'left', width : 200 
+                                }], 
+                                url : '${base.contextPath}/im/trx/queryItemsByOrgId', 
+                                enabledEdit : true, 
+                                delayLoad : false, 
+                                isSingleCheck : true, 
+                                width : '800', 
+                                checkbox : true 
+                            },
+                            condition : 
+                            {
+                                inputWidth : 150, labelWidth : 70, 
+                                fields : [
+                                {
+                                    type : 'text', label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemNumber"/>',
+                                    name : 'itemNumber' 
+                                },
+                                {
+                                    type : 'text', label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname"/>',
+                                    newline : false, name : 'itemName' 
+                                },
+                                {
+                                    display : '', labelWidth : 2, width : 200, style : 'display:none', name : "organization", 
+                                    newline : false, type : "text" 
+                                },
+                                {
+                                    type : 'select', label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category"/>',
+                                    newline : true, name : 'itemType'
+                                },
+                                {
+                                    type : 'select', label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.redeemFlag"/>',
+                                    name : 'redeemFlag', newline : false, options : {
+                                        data : yesno, valueField : "value", textField : "meaning" 
+                                    }
+                                },
+                                {
+                                    type : 'select', label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.starteraid"/>',
+                                    newline : false, name : 'starterAid', options : {
+                                        data : yesno, valueField : "value", textField : "meaning" 
+                                    }
+                                },
+                                ],
+                                onAfterSetFields : function () 
+                                {
+                                    $.ligerui.get('organization').set('value', currentInvOrgId);
+                                    var itemType_url = '${base.contextPath}/im/trx/queryCategorysByInvOrgId?invOrgId='+currentInvOrgId;
+                                    $.ajax({
+                            			url: itemType_url,
+                            			type:"GET",
+                            			dataType:"json",
+                            			contentType : "application/json",
+                                        data : '',
+                                        success : function(json) {
+                                        	var categoryArr = [];
+                                        	
+                                        	for(var i = 0;i<json.rows.length;i++){
+                                        		if(json.rows[i]){
+                                        			categoryArr.push({id:json.rows[i].categoryId,text:json.rows[i].categoryName})
+                                        		}
+                                        	}
+                                        	 liger.get('itemType').setData(categoryArr);
+                                            },
+                                        
+                                        error : function() {
+                                            $.ligerDialog.closeWaitting();
+                                        }
+                            		})
+                            
+                                },
+                            }
+                            //onSelected : f_buttonclick 
+                        }
+                    }, */
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemcode"/>', newline:true, name: 'itemNumber' },
+					/*   隐藏按批次到期日查询条件 20180207 by mingqing.wei
+                    { type: 'date', label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.expirydatefrom"/>', name: 'expiryDateFrom',newline:false,options:{format: "yyyy-MM-dd"}},
+					{ type: 'date', label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.expirydateto"/>', name: 'expiryDateTo',newline:false,options:{format: "yyyy-MM-dd"}},
+					*/
+                    { type: 'date', label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.trxdatefrom"/>', newline:true,newline:false, name: 'trxDateFrom',options:{format :"yyyy-MM-dd"}},
+					{ type: 'date', label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.trxdateto"/>', rightToken : ' ', newline:false, name: 'trxDateTo',options:{format: "yyyy-MM-dd"} },
+					/*  隐藏批次号查询条件输入框 20180207 by mingqing.wei
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.lotnumber"/>', newline:false, name: 'lotNumber' },
+					*/
+                    {
+						type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.trxtype"/>',name: 'trxType', 
+						newline:true, /* space : 0, */ /* labelWidth : 15, */ rightToken : '',
+						 options : {
+							data : transactionType
+						} 
+						
+					},
+					{ 							
+						type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.transferorgname"/>',name: 'transferOrgId', 
+						newline:false, /* space : 0, */ /* labelWidth : 15, */align: 'left', rightToken : '',
+						/* options : {
+							data : data_year_to,
+							onBeforeSelect:compare
+						} */
+						
+					},
+					{ type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.trxnumber"/>', newline:false, name: 'trxSourceReference' }
+                ], 
+                buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                    	var datas = inv_transaction_form.getData();
+                    	//delete datas.organizationId;
+                    	var is_empty = true;
+                    	for(var data in datas){
+                    		if(datas[data] != '' && datas[data] != null){
+                    			is_empty = false;
+                    			break;
+                    		}
+                    	}                     
+                    	
+                        Hap.gridQuery({
+                            form:inv_transaction_form,
+                            grid:inv_transaction_grid
+                        })
+                        
+                    }}
+                ]
+            });
+    		//liger.get('organizationName').setValue(_invOrgName);
+    		liger.get('organizationId').setValue(_invOrgId);
+            liger.get('organizationId').setText(_invOrgName);
+        
+            window['inv_transaction_grid'] = $("#inv_transaction_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [ 
+                    { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.trxid"/>', 
+                	name: 'trxId', align: 'middle', width: '8%',
+                	isAllowHide: false
+                  },{ 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>', 
+                	name: 'itemNumber', align: 'middle', width: '6%',
+                	isAllowHide: false
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>', 
+                	name: 'itemName', align: 'left', width: '8%'
+                  }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.transferorgname"/>',
+                	name: 'transferOrgName', align: 'left', width: '8%'
+                  }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.trxqty"/>', 
+                	name: 'trxQty', align: 'left', width: '8%'
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.uomcode"/>', 
+                	name: 'uomCode', align: 'left', width: '6%'
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.trxtype"/>', 
+                	name: 'trxType', align: 'left', width: '8%'
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.trxdate"/>', 
+                	name: 'trxDate', align: 'middle', width: '13%', format : 'yyyy-MM-dd hh:mm:ss'
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.trxreason"/>', 
+                	name: 'trxReason', align: 'left', width: '8%',
+                	render : function(item){
+                		for(var a in stockReason){
+                			if(stockReason[a].value==item.trxReason){
+                				return stockReason[a].meaning
+                			}
+                		}
+                		return ""
+                	}
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.remarks"/>', 
+                	name: 'remark', align: 'left', width: '6%'
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.trxnumber"/>', 
+                	name: 'trxSourceReference', align: 'left', width: '6%'
+                  }, {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.payrefundrequest.outrefundno"/>',
+                        name: 'outRefundNo', align: 'left', width: '6%'
+                    }, /* {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.unitprice"/>', 
+                	name: 'unitPrice', align: 'left', width: '6%'
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.totalprice"/>', 
+                	name: 'totalPrice', align: 'left', width: '4%'
+                  }, */ { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.assistcode"/>', 
+                	name: 'assistCode', align: 'left', width: '6%'
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.assistcount"/>', 
+                	name: 'assistCount', align: 'left', width: '6%'
+                  },
+                    /*   隐藏批次、批次到期日和商品包编码 20180207 by mingqing.wei
+                    {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.lotnumber"/>', 
+                	name: 'lotNumber', align: 'left', width: '6%'
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.expirydate"/>', 
+                	name: 'expiryDate', align: 'middle', width: '8%'
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.packageitemcode"/>', 
+                	name: 'packageItemNumber', align: 'middle', width: '8%'
+                  }*/
+                ], 
+                url:'${base.contextPath}/im/trx/query',
+                enabledEdit: false,
+                //usePager:true,
+                width: '99%', 
+                height: '98%', 
+                //checkbox: true,
+                rownumbers: true,
+                delayLoad:true,
+                pageSizeOptions:[10,20,30,40,50],
+                pageSize:'10' 
+            });
+           
+    	});//$function
+    </script>
+</body>
+</html>

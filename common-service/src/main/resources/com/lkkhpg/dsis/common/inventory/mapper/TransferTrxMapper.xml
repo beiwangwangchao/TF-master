@@ -1,0 +1,850 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.inventory.mapper.TransferTrxMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.inventory.dto.TransferTrx">
+        <id column="TRX_ID" property="trxId" jdbcType="DECIMAL"/>
+        <result column="TRX_NUMBER" property="trxNumber" jdbcType="VARCHAR"/>
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="DECIMAL"/>
+        <result column="TRANSFER_ORG_ID" property="transferOrgId" jdbcType="DECIMAL"/>
+        <result column="TRANSFER_TYPE" property="transferType" jdbcType="VARCHAR"/>
+        <result column="STATUS" property="status" jdbcType="VARCHAR"/>
+        <result column="OVERALL_STATUS" property="overallStatus" jdbcType="VARCHAR"/>
+        <result column="TRX_DATE" property="trxDate" jdbcType="TIMESTAMP"/>
+        <result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+        <result column="SOURCE_TYPE" property="sourceType" jdbcType="VARCHAR"/>
+        <result column="SOURCE_TRX_ID" property="sourceTrxId" jdbcType="VARCHAR"/>
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL"/>
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL"/>
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL"/>
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="TransferTrxQueryMap" type="com.lkkhpg.dsis.common.inventory.dto.TransferTrxQuery">
+
+
+        <id column="TRX_ID" property="trxId" jdbcType="DECIMAL"/>
+
+        <result column="inTrxNumber" property="inTrxNumber" jdbcType="DECIMAL"/>
+        <result column="outTrxNumber" property="outTrxNumber" jdbcType="DECIMAL"/>
+        <result column="inStatus" property="inStatus" jdbcType="VARCHAR"/>
+        <result column="outStatus" property="outStatus" jdbcType="VARCHAR"/>
+
+        <result column="TRX_NUMBER" property="trxNumber" jdbcType="VARCHAR"/>
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="DECIMAL"/>
+        <result column="TRANSFER_ORG_ID" property="transferOrgId" jdbcType="DECIMAL"/>
+        <result column="TRANSFER_TYPE" property="transferType" jdbcType="VARCHAR"/>
+        <result column="STATUS" property="status" jdbcType="VARCHAR"/>
+        <result column="OVERALL_STATUS" property="overallStatus" jdbcType="VARCHAR"/>
+        <result column="TRX_DATE" property="trxDate" jdbcType="TIMESTAMP"/>
+        <result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+        <result column="SOURCE_TYPE" property="sourceType" jdbcType="VARCHAR"/>
+        <result column="SOURCE_TRX_ID" property="sourceTrxId" jdbcType="VARCHAR"/>
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL"/>
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL"/>
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL"/>
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        TRX_ID, TRX_NUMBER, ORGANIZATION_ID,TRANSFER_ORG_ID, TRANSFER_TYPE, STATUS,
+        TRX_DATE, REMARK,
+        SOURCE_TYPE,
+        SOURCE_TRX_ID, OBJECT_VERSION_NUMBER,
+        REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+        CREATED_BY,
+        LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3,
+        ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8,
+        ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11,
+        ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14,
+        ATTRIBUTE15
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from INV_TRANSFER_TRX
+        where TRX_ID = #{trxId,jdbcType=DECIMAL}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from
+        INV_TRANSFER_TRX
+        where TRX_ID =
+        #{trxId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.dto.TransferTrx">
+        <selectKey resultType="java.lang.Long" keyProperty="trxId" order="BEFORE">
+            select INV_TRANSFER_TRX_S.nextval
+            from dual
+        </selectKey>
+        insert into INV_TRANSFER_TRX (TRX_ID, TRX_NUMBER, ORGANIZATION_ID,TRANSFER_ORG_ID,
+        TRANSFER_TYPE,
+        STATUS,TRX_DATE,
+        REMARK, SOURCE_TYPE, SOURCE_TRX_ID, OBJECT_VERSION_NUMBER,REQUEST_ID, PROGRAM_ID,
+        CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1, ATTRIBUTE2,
+        ATTRIBUTE3,
+        ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11,
+        ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14,
+        ATTRIBUTE15
+        )
+        values (#{trxId,jdbcType=DECIMAL},
+        #{trxNumber,jdbcType=VARCHAR},
+        #{organizationId,jdbcType=DECIMAL},
+        #{transferOrgId,jdbcType=DECIMAL},
+        #{transferType,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+        #{trxDate,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR},
+        #{sourceType,jdbcType=VARCHAR},
+        #{sourceTrxId,jdbcType=DECIMAL},
+        1,
+        #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP,
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR},
+        #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR},
+        #{attribute3,jdbcType=VARCHAR},
+        #{attribute4,jdbcType=VARCHAR},
+        #{attribute5,jdbcType=VARCHAR},
+        #{attribute6,jdbcType=VARCHAR},
+        #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR},
+        #{attribute9,jdbcType=VARCHAR},
+        #{attribute10,jdbcType=VARCHAR},
+        #{attribute11,jdbcType=VARCHAR},
+        #{attribute12,jdbcType=VARCHAR},
+        #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR},
+        #{attribute15,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.inventory.dto.TransferTrx">
+        <selectKey resultType="java.lang.Long" keyProperty="trxId" order="BEFORE">
+            select INV_TRANSFER_TRX_S.nextval
+            from dual
+        </selectKey>
+        insert into INV_TRANSFER_TRX
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            TRX_ID,
+            <if test="trxNumber != null">
+                TRX_NUMBER,
+            </if>
+            <if test="organizationId != null">
+                ORGANIZATION_ID,
+            </if>
+            <if test="transferOrgId != null">
+                TRANSFER_ORG_ID,
+            </if>
+            <if test="transferType != null">
+                TRANSFER_TYPE,
+            </if>
+            <if test="status != null">
+                STATUS,
+            </if>
+            <if test="trxDate != null">
+                TRX_DATE,
+            </if>
+            <if test="remark != null">
+                REMARK,
+            </if>
+            <if test="sourceType != null">
+                SOURCE_TYPE,
+            </if>
+            <if test="sourceTrxId != null">
+                SOURCE_TRX_ID,
+            </if>
+            <if test="objectVersionNumber != null">
+                OBJECT_VERSION_NUMBER,
+            </if>
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            <if test="creationDate != null">
+                CREATION_DATE,
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            <if test="lastUpdateDate != null">
+                LAST_UPDATE_DATE,
+            </if>
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY,
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1,
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2,
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3,
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4,
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5,
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6,
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7,
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8,
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9,
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10,
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11,
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12,
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13,
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14,
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{trxId,jdbcType=DECIMAL},
+            <if test="trxNumber != null">
+                #{trxNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="organizationId != null">
+                #{organizationId,jdbcType=DECIMAL},
+            </if>
+            <if test="transferType != null">
+                #{transferType,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="trxDate != null">
+                #{trxDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceType != null">
+                #{sourceType,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceTrxId != null">
+                #{sourceTrxId,jdbcType=DECIMAL},
+            </if>
+            <if test="objectVersionNumber != null">
+                1,
+            </if>
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="creationDate != null">
+                CURRENT_TIMESTAMP,
+            </if>
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateDate != null">
+                CURRENT_TIMESTAMP,
+            </if>
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.inventory.dto.TransferTrx">
+        update INV_TRANSFER_TRX
+        <set>
+            <if test="trxNumber != null">
+                TRX_NUMBER = #{trxNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="organizationId != null">
+                ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL},
+            </if>
+            <if test="transferOrgId != null">
+                TRANSFER_ORG_ID = #{transferOrgId,jdbcType=DECIMAL},
+            </if>
+            <if test="transferType != null">
+                TRANSFER_TYPE = #{transferType,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="trxDate != null">
+                TRX_DATE = #{trxDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceType != null">
+                SOURCE_TYPE = #{sourceType,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceTrxId != null">
+                SOURCE_TRX_ID = #{sourceTrxId,jdbcType=VARCHAR},
+            </if>
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateDate != null">
+                LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            </if>
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY =
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where TRX_ID = #{trxId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.inventory.dto.TransferTrx">
+        update
+        INV_TRANSFER_TRX
+        set TRX_NUMBER =
+        #{trxNumber,jdbcType=VARCHAR},
+        ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL},
+        TRANSFER_ORG_ID =
+        #{transferOrgId,jdbcType=DECIMAL},
+        TRANSFER_TYPE =
+        #{transferType,jdbcType=VARCHAR},
+        STATUS =
+        #{status,jdbcType=VARCHAR},
+        TRX_DATE = #{trxDate,jdbcType=TIMESTAMP},
+        REMARK =
+        #{remark,jdbcType=VARCHAR},
+        SOURCE_TYPE =
+        #{sourceType,jdbcType=VARCHAR},
+        SOURCE_TRX_ID =
+        #{sourceTrxId,jdbcType=VARCHAR},
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+        REQUEST_ID =
+        #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID =
+        #{programId,jdbcType=DECIMAL},
+        CREATION_DATE = CURRENT_TIMESTAMP,
+        CREATED_BY =
+        #{createdBy,jdbcType=DECIMAL},
+        LAST_UPDATED_BY =
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        LAST_UPDATE_LOGIN =
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        ATTRIBUTE_CATEGORY =
+        #{attributeCategory,jdbcType=VARCHAR},
+        ATTRIBUTE1 =
+        #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 =
+        #{attribute2,jdbcType=VARCHAR},
+        ATTRIBUTE3 =
+        #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 =
+        #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 =
+        #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 =
+        #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 =
+        #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 =
+        #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 =
+        #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 =
+        #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 =
+        #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 =
+        #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 =
+        #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 =
+        #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 =
+        #{attribute15,jdbcType=VARCHAR}
+        where TRX_ID =
+        #{trxId,jdbcType=DECIMAL}
+    </update>
+
+
+    <select id="selectTransferTrxForUpdate" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.common.inventory.dto.TransferTrxQuery">
+        select
+        trx.TRX_ID, trx.TRX_NUMBER, trx.ORGANIZATION_ID,trx.TRANSFER_ORG_ID, trx.TRANSFER_TYPE, trx.STATUS,
+        trx.TRX_DATE, trx.REMARK,
+        trx.SOURCE_TYPE,
+        trx.SOURCE_TRX_ID, trx.OBJECT_VERSION_NUMBER,
+        trx.REQUEST_ID,
+        trx.PROGRAM_ID, trx.CREATION_DATE,
+        trx.CREATED_BY,
+        trx.LAST_UPDATED_BY,
+        trx.LAST_UPDATE_DATE,
+        trx.LAST_UPDATE_LOGIN, trx.ATTRIBUTE_CATEGORY
+        from INV_TRANSFER_TRX trx
+        <where>
+            1=1
+            <if test="trxId != null">
+                AND trx.TRX_ID = #{trxId,jdbcType=DECIMAL}
+            </if>
+            <if test="sourceTrxId != null">
+                AND trx.SOURCE_TRX_ID = #{sourceTrxId,jdbcType=VARCHAR}
+            </if>
+            <if test="trxNumber != null">
+                AND trx.TRX_NUMBER = #{trxNumber,jdbcType=VARCHAR}
+            </if>
+            <if test="organizationId != null">
+                AND trx.ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL}
+            </if>
+            <if test="transferOrgId != null">
+                AND trx.TRANSFER_ORG_ID = #{transferOrgId,jdbcType=DECIMAL}
+            </if>
+            <if test="transferType != null">
+                AND trx.TRANSFER_TYPE = #{transferType,jdbcType=VARCHAR}
+            </if>
+            <if test="status != null">
+                AND trx.STATUS = #{status,jdbcType=VARCHAR}
+            </if>
+            <if test="trxDateFrom != null">
+                AND trx.TRX_DATE &gt;= #{trxDateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="trxDateTo != null">
+                AND trx.TRX_DATE &lt; #{trxDateTo,jdbcType=TIMESTAMP}
+            </if>
+            <if test="createDateFrom != null">
+                AND trx.CREATION_DATE &gt;= #{createDateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="createDateTo != null">
+                AND trx.CREATION_DATE &lt;= #{createDateTo,jdbcType=TIMESTAMP}
+            </if>
+
+        </where>
+        FOR UPDATE
+    </select>
+
+    <select id="selectTransferTrxs" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.common.inventory.dto.TransferTrxQuery">
+        select
+        trx.TRX_ID, trx.TRX_NUMBER, trx.ORGANIZATION_ID,trx.TRANSFER_ORG_ID, trx.TRANSFER_TYPE, trx.STATUS,
+        trx.TRX_DATE, trx.REMARK,
+        trx.SOURCE_TYPE,
+        trx.SOURCE_TRX_ID, trx.OBJECT_VERSION_NUMBER,
+        trx.REQUEST_ID,
+        trx.PROGRAM_ID, trx.CREATION_DATE,
+        trx.CREATED_BY,
+        trx.LAST_UPDATED_BY,
+        trx.LAST_UPDATE_DATE,
+        trx.LAST_UPDATE_LOGIN, trx.ATTRIBUTE_CATEGORY,
+        ttv.OVERALL_STATUS
+        from INV_TRANSFER_TRX trx
+        LEFT OUTER JOIN
+        INV_TRANSFER_TRX_V ttv
+        ON (trx.trx_id = ttv.trx_id)
+        <where>
+            1=1
+            <if test="trxId != null">
+                AND trx.TRX_ID = #{trxId,jdbcType=DECIMAL}
+            </if>
+            <if test="sourceTrxId != null">
+                AND trx.SOURCE_TRX_ID = #{sourceTrxId,jdbcType=VARCHAR}
+            </if>
+            <if test="trxNumber != null">
+                AND trx.TRX_NUMBER like concat('%',concat(#{trxNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="organizationId != null">
+                AND trx.ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL}
+            </if>
+            <if test="transferOrgId != null">
+                AND trx.TRANSFER_ORG_ID = #{transferOrgId,jdbcType=DECIMAL}
+            </if>
+            <if test="transferType != null">
+                AND trx.TRANSFER_TYPE = #{transferType,jdbcType=VARCHAR}
+            </if>
+            <if test="status != null">
+                AND trx.STATUS = #{status,jdbcType=VARCHAR}
+            </if>
+            <if test="trxDateFrom != null">
+                AND trunc(trx.TRX_DATE) &gt;= #{trxDateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="trxDateTo != null">
+                AND trunc(trx.TRX_DATE) &lt;= #{trxDateTo,jdbcType=TIMESTAMP}
+            </if>
+            <if test="createDateFrom != null">
+                AND trunc(trx.CREATION_DATE) &gt;= #{createDateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="createDateTo != null">
+                AND trunc(trx.CREATION_DATE) &lt;= #{createDateTo,jdbcType=TIMESTAMP}
+            </if>
+            <if test="outStatuses != null">
+                AND trx.STATUS in
+                <foreach item="outStatuses" index="index" collection="outStatuses" open="(" separator="," close=")">
+                    #{outStatuses}
+                </foreach>
+            </if>
+            <if test="overallStatuses != null">
+                AND ttv.OVERALL_STATUS in
+                <foreach item="overallStatuses" index="index" collection="overallStatuses" open="(" separator=","
+                         close=")">
+                    #{overallStatuses}
+                </foreach>
+            </if>
+            <!--             AND trx.ORGANIZATION_ID = #{request.invOrgId,jdbcType=DECIMAL}  -->
+        </where>
+        <if test="sortname =='trxNumber' and sortorder == 'asc'">
+            order by trx.TRX_NUMBER asc
+        </if>
+        <if test="sortname =='trxNumber' and sortorder == 'desc'">
+            order by trx.TRX_NUMBER desc
+        </if>
+        <if test="sortname =='creationDate' and sortorder == 'asc'">
+            order by trx.CREATION_DATE asc
+        </if>
+        <if test="sortname =='creationDate' and sortorder == 'desc'">
+            order by trx.CREATION_DATE desc
+        </if>
+        <if test="sortname =='trxDate' and sortorder == 'asc'">
+            order by trx.TRX_DATE asc
+        </if>
+        <if test="sortname =='trxDate' and sortorder == 'desc'">
+            order by trx.TRX_DATE desc
+        </if>
+        <if test="sortname == null">
+            order by trx.TRX_NUMBER desc
+        </if>
+    </select>
+    <select id="selectInTransferTrxs" resultMap="TransferTrxQueryMap"
+            parameterType="com.lkkhpg.dsis.common.inventory.dto.TransferTrxQuery">
+        select
+        t1.TRX_ID,
+        t1.TRX_NUMBER,
+        t1.ORGANIZATION_ID,
+        t1.TRANSFER_ORG_ID,
+        t1.TRANSFER_TYPE,
+        t1.SOURCE_TRX_ID,
+        t1.STATUS,
+        t1.TRX_DATE,
+        t1.REMARK,
+        t1.CREATION_DATE,
+        t1.TRX_ID inTrxNumber,
+        t2.TRX_NUMBER outTrxNumber,
+        t1.STATUS inStatus,
+        t2.STATUS outStatus,
+        t2.OVERALL_STATUS
+        from INV_TRANSFER_TRX t1,
+        INV_TRANSFER_TRX_V t2
+        <where>
+            1=1
+            <if test="trxId != null">
+                AND t1.TRX_ID like concat('%',concat(#{trxId,jdbcType=DECIMAL},'%'))
+            </if>
+            <if test="trxNumber != null">
+                AND t1.TRX_NUMBER like concat('%',concat(#{trxNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="organizationId != null">
+                AND t1.ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL}
+            </if>
+            <if test="transferOrgId != null">
+                AND t1.TRANSFER_ORG_ID = #{transferOrgId,jdbcType=DECIMAL}
+            </if>
+            <if test="transferType != null">
+                AND t1.TRANSFER_TYPE = #{transferType,jdbcType=VARCHAR}
+            </if>
+            <if test="status != null">
+                AND t1.STATUS = #{status,jdbcType=VARCHAR}
+            </if>
+            <if test="trxDateFrom != null">
+                AND trunc(t1.TRX_DATE) &gt;= #{trxDateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="trxDateTo != null">
+                AND trunc(t1.TRX_DATE) &lt;= #{trxDateTo,jdbcType=TIMESTAMP}
+            </if>
+            <if test="createDateFrom != null">
+                AND trunc(t1.CREATION_DATE) &gt;= #{createDateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="createDateTo != null">
+                AND trunc(t1.CREATION_DATE) &lt;= #{createDateTo,jdbcType=TIMESTAMP}
+            </if>
+            <if test="inTrxNumber !=null">
+                AND t1.TRX_NUMBER Like concat('%',concat(#{inTrxNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="outTrxNumber !=null">
+                AND t2.TRX_NUMBER Like concat('%',concat(#{outTrxNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="inStatuses != null">
+                AND t1.STATUS in
+                <foreach item="inStatuses" index="index" collection="inStatuses" open="(" separator="," close=")">
+                    #{inStatuses}
+                </foreach>
+            </if>
+            <if test="outStatuses != null">
+                AND t2.STATUS in
+                <foreach item="outStatuses" index="index" collection="outStatuses" open="(" separator="," close=")">
+                    #{outStatuses}
+                </foreach>
+            </if>
+            <if test="overallStatuses != null">
+                AND t2.OVERALL_STATUS in
+                <foreach item="overallStatuses" index="index" collection="overallStatuses" open="(" separator=","
+                         close=")">
+                    #{overallStatuses}
+                </foreach>
+            </if>
+            AND t1.SOURCE_TRX_ID=t2.TRX_ID
+            <!--             AND t1.TRANSFER_ORG_ID = #{request.invOrgId,jdbcType=DECIMAL}    -->
+        </where>
+        <if test="sortname =='trxNumber' and sortorder == 'asc'">
+            order by t1.TRX_NUMBER asc
+        </if>
+        <if test="sortname =='trxNumber' and sortorder == 'desc'">
+            order by t1.TRX_NUMBER desc
+        </if>
+        <if test="sortname =='outTrxNumber' and sortorder == 'asc'">
+            order by t2.TRX_NUMBER asc
+        </if>
+        <if test="sortname =='outTrxNumber' and sortorder == 'desc'">
+            order by t2.TRX_NUMBER desc
+        </if>
+        <if test="sortname =='creationDate' and sortorder == 'asc'">
+            order by t1.CREATION_DATE asc
+        </if>
+        <if test="sortname =='creationDate' and sortorder == 'desc'">
+            order by t1.CREATION_DATE desc
+        </if>
+        <if test="sortname =='trxDate' and sortorder == 'asc'">
+            order by t1.TRX_DATE asc
+        </if>
+        <if test="sortname =='trxDate' and sortorder == 'desc'">
+            order by t1.TRX_DATE desc
+        </if>
+        <if test="sortname == null">
+            order by t1.TRX_NUMBER desc
+        </if>
+    </select>
+    <!-- Mclin添加，用于转出单据编号通用Lov的查询 -->
+    <select id="selectTransferOutTrxsByOrg" resultMap="BaseResultMap">
+        select
+        itt.trx_id, itt.trx_number,
+        (select coalesce(scvt.meaning, scvb.meaning)
+        from sys_code_b scb, sys_code_value_b scvb
+        left outer join sys_code_value_tl scvt
+        ON (scvb.code_value_id = scvt.code_value_id AND
+        scvt.lang = #{request.locale,jdbcType=VARCHAR})
+        where scvb.value = itt.status
+        and scb.code like 'INV.TRANSFER_OUT_STATUS'
+        and scb.code_id = scvb.code_id) status
+        from inv_transfer_trx itt
+        <where>
+            itt.organization_id = #{request.invOrgId,jdbcType=DECIMAL}
+            and itt.transfer_type = 'TRFOT'
+            <if test="trxNumber != null">
+                and itt.trx_number = #{trxNumber, jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <!-- guanghui.liu添加，用于转入单据编号通用Lov的查询 -->
+    <select id="selectTransferInTrxsByOrg" resultMap="BaseResultMap">
+        select
+        itt.trx_id, itt.trx_number,
+        (select coalesce(scvt.meaning, scvb.meaning)
+        from sys_code_b scb, sys_code_value_b scvb
+        left outer join sys_code_value_tl scvt
+        ON (scvb.code_value_id = scvt.code_value_id AND
+        scvt.lang = #{request.locale,jdbcType=VARCHAR})
+        where scvb.value = itt.status
+        and scb.code like 'INV.TRANSFER_IN_STATUS'
+        and scb.code_id = scvb.code_id) status
+        from inv_transfer_trx itt
+        <where>
+            itt.transfer_org_id = #{request.invOrgId,jdbcType=DECIMAL}
+            and itt.transfer_type = 'TRFIN'
+            <if test="trxNumber != null">
+                and itt.trx_number = #{trxNumber, jdbcType=VARCHAR}
+            </if>
+        </where>
+        <if test="sortname != null">
+            <bind name='_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+            ORDER BY ${_colName} ${sortorder}
+        </if>
+
+    </select>
+</mapper>

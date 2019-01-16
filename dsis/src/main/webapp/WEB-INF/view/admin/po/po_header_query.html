@@ -1,0 +1,149 @@
+<#--
+ * description: 采购订单查询界面
+ * version: 1.0 
+ * author: huangjiajing
+ * .
+ * 
+-->
+
+<#include "../include/head.html">
+<body style="padding: 10px;">
+    <form id="d_stm_001_form"></form>
+    <div id="d_stm_001_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function() {
+        window['d_stm_001_form'] = $("#d_stm_001_form").ligerForm({
+            fields : [
+				{ name : 'poNumber', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poheadernumber"/>', newline : false ,type:'text'
+				},
+                { name : 'vendorName', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.vendorname"/>', newline : false},
+	            { name : 'marketId', type : 'popup', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.marketid"/>', newline : false ,
+                	textField:'name',
+	            	options  : ${lovService.getLov(base.contextPath, base.locale, "lov_market")}
+                },
+	            {
+	                name : 'orderDateTo',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.orderdate"/>',
+	                type : 'date',
+	                format: 'YYYY-MM-DD',
+	                newline:true,
+	                options:{
+		                onChangeDate  :function(date){
+		                	if($("input[name='endActiveDate']").val()<date){
+		                		if($("input[name='endActiveDate']").val()!=""){
+			                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+			                		$.ligerui.get("startActiveDate").setValue("");
+		                		}
+		                	}
+		                }
+	                }
+	            },
+	            {
+	                name : 'orderDateDo',
+	                label : '————',
+	                type : 'date',
+	                format: 'YYYY-MM-DD',
+	                newline:false,
+	                options:{
+		                onChangeDate : function(date){
+		                	if($("input[name='startActiveDate']").val()>date){
+		                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+		                		$.ligerui.get("endActiveDate").setValue("");
+		                	}
+		                }
+	                }
+	            }
+	        ],
+            buttons : [
+                {
+	                text : '<@spring.message "sys.hand.btn.query"/>',
+	                disabled : false,
+	                width : 60,
+	                click : function() {
+	                    Hap.gridQuery({
+	                        form : d_stm_001_form,
+	                        grid : d_stm_001_grid
+	                    })
+	                }
+	            },{
+                    text : '<@spring.message "sys.hand.btn.create"/>',
+                    disabled : false,
+                    width : 60,
+                    click: function(){  
+                        window.top.f_removeTab('IM_PO_HEADER');
+                        window.top.f_addTab('IM_PO_HEADER','<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poheaders"/>','${base.contextPath}/im/im_po_header.html');
+                    }
+                }
+            ]
+        });
+         var d_stm_001_grid;
+         d_stm_001_grid = window['d_stm_001_grid'] = $("#d_stm_001_grid").ligerGrid({
+            columns : [
+                {
+   	                display : '<@spring.message "sys.hand.btn.number"/>',
+   	                name : 'poHeaderId',
+   	                align : 'left',
+   	                width : 200
+    	        },
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.marketid"/>',
+	                name : 'name',
+	                align : 'left',
+	                width : 100
+                },
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poheadernumber"/>',
+	                name : 'poNumber',
+	                align : 'left',
+	                width : 200,
+                    type : 'text',
+                    render: function (row){
+                        return "<a href='javascript:void(0);' onclick='poheaderEdit(\""+row.poHeaderId+"\")'>" + row.poHeaderId + "</a> ";
+                    }
+	            },
+	            {
+	                name : 'poTo',
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poto"/>',
+	                align : 'left',
+	                width : 200
+	            },
+                {
+                    name : 'vendorName',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.vendorname"/>',
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    name : 'deliveryTo',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.deliveryto"/>',
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    name : 'orderDate',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.orderdates"/>',
+                    align : 'left',
+                    width : 200,
+                    format: "YYYY-MM-DD",
+                    type : 'date'
+                },
+                {
+                    name : 'remark',
+                    display : '<@spring.message "sys.hand.common.comment"/>',
+                    align : 'left',
+                    width : 200
+                }
+            ],
+            url : '${base.contextPath}/inv/poheader/query',
+            enabledEdit : false,
+            width : '99%',
+            height : '98%'
+        });
+    });
+    function poheaderEdit(poHeaderId){
+        window.top.f_removeTab('IM_PO_HEADER'+poHeaderId);
+        window.top.f_addTab('IM_PO_HEADER'+poHeaderId, '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poheaders"/>', 'im/im_po_header_edit.html?isedit=1&poHeaderId=' + poHeaderId);
+    }
+</script>
+</body>
+</html>

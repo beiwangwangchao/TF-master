@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.system.ResourceItemMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.system.ResourceItem" >
+    <id column="RESOURCE_ITEM_ID" property="resourceItemId" jdbcType="DECIMAL" />
+    <result column="OWNER_RESOURCE_ID" property="ownerResourceId" jdbcType="DECIMAL" />
+    <result column="TARGET_RESOURCE_ID" property="targetResourceId" jdbcType="DECIMAL" />
+    <result column="ITEM_ID" property="itemId" jdbcType="VARCHAR" /> 
+    <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="ITEM_TYPE" property="itemType" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="TARGET_RESOURCE_NAME" property="targetResourceName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    RESOURCE_ITEM_ID, OWNER_RESOURCE_ID, TARGET_RESOURCE_ID, ITEM_ID, ITEM_NAME, DESCRIPTION, 
+    ITEM_TYPE, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+    LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+    ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+    ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SYS_RESOURCE_ITEM_B
+    where RESOURCE_ITEM_ID = #{resourceItemId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.ResourceItem" >
+    <selectKey resultType="java.lang.Long" keyProperty="resourceItemId" order="BEFORE" >
+      select SYS_RESOURCE_ITEM_B_S.nextval from dual
+    </selectKey>
+    insert into SYS_RESOURCE_ITEM_B (RESOURCE_ITEM_ID, OWNER_RESOURCE_ID, 
+      TARGET_RESOURCE_ID, ITEM_ID, ITEM_NAME, 
+      DESCRIPTION, ITEM_TYPE, OBJECT_VERSION_NUMBER, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15)
+    values (#{resourceItemId,jdbcType=DECIMAL}, #{ownerResourceId,jdbcType=DECIMAL}, 
+      #{targetResourceId,jdbcType=DECIMAL}, #{itemId,jdbcType=VARCHAR}, #{itemName,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, #{itemType,jdbcType=VARCHAR}, 1, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, current_timestamp, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, current_timestamp, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.ResourceItem" >
+    update SYS_RESOURCE_ITEM_B
+    set 
+      TARGET_RESOURCE_ID = #{targetResourceId,jdbcType=DECIMAL},
+      ITEM_ID = #{itemId,jdbcType=VARCHAR},
+      ITEM_NAME = #{itemName,jdbcType=VARCHAR},
+      DESCRIPTION = #{description,jdbcType=VARCHAR},
+      ITEM_TYPE = #{itemType,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = current_timestamp,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where RESOURCE_ITEM_ID = #{resourceItemId,jdbcType=DECIMAL}
+  </update>  
+  <select id="selectResourceItemsByResourceId" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.system.Resource">
+    SELECT B.RESOURCE_ITEM_ID,
+           B.OWNER_RESOURCE_ID,
+           B.TARGET_RESOURCE_ID,
+           B.ITEM_ID,
+           T.ITEM_NAME,
+           T.DESCRIPTION,
+           B.ITEM_TYPE,
+           RT.NAME AS TARGET_RESOURCE_NAME
+      FROM SYS_RESOURCE_ITEM_B B
+      LEFT OUTER JOIN SYS_RESOURCE_TL RT
+        ON (B.TARGET_RESOURCE_ID = RT.RESOURCE_ID AND RT.LANG = #{request.locale,jdbcType=VARCHAR})
+      LEFT OUTER JOIN SYS_RESOURCE_ITEM_TL T
+        ON (B.RESOURCE_ITEM_ID = T.RESOURCE_ITEM_ID AND T.LANG = #{request.locale,jdbcType=VARCHAR})
+     WHERE B.OWNER_RESOURCE_ID = #{resourceId,jdbcType=DECIMAL}
+        
+  </select>
+  <select id="selectResourceItemsByFunctionId" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.system.Function">
+    SELECT SRI.RESOURCE_ITEM_ID,
+           SRI.ITEM_ID,
+           SRF.RESOURCE_ID       AS TARGET_RESOURCE_ID,
+           RTL.NAME              AS TARGET_RESOURCE_NAME,
+           SRI.OWNER_RESOURCE_ID,
+           SRIT.ITEM_NAME,
+           SRIT.DESCRIPTION
+      FROM SYS_RESOURCE_ITEM_B   SRI,
+           SYS_FUNCTION_RESOURCE SRF,
+           SYS_RESOURCE_ITEM_TL  SRIT,
+           SYS_RESOURCE_TL       RTL
+     WHERE SRI.OWNER_RESOURCE_ID = SRF.RESOURCE_ID
+       AND SRI.RESOURCE_ITEM_ID = SRIT.RESOURCE_ITEM_ID
+       AND SRF.RESOURCE_ID = RTL.RESOURCE_ID
+       AND RTL.LANG = #{request.locale,jdbcType=VARCHAR}
+       AND SRIT.LANG = #{request.locale,jdbcType=VARCHAR}
+       AND SRF.FUNCTION_ID = #{functionId,jdbcType=DECIMAL}
+  </select>
+  
+  <select id="selectResourceItemByResourceIdAndItemId" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.system.ResourceItem">
+    SELECT SRI.RESOURCE_ITEM_ID
+      FROM SYS_RESOURCE_ITEM_B   SRI
+     WHERE SRI.OWNER_RESOURCE_ID = #{ownerResourceId,jdbcType=DECIMAL}
+       AND SRI.ITEM_ID = #{itemId,jdbcType=VARCHAR}
+  </select>
+</mapper>

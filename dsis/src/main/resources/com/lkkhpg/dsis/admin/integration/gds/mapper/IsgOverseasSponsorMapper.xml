@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgOverseasSponsorMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgOverseasSponsor" >
+    <id column="INTERFACE_ID" property="interfaceId" jdbcType="DECIMAL" />
+    <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+    <result column="DEALER_NAME" property="dealerName" jdbcType="VARCHAR" />
+    <result column="DEALER_POST_CODE" property="dealerPostCode" jdbcType="VARCHAR" />
+    <result column="SPONSOR_NO" property="sponsorNo" jdbcType="VARCHAR" />
+    <result column="SALE_BRANCH_NO" property="saleBranchNo" jdbcType="VARCHAR" />
+    <result column="SALE_ORG_CODE" property="saleOrgCode" jdbcType="VARCHAR" />
+    <result column="TAX_CUST_CODE" property="taxCustCode" jdbcType="VARCHAR" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="PROCESS_STATUS" property="processStatus" jdbcType="VARCHAR" />
+    <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP" />
+    <result column="PROCESS_MESSAGE" property="processMessage" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INTERFACE_ID, DEALER_NO, DEALER_NAME, DEALER_POST_CODE, SPONSOR_NO, SALE_BRANCH_NO, 
+    SALE_ORG_CODE, TAX_CUST_CODE, ADVISE_NO, PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+    REQUEST_ID, PROGRAM_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from ISG_OVERSEAS_SPONSOR
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from ISG_OVERSEAS_SPONSOR
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgOverseasSponsor" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      select ISG_OVERSEAS_SPONSOR_S.nextval from dual
+    </selectKey>
+    insert into ISG_OVERSEAS_SPONSOR (INTERFACE_ID, DEALER_NO, DEALER_NAME, 
+      DEALER_POST_CODE, SPONSOR_NO, SALE_BRANCH_NO, 
+      SALE_ORG_CODE, TAX_CUST_CODE, ADVISE_NO, 
+      PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+      REQUEST_ID, PROGRAM_ID)
+    values (#{interfaceId,jdbcType=DECIMAL}, #{dealerNo,jdbcType=VARCHAR}, #{dealerName,jdbcType=VARCHAR}, 
+      #{dealerPostCode,jdbcType=VARCHAR}, #{sponsorNo,jdbcType=VARCHAR}, #{saleBranchNo,jdbcType=VARCHAR}, 
+      #{saleOrgCode,jdbcType=VARCHAR}, #{taxCustCode,jdbcType=VARCHAR}, #{adviseNo,jdbcType=VARCHAR}, 
+      #{processStatus,jdbcType=VARCHAR}, CURRENT_TIMESTAMP, #{processMessage,jdbcType=VARCHAR}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgOverseasSponsor" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      select ISG_OVERSEAS_SPONSOR_S.nextval from dual
+    </selectKey>
+    insert into ISG_OVERSEAS_SPONSOR
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INTERFACE_ID,
+      <if test="dealerNo != null" >
+        DEALER_NO,
+      </if>
+      <if test="dealerName != null" >
+        DEALER_NAME,
+      </if>
+      <if test="dealerPostCode != null" >
+        DEALER_POST_CODE,
+      </if>
+      <if test="sponsorNo != null" >
+        SPONSOR_NO,
+      </if>
+      <if test="saleBranchNo != null" >
+        SALE_BRANCH_NO,
+      </if>
+      <if test="saleOrgCode != null" >
+        SALE_ORG_CODE,
+      </if>
+      <if test="taxCustCode != null" >
+        TAX_CUST_CODE,
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO,
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS,
+      </if>
+        PROCESS_DATE,
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{interfaceId,jdbcType=DECIMAL},
+      <if test="dealerNo != null" >
+        #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerName != null" >
+        #{dealerName,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerPostCode != null" >
+        #{dealerPostCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sponsorNo != null" >
+        #{sponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleBranchNo != null" >
+        #{saleBranchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleOrgCode != null" >
+        #{saleOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="taxCustCode != null" >
+        #{taxCustCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="processMessage != null" >
+        #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgOverseasSponsor" >
+    update ISG_OVERSEAS_SPONSOR
+    <set >
+      <if test="dealerNo != null" >
+        DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerName != null" >
+        DEALER_NAME = #{dealerName,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerPostCode != null" >
+        DEALER_POST_CODE = #{dealerPostCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sponsorNo != null" >
+        SPONSOR_NO = #{sponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleBranchNo != null" >
+        SALE_BRANCH_NO = #{saleBranchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleOrgCode != null" >
+        SALE_ORG_CODE = #{saleOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="taxCustCode != null" >
+        TAX_CUST_CODE = #{taxCustCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgOverseasSponsor" >
+    update ISG_OVERSEAS_SPONSOR
+    set DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+      DEALER_NAME = #{dealerName,jdbcType=VARCHAR},
+      DEALER_POST_CODE = #{dealerPostCode,jdbcType=VARCHAR},
+      SPONSOR_NO = #{sponsorNo,jdbcType=VARCHAR},
+      SALE_BRANCH_NO = #{saleBranchNo,jdbcType=VARCHAR},
+      SALE_ORG_CODE = #{saleOrgCode,jdbcType=VARCHAR},
+      TAX_CUST_CODE = #{taxCustCode,jdbcType=VARCHAR},
+      ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL}
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select <include refid="Base_Column_List" />
+      from ISG_OVERSEAS_SPONSOR
+    <where>
+        PROCESS_DATE &gt; #{processDateFrom,jdbcType=TIMESTAMP}
+        <if test="requestDateTo != null" >
+            AND PROCESS_DATE &lt; #{processDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="processStatus != null" >
+            AND PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="advoiseNo != null" >
+            AND ADVISE_NO = #{advoiseNo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by interface_id desc
+  </select>
+</mapper>

@@ -1,0 +1,112 @@
+<#-- 
+ * description: 查询保存组织层次优先级界面
+ * version: 1.0 
+ * author:liuxuan
+ * Copyright LKK Health Products Group Limited.
+ * 
+--> 
+<#include "../include/head.html">
+<head>
+<script src="${base.contextPath}/common/code?rtype=SPM.PRIORITY_TYPE&lid=SPM.PRIORITY_LEVEL"
+	type="text/javascript"></script>
+</head>
+<body style="padding: 10px; overflow: hidden;">
+    <form id="d_sc_002_form"></form>
+    <div id="levelGrid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function() {
+    	jQuery.validator.addMethod("priorityCantBeSame",
+                function(value, element) {
+                    var rows = levelGrid.getData();
+                    for(var i = 0; i< rows.length; i++) {
+                    	var row = rows[i];
+                    	if(row.priorityType == element.row.priorityType 
+                    			&& row.levelId != element.row.levelId
+                    			    && row.priority == value) {
+                    		return false;
+                    	}
+                    }
+                    return true;
+                },
+                '<@spring.message "spm.error.priority_value_repeat"/>');
+            
+    	
+        window['levelGrid'] = $("#levelGrid").ligerGrid({
+            unSetValidateAttr : false,
+            columns : [/*  {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.level.lvlpriorityid"/>',
+                name : 'lvlPriorityId',
+                align : 'left',
+            } ,*/ {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.level.prioritytype"/>',
+                name : 'priorityType',
+                align : 'left',
+                render : function(item) {
+					for (var i = 0; i < rtype.length; i++) {
+						if (rtype[i].value == item.priorityType) {
+							return rtype[i].meaning;
+						}
+					}
+				}
+            } ,{
+            	display:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.level.levelid"/>',
+            	name:'levelId',
+            	align:'left',
+            	render : function(item) {
+					for (var i = 0; i < lid.length; i++) {
+						if (lid[i].value == item.levelId) {
+							return lid[i].meaning;
+						}
+					}
+				}
+            },{
+            	display:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.level.priority"/>',
+            	name:'priority',
+            	align:'left',
+            	editor: {
+                     type: 'number'
+                },
+                validate:{
+                	priorityCantBeSame : true,
+                	required:true
+                }
+            },{
+            	display:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.level.remark"/>',
+            	name:'remark',
+            	align:'left',
+            	 editor: {
+                     type: 'text'
+                 },
+            }],
+            url : '${base.contextPath}/spm/level/query',
+            toolbar: {
+            	items: [
+                               { 
+                            	   text: '<@spring.message "sys.hand.btn.save"/>',
+                            	   click: function(){
+                            		   Hap.gridSave({
+                                           grid:levelGrid,
+                                           url:'${base.contextPath}/spm/level/save'
+                                       })
+                            	   },
+                            		   icon: 'save' 
+                            	}
+                 ]
+            },
+            enabledEdit : true,
+            width : '99%',
+            height : '98%',
+            checkbox : true
+        });
+    });
+    function create_company(){
+        var path = "${base.contextPath}/spm/spm_company_edit.html";
+        if (window.parent.f_addTab != undefined) {
+            window.parent.f_addTab(null, '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.companyCreate"/>',path);
+        }else{
+            window.open(path)  
+        }
+    }
+    </script>
+</body>
+</html>

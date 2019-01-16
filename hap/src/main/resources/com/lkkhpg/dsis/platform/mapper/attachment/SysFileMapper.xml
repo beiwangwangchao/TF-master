@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.attachment.SysFileMapper" >
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.attachment.SysFile" >
+        <id column="FILE_ID" property="fileId" jdbcType="DECIMAL" />
+        <result column="ATTACHMENT_ID" property="attachmentId" jdbcType="DECIMAL" />
+        <result column="FILE_NAME" property="fileName" jdbcType="VARCHAR" />
+        <result column="FILE_PATH" property="filePath" jdbcType="VARCHAR" />
+        <result column="FILE_SIZE" property="fileSize" jdbcType="DECIMAL" />
+        <result column="FILE_TYPE" property="fileType" jdbcType="VARCHAR" />
+        <result column="UPLOAD_DATE" property="uploadDate" jdbcType="TIMESTAMP" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        FILE_ID, ATTACHMENT_ID, FILE_NAME, FILE_PATH, FILE_SIZE, FILE_TYPE, UPLOAD_DATE, 
+        OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+        ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+        select 
+        <include refid="Base_Column_List" />
+        from SYS_FILE
+        where FILE_ID = #{fileId,jdbcType=DECIMAL}
+    </select>
+		    <!-- 根据参数查询列表 -->
+     <select id="selectSysFiles" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.attachment.SysFile" >
+        select 
+        <include refid="Base_Column_List" />
+        from SYS_FILE
+        <trim prefix="WHERE" prefixOverrides="AND | OR">  
+        					1 = 1 
+        				<if test="attachmentId != null" >
+               			and ATTACHMENT_ID = #{attachmentId,jdbcType=DECIMAL}
+            			</if>
+                        <if test="fileId != null">
+                        AND FILE_ID = #{fileId,jdbcType=DECIMAL}
+                        </if>
+					</trim>     
+    </select>
+    
+      <!-- 根据attachmentIds查找到列表   -->
+     <select id="selectFilesByAttachIds" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select 
+        <include refid="Base_Column_List" />
+        from SYS_FILE
+        <trim prefix="WHERE" prefixOverrides="AND | OR">  
+        					1 = 1 
+        					 <if test="attachmentIds != null" >
+        					 and ATTACHMENT_ID in
+               			<foreach item="item" index="index" collection="attachmentIds" open="(" separator="," close=")">  
+											  #{item}  
+											 </foreach>  
+            			</if>
+					</trim>     
+    </select>
+    
+    <select id="selectFilesByIds" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select 
+        <include refid="Base_Column_List" />
+        from SYS_FILE
+        <trim prefix="WHERE" prefixOverrides="AND | OR">  
+        					1 = 1 
+        					 <if test="fileIds != null" >
+        					 and FILE_ID in
+               			<foreach item="item" index="index" collection="fileIds" open="(" separator="," close=")">  
+											  #{item}  
+											 </foreach>  
+            			</if>
+					</trim>     
+    </select>
+
+
+    <!-- 20180425 -->
+    <select id="selectFileIdBySourceKey" resultType="java.lang.Long">
+        SELECT SF.FILE_ID
+          FROM SYS_FILE SF, SYS_ATTACHMENT SA
+         WHERE SF.ATTACHMENT_ID = SA.ATTACHMENT_ID
+           AND SA.SOURCE_KEY = #{sourceKey,jdbcType=VARCHAR}
+           AND ROWNUM = 1
+    </select>
+
+    <delete id="delete" parameterType="com.lkkhpg.dsis.platform.dto.attachment.SysFile" >
+        delete from SYS_FILE
+        where FILE_ID = #{fileId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.attachment.SysFile" >
+        <selectKey resultType="java.lang.Long" keyProperty="fileId" order="BEFORE" >
+      		select SYS_FILE_S.nextval from dual
+   		 </selectKey>
+        insert into SYS_FILE (FILE_ID, ATTACHMENT_ID, FILE_NAME, 
+            FILE_PATH, FILE_SIZE, FILE_TYPE, 
+            UPLOAD_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+            CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+            LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+            ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+            ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+            ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+            ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+            ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+            )
+        values (#{fileId,jdbcType=DECIMAL}, #{attachmentId,jdbcType=DECIMAL}, #{fileName,jdbcType=VARCHAR}, 
+            #{filePath,jdbcType=VARCHAR}, #{fileSize,jdbcType=DECIMAL}, #{fileType,jdbcType=VARCHAR}, 
+            #{uploadDate,jdbcType=TIMESTAMP}, 1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+            CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+            CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+            #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+            #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+            #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+            #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+            #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+            )
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.platform.dto.attachment.SysFile" >
+        update SYS_FILE
+        <set >
+            <if test="attachmentId != null" >
+                ATTACHMENT_ID = #{attachmentId,jdbcType=DECIMAL},
+            </if>
+            <if test="fileName != null" >
+                FILE_NAME = #{fileName,jdbcType=VARCHAR},
+            </if>
+            <if test="filePath != null" >
+                FILE_PATH = #{filePath,jdbcType=VARCHAR},
+            </if>
+            <if test="fileSize != null" >
+                FILE_SIZE = #{fileSize,jdbcType=DECIMAL},
+            </if>
+            <if test="fileType != null" >
+                FILE_TYPE = #{fileType,jdbcType=VARCHAR},
+            </if>
+            <if test="uploadDate != null" >
+                UPLOAD_DATE = #{uploadDate,jdbcType=TIMESTAMP},
+            </if>
+            OBJECT_VERSION_NUMBER = COALESCE(OBJECT_VERSION_NUMBER,0) + 1,
+            <if test="requestId != null" >
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null" >
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null" >
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            <if test="lastUpdateLogin != null" >
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null" >
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null" >
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null" >
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null" >
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null" >
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null" >
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null" >
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null" >
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null" >
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null" >
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null" >
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null" >
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null" >
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null" >
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null" >
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null" >
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where FILE_ID = #{fileId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.attachment.SysFile" >
+        update SYS_FILE
+        set ATTACHMENT_ID = #{attachmentId,jdbcType=DECIMAL},
+            FILE_NAME = #{fileName,jdbcType=VARCHAR},
+            FILE_PATH = #{filePath,jdbcType=VARCHAR},
+            FILE_SIZE = #{fileSize,jdbcType=DECIMAL},
+            FILE_TYPE = #{fileType,jdbcType=VARCHAR},
+            UPLOAD_DATE = #{uploadDate,jdbcType=TIMESTAMP},
+            OBJECT_VERSION_NUMBER = COALESCE(OBJECT_VERSION_NUMBER,0) + 1,
+            REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+        where FILE_ID = #{fileId,jdbcType=DECIMAL}
+    </update>
+</mapper>

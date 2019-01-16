@@ -1,0 +1,427 @@
+<#--
+ * description: 提货单维护界面
+ * version: 1.0 
+ * author: liuxuan
+ * .
+ * 
+-->
+
+<#include "../include/head.html">
+<body style="padding: 10px;">
+        <script src="${base.contextPath}/common/code?incortems=INV.INCORTEMS&Area=SYS.TEL_COUNTRY_CODE""
+            type="text/javascript"></script>
+    <form id="grid_tool"></form>
+    <form id="d_do_001_form"></form>
+    <div id="d_do_001_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    <#assign isedit = (RequestParameters.isedit!'0')/> 
+    jQuery.validator.addMethod("stringMaxLength", function(value, element, param) {  
+        var length = value.length;  
+        for(var i = 0; i < value.length; i++){  
+            if(value.charCodeAt(i) > 127){  
+                length = length + 2;  
+            }  
+        }  
+        return this.optional(element) || ( length <= param );  
+    }, "<@spring.message "sys.hand.btn.string240"/>");  
+    $(function() {
+    	window['grid_tool'] = $("#grid_tool").ligerForm({
+            buttons : [
+                               {
+                                   text : '<@spring.message "sys.hand.btn.save"/>',
+                                   disabled : false,
+                                   width : 60,
+                                   click : function() {
+                                       f_save();
+                                   }
+                               },{
+                                   text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.print"/>',
+                                   disabled : false,
+                                   width : 60,
+                                   click: function(){  
+                                        var doHeaderId = d_do_001_form.getData().doHeaderId;
+                                       $.ligerDialog.open({
+                                           id : 'dialog1',
+                                           height : 200,
+                                           width : 500,
+                                           title : '<@spring.message "type.com.lkkhpg.dsis.common.order.download"/>',
+                                           url : 'do_header_rpt.html?doHeaderId='+doHeaderId,
+                                           showMax : false,
+                                           showToggle : true,
+                                           showMin : false,
+                                           isResize : true,
+                                           slide : false,
+                                           center : 0
+                                       });
+                                   } 
+                               }
+                           ]
+    	})
+        window['d_do_001_form'] = $("#d_do_001_form").ligerForm({
+            fields : [
+                {name : "__status",type : "hidden",options:{value:"<#if isedit =='1'>update<#else>add</#if>"},newline : false},
+                {name : "doHeaderId",type : "hidden",newline : false},
+				{ name : 'doNumber', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.donumber"/>', newline : false ,type:'text',readonly : true,
+                },
+                
+                { name : 'orderDate', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.orderdate"/>', newline : false,type:'date',
+                    validate : {
+                        required : true
+                    }},
+	            { name : 'marketId', type : 'popup', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.marketid"/>', newline : false ,
+                	textField:'name',
+	            	options:$.extend(${lovService.getLov(base.contextPath,base.locale, "lov_market")},{ 
+                        onSelect : function(datas){
+                            marketCurrency(datas.data[0].marketId);
+                        }
+                    }),
+	            	validate : {
+                        required : true
+                    }
+                },
+              
+	            { name : 'doTo', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.doto"/>', type : 'text', newline:true ,
+	            	validate : {
+                        required : true
+                    }
+                },
+	            { name : 'vendorName', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.vendorname"/>', type : 'popup', newline:false,
+	            	textField:'vendorName',
+	            	valueField:'name',
+	            	options  : ${lovService.getLov(base.contextPath, base.locale, "lov_record")},
+                    validate : {
+                        required : true
+                    }
+	            },
+                { name : 'deliveryTo', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.deliveryto"/>', newline : false , type : 'text',
+                    validate : {
+                        required : true
+                    }
+	            },
+                { name : 'contacts', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.contacts"/>', newline : true , type : 'text',
+                        validate : {
+                            required : true
+                        }
+                },
+                { name : 'fax', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.fax"/>', newline : false , type : 'text',
+                        validate : {
+                            required : true
+                        }
+                },
+            
+                { name : 'areaCode',type : 'select',label : '<@spring.message "mws.addressbook.areacode"/>', 
+                	newline : false , attr : { placeHolder : '<@spring.message "mws.addressbook.areacode"/>' },
+                    width : 42,
+                    space : 8,
+                    options: {
+     	                valueField: 'value',
+     	                textField: 'meaning',
+     	                data: Area
+     	            },
+                    validate : {
+                        required : true
+                    }
+                },
+                { name : 'phone', label : '<@spring.message "mws.accountinfo.phoneno"/>', newline : false , type : 'text',
+                	hideLabel: true,
+                	width:130,
+                    validate : {
+                        required : true
+                    }
+                },
+                { name : 'currency', label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.currency"/>', newline : true , type : 'select',
+                	validate : {
+                        required : true
+                    },
+                    options:{
+                        valueField:'currencyCode',
+                        textField : 'currencyName',
+                        url:"${base.contextPath}/spm/currency/query?page=-1"
+                    }
+                },
+                { name : 'incoterm', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.incoterm"/>', newline : false,type:'select',
+                	options : {
+                        valueField : "value",
+                        textField : "meaning",
+                        data : incortems
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                { name : 'expectedDate', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.expecteddate"/>', newline : false , type : 'date',
+                	validate : {
+                        required : true
+                    }
+                },
+                { name : 'deliveryAddress', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.deliveryaddress"/>', newline : true ,width:810, type : "text",
+                	validate : {
+                        required : true
+                    }
+                },
+                { name : 'remark', label : '<@spring.message "sys.hand.common.comment"/>', newline : true ,width:810,height:100, type : "textarea",
+                    validate : {
+                        required : true,
+                        stringMaxLength : 240
+                    }
+                }
+	        ]
+        });
+         var d_do_001_grid;
+         d_do_001_grid = window['d_do_001_grid'] = $("#d_do_001_grid").ligerGrid({
+            columns : [
+                {
+   	                display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.itemid"/>',
+   	                name : 'itemId',
+   	                align : 'left',
+   	                width : 200,
+	   	            textField : 'itemNumber',
+    	        },
+    	        {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+                    name : 'itemName',
+                    textField : 'itemName',
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.uomcode"/>',
+                    name : 'uomCode',
+                    hide:true,
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.uomcode"/>',
+                    name : 'uomName',
+                    textField:'unitName',
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.packagequantity"/>',
+                    name : 'packageQuantity',
+                    textField:'packageQuantity',
+                    align : 'left',
+                    width : 200,
+                    editor:{
+                        type:'int'
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.minquantity"/>',
+                    name : 'minQuantity',
+                    align : 'left',
+                    width : 200,
+                    editor:{
+                        type:'int'
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.quantity"/>',
+                    name : 'quantity',
+                    align : 'left',
+                    width : 200,
+                    editor:{
+                        type:'int'
+                    },
+                    validate : {
+                        required : true
+                    }
+                }
+            ],
+            <#if isedit == '1'>
+            url : '${base.contextPath}/im/doline/query?doHeaderId=${RequestParameters.doHeaderId!}',
+            </#if>
+            enabledEdit : true,
+            checkbox:true,
+            width : '99%',
+            height : '310',
+            usePager: false,
+            onBeforeSubmitEdit : function(e) {
+            	if (e.column.columnname == "packageQuantity") {
+                    if(e.value < 0){
+                        return false;
+                    }
+                }
+                if (e.column.columnname == "minQuantity") {
+                    if(e.value < 0){
+                    	$.ligerDialog.warn("<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.mingmin"/>");
+                        return false;
+                    }
+                }
+                if (e.column.columnname == "quantity") {
+                    if(e.value < 0){
+                        $.ligerDialog.warn("<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.mingmin"/>");
+                        return false;
+                    }
+                }
+            },
+            toolbar : {
+                items: [
+                    {
+                        text: '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.add"/>',
+                        disable:false, 
+                        click: function(){
+                        	f_import_province();
+                        // d_do_001_grid.addRow({})
+                        }, icon: 'add'
+                    },
+                    { line: true },
+                    { 
+                        text : '<@spring.message "sys.hand.btn.delete"/>',
+                        click : function(){
+                          Hap.gridDelete({
+                                 grid : d_do_001_grid
+                             })
+                        }, 
+                        icon : 'delete'
+                    }
+                ]
+            }
+        });
+         <#if isedit == '1'>
+         Hap.loadForm({form:d_do_001_form,url:'${base.contextPath}/im/header/query',para:{doHeaderId:${RequestParameters.doHeaderId}},callback:function(){
+         }});
+         var doNumberComponent= $.ligerui.get('doNumber');
+         doNumberComponent.setReadonly(true);
+         </#if>
+         liger.get('currency').setDisabled(true);
+    });
+    
+    
+    function f_save(){
+    	var grid = $.ligerui.get('d_do_001_grid').getData();
+        if(grid == null || grid == ""){
+            Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.order.salesline.item_not_null"/>');
+            return false;
+        }
+    	Hap.submitForm({
+            form:d_do_001_form,
+            grid:d_do_001_grid,
+            gridName:"doLines",
+            url:'${base.contextPath}/im/header/save',
+            success:function(json,opt){
+                $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+                }); 
+                d_do_001_form.setData({'__status':'update'});
+                liger.get('doNumber').setValue(json.rows[0].doNumber);
+                d_do_001_form.setData({'doHeaderId':json.rows[0].doHeaderId});
+                var doNumberComponent= $.ligerui.get('doNumber');
+                doNumberComponent.setReadonly(true);
+            }   
+        })
+    }
+    function marketCurrency(marketId){
+    	var params = [{
+    		orgType: 'MKT',
+            orgId: marketId,
+            paramNames: ['SPM.CURRENCY']}];
+		 Hap.ajax({
+		        url : '${base.contextPath}/spm/orgParam/get',
+		        data : params,
+		        success : function(json) {
+		            var currency = json.rows[0].paramValues['SPM.CURRENCY'] == undefined ? null : json.rows[0].paramValues['SPM.CURRENCY'][0];
+		            if(currency ){
+		            	liger.get('currency').setValue(currency);
+		            } else {
+		            	liger.get('currency').setValue(null);
+		            }
+		        }
+		});
+    }
+    function f_import_province() {
+        var fn = $.ligerui.getPopupFn({
+            onSelect : function(e){
+            	f_select_header(e);
+            },
+            title:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.querylovtitle"/>',
+            condition: {
+                fields: [{
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.itemnumber"/>',
+                    name: "itemNumber",
+                    type: "text"
+                },
+                {
+                    type: "text",
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+                    name: "itemName",
+                    newline: false
+                },{
+                    type: "text",
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category"/>',
+                    name: "categoryId",
+                    newline: false
+                },{
+                    type: "text",
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.redeemFlag"/>',
+                    name: "redeemFlag",
+                    newline: false
+                },{
+                    type: "text",
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.starteraid"/>',
+                    name: "starterAid",
+                    newline: false
+                }
+                ]
+            }, 
+            grid: {
+                columns: [{
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.itemnumber"/>',
+                    name: 'itemNumber',
+                    type: 'text',
+                    width: 200
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+                    name: 'itemName',
+                    width: 200,
+                    editor:{
+                        type:'tl',
+                        idField: 'itemId',
+                        dto: 'com.lkkhpg.dsis.common.product.dto.InvItem'
+                    }
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.description"/>',
+                    name: 'description',
+                    width: 200,
+                    editor:{
+                        type:'tl',
+                        idField: 'itemId',
+                        dto: 'com.lkkhpg.dsis.common.product.dto.InvItem'
+                    }
+                }],
+                url:'${base.contextPath}/inv/poheaderitem/query',
+                checkbox: true
+            },
+            delayLoad : true,
+        });
+        fn();
+    }
+    function f_select_header(e){
+        var selectRows = e.data;
+        var gridRows = d_do_001_grid.getData();
+        if(gridRows.length > 0){
+            for(var i = 0; i< selectRows.length; i++){
+                var itemIdSel = selectRows[i].itemId;
+                for(var j=0;j<gridRows.length;j++){
+                    var itemIdGrid = gridRows[j].itemId;
+                    if(itemIdSel == itemIdGrid){
+                        $.ligerDialog.error('<@spring.message "msg.error.pm.item_repeat"/>');
+                        return false;
+                    }
+                }
+            }
+        }
+        d_do_001_grid.addRows(e.data);
+    }
+</script>
+</body>
+</html>

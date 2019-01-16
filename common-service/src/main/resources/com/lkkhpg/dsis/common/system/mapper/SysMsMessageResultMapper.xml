@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.system.mapper.SysMsMessageResultMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.system.dto.SysMsMessagePublishResult">
+        <id column="RESULT_ID" property="resultId" jdbcType="DECIMAL" />
+        <result column="MS_MESSAGE_ID" property="msMessageId" jdbcType="DECIMAL" />
+        <result column="SYS_MESSAGE_ID" property="sysMessageId" jdbcType="DECIMAL" />
+        <result column="ASSIGN_TYPE" property="assignType" jdbcType="VARCHAR" />
+        <result column="ASSIGN_VALUE" property="assignValue" jdbcType="VARCHAR" />
+        <result column="PUBLISH_STATUS" property="publishStatus" jdbcType="VARCHAR" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        RESULT_ID, MS_MESSAGE_ID,SYS_MESSAGE_ID, ASSIGN_TYPE, ASSIGN_VALUE,PUBLISH_STATUS,
+        OBJECT_VERSION_NUMBER, REQUEST_ID,
+        PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14, ATTRIBUTE15
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from sys_ms_message_result
+        where RESULT_ID = #{resultId,jdbcType=DECIMAL}
+    </select>
+
+    <select id="selectByMsMessageId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from sys_ms_message_result
+        where MS_MESSAGE_ID = #{"msMessageId",jdbcType=DECIMAL}
+    </select>
+
+
+
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.system.dto.SysMsMessagePublishResult">
+        <selectKey resultType="java.lang.Long" keyProperty="resultId" order="BEFORE">
+            select
+            SYS_MS_MESSAGE_RESULT_S.nextval from dual
+        </selectKey>
+        insert into SYS_MS_MESSAGE_RESULT
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            RESULT_ID,
+            <if test="msMessageId != null">
+                MS_MESSAGE_ID,
+            </if>
+            <if test="sysMessageId != null">
+                SYS_MESSAGE_ID,
+            </if>
+            <if test="assignType != null">
+                ASSIGN_TYPE,
+            </if>
+            <if test="assignValue != null">
+                ASSIGN_VALUE,
+            </if>
+            <if test="publishStatus != null">
+                PUBLISH_STATUS,
+            </if>
+            OBJECT_VERSION_NUMBER,
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            CREATION_DATE,
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            LAST_UPDATE_DATE,
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY,
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1,
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2,
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3,
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4,
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5,
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6,
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7,
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8,
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9,
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10,
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11,
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12,
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13,
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14,
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{resultId,jdbcType=DECIMAL},
+            <if test="msMessageId != null">
+                #{msMessageId,jdbcType=DECIMAL},
+            </if>
+            <if test="sysMessageId != null">
+                #{sysMessageId,jdbcType=DECIMAL},
+            </if>
+            <if test="assignType != null">
+                #{assignType,jdbcType=VARCHAR},
+            </if>
+            <if test="assignValue != null">
+                #{assignValue,jdbcType=VARCHAR},
+            </if>
+             <if test="publishStatus != null">
+                #{publishStatus,jdbcType=VARCHAR},
+            </if>
+            1,
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            CURRENT_TIMESTAMP,
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            CURRENT_TIMESTAMP,
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+</mapper>

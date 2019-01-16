@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.ReportSalesMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.ReportSales">
+        <id column="HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+        <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL"/>
+        <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+        <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+        <result column="ORDER_DATE" property="orderDate" jdbcType="TIMESTAMP" />
+        <result column="ORDER_AMT" property="orderAmt" jdbcType="DECIMAL" />
+        <result column="DISCOUNT_AMT" property="discountAmt" jdbcType="DECIMAL"/>
+        <result column="TAX_AMT" property="taxAmt" jdbcType="DECIMAL"/>
+        <result column="ACTRUAL_PAY_AMT" property="actrualPayAmt" jdbcType="DECIMAL"/>
+        <result column="WEIGHT" property="weight" jdbcType="DECIMAL"/>
+        <result column="SHIPPING_FEE" property="shippingFee" jdbcType="DECIMAL"/>
+        <result column="SALE_PRICE" property="unitSellingPrice" jdbcType="DECIMAL"/>
+        <result column="QUANTITY"  property="quantity" jdbcType="DECIMAL"/>
+        <result column="ITEM_NUMBER"   property="itemNumber" jdbcType="VARCHAR"/>
+        <result column="ITEM_NAME"   property="itemName" jdbcType="VARCHAR"/>
+        <result column="CATEGORY_NAME"  property="categoryName"  jdbcType="VARCHAR"/>
+        <result column="SALE_NAME" property="name" jdbcType="VARCHAR"/>
+        <result column="ORDER_DATE" property="orderDateFrom" jdbcType="TIMESTAMP" />
+        <result column="ORDER_DATE" property="orderDateTo" jdbcType="TIMESTAMP" />
+        <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL"/>
+</resultMap>
+    <select id="reportSales" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.order.dto.ReportSales">
+SELECT OSO.ORDER_DATE,
+       OSO.HEADER_ID,
+       OSO.ORDER_NUMBER,
+       OSO.MEMBER_ID,
+       MM.MEMBER_CODE,
+       NVL(SSOB.NAME, SSOT.NAME) SALE_NAME,
+       ICBT.CATEGORY_NAME,
+       IIB.ITEM_NAME,
+       IIB.ITEM_NUMBER,
+       OSL.QUANTITY,
+       OSL.UNIT_SELLING_PRICE SALE_PRICE,
+       OSLO.SHIPPING_FEE,
+       OSO.TAX_AMT,
+       OSO.DISCOUNT_AMT,
+       OSO.ORDER_AMT,
+       OSO.ACTRUAL_PAY_AMT,
+       OSL.WEIGHT
+  FROM SPM_SALES_ORGANIZATION_B  SSOB,
+       SPM_SALES_ORGANIZATION_TL SSOT,
+       OM_SALES_LOGISTICS        OSLO,
+       INV_CATEGORY_B            ICB,
+       INV_CATEGORY_TL           ICBT,
+       INV_ITEM_CATEGORY         IIC,
+       INV_ITEM_B                IIB,
+       MM_MEMBER                 MM,
+       OM_SALES_LINE             OSL,
+       OM_SALES_ORDER            OSO
+ WHERE OSO.MEMBER_ID = MM.MEMBER_ID
+   AND OSO.HEADER_ID = OSL.HEADER_ID
+   AND OSL.ITEM_ID = IIB.ITEM_ID(+)
+   AND ICB.CATEGORY_ID = ICBT.CATEGORY_ID
+   AND ICBT.LANG = 'zh_CN'
+   AND ICB.CATEGORY_ID(+) = IIC.CATEGORY_ID
+   AND IIC.ITEM_ID(+) = OSL.ITEM_ID
+   AND OSLO.HEADER_ID(+) = OSO.HEADER_ID
+   AND SSOB.SALES_ORG_ID = SSOT.SALES_ORG_ID
+   AND SSOT.LANG = 'zh_CN'
+   AND OSO.SALES_ORG_ID = SSOB.SALES_ORG_ID
+        <if test="salesOrgId != null">
+            AND OSO.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+        </if>
+        <if test="memberCode != null">
+           AND  MM.MEMBER_CODE= #{memberCode,jdbcType=VARCHAR}
+        </if>
+        <if test="orderDateFrom != null and orderDateTo != null">
+            AND trunc(ORDER_DATE) between #{orderDateFrom, jdbcType=TIMESTAMP} and #{orderDateTo, jdbcType=TIMESTAMP}
+        </if>
+        <if test="orderDateFrom != null and orderDateTo == null">
+            AND trunc(ORDER_DATE) <![CDATA[ >= ]]> #{orderDateFrom, jdbcType=TIMESTAMP}
+        </if>
+        <if test="orderDateFrom == null and orderDateTo != null">
+            AND trunc(ORDER_DATE)  <![CDATA[ <= ]]> #{orderDateTo, jdbcType=TIMESTAMP}
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ~ Copyright LKK Health Products Group Limited -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+<!-- 
+    <bean id="migsVPCPassword" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="aesClientService" />
+        <property name="targetMethod" value="decrypt" />
+        <property name="arguments">
+            <list>
+                <value>LKK@1234</value>
+                <value>71e1b823b72e4d5ed6e129544b90c270</value>
+            </list>
+        </property>
+    </bean>
+    
+    
+    <bean id="migsVPCPassword" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="aesClientService" />
+        <property name="targetMethod" value="decrypt" />
+        <property name="arguments">
+            <list>
+                <value>LKK@1234</value>
+                <value>71e1b823b72e4d5ed6e129544b90c270</value>
+            </list>
+        </property>
+    </bean> -->
+    
+
+    <bean id="chinaTrustUnionConfigration" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="paymentConfigrationManager" />
+        <property name="targetMethod" value="union" />
+    </bean>
+     <bean id="migsConfigration" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="paymentConfigrationManager" />
+        <property name="targetMethod" value="migs" />
+    </bean>
+     <bean id="chinaTrustNonUnionConfigration" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="paymentConfigrationManager" />
+        <property name="targetMethod" value="noUnion" />
+    </bean>
+
+
+    <bean name="paymentConfigrationManager" class="com.lkkhpg.dsis.integration.payment.configration.PaymentConfigrationManager">
+
+    </bean>
+
+<!-- 
+    <bean id="unionKey" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="aesClientService" />
+        <property name="targetMethod" value="decrypt" />
+        <property name="arguments">
+            <list>
+                <value>r6bGMbggPW7tJxTLtTQ1nZwe</value>
+                <value>6a13ced5fd8f50d503fcc34e80464d180f08fc081b6d6a6f812862d2c19a281c</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="nonUnionKey" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="aesClientService" />
+        <property name="targetMethod" value="decrypt" />
+        <property name="arguments">
+            <list>
+                <value>KGzpxKBsUF2Zo5Asgs3zwvrr</value>
+                <value>d7ae353fcfd0ed2b26550c3b8cfb7a46bc2c56e94646ebc914793fbdd6bb1d52</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="migsConfigration" class="com.lkkhpg.dsis.integration.payment.configration.MIGSConfigration">
+        <property name="merchantId" value="Test00000493197" />
+        <property name="merchtxnRef" value="EvanTest1234" />
+        <property name="accessCode" value="1605FD1D" />
+        <property name="vpcReturnUrl" value="https://59.42.51.187:8443/dsis/payment/pay/callback/migs" />
+        <property name="vpcSecureHashType" value="SHA256" />
+        <property name="secureType" value="HmacSHA256" />
+        <property name="action" value="https://migs.mastercard.com.au/vpcpay" />
+        <property name="txnResponseCode" value="0" />
+        <property name="acqResponseCode" value="00" />
+        <property name="virtualPaymentClientURL" value="https://migs.mastercard.com.au/vpcdps" />
+        <property name="vpcUser" value="POSTest" />
+        <property name="secureHashSecret" value="145D73685AE7A5AD35817CCA4980985E" />
+        <property name="secureHashSecret" ref="migsSecureHashSecret" />
+        <property name="vpcPassword" ref="migsVPCPassword" />
+        <property name="vpcPassword" value="LKK@1234" />
+        <property name="checkAES" value="true" />
+    </bean>
+    <bean name="chinaTrustUnionConfigration" class="com.lkkhpg.dsis.integration.payment.configration.ChinaTrustUnionConfigration">
+        <property name="key" ref="unionKey" />
+        <property name="key" value="r6bGMbggPW7tJxTLtTQ1nZwe" />
+        <property name="merid" value="3457" />
+        <property name="successRespCode" value="00" />
+        <property name="successRtnCode" value="000" />
+        <property name="refundServer" value="https://testepos.ctbcbank.com" />
+        <property name="queryServer" value="https://testepos.ctbcbank.com" />
+        <property name="action" value="https://testepos.ctbcbank.com/UPOP/unionPayAuth.do" />
+        <property name="frontCallbackUrl" value="https://59.42.51.187:8443/dsis/payment/pay/callback/union" />
+        <property name="backCallbackUrl" value="https://59.42.51.187:8443/dsis/payment/pay/callback/union/backend" />
+        <property name="orderStatusS" value="23" />
+        <property name="orderStatusF" value="24" />
+    </bean>
+
+
+    <bean name="chinaTrustNonUnionConfigration" class="com.lkkhpg.dsis.integration.payment.configration.ChinaTrustNonUnionConfigration">
+        <property name="key" value="KGzpxKBsUF2Zo5Asgs3zwvrr" />
+        <property name="key" ref="nonUnionKey" />
+        <property name="merid" value="3435" />
+        <property name="merchantId" value="8220276806551" />
+        <property name="merchantName" value="INFINITUS" />
+        <property name="terminalId" value="90008333" />
+        <property name="authResUrl" value="https://59.42.51.187:8443/dsis/payment/pay/callback/non_union" />
+        <property name="refundServer" value="https://testepos.ctbcbank.com:2011" />
+        <property name="queryServer" value="https://testepos.ctbcbank.com:2011" />
+        <property name="action" value="https://testepos.ctbcbank.com/auth/SSLAuthUI.jsp" />
+        <property name="successRespCode" value="0" />
+        <property name="errCode" value="00" />
+        <property name="currentStateS" value="12" />
+        <property name="currentStateF" value="13" />  
+    </bean>
+ -->
+
+    <bean name="paymentConfigration" class="com.lkkhpg.dsis.integration.payment.configration.PaymentConfigration">
+        <property name="unionPaySubmitUrl" value="admin/payment/chinatrust_unionpay" />
+        <property name="nonUnionPaySubmitUrl" value="admin/payment/chinatrust_non_unionpay" />
+        <property name="migsPaySubmitUrl" value="admin/payment/migs_submit" />
+        <property name="resultUrl" value="admin/payment/payment_result" />
+        <property name="errorUrl" value="admin/payment/payment_error" />
+    </bean>
+</beans>

@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.system.mapper.SysReportTemplateMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.system.dto.SysReportTemplate" >
+    <id column="TEMPLATE_ID" jdbcType="DECIMAL" property="templateId" />
+    <result column="TEMPLATE_CODE" jdbcType="VARCHAR" property="templateCode" />
+    <result column="TEMPLATE_NAME" jdbcType="VARCHAR" property="templateName" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="ENABLED_FLAG" jdbcType="VARCHAR" property="enabledFlag" />
+    <result column="START_ACTIVE_DATE" jdbcType="TIMESTAMP" property="startActiveDate" />
+    <result column="END_ACTIVE_DATE" jdbcType="TIMESTAMP" property="endActiveDate" />
+    <result column="FILE_ID" jdbcType="DECIMAL" property="fileId" />
+    <result column="OBJECT_VERSION_NUMBER" jdbcType="DECIMAL" property="objectVersionNumber" />
+    <result column="REQUEST_ID" jdbcType="DECIMAL" property="requestId" />
+    <result column="PROGRAM_ID" jdbcType="DECIMAL" property="programId" />
+    <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+    <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+    <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="LAST_UPDATE_LOGIN" jdbcType="DECIMAL" property="lastUpdateLogin" />
+    <result column="ATTRIBUTE_CATEGORY" jdbcType="VARCHAR" property="attributeCategory" />
+    <result column="ATTRIBUTE1" jdbcType="VARCHAR" property="attribute1" />
+    <result column="ATTRIBUTE2" jdbcType="VARCHAR" property="attribute2" />
+    <result column="ATTRIBUTE3" jdbcType="VARCHAR" property="attribute3" />
+    <result column="ATTRIBUTE4" jdbcType="VARCHAR" property="attribute4" />
+    <result column="ATTRIBUTE5" jdbcType="VARCHAR" property="attribute5" />
+    <result column="ATTRIBUTE6" jdbcType="VARCHAR" property="attribute6" />
+    <result column="ATTRIBUTE7" jdbcType="VARCHAR" property="attribute7" />
+    <result column="ATTRIBUTE8" jdbcType="VARCHAR" property="attribute8" />
+    <result column="ATTRIBUTE9" jdbcType="VARCHAR" property="attribute9" />
+    <result column="ATTRIBUTE10" jdbcType="VARCHAR" property="attribute10" />
+    <result column="ATTRIBUTE11" jdbcType="VARCHAR" property="attribute11" />
+    <result column="ATTRIBUTE12" jdbcType="VARCHAR" property="attribute12" />
+    <result column="ATTRIBUTE13" jdbcType="VARCHAR" property="attribute13" />
+    <result column="ATTRIBUTE14" jdbcType="VARCHAR" property="attribute14" />
+    <result column="ATTRIBUTE15" jdbcType="VARCHAR" property="attribute15" />
+    <result column="TEMPLATE_CATEOGRY" jdbcType="VARCHAR" property="templateCateogry" />
+    <result column="MARKET_ID" jdbcType="DECIMAL" property="marketId" />
+    <!-- 文件名称 -->
+    <result column="FILE_NAME" property="fileName" jdbcType="VARCHAR" />
+    <!-- 文件大小 -->
+    <result column="FILE_SIZE" property="fileSize" jdbcType="DECIMAL" />
+    <result column="FILE_PATH" property="filePath" jdbcType="VARCHAR" />
+    <!-- 市场名称 -->
+    <result column="NAME" property="name" jdbcType="VARCHAR" />    
+  </resultMap>
+  <sql id="Base_Column_List" >
+    TEMPLATE_ID, TEMPLATE_CODE, TEMPLATE_NAME, REMARK, ENABLED_FLAG, START_ACTIVE_DATE, 
+    END_ACTIVE_DATE, FILE_ID, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15, TEMPLATE_CATEOGRY, MARKET_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_REPORT_TEMPLATE
+    where TEMPLATE_ID = #{templateId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SYS_REPORT_TEMPLATE
+    where TEMPLATE_ID = #{templateId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.system.dto.SysReportTemplate" >
+    <selectKey resultType="java.lang.Long" keyProperty="templateId" order="BEFORE" >
+      select SYS_REPORT_TEMPLATE_S.nextval from dual
+    </selectKey>
+    insert into SYS_REPORT_TEMPLATE (TEMPLATE_ID, TEMPLATE_CODE, TEMPLATE_NAME, 
+      REMARK, ENABLED_FLAG, START_ACTIVE_DATE, 
+      END_ACTIVE_DATE, FILE_ID, OBJECT_VERSION_NUMBER, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15, TEMPLATE_CATEOGRY, 
+      MARKET_ID)
+    values (#{templateId,jdbcType=DECIMAL}, #{templateCode,jdbcType=VARCHAR}, #{templateName,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{enabledFlag,jdbcType=VARCHAR}, #{startActiveDate,jdbcType=TIMESTAMP}, 
+      #{endActiveDate,jdbcType=TIMESTAMP}, #{fileId,jdbcType=DECIMAL}, 1, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{templateCateogry,jdbcType=VARCHAR}, 
+      #{marketId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.system.dto.SysReportTemplate" >
+    <selectKey resultType="java.lang.Long" keyProperty="templateId" order="BEFORE" >
+      select SYS_REPORT_TEMPLATE_S.nextval from dual
+    </selectKey>
+    insert into SYS_REPORT_TEMPLATE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      TEMPLATE_ID,
+      <if test="templateCode != null" >
+        TEMPLATE_CODE,
+      </if>
+      <if test="templateName != null" >
+        TEMPLATE_NAME,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG,
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE,
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE,
+      </if>
+      <if test="fileId != null" >
+        FILE_ID,
+      </if>
+        OBJECT_VERSION_NUMBER,
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID,
+      </if>
+      <if test="templateCateogry != null" >
+        TEMPLATE_CATEOGRY,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{templateId,jdbcType=DECIMAL},
+      <if test="templateCode != null" >
+        #{templateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="templateName != null" >
+        #{templateName,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledFlag != null" >
+        #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endActiveDate != null" >
+        #{endActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fileId != null" >
+        #{fileId,jdbcType=DECIMAL},
+      </if>
+      1,
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="marketId != null" >
+        #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="templateCateogry != null" >
+        #{templateCateogry,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.system.dto.SysReportTemplate" >
+    update SYS_REPORT_TEMPLATE
+    <set >
+      <if test="templateCode != null" >
+        TEMPLATE_CODE = #{templateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="templateName != null" >
+        TEMPLATE_NAME = #{templateName,jdbcType=VARCHAR},
+      </if>
+        REMARK = #{remark,jdbcType=VARCHAR},
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fileId != null" >
+        FILE_ID = #{fileId,jdbcType=DECIMAL},
+      </if>
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER +1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="templateCateogry != null" >
+        TEMPLATE_CATEOGRY = #{templateCateogry,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where TEMPLATE_ID = #{templateId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.system.dto.SysReportTemplate" >
+    update SYS_REPORT_TEMPLATE
+    set TEMPLATE_CODE = #{templateCode,jdbcType=VARCHAR},
+      TEMPLATE_NAME = #{templateName,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      FILE_ID = #{fileId,jdbcType=DECIMAL},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      TEMPLATE_CATEOGRY = #{templateCateogry,jdbcType=VARCHAR}
+    where TEMPLATE_ID = #{templateId,jdbcType=DECIMAL}
+  </update>
+  <!-- 查询模板 -->
+  <select id="querySysReportTemplate" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.system.dto.SysReportTemplate" >
+    select 
+    srt.TEMPLATE_ID, srt.TEMPLATE_CODE, srt.TEMPLATE_NAME, srt.REMARK, srt.ENABLED_FLAG, srt.START_ACTIVE_DATE, 
+    srt.END_ACTIVE_DATE, srt.FILE_ID, srt.OBJECT_VERSION_NUMBER, srt.REQUEST_ID, srt.PROGRAM_ID, srt.CREATION_DATE, 
+    srt.CREATED_BY, srt.LAST_UPDATED_BY, srt.LAST_UPDATE_DATE, srt.LAST_UPDATE_LOGIN, srt.ATTRIBUTE_CATEGORY, 
+    sf.FILE_NAME,sf.FILE_SIZE,sf.FILE_PATH,srt.MARKET_ID,srt.TEMPLATE_CATEOGRY
+    from SYS_REPORT_TEMPLATE srt, 
+    SYS_FILE sf
+    <where>
+    srt.FILE_ID = sf.FILE_ID
+    AND srt.ENABLED_FLAG = 'Y'
+    <if test="templateCode != null" >
+        AND Upper(srt.TEMPLATE_CODE) like concat('%',concat(Upper(#{templateCode,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="templateName != null" >
+        AND Upper(srt.TEMPLATE_NAME) like concat('%',concat(Upper(#{templateName,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="templateDescription != null" >
+        AND Upper(srt.REMARK) like concat('%',concat(Upper(#{templateDescription,jdbcType=VARCHAR}),'%'))
+    </if>
+    </where>
+     <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+    
+  </select>
+</mapper>

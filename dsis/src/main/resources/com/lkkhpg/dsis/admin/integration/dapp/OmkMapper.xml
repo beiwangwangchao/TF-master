@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.dapp.mapper.OmkMapper">
+	<resultMap id="OmkActBalanceMap"
+		type="com.lkkhpg.dsis.admin.integration.dapp.dto.OmkAcctBalanceResponse">
+		<result column="DISTRIBUTORID" property="distributorId"
+			jdbcType="VARCHAR" />
+		<result column="PPV" property="PPV" jdbcType="VARCHAR" />
+		<result column="GPV" property="GPV" jdbcType="VARCHAR" />
+		<result column="POSITION" property="position" jdbcType="VARCHAR" />
+		<result column="POSITIONCODE" property="positionCode" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="OmkDealerDetallMap"
+		type="com.lkkhpg.dsis.admin.integration.dapp.dto.OmkDealerDetallResponse">
+		<result column="DISTRIBUTORID" property="distributorId"
+			jdbcType="VARCHAR" />
+		<result column="SPONSORID" property="sponsorId" jdbcType="VARCHAR" />
+		<result column="REGIONCODE" property="regionCode" jdbcType="VARCHAR" />
+		<result column="LASTUPDATEDATE" property="lastUpdateDate"
+			jdbcType="VARCHAR" />
+		<result column="TYPEEFFECTIVEDATE" property="typeEffectiveDate"
+			jdbcType="VARCHAR" />
+		<result column="CONTACTTEKEAREACODE" property="contactTekeAreaCode"
+			jdbcType="VARCHAR" />
+		<result column="DEALERTYPE" property="dealerType" jdbcType="VARCHAR" />
+		<result column="TYPEINACTIVEDATE" property="typeInactiveDate"
+			jdbcType="VARCHAR" />
+		<result column="PHONENUMBER" property="phoneNumber" jdbcType="VARCHAR" />
+		<result column="FULLNAME" property="fullName" jdbcType="VARCHAR" />
+		<result column="CERTIFICATENO" property="certificateNo"
+			jdbcType="VARCHAR" />
+		<result column="CERTIFICATETYPE" property="certificateType"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap
+		type="com.lkkhpg.dsis.admin.integration.dapp.dto.OmkTeamBalanceResponse"
+		id="OmkTeamBalanceMap">
+		<result column="DISTRIBUTORID" property="distributorId"
+			jdbcType="VARCHAR" />
+		<result column="TOTALOV" property="totalOV" jdbcType="DECIMAL" />
+		<result column="LOCALOV" property="localOV" jdbcType="DECIMAL" />
+		<result column="INTLOV" property="intlOV" jdbcType="DECIMAL" />
+		<result column="TOTALGV" property="totalGV" jdbcType="DECIMAL" />
+		<result column="LOCALGV" property="localGV" jdbcType="DECIMAL" />
+		<result column="INTLGV" property="intlGV" jdbcType="DECIMAL" />
+	</resultMap>
+    <resultMap
+        type="com.lkkhpg.dsis.admin.integration.dapp.dto.OmkTeamStructure"
+        id="OmkTeamStructureMap">
+        <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+        <result column="CNT10K" property="cnt10k" jdbcType="DECIMAL" />
+        <result column="CNT100K" property="cnt100k" jdbcType="DECIMAL" />
+        <result column="CNT500K" property="cnt500k" jdbcType="DECIMAL" />
+        <result column="ORG_MEMBER_CNT" property="orgMemberCnt" jdbcType="DECIMAL" />
+        <result column="ORG_MEMBER_CNT_NEW" property="orgMemberCntNew" jdbcType="DECIMAL" />
+        <result column="ORG_CODE" property="orgCode" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="OmkDownlinePerforMap" type="com.lkkhpg.dsis.admin.integration.dapp.dto.OmkDownlinePerforResponse">
+		<result column="DISTRIBUTOR_ID" property="distributorId" jdbcType="VARCHAR"/>
+		<result column="SPONSOR_ID" property="sponsorId" jdbcType="VARCHAR"/>
+		<result column="FULL_NAME" property="fullName" jdbcType="VARCHAR"/>
+		<result column="TOTAL_OV" property="totalOv" jdbcType="VARCHAR"/>
+		<result column="TOTAL_NEW" property="totalNew" jdbcType="VARCHAR"/>
+		<result column="POSITION" property="position" jdbcType="VARCHAR"/>
+		<result column="POSITION_CODE" property="positionCode" jdbcType="VARCHAR"/>
+	</resultMap> 
+	<select id="getAccountBalance" resultMap="OmkActBalanceMap"
+		parameterType="java.util.Map">
+		<!--根据会员卡号，语言类型查询会员账号余额 -->
+		SELECT ori.dealer_no distributorId,
+		ori.omk_pv ppv,
+		ori.omk_gpv gpv,
+		opd.post_desc position,
+		ori.positioncode positionCode
+		FROM (SELECT
+		a.dealer_no,
+		b.ps AS omk_pv,
+		b.gpv AS omk_gpv,
+		a.dealer_post_code AS
+		positionCode
+		FROM omk.omk_dealer_info a, omk.omk_rtl_salary_balance b
+		WHERE a.dealer_no = b.dealer_no
+		AND a.dealer_no = #{distributorId,jdbcType = VARCHAR}
+		<if test="month != null">
+		AND b.period = #{month,jdbcType = VARCHAR}
+		</if>) ori
+		LEFT JOIN omk.omk_post_desc
+		opd
+		ON ori.positioncode = opd.post_code
+		AND opd.language_code =
+		#{language,jdbcType = VARCHAR}
+	</select>
+	<select id="getDealerDetall" resultMap="OmkDealerDetallMap"
+		parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.OmkTeamBalanceRequest">
+		<!-- 根据会员卡号查询会员详细信息 -->
+		SELECT omkinfo.dealer_no distributorId,
+		omkinfo.sponsor_no sponsorId,
+		(SELECT scv.meaning
+		FROM sys_code_b sc,
+		sys_code_value_b scv
+		WHERE
+		sc.code_id = scv.code_id
+		AND sc.code = 'ISG.GDS_ORG_CODE_MAPPING'
+		AND
+		scv.value = omkinfo.sale_org_code) regionCode,
+		omkinfo.last_updated_time lastUpdateDate,
+		omkinfo.type_effective_date
+		typeEffectiveDate,
+		omkinfo.contact_tele_area_code contactTekeAreaCode,
+		omkinfo.dealer_type dealerType,
+		omkinfo.type_inactive_date
+		typeInactiveDate,
+		omkinfo.contact_mobile phoneNumber,
+		omkinfo.dealer_name fullName,
+		omkinfo.certificate_no certificateNo,
+		omkinfo.certificate_type certificateType
+		FROM omk.omk_dealer_info
+		omkinfo
+		WHERE omkinfo.dealer_no = #{distributorId,jdbcType = VARCHAR}
+	</select>
+	<select id="getTeamBalance" resultMap="OmkTeamBalanceMap"
+		parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.OmkTeamBalanceRequest">
+		<!-- 根据会员卡号查询团队余额信息 -->
+		SELECT a.dealer_no distributorId,
+		b.omk_ov totalOV,
+		b.omk_ov_local localOV,
+		b.omk_ov_int intlOV,
+		b.omk_gv totalGV,
+		b.omk_gv_local localGV,
+		b.omk_gv_int intlGV
+		FROM omk.omk_dealer_info a,
+		omk.omk_de_salary_stat_01 b
+		<where>
+			a.dealer_no = b.dealer_no 
+			and a.dealer_no = #{distributorId,jdbcType = VARCHAR}
+			<if test="period == null">
+				and b.period = to_char(current_date,'YYYYMM')
+			</if>
+			<if test="period != null">
+				and b.period = #{period,jdbcType = VARCHAR}
+			</if>
+		</where>
+	</select>
+    <select id="getTeamStructure" resultMap="OmkTeamStructureMap"
+        parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.OmkTeamStructureRequest">
+        SELECT teamregion.dealer_no,
+               teamregion.cnt10k,
+               teamregion.cnt100k,
+               teamregion.cnt500k,
+               teamcnt.org_member_cnt,
+               teamcnt.org_member_cnt_new
+          FROM (SELECT a.dealer_no,
+                       omk_downline_c10k  AS cnt10k,
+                       omk_downline_c100k AS cnt100k,
+                       omk_downline_c500k AS cnt500k
+                  FROM omk.omk_dealer_info       a,
+                       omk.omk_de_salary_stat_01 b
+                 WHERE a.dealer_no = b.dealer_no
+                   <if test="period == null">
+                        and b.period = to_char(current_date,'YYYYMM')
+                    </if>
+                    <if test="period != null">
+                        and b.period = #{period,jdbcType = VARCHAR}
+                    </if>
+                   AND a.dealer_no = #{distributorId,jdbcType = VARCHAR}) teamregion,
+               (SELECT dealer_no AS d_no,
+                       org_member_cnt,
+                       org_member_cnt_new,
+                       org_code
+                  FROM omk.omk_de_salary_stat_02
+                 WHERE dealer_no = #{distributorId,jdbcType = VARCHAR}
+                   <if test="period == null">
+                        and period = to_char(current_date,'YYYYMM')
+                    </if>
+                    <if test="period != null">
+                        and period = #{period,jdbcType = VARCHAR}
+                    </if> ) teamcnt
+        WHERE teamregion.dealer_no = teamcnt.d_no(+)
+        ORDER BY teamcnt.org_code
+    </select>
+    <select id="getOmkDownlinePerfor" resultMap="OmkDownlinePerforMap" parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.OmkDownlinePerforRequest">
+	<!--根据会员卡号，语言类型查询推荐人下线  -->
+		SELECT a.dealer_no             distributor_id,
+       a.sponsor_no            sponsor_id,
+       a.dealer_name           AS full_name,
+       b.omk_ov                AS total_ov,
+       member_cnt_new          AS total_new,
+       omk_post_desc.post_desc AS position,
+       a.dealer_post_code      AS position_code
+  FROM (SELECT * FROM omk.omk_dealer_info WHERE sponsor_no = #{distributorId,jdbcType = VARCHAR}) a
+ INNER JOIN omk.omk_de_salary_stat_01 b
+    ON a.dealer_no = b.dealer_no
+    AND b.omk_pv > coalesce(#{totalPv,jdbcType = DECIMAL}, 0)
+    <if test="period == null">
+	and period = to_char(current_date,'YYYYMM')
+    </if>
+	<if test="period != null">
+		and period = #{period,jdbcType = VARCHAR}
+	</if>
+	LEFT JOIN omk.omk_post_desc
+	ON a.dealer_post_code = omk_post_desc.post_code
+	AND omk_post_desc.language_code = #{lang,jdbcType = VARCHAR}
+	</select>
+</mapper>

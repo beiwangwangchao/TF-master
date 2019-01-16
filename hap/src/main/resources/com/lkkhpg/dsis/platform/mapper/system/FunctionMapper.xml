@@ -1,0 +1,594 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.system.FunctionMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.system.Function" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD" >
+    <id column="FUNCTION_ID" property="functionId" jdbcType="DECIMAL" />
+    <result column="MODULE_CODE" property="moduleCode" jdbcType="VARCHAR" />
+    <result column="FUNCTION_ICON" property="functionIcon" jdbcType="VARCHAR" />
+    <result column="FUNCTION_CODE" property="functionCode" jdbcType="VARCHAR" />
+    <result column="FUNCTION_NAME" property="functionName" jdbcType="VARCHAR" />
+    <result column="FUNCTION_DESCRIPTION" property="functionDesc" jdbcType="VARCHAR" />
+    <result column="LANG" property="lang" jdbcType="VARCHAR" />
+    <result column="RESOURCE_ID" property="resourceId" jdbcType="DECIMAL" />
+    <result column="PARENT_FUNCTION_ID" property="parentFunctionId" jdbcType="DECIMAL"/>
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+    <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR" />
+    <result column="FUNCTION_SEQUENCE" property="functionSequence" jdbcType="DECIMAL" />
+  </resultMap>
+  <resultMap id="FunctionDisplayMap" type="com.lkkhpg.dsis.platform.dto.system.FunctionDisplay" extends="BaseResultMap">
+      <result column="PARENT_FUNCTION_NAME" property="parentFunctionName" jdbcType="VARCHAR" />
+      <result column="RESOURCE_NAME" property="resourceName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    FUNCTION_ID, MODULE_CODE, FUNCTION_ICON,FUNCTION_SEQUENCE, FUNCTION_CODE, FUNCTION_NAME, FUNCTION_DESCRIPTION, RESOURCE_ID, TYPE, 
+    AREA_CODE,PARENT_FUNCTION_ID, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+    LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+    ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+    ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+     SELECT sfb.FUNCTION_ID, sfb.MODULE_CODE, sfb.FUNCTION_ICON,sfb.FUNCTION_SEQUENCE, sfb.FUNCTION_CODE,
+    sft.FUNCTION_NAME, sft.FUNCTION_DESCRIPTION, sfb.RESOURCE_ID, sfb.TYPE, 
+    sfb.AREA_CODE, sfb.OBJECT_VERSION_NUMBER, sfb.REQUEST_ID, sfb.PARENT_FUNCTION_ID,
+    sfb.PROGRAM_ID, sfb.CREATION_DATE, sfb.CREATED_BY, 
+    sfb.LAST_UPDATED_BY, sfb.LAST_UPDATE_DATE, sfb.LAST_UPDATE_LOGIN, 
+    sfb.ATTRIBUTE_CATEGORY, sfb.ATTRIBUTE1,sfb.ATTRIBUTE2, sfb.ATTRIBUTE3, 
+    sfb.ATTRIBUTE4, sfb.ATTRIBUTE5, sfb.ATTRIBUTE6, sfb.ATTRIBUTE7, sfb.ATTRIBUTE8, 
+    sfb.ATTRIBUTE9, sfb.ATTRIBUTE10, sfb.ATTRIBUTE11, sfb.ATTRIBUTE12, 
+    sfb.ATTRIBUTE13, sfb.ATTRIBUTE14, sfb.ATTRIBUTE15
+    FROM SYS_FUNCTION_B sfb LEFT OUTER JOIN SYS_FUNCTION_TL sft
+        on( sfb.FUNCTION_ID = sft.FUNCTION_ID
+        AND sft.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+    where sfb.FUNCTION_ID = #{functionId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.Function" >
+    delete from SYS_FUNCTION_B
+    where FUNCTION_ID = #{functionId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.Function" >
+     <selectKey resultType="java.lang.Long" keyProperty="functionId" order="BEFORE" >
+      select SYS_FUNCTION_B_s.nextval from dual
+    </selectKey>
+    insert into SYS_FUNCTION_B (FUNCTION_ID, MODULE_CODE, FUNCTION_ICON,FUNCTION_SEQUENCE, FUNCTION_CODE, 
+      FUNCTION_NAME, FUNCTION_DESCRIPTION, RESOURCE_ID, 
+      TYPE, AREA_CODE,PARENT_FUNCTION_ID,  
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15)
+    values (#{functionId,jdbcType=DECIMAL}, #{moduleCode,jdbcType=VARCHAR},#{functionIcon,jdbcType=VARCHAR}, 
+      #{functionSequence,jdbcType=DECIMAL}, #{functionCode,jdbcType=VARCHAR},  
+      #{functionName,jdbcType=VARCHAR}, #{functionDesc,jdbcType=VARCHAR}, #{resourceId,jdbcType=DECIMAL},
+      #{type,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR},#{parentFunctionId,jdbcType=DECIMAL},  
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, #{creationDate,jdbcType=TIMESTAMP}, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, #{lastUpdateDate,jdbcType=TIMESTAMP}, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.Function" >
+    <selectKey resultType="java.lang.Long" keyProperty="functionId" order="BEFORE" >
+      select SYS_FUNCTION_B_s.nextval from dual
+    </selectKey>
+    insert into SYS_FUNCTION_B
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="functionId != null" >
+        FUNCTION_ID,
+      </if>
+      <if test="moduleCode != null" >
+        MODULE_CODE,
+      </if>
+      <if test="parentFunctionId!=null">
+        PARENT_FUNCTION_ID,
+      </if>
+      <if test="functionIcon != null" >
+        FUNCTION_ICON,
+      </if>
+      <if test="functionSequence != null" >
+        FUNCTION_SEQUENCE,
+      </if>
+      <if test="functionCode != null" >
+        FUNCTION_CODE,
+      </if>
+      <if test="functionName != null" >
+        FUNCTION_NAME,
+      </if>
+      <if test="functionDesc != null" >
+        FUNCTION_DESCRIPTION,
+      </if>
+      <if test="resourceId != null" >
+        RESOURCE_ID,
+      </if>
+      <if test="type != null" >
+        TYPE,
+      </if>
+      <if test="areaCode != null" >
+        AREA_CODE,
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="functionId != null" >
+        #{functionId,jdbcType=DECIMAL},
+      </if>
+      <if test="moduleCode != null" >
+        #{moduleCode,jdbcType=VARCHAR},
+      </if>
+      <if test="parentFunctionId!=null">
+        #{parentFunctionId,jdbcType=DECIMAL},
+      </if>
+      <if test="functionIcon != null" >
+        #{functionIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="functionSequence != null" >
+         #{functionSequence,jdbcType=DECIMAL}
+      </if>
+      <if test="functionCode != null" >
+        #{functionCode,jdbcType=VARCHAR},
+      </if>
+      <if test="functionName != null" >
+        #{functionName,jdbcType=VARCHAR},
+      </if>
+      <if test="functionDesc != null" >
+        #{functionDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="resourceId != null" >
+        #{resourceId,jdbcType=DECIMAL},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="areaCode != null" >
+        #{areaCode,jdbcType=VARCHAR},
+      </if>
+      <if test="objectVersionNumber != null" >
+        #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.platform.dto.system.Function" >
+    update SYS_FUNCTION_B
+    <set >
+      <if test="moduleCode != null" >
+        MODULE_CODE = #{moduleCode,jdbcType=VARCHAR},
+      </if>
+      <if test="functionIcon != null" >
+        FUNCTION_ICON = #{functionIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="functionSequence != null" >
+        FUNCTION_SEQUENCE = #{functionSequence,jdbcType=DECIMAL},
+      </if>
+      <if test="functionCode != null" >
+        FUNCTION_CODE = #{functionCode,jdbcType=VARCHAR},
+      </if>
+      <if test="functionName != null" >
+        FUNCTION_NAME = #{functionName,jdbcType=VARCHAR},
+      </if>
+      <if test="functionDesc != null" >
+        FUNCTION_DESCRIPTION = #{functionDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="resourceId != null" >
+        RESOURCE_ID = #{resourceId,jdbcType=DECIMAL},
+      </if>
+      <if test="type != null" >
+        TYPE = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="areaCode != null" >
+        AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="parentFunctionId!=null">
+        PARENT_FUNCTION_ID=#{parentFunctionId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where FUNCTION_ID = #{functionId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.Function" >
+    update SYS_FUNCTION_B
+    set MODULE_CODE = #{moduleCode,jdbcType=VARCHAR},
+      FUNCTION_ICON = #{functionIcon,jdbcType=VARCHAR},
+      FUNCTION_SEQUENCE = #{functionSequence,jdbcType=DECIMAL},
+      FUNCTION_CODE = #{functionCode,jdbcType=VARCHAR},
+      FUNCTION_NAME = #{functionName,jdbcType=VARCHAR},
+      FUNCTION_DESCRIPTION = #{functionDesc,jdbcType=VARCHAR},
+      RESOURCE_ID = #{resourceId,jdbcType=DECIMAL},
+      TYPE = #{type,jdbcType=VARCHAR},
+      AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      PARENT_FUNCTION_ID=#{parentFunctionId,jdbcType=DECIMAL}
+    where FUNCTION_ID = #{functionId,jdbcType=DECIMAL}
+  </update>
+  <select id="selectFunctions" resultMap="FunctionDisplayMap" parameterType="com.lkkhpg.dsis.platform.dto.system.Function" >
+    SELECT sfb.FUNCTION_ID, sfb.MODULE_CODE, sfb.FUNCTION_ICON, sfb.FUNCTION_SEQUENCE, sfb.FUNCTION_CODE,
+    sft.FUNCTION_NAME, sft.FUNCTION_DESCRIPTION, sfb.RESOURCE_ID, srtl.NAME as RESOURCE_NAME,
+    sfb.TYPE, sfb.AREA_CODE, sfb.OBJECT_VERSION_NUMBER, sfb.REQUEST_ID,
+    sfb.PROGRAM_ID, sfb.CREATION_DATE, sfb.CREATED_BY, 
+    sfb.LAST_UPDATED_BY, sfb.LAST_UPDATE_DATE, sfb.LAST_UPDATE_LOGIN, 
+    sfb.ATTRIBUTE_CATEGORY, sfb.ATTRIBUTE1,sfb.ATTRIBUTE2, sfb.ATTRIBUTE3, 
+    sfb.ATTRIBUTE4, sfb.ATTRIBUTE5, sfb.ATTRIBUTE6, sfb.ATTRIBUTE7, sfb.ATTRIBUTE8, 
+    sfb.ATTRIBUTE9, sfb.ATTRIBUTE10, sfb.ATTRIBUTE11, sfb.ATTRIBUTE12, 
+    sfb.ATTRIBUTE13, sfb.ATTRIBUTE14, sfb.ATTRIBUTE15,sfb.PARENT_FUNCTION_ID
+    FROM SYS_FUNCTION_B sfb
+      LEFT OUTER JOIN SYS_FUNCTION_TL sft
+        on( sfb.FUNCTION_ID = sft.FUNCTION_ID AND sft.lang = #{request.locale,jdbcType=VARCHAR})
+      LEFT OUTER JOIN SYS_RESOURCE_TL srtl
+        ON ( sfb.resource_id = srtl.resource_id AND srtl.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+       <if test="functionId != null">
+           sfb.FUNCTION_ID = #{functionId,jdbcType=DECIMAL}
+       </if>
+       <if test="moduleCode != null">
+           AND sfb.MODULE_CODE like concat('%',concat(#{moduleCode,jdbcType=VARCHAR},'%'))
+       </if>
+       <if test="functionCode != null">
+           AND sfb.FUNCTION_CODE like concat('%',concat(#{functionCode,jdbcType=VARCHAR},'%'))
+       </if>
+       <if test="parentFunctionId != null">
+           AND sfb.PARENT_FUNCTION_ID = #{parentFunctionId,jdbcType=DECIMAL}
+       </if>
+       <if test="functionName != null">
+           AND sft.FUNCTION_NAME like concat('%',concat(#{functionName,jdbcType=VARCHAR},'%'))
+       </if>
+    </where>
+    <if test="sortname =='functionCode' and sortorder == 'asc'">
+        order by sfb.function_code asc
+    </if>
+    <if test="sortname =='functionCode' and sortorder == 'desc'">
+        order by sfb.function_code desc
+    </if>
+    <if test="sortname =='moduleCode' and sortorder == 'asc'">
+        order by sfb.MODULE_CODE asc
+    </if>
+    <if test="sortname =='moduleCode' and sortorder == 'desc'">
+        order by sfb.MODULE_CODE desc
+    </if>
+    <if test="sortname ==null and sortorder == null">
+        order by sfb.function_code asc
+    </if>
+    
+  </select>
+  <resultMap id="ResourceResultMap" type="com.lkkhpg.dsis.platform.dto.system.Resource" >
+    <id column="RESOURCE_ID" property="resourceId" jdbcType="DECIMAL" />
+    <result column="URL" property="url" jdbcType="VARCHAR" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="LOGIN_REQUIRE" property="loginRequire" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="selectExitResourcesByFunction" resultMap="ResourceResultMap" parameterType="map">
+        select
+        b.RESOURCE_ID, b.URL, b.TYPE, t.NAME, t.DESCRIPTION, b.LOGIN_REQUIRE, b.OBJECT_VERSION_NUMBER,
+        b.REQUEST_ID, b.PROGRAM_ID, b.CREATION_DATE, b.CREATED_BY, b.LAST_UPDATED_BY, b.LAST_UPDATE_DATE,
+        b.LAST_UPDATE_LOGIN, b.ATTRIBUTE_CATEGORY, b.ATTRIBUTE1, b.ATTRIBUTE2, b.ATTRIBUTE3, b.ATTRIBUTE4,
+        b.ATTRIBUTE5, b.ATTRIBUTE6, b.ATTRIBUTE7, b.ATTRIBUTE8, b.ATTRIBUTE9, b.ATTRIBUTE10, b.ATTRIBUTE11,
+        b.ATTRIBUTE12, b.ATTRIBUTE13, b.ATTRIBUTE14, b.ATTRIBUTE15
+        from SYS_RESOURCE_B b
+        LEFT OUTER JOIN SYS_RESOURCE_TL t
+          on(b.resource_id = t.resource_id and t.lang = #{request.locale,jdbcType=VARCHAR})
+        JOIN SYS_FUNCTION_RESOURCE sfr 
+          on(b.RESOURCE_ID=sfr.RESOURCE_ID and sfr.FUNCTION_ID=#{function.functionId,jdbcType=DECIMAL})
+        <where>
+            <if test="resource.url != null">
+                AND b.URL like concat('%',concat(#{resource.url,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="resource.name != null">
+                AND t.NAME like concat('%',concat(#{resource.name,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="resource.type != null">
+                AND b.TYPE like concat('%',concat(#{resource.type,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="resource.description != null">
+                AND t.DESCRIPTION like concat('%',concat(#{resource.description,jdbcType=VARCHAR},'%'))
+            </if>
+        </where>
+  </select>
+  <select id="selectNotExitResourcesByFunction" resultMap="ResourceResultMap" parameterType="map">
+        select
+        b.RESOURCE_ID, b.URL, b.TYPE, t.NAME, t.DESCRIPTION, b.LOGIN_REQUIRE, b.OBJECT_VERSION_NUMBER,
+        b.REQUEST_ID, b.PROGRAM_ID, b.CREATION_DATE, b.CREATED_BY, b.LAST_UPDATED_BY, b.LAST_UPDATE_DATE,
+        b.LAST_UPDATE_LOGIN, b.ATTRIBUTE_CATEGORY, b.ATTRIBUTE1, b.ATTRIBUTE2, b.ATTRIBUTE3, b.ATTRIBUTE4,
+        b.ATTRIBUTE5, b.ATTRIBUTE6, b.ATTRIBUTE7, b.ATTRIBUTE8, b.ATTRIBUTE9, b.ATTRIBUTE10, b.ATTRIBUTE11,
+        b.ATTRIBUTE12, b.ATTRIBUTE13, b.ATTRIBUTE14, b.ATTRIBUTE15
+        from SYS_RESOURCE_B b
+        LEFT OUTER JOIN SYS_RESOURCE_TL t
+          on(b.resource_id = t.resource_id and t.lang = #{request.locale,jdbcType=VARCHAR})
+        <where>
+          b.RESOURCE_ID NOT IN (
+        SELECT sfr.RESOURCE_ID from SYS_FUNCTION_RESOURCE sfr 
+        WHERE sfr.FUNCTION_ID = #{function.functionId,jdbcType=DECIMAL})
+            <if test="resource.url != null">
+                AND b.URL like concat('%',concat(#{resource.url,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="resource.name != null">
+                AND t.NAME like concat('%',concat(#{resource.name,jdbcType=VARCHAR},'%'))
+            </if>
+        </where>
+  </select>
+
+    <select id="selectForCache" resultMap="BaseResultMap">
+        SELECT sfb.FUNCTION_ID,
+               sfb.MODULE_CODE,
+               sfb.FUNCTION_ICON,
+               sfb.FUNCTION_SEQUENCE,
+               sfb.FUNCTION_CODE,
+               sft.FUNCTION_NAME,
+               sft.FUNCTION_DESCRIPTION,
+               sfb.RESOURCE_ID,
+               sfb.TYPE,
+               sfb.AREA_CODE,
+               sfb.PARENT_FUNCTION_ID,
+               sft.lang
+          FROM SYS_FUNCTION_B sfb
+          LEFT OUTER JOIN SYS_FUNCTION_TL sft
+            on (sfb.FUNCTION_ID = sft.FUNCTION_ID)
+            where sft.lang is not null
+    </select>
+</mapper>

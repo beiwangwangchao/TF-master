@@ -1,0 +1,69 @@
+/*
+ * Copyright LKK Health Products Group Limited
+ */
+package com.lkkhpg.dsis.platform.audit.dto;
+
+import javax.persistence.Table;
+
+import com.lkkhpg.dsis.platform.dto.BaseDTO;
+
+/**
+ * 审计DTO.
+ *
+ * @author xiawang.liu
+ */
+@Table(name = "SYS_AUDIT_ENTITY")
+public class Audit extends BaseDTO {
+
+	private static final long serialVersionUID = 1L;
+	
+	private Long entityId;
+	
+	public Long getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(Long entityId) {
+		this.entityId = entityId;
+	}
+
+	/**
+     * 审计实体Code.
+     */
+    private String entityCode;
+
+    /**
+     * 审计备注.
+     */
+    private String description;
+
+    /**
+     * 审计开关.
+     */
+    private String auditFlag;
+
+	public String getEntityCode() {
+		return entityCode;
+	}
+
+	public void setEntityCode(String entityCode) {
+		this.entityCode = entityCode;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getAuditFlag() {
+		return auditFlag;
+	}
+
+	public void setAuditFlag(String auditFlag) {
+		this.auditFlag = auditFlag;
+	}
+
+}

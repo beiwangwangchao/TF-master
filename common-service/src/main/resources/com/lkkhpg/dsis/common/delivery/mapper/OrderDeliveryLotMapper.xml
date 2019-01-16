@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.delivery.mapper.OrderDeliveryLotMapper">
+    <resultMap type="java.util.Map" id="lotListMap">
+        <result column="ORGANIZATION_ID" property="orgId" jdbcType="INTEGER"/>
+        <result column="ITEM_ID" property="itemId" jdbcType="INTEGER"/>
+        <result column="LOT_NUMBER" property="lotNumber" jdbcType="INTEGER"/>
+        <result column="QUANTITY" property="quantity" jdbcType="INTEGER"/>
+        <result column="UOM_CODE" property="uomCode" jdbcType="VARCHAR"/>
+        <result column="EXPIRY_DATE" property="expiryDate" jdbcType="VARCHAR"/>
+        <result column="TRANSACTION_ID" property="initTransactionId" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLot">
+        <id column="DELIVERY_LOT_ID" property="deliveryLotId" jdbcType="DECIMAL" />
+        <result column="DELIVERY_LINE_ID" property="deliveryLineId"
+            jdbcType="DECIMAL" />
+        <result column="DELIVERY_ID" property="deliveryId" jdbcType="DECIMAL" />
+        <result column="LOT_NUMBER" property="lotNumber" jdbcType="VARCHAR" />
+        <result column="OUTSTANDING_QTY" property="outstandingQty"
+            jdbcType="DECIMAL" />
+        <result column="RETURN_QTY" property="returnQty" jdbcType="DECIMAL" />
+        <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber"
+            jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate"
+            jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy"
+            jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate"
+            jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin"
+            jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory"
+            jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+        <result column="EXPIRY_DATE" property="expiryDate" jdbcType="DATE" />
+        <result column="ONHAND_QUANTITY" property="onhandQuantity"
+            jdbcType="DECIMAL" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        DELIVERY_LOT_ID, DELIVERY_LINE_ID, DELIVERY_ID, LOT_NUMBER, OUTSTANDING_QTY,
+        RETURN_QTY,
+        REMARK, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+        CREATED_BY,
+        LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8,
+        ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14,
+        ATTRIBUTE15
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap"
+        parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from DM_ORDER_DELIVERY_LOT
+        where DELIVERY_LOT_ID = #{deliveryLotId,jdbcType=DECIMAL}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from DM_ORDER_DELIVERY_LOT
+        where DELIVERY_LOT_ID = #{deliveryLotId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLot">
+        <selectKey resultType="java.lang.Long" keyProperty="deliveryLotId"
+            order="BEFORE">
+            select DM_ORDER_DELIVERY_LOT_S.nextval from dual
+        </selectKey>
+        insert into DM_ORDER_DELIVERY_LOT (DELIVERY_LOT_ID, DELIVERY_LINE_ID,
+        DELIVERY_ID,
+        LOT_NUMBER, OUTSTANDING_QTY, RETURN_QTY,
+        REMARK, REQUEST_ID,
+        PROGRAM_ID, CREATION_DATE, CREATED_BY,
+        LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2,
+        ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5,
+        ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8,
+        ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11,
+        ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14,
+        ATTRIBUTE15)
+        values (#{deliveryLotId,jdbcType=DECIMAL},
+        #{deliveryLineId,jdbcType=DECIMAL}, #{deliveryId,jdbcType=DECIMAL},
+        #{lotNumber,jdbcType=VARCHAR}, #{outstandingQty,jdbcType=DECIMAL},
+        #{returnQty,jdbcType=DECIMAL},
+        #{remark,jdbcType=VARCHAR},
+        #{requestId,jdbcType=DECIMAL},
+        #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP,
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR},
+        #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR},
+        #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR},
+        #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR},
+        #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR},
+        #{attribute15,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLot">
+        <selectKey resultType="java.lang.Long" keyProperty="deliveryLotId"
+            order="BEFORE">
+            select DM_ORDER_DELIVERY_LOT_S.nextval from dual
+        </selectKey>
+        insert into DM_ORDER_DELIVERY_LOT
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deliveryLotId != null">
+                DELIVERY_LOT_ID,
+            </if>
+            <if test="deliveryLineId != null">
+                DELIVERY_LINE_ID,
+            </if>
+            <if test="deliveryId != null">
+                DELIVERY_ID,
+            </if>
+            <if test="lotNumber != null">
+                LOT_NUMBER,
+            </if>
+            <if test="outstandingQty != null">
+                OUTSTANDING_QTY,
+            </if>
+            <if test="returnQty != null">
+                RETURN_QTY,
+            </if>
+            <if test="remark != null">
+                REMARK,
+            </if>
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            <if test="creationDate != null">
+                CREATION_DATE,
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            <if test="lastUpdateDate != null">
+                LAST_UPDATE_DATE,
+            </if>
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY,
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1,
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2,
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3,
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4,
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5,
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6,
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7,
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8,
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9,
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10,
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11,
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12,
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13,
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14,
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deliveryLotId != null">
+                #{deliveryLotId,jdbcType=DECIMAL},
+            </if>
+            <if test="deliveryLineId != null">
+                #{deliveryLineId,jdbcType=DECIMAL},
+            </if>
+            <if test="deliveryId != null">
+                #{deliveryId,jdbcType=DECIMAL},
+            </if>
+            <if test="lotNumber != null">
+                #{lotNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="outstandingQty != null">
+                #{outstandingQty,jdbcType=DECIMAL},
+            </if>
+            <if test="returnQty != null">
+                #{returnQty,jdbcType=DECIMAL},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="creationDate != null">
+                CURRENT_TIMESTAMP,
+            </if>
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateDate != null">
+                CURRENT_TIMESTAMP,
+            </if>
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLot">
+        update DM_ORDER_DELIVERY_LOT
+        <set>
+            <if test="deliveryLineId != null">
+                DELIVERY_LINE_ID = #{deliveryLineId,jdbcType=DECIMAL},
+            </if>
+            <if test="deliveryId != null">
+                DELIVERY_ID = #{deliveryId,jdbcType=DECIMAL},
+            </if>
+            <if test="lotNumber != null">
+                LOT_NUMBER = #{lotNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="outstandingQty != null">
+                OUTSTANDING_QTY = #{outstandingQty,jdbcType=DECIMAL},
+            </if>
+            <if test="returnQty != null">
+                RETURN_QTY = #{returnQty,jdbcType=DECIMAL},
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="objectVersionNumber != null">
+                OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+            </if>
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="creationDate != null">
+                CREATION_DATE = CURRENT_TIMESTAMP,
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateDate != null">
+                LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            </if>
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where DELIVERY_LOT_ID = #{deliveryLotId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDeliveryLot">
+        update DM_ORDER_DELIVERY_LOT
+        set DELIVERY_LINE_ID = #{deliveryLineId,jdbcType=DECIMAL},
+        DELIVERY_ID = #{deliveryId,jdbcType=DECIMAL},
+        LOT_NUMBER = #{lotNumber,jdbcType=VARCHAR},
+        OUTSTANDING_QTY = #{outstandingQty,jdbcType=DECIMAL},
+        RETURN_QTY = #{returnQty,jdbcType=DECIMAL},
+        REMARK = #{remark,jdbcType=VARCHAR},
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+        CREATION_DATE = CURRENT_TIMESTAMP,
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+        where DELIVERY_LOT_ID = #{deliveryLotId,jdbcType=DECIMAL}
+    </update>
+
+    <select id="selectByDeliveryLineId" resultMap="BaseResultMap"
+        parameterType="java.lang.Long">
+        SELECT dodlt.delivery_lot_id
+        ,dodlt.delivery_line_id
+        ,dodlt.delivery_id
+        ,dodlt.lot_number
+        ,dodlt.outstanding_qty
+        ,dodlt.return_qty
+        ,dodlt.remark
+        ,dodlt.object_version_number
+        ,dodlt.request_id
+        ,dodlt.program_id
+        ,dodlt.creation_date
+        ,dodlt.created_by
+        ,dodlt.last_updated_by
+        ,dodlt.last_update_date
+        ,dodlt.last_update_login
+        ,dodlt.attribute_category
+        ,dodlt.attribute1
+        ,dodlt.attribute2
+        ,dodlt.attribute3
+        ,dodlt.attribute4
+        ,dodlt.attribute5
+        ,dodlt.attribute6
+        ,dodlt.attribute7
+        ,dodlt.attribute8
+        ,dodlt.attribute9
+        ,dodlt.attribute10
+        ,dodlt.attribute11
+        ,dodlt.attribute12
+        ,dodlt.attribute13
+        ,dodlt.attribute14
+        ,dodlt.attribute15
+        ,(select il.expiry_date
+      from inv_lot il
+    where il.organization_id= dodl.inv_org_id
+      and il.item_id = dodl.count_item_id
+      and il.lot_number = dodlt.lot_number) expiry_date
+        ,coalesce((SELECT sum(ioqv.quantity)
+        FROM inv_onhand_quantity_lot_v ioqv
+        LEFT JOIN inv_item_property_v iipv
+        ON ioqv.item_id = iipv.COUNT_ITEM_ID
+       and ioqv.organization_id = iipv.organization_Id
+        WHERE iipv.item_id = osl.item_id
+        AND ioqv.organization_id = dodl.inv_org_id
+        AND ioqv.lot_number = dodlt.lot_number)
+        ,0) onhand_quantity
+        FROM dm_order_delivery_lot dodlt
+        LEFT JOIN dm_order_delivery_line dodl
+        ON dodl.line_id = dodlt.delivery_line_id
+        LEFT JOIN om_sales_line osl
+        ON osl.line_id = dodl.order_line_id
+        WHERE dodlt.delivery_line_id = #{deliveryLineId,jdbcType=DECIMAL}
+
+    </select>
+
+    <select id="enabledLot" resultType="java.util.Map">
+      SELECT pv.LOT_CONTROL_FLAG 
+      FROM INV_ITEM_PROPERTY_V pv
+      WHERE PV.ORGANIZATION_ID = #{orgId,jdbcType = DECIMAL}
+      AND pv.ITEM_ID = #{itemId, jdbcType = DECIMAL}
+    </select>
+
+    <select id="getItemLots" resultMap="lotListMap">
+        SELECT ioq.organization_id,
+        ioq.lot_number,
+        ioq.item_id,
+        sum(ioq.quantity) as quantity,
+        ioq.uom_code,
+        il.expiry_date,
+        min(ioq.init_transaction_id) as transaction_id
+        FROM inv_onhand_quantity ioq
+      LEFT JOIN inv_lot il
+        ON il.lot_number = ioq.lot_number and il.item_id = ioq.item_id and il.organization_id = ioq.organization_id
+        <where>
+            1=1
+            <if test="orgId !=null">
+                AND ioq.organization_id = #{orgId,jdbcType=DECIMAL}
+            </if>
+            <if test="itemId !=null">
+                AND ioq.item_id = #{itemId,jdbcType=DECIMAL}
+            </if>
+        </where>
+        GROUP BY ioq.organization_id,
+        ioq.item_id,
+        ioq.lot_number,
+        ioq.uom_code,
+        il.expiry_date
+        order by transaction_id ASC
+
+    </select>
+    
+    <select id="getItemAvailableLots" resultMap="lotListMap">
+        SELECT ioq.organization_id,
+        ioq.lot_number,
+        ioq.item_id,
+        sum(ioq.quantity) - coalesce((SELECT
+                       SUM(dodlt.outstanding_qty - coalesce(dodlt.return_qty,0))
+                  FROM om_sales_line          osl,
+                       dm_order_delivery      dod,
+                       dm_order_delivery_line dodl
+                       ,dm_order_delivery_lot  dodlt
+                       ,inv_item_property_v v
+                 WHERE dod.delivery_id = dodl.delivery_id
+                   AND dodl.line_id = dodlt.delivery_line_id
+                   AND dodl.order_line_id = osl.line_id
+                   AND dod.inv_org_id = ioq.organization_id
+                   AND osl.item_id = v.item_id
+                   and v.organization_id = dod.inv_org_id
+                   and v.count_item_id = ioq.item_id
+                   AND coalesce(dodlt.lot_number, chr(10)) =
+                       coalesce(ioq.lot_number, chr(10))
+                   AND (dod.delivery_status = 'PDDL' or dod.delivery_status = 'NEW')),
+                0) as quantity,
+        ioq.uom_code,
+        il.expiry_date,
+        min(ioq.init_transaction_id) as transaction_id
+        FROM inv_onhand_quantity ioq
+      LEFT JOIN inv_lot il
+        ON il.lot_number = ioq.lot_number and il.item_id = ioq.item_id and il.organization_id = ioq.organization_id
+        <where>
+            1=1
+            <if test="orgId !=null">
+                AND ioq.organization_id = #{orgId,jdbcType=DECIMAL}
+            </if>
+            <if test="itemId !=null">
+                AND ioq.item_id = #{itemId,jdbcType=DECIMAL}
+            </if>
+        </where>
+        GROUP BY ioq.organization_id,
+        ioq.item_id,
+        ioq.lot_number,
+        ioq.uom_code,
+        il.expiry_date
+        order by il.expiry_date ASC
+
+    </select>
+</mapper>

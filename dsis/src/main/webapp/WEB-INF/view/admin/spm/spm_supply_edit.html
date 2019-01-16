@@ -1,0 +1,487 @@
+<#--
+ * description: 供货组织维护界面
+ * version: 1.0
+ * author: wangc
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?yesno=SYS.YES_NO" type="text/javascript"></script>
+<body style="padding: 10px;">
+    <div id="spm_supply_saleorg" style="margin: 0; padding: 0"></div>
+    <div id="spm_supply_address" style="margin: 0; padding: 0"></div>
+    <div id="spm_supply_invorg" style="margin: 0; padding: 0"></div>
+<script type="text/javascript">
+<#assign isedit = (RequestParameters.isedit!'0') />
+<#assign supplyType = '${RequestParameters.type}' />
+var dialog = frameElement.dialog;
+var userId='${Session.userId}';
+<#if isedit == '1'>
+<#if supplyType == 'SITE'>
+var stateCode = '${RequestParameters.stateCode}';
+var cityCode = '${RequestParameters.cityCode}';
+var addressParam;
+if(stateCode == 'null'){
+	addressParam = {
+			countryCode : '${RequestParameters.countryCode}'
+	}
+}else if(cityCode == 'null'){
+	addressParam = {
+			countryCode : '${RequestParameters.countryCode}',
+			stateCode : '${RequestParameters.stateCode}'
+	}
+}else{
+	addressParam = {
+			countryCode : '${RequestParameters.countryCode}',
+			stateCode : '${RequestParameters.stateCode}',
+			cityCode : '${RequestParameters.cityCode}',
+	}
+}
+</#if>
+</#if>
+var currentRowId,buttons = [], count = 0;
+buttons.push({
+	id   : 'saveBtn',
+    text : '<@spring.message "sys.hand.btn.save" />',
+    onclick : f_save_supply
+});
+Hap.addFormButtons(buttons);
+    <#if supplyType == 'ORG'>
+    window['spm_supply_saleorg'] = $("#spm_supply_saleorg").ligerGrid({
+    	title : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.orgtemplatedtl.assignvalue" />',
+        columns: [{
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.salesorgcode" />',
+            name: 'salesOrgCode',
+            width : 200,
+            textField:'code',
+          	valueField:'code',
+            <#if userId==1>
+          	editor: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_salesorg_sysadmin")},{
+            	onSelect: lotSalesOrg
+            }),
+    <#else >
+editor: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_sales_organization_code")},{
+    onSelect: lotSalesOrg
+}),
+</#if>
+            validate : {
+            	required : true
+            }
+        },
+        {
+            type: 'text',
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.salesorgname" />',
+            name: 'salesOrgName',
+            width : '200',
+            validate : {
+            	required : true
+            }
+        }],
+        toolbar: {
+            items: [{
+                text: '<@spring.message "sys.hand.btn.new"/>',
+                click: function() {
+                	var rowdata = spm_supply_saleorg.addRow({});
+                	//spm_supply_saleorg.select(rowdata.__id);
+                },
+                icon: 'add'
+            },
+            {
+                line: true
+            },
+            {
+                text: '<@spring.message "sys.hand.btn.delete"/>',
+                click: function() {
+                    Hap.gridDelete({
+                        grid: spm_supply_saleorg,
+                        url:'${base.contextPath}/spm/supply/salesOrgRemove'
+                    })
+                    var data = spm_supply_saleorg.getData();
+                    if(data.length == 1){
+                    	spm_supply_invorg.loadData(null);
+                    }
+                },
+                icon: 'delete'
+            },
+            {
+                line: true
+            }]
+        },
+        <#if isedit == '1'>
+        url : '${base.contextPath}/spm/supply/querySalesOrg',
+        parms : {
+        	salesOrgId : ${RequestParameters.salesOrgId},
+        },	
+        </#if>
+        width: '98%',
+        height: '48%',
+        enabledEdit: true,
+        checkbox: true,
+        isSingleCheck : true,
+        onAfterShowData : function(currentData){
+        	if(count == 0){
+        		count = 1;
+        		currentRowId = currentData.rows[0].__id;
+            	spm_supply_saleorg.select(currentRowId);
+        	}
+        }, 
+        onSelectRow: function(data, rowid, rowobj) {
+        	pushInvsIntoHeader();
+        	currentRowId = rowid;
+        	liger.get('spm_supply_invorg').loadData(null);
+        	var obj = {};
+            obj.rows = data.invs;
+            liger.get('spm_supply_invorg').loadData(obj);
+        },
+        onBeforeEdit : function(editParm){
+        	var columnname = editParm.column.columnname;
+        	if(editParm.record.__status == 'nochanged'){
+        		if(columnname=='salesOrgCode'
+        				|| columnname=='salesOrgCode'){
+            		return false;
+            	}
+        	}
+        }
+    });
+    </#if>
+    <#if supplyType == 'SITE'>
+    window['spm_supply_address'] = $("#spm_supply_address").ligerGrid({
+    	title : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.seg"/>',
+        columns: [
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierseg.countryname"/>',
+            width : '200',
+            name: 'countryCode',
+            textField:'countryName',
+            editor : {
+            		type: 'select',
+                	valueField : 'countryCode',
+    				textField:'name',
+                	url:'${base.contextPath}/spm/country/query',
+                	onChangeValue:function(){
+                		spm_supply_address.updateRow(this.options.host_grid_row,{
+                			'stateCode':'',
+                			'stateName':'',
+                			'cityCode':'',
+                            'cityName':''
+                		});
+                	}
+            },
+            validate : {
+            	required : true
+            }
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtlseg.statecode"/>',
+            width : '200',
+            name: 'stateCode',
+            textField : 'stateName',
+            editor : {
+        		type: 'select',
+            	valueField : 'stateCode',
+				textField:'name',
+            	url:'${base.contextPath}/spm/state/query',
+                staticOptions : function(e){
+                	e.column.editor.parms = {
+                			countryCode : e.record.countryCode
+                	}
+                },
+                onChangeValue:function(){
+                    spm_supply_address.updateRow(this.options.host_grid_row,{
+                        'cityCode':'',
+                        'cityName':''
+                    });
+                }
+            }
+        },{
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtlseg.citycode"/>',
+            width : '200',
+            name: 'cityCode',
+            textField : 'cityName',
+            editor : {
+        		type: 'select',
+            	valueField : 'cityCode',
+				textField:'name',
+            	url:'${base.contextPath}/spm/city/query',
+            	staticOptions : function(e){
+                	e.column.editor.parms = {
+                			stateCode : e.record.stateCode
+                	}
+                },
+           }
+        }],
+        toolbar: {
+            items: [{
+                text: '<@spring.message "sys.hand.btn.new"/>',
+                click: function() {
+                	var rowdata = spm_supply_address.addRow({});
+                	//spm_supply_address.select(rowdata.__id);
+                },
+                icon: 'add'
+            },
+            {
+                line: true
+            },
+            {
+                text: '<@spring.message "sys.hand.btn.delete"/>',
+                click: function() {
+                    Hap.gridDelete({
+                        grid: spm_supply_address,
+                        url:'${base.contextPath}/spm/supply/addressRemove'
+                    })
+                    var data = spm_supply_address.getData();
+                    if(data.length == 1){
+                    	spm_supply_invorg.loadData(null);
+                    }
+                },
+                icon: 'delete'
+            },
+            {
+                line: true
+            }]
+        },
+        <#if isedit == '1'>
+        url : '${base.contextPath}/spm/supply/queryAddress',
+        parms : addressParam,
+        </#if> 
+        width: '98%',
+        height: '48%',
+        enabledEdit: true,
+        checkbox: true,
+        isSingleCheck : true,
+        onAfterShowData : function(currentData){
+        	if(count == 0) {
+        		count = 1;
+            	currentRowId = currentData.rows[0].__id;
+            	spm_supply_address.select(currentRowId);
+        	} 
+        }, 
+        onSelectRow: function(data, rowid, rowobj) {
+        	pushInvsIntoHeader();
+        	currentRowId = rowid;
+        	liger.get('spm_supply_invorg').loadData(null);
+        	var obj = {};
+            obj.rows = data.invs;
+            liger.get('spm_supply_invorg').loadData(obj);
+        },
+        onBeforeEdit : function(editParm){
+        	var columnname = editParm.column.columnname;
+        	if(editParm.record.__status == 'nochanged'){
+        		if(columnname=='countryCode'
+        				|| columnname=='stateCode'
+        					|| columnname=='cityCode'){
+            		return false;
+            	}
+        	}
+        }
+    });
+    </#if>
+    
+    window['spm_supply_invorg'] = $("#spm_supply_invorg").ligerGrid({
+    	title : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.organization" />',
+    	columns: [{
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.organizationcode" />',
+            width : '200',
+            name: 'invOrgCode',
+            textField:'code',
+          	valueField:'code',
+        <#if userId ==1>
+          	editor: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_pm_inv_org")},{
+            	onSelect: lotInvOrg
+            }),
+    <#else>
+editor: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_inv_org_user_role")},{
+    onSelect: lotInvOrg
+}),
+         </#if>
+            validate : {
+            	required : true
+            }
+        },
+        {
+            type: 'text',
+            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.assignName" />',
+            width : '200',
+            name: 'invOrgName',
+            validate : {
+            	required : true
+            }
+        },{
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.default" />',
+            width : '200',
+            name: 'defaultFlag',
+            editor : {
+            	type : 'select',
+            	valueField : 'value',
+            	textField : 'meaning',
+            	data : yesno
+            },
+            render : function(item){
+            	for(var i in yesno){
+            		if(yesno[i].value == item.defaultFlag){
+            			return yesno[i].meaning;
+            		}
+            	}
+            },
+            validate : {
+            	required : true
+            }
+        }],
+        toolbar: {
+            items: [{
+                text: '<@spring.message "sys.hand.btn.new"/>',
+                click: function() {
+                	<#if supplyType == 'ORG'>
+                		var salesSelRow = spm_supply_saleorg.getSelectedRow();
+                    	if(salesSelRow == null || salesSelRow.salesOrgCode == null){
+                    		$.ligerDialog.error('<@spring.message "msg.error.spm.country.selectorganization"/>');
+                    		return;
+                    	}
+                	</#if>
+                	<#if supplyType == 'SITE'>
+                		var addressSelRow = spm_supply_address.getSelectedRow();
+                    	if(addressSelRow == null || addressSelRow.countryCode == null){
+                    		$.ligerDialog.error('<@spring.message "msg.error.spm.country.selectline"/>');
+                    		return;
+                    	}
+                	</#if>
+                	spm_supply_invorg.addRow({
+                		defaultFlag : 'Y'
+                	})
+                },
+                icon: 'add'
+            },
+            {
+                line: true
+            },
+            {
+                text: '<@spring.message "sys.hand.btn.delete"/>',
+                click: function() {
+                    Hap.gridDelete({
+                        grid: spm_supply_invorg,
+                        url:'${base.contextPath}/spm/supply/delete'
+                    })
+                },
+                icon: 'delete'
+            },
+            {
+                line: true
+            }]
+        },
+        <#if isedit == '1'>
+        url : '${base.contextPath}/spm/supply/querySupply',
+        <#if supplyType == 'ORG'>
+        parms : {
+        	salesOrgId : ${RequestParameters.salesOrgId},
+        	supplyType : '${RequestParameters.type}'
+        },	
+        </#if>
+        <#if supplyType == 'SITE'>
+        parms : addressParam,
+        </#if>
+        </#if> 
+        width: '98%',
+        height: '48%',
+        enabledEdit: true,
+        checkbox: true,
+        onBeforeEdit : function(editParm){
+        	var columnname = editParm.column.columnname;
+        	if(editParm.record.__status == 'nochanged'){
+        		if(columnname=='invOrgCode'
+        				|| columnname=='invOrgName'
+        					|| columnname=='defaultFlag'){
+            		return false;
+            	}
+        	}
+        	<#if supplyType == 'ORG'>
+        	if(columnname=='invOrgCode'){
+        		var salesSelRow = spm_supply_saleorg.getSelectedRow();
+            	if(salesSelRow == null || salesSelRow.salesOrgCode == null){
+            		$.ligerDialog.error('<@spring.message "msg.error.spm.country.selectorganization"/>');
+            		return false;
+            	}
+        	}
+        	</#if>
+        	<#if supplyType == 'SITE'>
+        	if(columnname=='invOrgCode'){
+        		var addressSelRow = spm_supply_address.getSelectedRow();
+            	if(addressSelRow == null || addressSelRow.countryCode == null){
+            		$.ligerDialog.error('<@spring.message "msg.error.spm.country.selectline"/>');
+            		return false;
+            	}
+        	}
+        	</#if>
+        }
+    });
+    
+    /*填充销售组织表格*/
+    function lotSalesOrg(e){
+    	if(!e.data || !e.data.length) return false;
+    	var updateData = {
+    			'salesOrgId' : e.data[0].salesOrgId,
+    			'salesOrgName' : e.data[0].name
+    	}
+    	spm_supply_saleorg.updateRow(spm_supply_saleorg.lastEditRow,updateData);
+    } 
+    /*填充库存组织表格*/
+    function lotInvOrg(e){
+    	if(!e.data || !e.data.length) return false;
+    	var updateData = {
+    			'invOrgId' : e.data[0].invOrgId,
+    			'invOrgName' : e.data[0].name 
+    	}
+    	spm_supply_invorg.updateRow(spm_supply_invorg.lastEditRow,updateData);
+    }
+    /*将库存组织保存到行中*/
+    
+    function pushInvsIntoHeader(){
+    	if(currentRowId){
+    		var invs = liger.get('spm_supply_invorg').getData();
+    		var deletedRow = liger.get('spm_supply_invorg').getDeleted();
+    		invs = invs.concat(deletedRow);
+    		<#if supplyType == 'ORG'>
+    		var preRow = liger.get('spm_supply_saleorg').getRow(currentRowId);
+    		</#if>
+    		<#if supplyType == 'SITE'>
+    		var preRow = liger.get('spm_supply_address').getRow(currentRowId);
+    		</#if>
+    		if(preRow!= null){
+    			preRow.invs = invs;
+    		}
+    	}
+    }
+    /*保存供货组织*/
+    function f_save_supply(){
+    	pushInvsIntoHeader();
+    	<#if supplyType == 'ORG'>
+    	var supplyHeadObj = spm_supply_saleorg.rows;
+    	var deletedRow = liger.get('spm_supply_saleorg').getDeleted();
+    	supplyHeadObj = supplyHeadObj.concat(deletedRow);
+    	</#if>
+    	<#if supplyType == 'SITE'>
+    	var supplyHeadObj = spm_supply_address.rows;
+    	var deletedRow = liger.get('spm_supply_address').getDeleted();
+    	supplyHeadObj = supplyHeadObj.concat(deletedRow);
+    	</#if>
+    	if(supplyHeadObj == null || supplyHeadObj.length== 0){
+    		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.config.supply.tip.canotsave"/>')
+    		return false;
+    	}
+    	Hap.ajax({
+            url:"${base.contextPath}/spm/supply/submit",
+            data: {
+            	'supplyType' : '${RequestParameters.type}',
+            	'supplies' : supplyHeadObj,
+            },
+            success:function(){
+                $.ligerDialog.success('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.saveSuccess"/>',
+                function() {
+                	this.parent.location.href="${base.contextPath}/spm/spm_supply_query.html";
+                	dialog.close();
+                });
+            }
+        })
+    }
+</script>
+</body>
+</html>

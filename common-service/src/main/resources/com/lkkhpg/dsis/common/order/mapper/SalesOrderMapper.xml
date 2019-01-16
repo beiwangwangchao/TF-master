@@ -1,0 +1,1605 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.SalesOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.SalesOrder" >
+    <id column="HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="INVOICE_NUMBER" property="invoiceNumber" jdbcType="VARCHAR" />
+    <result column="ORDER_STATUS" property="orderStatus" jdbcType="VARCHAR" />
+    <result column="ORDER_STATUS_DESC" property="orderStatusDesc" jdbcType="VARCHAR" />
+    <result column="ORDER_DATE" property="orderDate" jdbcType="TIMESTAMP" />
+    <result column="ORDER_TYPE" property="orderType" jdbcType="VARCHAR" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="CHANNEL" property="channel" jdbcType="VARCHAR" />
+    <result column="SERVICE_CENTER_ID" property="serviceCenterId" jdbcType="DECIMAL" />
+    <result column="CREATE_USER_ID" property="createUserId" jdbcType="DECIMAL" />
+    <result column="PERIOD_ID" property="periodId" jdbcType="DECIMAL" />
+    <result column="CURRENCY" property="currency" jdbcType="VARCHAR" />
+    <result column="ORDER_AMT" property="orderAmt" jdbcType="DECIMAL" />
+    <result column="DISCOUNT_AMT" property="discountAmt" jdbcType="DECIMAL" />
+    <result column="TAX_AMT" property="taxAmt" jdbcType="DECIMAL" />
+    <result column="ACTRUAL_PAY_AMT" property="actrualPayAmt" jdbcType="DECIMAL" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="DELIVERY_TYPE" property="deliveryType" jdbcType="VARCHAR" />
+    <result column="COD_FLAG" property="codFlag" jdbcType="VARCHAR" />
+    <result column="DELIVERY_LOCATION_ID" property="deliveryLocationId" jdbcType="DECIMAL" />
+    <result column="DELIVERY_TO" property="deliveryTo" jdbcType="VARCHAR" />
+    <result column="BILLING_LOCATION_ID" property="billingLocationId" jdbcType="DECIMAL" />
+    <result column="BILLING_TO" property="billingTo" jdbcType="VARCHAR" />
+    <result column="SOURCE_TYPE" property="sourceType" jdbcType="VARCHAR" />
+    <result column="SOURCE_KEY" property="sourceKey" jdbcType="VARCHAR" />
+    <result column="BATCH_NUMBER" property="batchNumber" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="PAY_DATE" property="payDate" jdbcType="TIMESTAMP" />
+    <result column="SYNC_FLAG" property="syncFlag" jdbcType="VARCHAR" />
+    <result column="SALES_POINTS" property="salesPoints" jdbcType="DECIMAL" />
+    <result column="DAPP_APP_NO" property="dappAppNo" jdbcType="VARCHAR" />    <!-- Service center- 获取pv总计 -->
+    <result column="PV_SUM" property="pvSum" jdbcType="DECIMAL" />
+    <result column="ACTRUAL_PAY_AMT_SUM" property="actrualPayAmtSum" jdbcType="DECIMAL" />
+    <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+    
+    <result column="DAPP_SYNC_FLAG" property="dappSyncFlag" jdbcType="VARCHAR" />
+     <result column="create_user_name" property="createUserName" jdbcType="VARCHAR"/>
+	 
+     <result column="AUTOSHIP_GIFT_FLAG" property="autoshipGiftFlag" jdbcType="VARCHAR" />
+     <result column="AUTOSHIP_GIFT_RULE_FLAG" property="autoshipGiftRuleFlag" jdbcType="VARCHAR" />
+     <!-- 会员名称 -->
+     <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR" />
+     <!-- 会员编号 -->
+     <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR"/>
+      <!-- Gst_id_number-->
+     <result column="gst_id_number" property="gstIdNumber" jdbcType="VARCHAR"/>
+       <!--电话-->
+     <result column="phone_no" property="phoneNo" jdbcType="VARCHAR"/>
+      <!--地址-->
+     <result column="address" property="address" jdbcType="VARCHAR"/>
+     
+     <result column="SALES_ORG_NAME" property="salesOrgName" jdbcType="VARCHAR" />
+     <!-- 发票统一编号 -->
+     <result column="BR_NO" property="brNo" jdbcType="VARCHAR" />
+     <!-- GST_ID-->
+     <result column="GST_ID" property="gstId" jdbcType="VARCHAR"/>
+     <result column="SHIPPING_FEE" property="shippingFee" jdbcType="DECIMAL"/>
+     <result column="SHIPPING_STATUS" property="shippingStatus" jdbcType="VARCHAR"/>
+     <result column="FREE_SHIPPING" property="freeShipping" jdbcType="VARCHAR"/>
+     <result column="INTERNAL_REMARK" property="internalRemark" jdbcType="VARCHAR"/>
+     <result column="STAFF_NAME" property="staffName" jdbcType="VARCHAR"/>
+     <result column="STAFF_NUM" property="staffNum" jdbcType="VARCHAR"/>
+     <result column="WPAY_DATE" property="waitPayDate" jdbcType="TIMESTAMP"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    HEADER_ID, SALES_ORG_ID, ORDER_NUMBER, INVOICE_NUMBER, ORDER_STATUS, ORDER_DATE, 
+    ORDER_TYPE, MEMBER_ID, CHANNEL, SERVICE_CENTER_ID, CREATE_USER_ID, PERIOD_ID, CURRENCY, 
+    ORDER_AMT, DISCOUNT_AMT, TAX_AMT, ACTRUAL_PAY_AMT, REMARK, DELIVERY_TYPE, COD_FLAG, 
+    DELIVERY_LOCATION_ID, DELIVERY_TO, BILLING_LOCATION_ID, BILLING_TO, SOURCE_TYPE, 
+    SOURCE_KEY, BATCH_NUMBER, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15, PAY_DATE, SYNC_FLAG,SALES_POINTS,DAPP_APP_NO,FREE_SHIPPING,INTERNAL_REMARK,
+    STAFF_NAME,STAFF_NUM
+    
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    ,(CASE WHEN source_type = 'MWS' THEN 'mwsuser'
+     ELSE
+     ( SELECT  su.user_name
+ FROM (sys_user su left outer join
+            sys_acc_rel sar  on (su.user_id=sar.rel_party_id and sar.ACCOUNT_TYPE = 'USER'))
+            left outer join sys_account sa on(sar.account_id = sa.account_id)
+       where sa.account_id = OM_SALES_ORDER.LAST_UPDATED_BY)        
+     END)  create_user_name
+    from OM_SALES_ORDER
+    where HEADER_ID = #{headerId,jdbcType=DECIMAL} 
+  </select>
+      <select id="selectByPrimaryKeyOnly" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from OM_SALES_ORDER
+    where HEADER_ID = #{headerId,jdbcType=DECIMAL} 
+  </select>
+   <select id="queryByOrderNumber" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from OM_SALES_ORDER
+    where ORDER_NUMBER= #{orderNumber,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="queryAutoshipWpayOrder" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from OM_SALES_ORDER
+    where channel ='AUTOS'
+    and order_status = 'WPAY'
+  </select>
+  <!--9633根据订单号查询是否使用折扣-->
+  <select id="selectDiscountTrx" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" resultMap="BaseResultMap">
+    SELECT
+	o.*
+  FROM
+	OM_SALES_ORDER o
+  WHERE
+	o.ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR}
+  </select>
+
+  <select id="queryOrdersId" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" resultMap="BaseResultMap">
+    select HEADER_ID, SALES_ORG_ID from OM_SALES_ORDER where ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder">
+    delete from OM_SALES_ORDER
+    where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" >
+    <selectKey resultType="java.lang.Long" keyProperty="headerId" order="BEFORE" >
+      SELECT OM_SALES_ORDER_S.nextval from dual
+    </selectKey>
+    insert into OM_SALES_ORDER (HEADER_ID, SALES_ORG_ID, ORDER_NUMBER, 
+      INVOICE_NUMBER, ORDER_STATUS, ORDER_DATE, 
+      ORDER_TYPE, MEMBER_ID, CHANNEL, 
+      SERVICE_CENTER_ID, CREATE_USER_ID, PERIOD_ID, 
+      CURRENCY, ORDER_AMT, DISCOUNT_AMT, 
+      TAX_AMT, ACTRUAL_PAY_AMT, REMARK, 
+      DELIVERY_TYPE, COD_FLAG, DELIVERY_LOCATION_ID, 
+      DELIVERY_TO, BILLING_LOCATION_ID, BILLING_TO, 
+      SOURCE_TYPE, SOURCE_KEY, BATCH_NUMBER, 
+       REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,
+      PAY_DATE, SYNC_FLAG,SALES_POINTS,DAPP_APP_NO,
+      AUTOSHIP_GIFT_FLAG,AUTOSHIP_GIFT_RULE_FLAG,
+      DAPP_SYNC_FLAG,FREE_SHIPPING,INTERNAL_REMARK,
+      STAFF_NAME,STAFF_NUM,WPAY_DATE
+      )
+    values (#{headerId,jdbcType=DECIMAL}, #{salesOrgId,jdbcType=DECIMAL}, #{orderNumber,jdbcType=VARCHAR}, 
+      #{invoiceNumber,jdbcType=VARCHAR}, #{orderStatus,jdbcType=VARCHAR}, #{orderDate,jdbcType=TIMESTAMP}, 
+      #{orderType,jdbcType=VARCHAR}, #{memberId,jdbcType=DECIMAL}, #{channel,jdbcType=VARCHAR}, 
+      #{serviceCenterId,jdbcType=DECIMAL}, #{createUserId,jdbcType=DECIMAL}, #{periodId,jdbcType=DECIMAL}, 
+      #{currency,jdbcType=VARCHAR}, #{orderAmt,jdbcType=DECIMAL}, #{discountAmt,jdbcType=DECIMAL}, 
+      #{taxAmt,jdbcType=DECIMAL}, #{actrualPayAmt,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
+      #{deliveryType,jdbcType=VARCHAR}, #{codFlag,jdbcType=VARCHAR}, #{deliveryLocationId,jdbcType=DECIMAL}, 
+      #{deliveryTo,jdbcType=VARCHAR}, #{billingLocationId,jdbcType=DECIMAL}, #{billingTo,jdbcType=VARCHAR}, 
+      #{sourceType,jdbcType=VARCHAR}, #{sourceKey,jdbcType=VARCHAR}, #{batchNumber,jdbcType=VARCHAR}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR},
+      #{payDate,jdbcType=TIMESTAMP}, 'N',#{salesPoints,jdbcType=DECIMAL},#{dappAppNo,jdbcType=VARCHAR}, 
+      #{autoshipGiftFlag,jdbcType=VARCHAR},#{autoshipGiftRuleFlag,jdbcType=VARCHAR},#{dappSyncFlag,jdbcType=VARCHAR},
+      #{freeShipping,jdbcType=VARCHAR},#{internalRemark,jdbcType=VARCHAR},
+      #{staffName,jdbcType=VARCHAR},#{staffNum,jdbcType=VARCHAR},#{waitPayDate,jdbcType=TIMESTAMP}
+      )  
+    </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" >
+    <selectKey resultType="java.lang.Long" keyProperty="headerId" order="BEFORE" >
+      SELECT OM_SALES_ORDER_S.nextval from dual
+    </selectKey>
+    insert into OM_SALES_ORDER
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      HEADER_ID,
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID,
+      </if>
+      <if test="orderNumber != null" >
+        ORDER_NUMBER,
+      </if>
+      <if test="invoiceNumber != null" >
+        INVOICE_NUMBER,
+      </if>
+      <if test="orderStatus != null" >
+        ORDER_STATUS,
+      </if>
+      <if test="orderDate != null" >
+        ORDER_DATE,
+      </if>
+      <if test="orderType != null" >
+        ORDER_TYPE,
+      </if>
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="channel != null" >
+        CHANNEL,
+      </if>
+      <if test="serviceCenterId != null" >
+        SERVICE_CENTER_ID,
+      </if>
+      <if test="createUserId != null" >
+        CREATE_USER_ID,
+      </if>
+      <if test="periodId != null" >
+        PERIOD_ID,
+      </if>
+      <if test="currency != null" >
+        CURRENCY,
+      </if>
+      <if test="orderAmt != null" >
+        ORDER_AMT,
+      </if>
+      <if test="discountAmt != null" >
+        DISCOUNT_AMT,
+      </if>
+      <if test="taxAmt != null" >
+        TAX_AMT,
+      </if>
+      <if test="actrualPayAmt != null" >
+        ACTRUAL_PAY_AMT,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="deliveryType != null" >
+        DELIVERY_TYPE,
+      </if>
+      <if test="codFlag != null" >
+        COD_FLAG,
+      </if>
+      <if test="deliveryLocationId != null" >
+        DELIVERY_LOCATION_ID,
+      </if>
+      <if test="deliveryTo != null" >
+        DELIVERY_TO,
+      </if>
+      <if test="billingLocationId != null" >
+        BILLING_LOCATION_ID,
+      </if>
+      <if test="billingTo != null" >
+        BILLING_TO,
+      </if>
+      <if test="sourceType != null" >
+        SOURCE_TYPE,
+      </if>
+      <if test="sourceKey != null" >
+        SOURCE_KEY,
+      </if>
+      <if test="batchNumber != null" >
+        BATCH_NUMBER,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="payDate != null" >
+        PAY_DATE,
+      </if>
+      <if test="syncFlag != null" >
+        SYNC_FLAG,
+      </if>
+      <if test="salesPoints != null" >
+        SALES_POINTS,
+      </if>
+      <if test="freeShipping != null" >
+        FREE_SHIPPING,
+      </if>
+      <if test="internalRemark != null" >
+        INTERNAL_REMARK,
+      </if>
+      <if test="staffName != null" >
+        STAFF_NAME,
+      </if>
+      <if test="staffNum != null" >
+        STAFF_NUM,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{headerId,jdbcType=DECIMAL},
+      <if test="salesOrgId != null" >
+        #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="orderNumber != null" >
+        #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceNumber != null" >
+        #{invoiceNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="orderStatus != null" >
+        #{orderStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDate != null" >
+        #{orderDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderType != null" >
+        #{orderType,jdbcType=VARCHAR},
+      </if>
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="channel != null" >
+        #{channel,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceCenterId != null" >
+        #{serviceCenterId,jdbcType=DECIMAL},
+      </if>
+      <if test="createUserId != null" >
+        #{createUserId,jdbcType=DECIMAL},
+      </if>
+      <if test="periodId != null" >
+        #{periodId,jdbcType=DECIMAL},
+      </if>
+      <if test="currency != null" >
+        #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmt != null" >
+        #{orderAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="discountAmt != null" >
+        #{discountAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="taxAmt != null" >
+        #{taxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="actrualPayAmt != null" >
+        #{actrualPayAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryType != null" >
+        #{deliveryType,jdbcType=VARCHAR},
+      </if>
+      <if test="codFlag != null" >
+        #{codFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryLocationId != null" >
+        #{deliveryLocationId,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryTo != null" >
+        #{deliveryTo,jdbcType=VARCHAR},
+      </if>
+      <if test="billingLocationId != null" >
+        #{billingLocationId,jdbcType=DECIMAL},
+      </if>
+      <if test="billingTo != null" >
+        #{billingTo,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceType != null" >
+        #{sourceType,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceKey != null" >
+        #{sourceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNumber != null" >
+        #{batchNumber,jdbcType=VARCHAR},
+      </if> 
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+       CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="payDate != null" >
+        #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="syncFlag != null" >
+        #{syncFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="salesPoints != null" >
+        #{salesPoints,jdbcType=DECIMAL},
+      </if>
+      <if test="freeShipping != null" >
+         #{freeShipping,jdbcType=VARCHAR},
+      </if>
+      <if test="internalRemark != null" >
+         #{internalRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="staffName != null" >
+         #{staffName,jdbcType=VARCHAR},
+      </if>
+      <if test="staffNum != null" >
+         #{staffNum,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" >
+    update OM_SALES_ORDER
+    <set >
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+        LAST_UPDATE_DATE =CURRENT_TIMESTAMP,
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="orderNumber != null" >
+        ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceNumber != null" >
+        INVOICE_NUMBER = #{invoiceNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="orderStatus != null" >
+        ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDate != null" >
+        ORDER_DATE = #{orderDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderType != null" >
+        ORDER_TYPE = #{orderType,jdbcType=VARCHAR},
+      </if>
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="channel != null" >
+        CHANNEL = #{channel,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceCenterId != null" >
+        SERVICE_CENTER_ID = #{serviceCenterId,jdbcType=DECIMAL},
+      </if>
+      <if test="createUserId != null" >
+        CREATE_USER_ID = #{createUserId,jdbcType=DECIMAL},
+      </if>
+      <if test="periodId != null" >
+        PERIOD_ID = #{periodId,jdbcType=DECIMAL},
+      </if>
+      <if test="currency != null" >
+        CURRENCY = #{currency,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmt != null" >
+        ORDER_AMT = #{orderAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="discountAmt != null" >
+        DISCOUNT_AMT = #{discountAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="taxAmt != null" >
+        TAX_AMT = #{taxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="actrualPayAmt != null" >
+        ACTRUAL_PAY_AMT = #{actrualPayAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryType != null" >
+        DELIVERY_TYPE = #{deliveryType,jdbcType=VARCHAR},
+      </if>
+      <if test="codFlag != null" >
+        COD_FLAG = #{codFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryLocationId != null" >
+        DELIVERY_LOCATION_ID = #{deliveryLocationId,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryTo != null" >
+        DELIVERY_TO = #{deliveryTo,jdbcType=VARCHAR},
+      </if>
+      <if test="billingLocationId != null" >
+        BILLING_LOCATION_ID = #{billingLocationId,jdbcType=DECIMAL},
+      </if>
+      <if test="billingTo != null" >
+        BILLING_TO = #{billingTo,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceType != null" >
+        SOURCE_TYPE = #{sourceType,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceKey != null" >
+        SOURCE_KEY = #{sourceKey,jdbcType=VARCHAR},
+      </if>
+      <if test="batchNumber != null" >
+        BATCH_NUMBER = #{batchNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="payDate != null" >
+        PAY_DATE = #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="syncFlag != null" >
+        SYNC_FLAG = #{syncFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="salesPoints != null" >
+        SALES_POINTS = #{salesPoints,jdbcType=DECIMAL},
+      </if>
+      <if test="dappSyncFlag != null" >
+        DAPP_SYNC_FLAG = #{dappSyncFlag,jdbcType=VARCHAR},
+      </if>
+       <if test="freeShipping != null" >
+        FREE_SHIPPING =  #{freeShipping,jdbcType=VARCHAR},
+      </if>
+       <if test="internalRemark != null" >
+        INTERNAL_REMARK = #{internalRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="staffName != null" >
+        STAFF_NAME = #{staffName,jdbcType=VARCHAR},
+      </if>
+      <if test="staffNum != null" >
+        STAFF_NUM = #{staffNum,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" >
+    update OM_SALES_ORDER
+    set SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR},
+      INVOICE_NUMBER = #{invoiceNumber,jdbcType=VARCHAR},
+      ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR},
+      ORDER_DATE = #{orderDate,jdbcType=TIMESTAMP},
+      ORDER_TYPE = #{orderType,jdbcType=VARCHAR},
+      MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      CHANNEL = #{channel,jdbcType=VARCHAR},
+      SERVICE_CENTER_ID = #{serviceCenterId,jdbcType=DECIMAL},
+      CREATE_USER_ID = #{createUserId,jdbcType=DECIMAL},
+      PERIOD_ID = #{periodId,jdbcType=DECIMAL},
+      CURRENCY = #{currency,jdbcType=VARCHAR},
+      ORDER_AMT = #{orderAmt,jdbcType=DECIMAL},
+      DISCOUNT_AMT = #{discountAmt,jdbcType=DECIMAL},
+      TAX_AMT = #{taxAmt,jdbcType=DECIMAL},
+      ACTRUAL_PAY_AMT = #{actrualPayAmt,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      DELIVERY_TYPE = #{deliveryType,jdbcType=VARCHAR},
+      COD_FLAG = #{codFlag,jdbcType=VARCHAR},
+      DELIVERY_LOCATION_ID = #{deliveryLocationId,jdbcType=DECIMAL},
+      DELIVERY_TO = #{deliveryTo,jdbcType=VARCHAR},
+      BILLING_LOCATION_ID = #{billingLocationId,jdbcType=DECIMAL},
+      BILLING_TO = #{billingTo,jdbcType=VARCHAR},
+      SOURCE_TYPE = #{sourceType,jdbcType=VARCHAR},
+      SOURCE_KEY = #{sourceKey,jdbcType=VARCHAR},
+      BATCH_NUMBER = #{batchNumber,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      LAST_UPDATE_DATE =CURRENT_TIMESTAMP,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      PAY_DATE = #{payDate,jdbcType=TIMESTAMP},
+      SYNC_FLAG = 'N',
+      SALES_POINTS = #{salesPoints,jdbcType=DECIMAL},
+      FREE_SHIPPING =  #{freeShipping,jdbcType=VARCHAR},
+      INTERNAL_REMARK = #{internalRemark,jdbcType=VARCHAR},
+      STAFF_NAME = #{staffName,jdbcType=VARCHAR},
+      STAFF_NUM = #{staffNum,jdbcType=VARCHAR},
+      WPAY_DATE = #{waitPayDate,jdbcType=TIMESTAMP}
+    where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="selectForUpdateByHeadId" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" resultMap="BaseResultMap">
+  	select <include refid="Base_Column_List" />
+  	from OM_SALES_ORDER
+  	where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  	for update
+  </select>
+  
+  <select id="queryOrders" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> 
+               ,(SELECT t.meaning
+              FROM sys_code_b       scb,
+                   sys_code_value_b scvb
+                   LEFT OUTER JOIN sys_code_value_tl t on
+                   (scvb.CODE_VALUE_ID = t.CODE_VALUE_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+             WHERE scb.code = 'OM.SALES_STATUS'
+               AND scb.code_id = scvb.code_id
+               AND scvb.value = o.order_status) order_status_desc
+          from OM_SALES_ORDER o
+        <where>
+            <if test="salesOrgId !=null">
+                o.SALES_ORG_ID=#{salesOrgId,jdbcType=DECIMAL}
+            </if>
+            <if test="dateB !=null">
+                AND o.ORDER_DATE &gt;= #{dateB,jdbcType=DATE}
+            </if>
+            <if test="dateE !=null">
+                AND o.ORDER_DATE &lt;= #{dateE,jdbcType=DATE}
+            </if>
+            <if test="headerId !=null">
+                AND o.HEADER_ID=#{headerId,jdbcType=DECIMAL}
+            </if>
+            <if test="orderNumber != null">
+                AND o.ORDER_NUMBER like concat('%',concat(#{orderNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="memberId != null">
+                AND o.MEMBER_ID = #{memberId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderDate != null">
+                AND o.ORDER_DATE &gt; #{orderDate,jdbcType=DATE} 
+            </if>
+            <if test="createUserId != null">
+                AND o.CREATE_USER_ID = #{createUserId,jdbcType=DATE} 
+            </if>
+            <if test="orderStatus !=null">
+                AND o.ORDER_STATUS=#{orderStatus,jdbcType=VARCHAR}
+            </if>
+             <if test="statusList != null">
+                and o.ORDER_STATUS in 
+                <foreach collection="statusList" open="(" separator="," close=")" item="status" index="index">
+                    #{status,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <if test="channel !=null" >
+                AND o.CHANNEL=#{channel,jdbcType=VARCHAR}
+            </if>
+            <if test="orderType !=null">
+                AND o.ORDER_TYPE=#{orderType,jdbcType=VARCHAR}
+            </if>
+           <!--  AND o.ORDER_STATUS IN ('CANCL', 'COMP', 'WPAY', 'PAYIN') --> 
+            AND o.ORDER_TYPE IN ('NMDP', 'STDP', 'BIGF', 'RDEM','REF','REFUN','REFU','REFF')
+        </where>
+        order by o.CREATION_DATE desc, o.ORDER_NUMBER desc 
+        <if test="sortname != null and sortname != 'orderNumber' and sortname != 'creationDate'">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ,o.${_colName} ${sortorder}
+        </if>
+        
+  </select>
+  
+  <!-- 报表-获取销售订单Lov(当前用户角色可访问的销售组织屏蔽) -->
+  <select id="queryOrdersForReport" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" resultMap="BaseResultMap">
+  	SELECT OSO.ORDER_NUMBER
+  	,SSOTL.NAME SALES_ORG_NAME,
+  	(SELECT t.MEANING
+        FROM SYS_CODE_B       SCB,
+             SYS_CODE_VALUE_B SCVB
+             LEFT OUTER JOIN sys_code_value_tl t on
+                   (SCVB.CODE_VALUE_ID = t.CODE_VALUE_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+       WHERE SCB.CODE = 'OM.SALES_STATUS'
+         AND SCB.CODE_ID = SCVB.CODE_ID
+         AND SCVB.VALUE = OSO.ORDER_STATUS) ORDER_STATUS_DESC
+  	FROM OM_SALES_ORDER OSO
+		LEFT OUTER JOIN SPM_SALES_ORGANIZATION_TL SSOTL 
+			ON (SSOTL.SALES_ORG_ID = OSO.SALES_ORG_ID AND SSOTL.LANG = #{request.locale,jdbcType=VARCHAR})
+ 	WHERE OSO.ORDER_NUMBER LIKE CONCAT('%',CONCAT(#{orderNumber,jdbcType=VARCHAR},'%'))
+ 		AND EXISTS (SELECT 'X'
+          	FROM SYS_USER_ROLE_ASSIGN SURA
+         	WHERE SURA.ROLE_ID = #{request.roleId,jdbcType=DECIMAL}
+           		AND SURA.USER_ID = #{request.userId,jdbcType=DECIMAL}
+				AND OSO.SALES_ORG_ID = SURA.ASSIGN_VALUE
+           		AND SURA.ASSIGN_TYPE = 'SALES')
+    ORDER BY OSO.ORDER_NUMBER DESC
+     <if test="sortname != null and sortname !='orderNumber' ">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+            , ${_colName} ${sortorder}
+        </if>
+    
+  </select>
+
+  <!-- modify mingqing.wei 20180122 添加订单审核状态CHECK-->
+  <select id="queryMwsOrders" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> 
+               ,(SELECT scvt.meaning
+              FROM sys_code_b       scb,
+                   sys_code_value_b scvb,
+                   sys_code_value_tl scvt
+             WHERE scb.code = 'OM.SALES_STATUS'
+               AND scvb.code_value_id = scvt.code_value_id 
+               AND scvt.lang = #{request.locale,jdbcType=VARCHAR}
+               AND scb.code_id = scvb.code_id
+               AND scvb.value = o.order_status) order_status_desc
+          from OM_SALES_ORDER o
+        <where>
+            o.SALES_ORG_ID=#{request.salesOrgId,jdbcType=DECIMAL}
+            <if test="dateB !=null">
+                AND o.ORDER_DATE &gt;= #{dateB,jdbcType=DATE}
+            </if>
+            <if test="dateE !=null">
+                AND o.ORDER_DATE &lt;= #{dateE,jdbcType=DATE}
+            </if>
+            <if test="headerId !=null">
+                AND o.HEADER_ID=#{headerId,jdbcType=DECIMAL}
+            </if>
+            <if test="orderNumber != null">
+                AND o.ORDER_NUMBER like concat('%',concat(#{orderNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="memberId != null">
+                AND o.MEMBER_ID = #{memberId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderDate != null">
+                AND o.ORDER_DATE > #{orderDate,jdbcType=DATE} 
+            </if>
+            <if test="createUserId != null">
+                AND o.CREATE_USER_ID = #{createUserId,jdbcType=DATE} 
+            </if>
+            <if test="orderStatus !=null">
+                AND o.ORDER_STATUS=#{orderStatus,jdbcType=VARCHAR}
+            </if>
+            <if test="channel !=null" >
+                AND o.CHANNEL=#{channel,jdbcType=VARCHAR}
+            </if>
+            <if test="orderType !=null">
+                AND o.ORDER_TYPE=#{orderType,jdbcType=VARCHAR}
+            </if>
+
+                AND ((o.order_status IN ('VOID', 'COMP', 'WPAY','REF','REFUN','REFU','REFF','CHECK',
+                           'PAYIN','CANCL') and o.channel &lt; &gt; 'AUTOS') OR
+
+       (o.channel = 'AUTOS' AND o.order_status IN ('CANCL',
+                                                    'COMP'))) 
+            AND o.ORDER_TYPE IN ('NMDP', 'STDP', 'BIGF','REF','REFUN','REFU','REFF', 'RDEM')
+        </where>
+        order by o.CREATION_DATE desc, o.ORDER_NUMBER desc 
+  </select>
+  
+  <select id="queryFullOrders" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"></include> from OM_SALES_ORDER o
+        <where>
+            o.SALES_ORG_ID=#{request.salesOrgId,jdbcType=DECIMAL}
+            <if test="orderNumber != null">
+                AND o.ORDER_NUMBER like concat('%',concat(#{orderNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="memberId != null">
+                AND o.MEMBER_ID = #{memberId,jdbcType=VARCHAR}
+            </if>
+            <if test="orderDate != null">
+                o.ORDER_DATE &gt; #{orderDate,jdbcType=DATE} 
+            </if>
+            <if test="createUserId != null">
+                o.CREATE_USER_ID = #{createUserId,jdbcType=DATE} 
+            </if>
+        </where>
+  </select>
+  
+  <!-- 根据订单编号更新订单状态  -->
+  <update id="updateOrderStatus" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder">
+    UPDATE OM_SALES_ORDER
+    SET ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR},OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+        SYNC_FLAG = 'N',
+        DAPP_SYNC_FLAG = 'N',
+      LAST_UPDATE_DATE =CURRENT_TIMESTAMP
+    WHERE HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </update>
+
+  <!-- 根据订单编号更新订单状态  -->
+  <update id="updateOrderStatusRefund" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder">
+    UPDATE OM_SALES_ORDER
+    SET ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR},OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+    SYNC_FLAG = 'N',
+    DAPP_SYNC_FLAG = 'N',
+    LAST_UPDATE_DATE =CURRENT_TIMESTAMP
+    WHERE ORDER_NUMBER = #{orderNumber,jdbcType=DECIMAL}
+  </update>
+
+  <!---->
+  <select id="selectOrderStatus" resultType="string">
+ SELECT
+	o.ORDER_STATUS
+ FROM
+	OM_SALES_ORDER o
+ WHERE
+	O.ORDER_NUMBER=#{orderNumber,jdbcType=DECIMAL}
+  </select>
+    <!-- 根据订单编号更新订单状态  -->
+  <update id="updateOrderStatusWithFormerStatus">
+    UPDATE OM_SALES_ORDER
+    SET ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR},OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+        LAST_UPDATE_DATE =CURRENT_TIMESTAMP,
+        SYNC_FLAG = 'N',
+        DAPP_SYNC_FLAG = 'N'
+    WHERE HEADER_ID = #{headerId,jdbcType=DECIMAL}
+    and order_status = #{orderFormerStatus,jdbcType=VARCHAR}
+  </update>
+  
+  <!-- 根据订单头ID更新订单状态及支付日期 (update 2016-08-18 更新支付日期) -->
+  <update id="updateOrderAfterPayment" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder">
+  	UPDATE OM_SALES_ORDER
+    SET ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR},
+        <if test="payDate == null">
+          	PAY_DATE = CURRENT_TIMESTAMP,
+        </if>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+        LAST_UPDATE_DATE =CURRENT_TIMESTAMP,
+        SYNC_FLAG = 'N',
+        DAPP_SYNC_FLAG = 'N'
+    WHERE HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </update>
+  
+  <!-- 根据订单编号更新发票编号 -->
+  <update id="updateInvoiceNumberByHeaderId">
+    update OM_SALES_ORDER
+    SET INVOICE_NUMBER = #{invoiceNumber,jdbcType=DECIMAL},OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      LAST_UPDATE_DATE =CURRENT_TIMESTAMP
+    where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </update>
+  
+ <!-- 根据订单头ID查询实际支付金额 -->
+ <select id="selectActrualPayAmtByHeaderId" resultType="java.math.BigDecimal">
+    select ACTRUAL_PAY_AMT
+    from OM_SALES_ORDER
+    where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+ </select>
+ 
+ <select id="queryBatchNumber"  resultMap="BaseResultMap">
+    select distinct(BATCH_NUMBER)
+    from OM_SALES_ORDER 
+    where BATCH_NUMBER like concat('%',concat(#{batchNumber,jdbcType=VARCHAR},'%'))
+     <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+    
+  </select>
+  
+  <resultMap type="com.lkkhpg.dsis.common.order.dto.SalesOrder" id="OrderWithLine" extends="BaseResultMap">
+    <result column="FIRST_SO_NO" property="firstFlag" jdbcType="VARCHAR" />
+    <collection property="lines" ofType="com.lkkhpg.dsis.common.order.dto.SalesLine">
+      <id column="LINE_ID" property="lineId" jdbcType="DECIMAL" />
+      <result column="L_HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+      <result column="LINE_NUM" property="lineNum" jdbcType="DECIMAL" />
+      <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL" />
+      <result column="UNIT_ORIG_PRICE" property="unitOrigPrice" jdbcType="DECIMAL" />
+      <result column="UNIT_DISCOUNT_PRICE" property="unitDiscountPrice" jdbcType="DECIMAL" />
+      <result column="UNIT_SELLING_PRICE" property="unitSellingPrice" jdbcType="DECIMAL" />
+      <result column="ITEM_SALES_TYPE" property="itemSalesType" jdbcType="VARCHAR" />
+      <result column="PV" property="pv" jdbcType="DECIMAL" />
+      <result column="QUANTITY" property="quantity" jdbcType="DECIMAL" />
+      <result column="AMOUNT" property="amount" jdbcType="DECIMAL" />
+      <result column="STATUS" property="status" jdbcType="VARCHAR" />
+      <result column="UNIT_REDEEM_POINT" property="unitRedeemPoint" jdbcType="DECIMAL" />
+      <result column="REDEEM_POINT" property="redeemPoint" jdbcType="DECIMAL" />
+      <result column="VOUCHER_ID" property="voucherId" jdbcType="DECIMAL" />
+      <result column="DEFAULT_INV_ORG_ID" property="defaultInvOrgId" jdbcType="DECIMAL" />
+      <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+      <result column="UOM_CODE" property="uomCode" jdbcType="VARCHAR" />
+      <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR" />
+      <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+      <result column="UNPICK_QUANTITY" property="unpickQuantity" jdbcType="DECIMAL" />
+      <result column="SYNC_FLAG" property="syncFlag" jdbcType="VARCHAR" />
+      <result column="L_CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+      <result column="L_LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+      <result column="L_LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+      <result column="L_OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+     <!--商品表关联 -->
+      <result column="STARTER_AID" property="starterAid" jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
+  
+  <select id="selectWaitSyncGds" resultMap="OrderWithLine">
+    select 
+    oso.HEADER_ID, oso.SALES_ORG_ID, oso.ORDER_NUMBER, oso.INVOICE_NUMBER, oso.ORDER_STATUS, oso.ORDER_DATE, 
+    oso.ORDER_TYPE, oso.MEMBER_ID, oso.CHANNEL, oso.SERVICE_CENTER_ID, oso.CREATE_USER_ID, oso.PERIOD_ID, oso.CURRENCY, 
+    oso.ORDER_AMT, oso.DISCOUNT_AMT, oso.TAX_AMT, oso.ACTRUAL_PAY_AMT,oso.REMARK, oso.DELIVERY_TYPE, oso.COD_FLAG, 
+    oso.DELIVERY_LOCATION_ID, oso.DELIVERY_TO, oso.BILLING_LOCATION_ID, oso.BILLING_TO, oso.BATCH_NUMBER, oso.CREATION_DATE, 
+    oso.CREATED_BY,oso.PAY_DATE, oso.SYNC_FLAG,osl.HEADER_ID as L_HEADER_ID,osl.ITEM_ID,osl.UNIT_ORIG_PRICE,
+    osl.UNIT_DISCOUNT_PRICE,osl.UNIT_SELLING_PRICE,osl.ITEM_SALES_TYPE,osl.PV,osl.QUANTITY,osl.AMOUNT,osl.STATUS,
+    osl.line_num,osl.UNIT_REDEEM_POINT,osl.REDEEM_POINT,osl.VOUCHER_ID,osl.DEFAULT_INV_ORG_ID,osl.SALES_ORG_ID,osl.UOM_CODE,osl.LINE_ID,
+    itb.ITEM_NUMBER,CASE (SELECT MIN(t.creation_date)  FROM om_sales_order t
+    WHERE t.member_id = oso.member_id) WHEN oso.creation_date THEN  'Y'
+         ELSE 'N'  END FIRST_SO_NO,OSO.OBJECT_VERSION_NUMBER,OSO.CREATED_BY,OSO.LAST_UPDATED_BY,OSO.LAST_UPDATE_DATE,
+         OSL.CREATED_BY as L_CREATED_BY,OSL.LAST_UPDATED_BY as L_LAST_UPDATED_BY,OSL.LAST_UPDATE_DATE as L_LAST_UPDATE_DATE,
+    OSL.OBJECT_VERSION_NUMBER as L_OBJECT_VERSION_NUMBER
+    from (OM_SALES_ORDER oso LEFT OUTER JOIN OM_SALES_LINE osl ON(OSL.HEADER_ID=OSO.HEADER_ID and OSL.parent_line_id is null)) 
+    LEFT OUTER JOIN INV_ITEM_B itb ON(osl.ITEM_ID=itb.ITEM_ID)
+    WHERE oso.SYNC_FLAG= 'N' AND oso.ORDER_STATUS in ('CONF','COMP','VOID')
+      AND EXISTS (SELECT 'X'
+          FROM spm_sales_organization_b sso
+         WHERE sso.market_id in
+        <foreach collection="list" item="marketId" index="index"
+            open="(" close=")" separator=",">
+            #{marketId}
+        </foreach>
+           AND sso.sales_org_id = oso.sales_org_id)
+      AND member_id IS NOT NULL
+      and oso.order_type not in ('DIRP','STFP','CONP','STFPT','NMDP','BIGF','RDEM','CONPT','REFUN','REF','REFU','REFF')
+  </select>
+  <update id="updateSyncByOrderNumber">
+    update OM_SALES_ORDER set SYNC_FLAG= #{syncFlag,jdbcType=VARCHAR} 
+    WHERE ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR} 
+    AND OBJECT_VERSION_NUMBER = (select MAX(OBJECT_VERSION_NUMBER) from ISG_SO_HEADER 
+    where ADVISE_NO=#{adviseNo,jdbcType=VARCHAR} AND SO_NO=#{orderNumber,jdbcType=VARCHAR})
+  </update>
+  
+ <!--  根据会员表主键查询非取消状态的订单集合 -->
+  <select id="selectOrderByMemberId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+      select <include refid="Base_Column_List"></include> 
+      from OM_SALES_ORDER
+      where MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+                and order_status != 'CANCL' ORDER BY order_date asc
+  </select>
+  
+  
+  <select id="queryOrdersNumByBatchNumber" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" resultType="java.lang.Long">
+        SELECT COUNT(1) FROM om_sales_order t 
+        <where>
+            t.source_type = 'AUTOS' and
+            t.batch_number = #{batchNumber,jdbcType=VARCHAR}
+        </where>
+  </select>
+  <select id="queryOrdersPayByBatchNumber" resultType="java.math.BigDecimal">
+        SELECT SUM(T.ACTRUAL_PAY_AMT)*100 FROM om_sales_order t
+        <where>
+            t.source_type = 'AUTOS' and
+            t.batch_number = #{batchNumber,jdbcType=VARCHAR}
+        </where>
+  </select>
+  <select id="selectByOrderNumber" resultMap="BaseResultMap">
+        select t.header_id,t.sales_org_id from om_sales_order t
+        <where>
+            t.order_number = #{orderNumber,jdbcType=VARCHAR}
+        </where>
+  </select>
+  <update id="updateOrderStatusByOrderNumber">
+      UPDATE OM_SALES_ORDER
+      SET ORDER_STATUS = 'COMP',
+          SYNC_FLAG = 'N',
+          DAPP_SYNC_FLAG = 'N'
+      <where>
+              ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR}
+      </where>
+  </update>
+  <select id="getOrderPaymentByOrderId" resultMap="BaseResultMap" parameterType="java.util.Map">
+  	  	SELECT oso.header_id,
+  		   oso.sales_org_id,
+  		   oso.actrual_pay_amt,
+  		   oso.order_status,
+  		   oso.source_type 
+      FROM om_sales_order oso
+  	where oso.order_number = #{orderNumber,jdbcType=VARCHAR}
+  </select>
+  <update id="updateOrderStatusByHeaderId" parameterType="java.util.HashMap">
+  	  	UPDATE OM_SALES_ORDER 
+  		SET ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR},
+  		LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+  		LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        SYNC_FLAG = 'N',
+        <if test="payDate != null">
+          PAY_DATE = #{payDate,javaType=java.util.Date},
+        </if>
+        <if test="periodId != null">
+          PERIOD_ID = #{periodId,jdbcType=DECIMAL},
+        </if>
+        DAPP_SYNC_FLAG = 'N'
+  	where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </update>
+  <select id="isExistDappNo" resultType="java.lang.Long" parameterType="java.lang.String">
+  	select count(o.HEADER_ID) from OM_SALES_ORDER o
+	where o.DAPP_APP_NO = #{dappAppNo,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByOrderNumberForDApp" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select oso.header_id, oso.order_status, oso.source_type 
+    from om_sales_order oso
+    where oso.order_number = #{orderNumber}
+  </select>
+  
+  <!-- Service Center-汇总PV值 -->
+  <select id="getPvSum" resultMap="BaseResultMap">
+    SELECT SUM(osl.PV*osl.QUANTITY) PV_SUM, oso.SERVICE_CENTER_ID
+    FROM OM_SALES_ORDER oso
+        LEFT OUTER JOIN OM_SALES_LINE osl ON oso.HEADER_ID = osl.HEADER_ID
+        LEFT OUTER JOIN SPM_PERIOD sp ON oso.PERIOD_ID = sp.PERIOD_ID
+    WHERE sp.PERIOD_NAME = #{periodName, jdbcType=VARCHAR} 
+    	AND oso.CHANNEL = 'SRVC' 
+    	AND oso.ORDER_STATUS in ('COMP','CONF')
+      	AND sp.ORG_TYPE = 'MKT' 
+      	AND sp.CLOSING_STATUS = 'Y' 
+      	AND sp.ORG_ID = #{orgId, jdbcType=DECIMAL}
+    GROUP BY (oso.SERVICE_CENTER_ID)
+  </select>
+  
+  <!-- iPoint Center-汇总销售额和PV总和 -->
+  <select id="getActrualPayAmtSum" resultMap="BaseResultMap">
+     SELECT SUM(oso.ACTRUAL_PAY_AMT) ACTRUAL_PAY_AMT_SUM, SUM(osl.PV*osl.QUANTITY) PV_SUM, oso.SALES_ORG_ID, oso.CREATE_USER_ID 
+     FROM OM_SALES_ORDER oso 
+        LEFT OUTER JOIN OM_SALES_LINE osl ON oso.HEADER_ID = osl.HEADER_ID
+        LEFT OUTER JOIN SPM_PERIOD sp ON (oso.PERIOD_ID = sp.PERIOD_ID) 
+        LEFT OUTER JOIN (
+                SELECT sar.ACCOUNT_ID, su.USER_TYPE
+                FROM SYS_USER su
+                        LEFT OUTER JOIN SYS_ACC_REL sar ON (su.USER_ID = sar.REL_PARTY_ID AND sar.ACCOUNT_TYPE = 'USER')
+        ) ACCOUNT ON (oso.CREATE_USER_ID = ACCOUNT.ACCOUNT_ID)
+     WHERE oso.CHANNEL = 'IPTC' 
+     	AND oso.ORDER_STATUS IN ('COMP','CONF') 
+        AND ACCOUNT.USER_TYPE = 'IPONT' 
+        AND sp.PERIOD_NAME = #{periodName,jdbcType=VARCHAR} 
+        AND sp.ORG_TYPE = 'MKT' 
+        AND sp.CLOSING_STATUS = 'Y' 
+        AND sp.ORG_ID = #{orgId, jdbcType=DECIMAL} 
+     GROUP BY (oso.SALES_ORG_ID,oso.CREATE_USER_ID)
+  </select>
+  
+  
+  <!-- dapp接口调用 -->
+  <sql id="Base_Column_List_DAPP" >
+    o.HEADER_ID, o.SALES_ORG_ID, o.ORDER_NUMBER, o.INVOICE_NUMBER, o.ORDER_STATUS, o.ORDER_DATE, 
+    o.ORDER_TYPE, o.MEMBER_ID, o.CHANNEL, o.SERVICE_CENTER_ID, o.CREATE_USER_ID, o.PERIOD_ID, o.CURRENCY, 
+    o.ORDER_AMT, o.DISCOUNT_AMT, o.TAX_AMT, o.ACTRUAL_PAY_AMT, o.REMARK, o.DELIVERY_TYPE, o.COD_FLAG, 
+    o.DELIVERY_LOCATION_ID, o.DELIVERY_TO, o.BILLING_LOCATION_ID, o.BILLING_TO,  
+    o.BATCH_NUMBER, o.PAY_DATE, o.SYNC_FLAG,o.SALES_POINTS,o.DAPP_APP_NO
+  </sql>
+  <select id="queryOrdersForDapp" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select <include refid="Base_Column_List_DAPP"></include>,
+        (select osl.SHIPPING_FEE
+    from  OM_SALES_LOGISTICS osl LEFT OUTER JOIN DM_SHIPPING_TIER dst ON(osl.SHIPPING_TIER_ID=dst.SHIPPING_TIER_ID)
+    where osl.HEADER_ID = o.HEADER_ID 
+    AND osl.AUTOSHIP_FLAG = 'N') as SHIPPING_FEE,
+(SELECT m.member_code from MM_MEMBER m WHERE m.MEMBER_ID = o.MEMBER_ID) as MEMBER_CODE,
+(
+		CASE
+		WHEN (
+			SELECT
+				COUNT (OSL.STATUS)
+			FROM
+				OM_SALES_LINE osl
+			WHERE
+				o.HEADER_ID = OSL.HEADER_ID
+			
+			AND OSL.STATUS = 'USHIP'
+		) = (
+			SELECT
+				COUNT (OSL.STATUS)
+			FROM
+				OM_SALES_LINE osl
+				
+			WHERE
+				o.HEADER_ID = OSL.HEADER_ID
+			
+		) THEN
+			'USHIP'
+		WHEN (
+			SELECT
+				COUNT (OSL.STATUS)
+			FROM
+				OM_SALES_LINE osl
+			WHERE
+				o.HEADER_ID = OSL.HEADER_ID
+			
+			AND OSL.STATUS = 'SHIPP'
+		) = (
+			SELECT
+				COUNT (OSL.STATUS)
+			FROM
+				OM_SALES_LINE osl
+			WHERE
+				o.HEADER_ID = OSL.HEADER_ID
+			
+		) THEN
+			'SHIPP'
+	else 'PSHIP'
+		END
+	) AS SHIPPING_STATUS
+          from OM_SALES_ORDER o
+          
+        <where>
+            o.ORDER_STATUS in ('PAYIN','COMP','FAIL','CANCL','VOID') 
+            and o.member_id is not null
+            <if test="memberCode != null">
+                and EXISTS (select 1 from MM_MEMBER m where m.MEMBER_CODE = #{memberCode,jdbcType=VARCHAR} and m.MEMBER_ID = o.MEMBER_ID)
+            </if>
+            <if test="salesOrgId != null">
+                AND o.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+            </if>
+            <if test="startDate != null">
+                AND o.ORDER_DATE >= #{startDate,jdbcType=DATE} 
+            </if>
+            <if test="endDate != null">
+                AND o.ORDER_DATE <![CDATA[<]]>= #{endDate,jdbcType=DATE} 
+            </if>
+            <if test="updateStartDate !=null">
+                AND o.ORDER_DATE >= #{updateStartDate,jdbcType=DATE} 
+            </if>
+            <if test="updateEndDate !=null">
+                AND o.ORDER_DATE <![CDATA[<]]>= #{updateEndDate,jdbcType=DATE} 
+            </if>
+            <if test="orderStatus !=null">
+                AND o.ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR}
+            </if>
+            <if test="shippingStatus !=null">
+                AND EXISTS (select 1 from OM_SALES_LINE l where l.STATUS =  #{shippingStatus,jdbcType=VARCHAR} and l.HEADER_ID = o.HEADER_ID)
+            </if>
+            <if test="dappSyncFlag !=null">
+                AND o.DAPP_SYNC_FLAG = #{dappSyncFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="salesOrgId ==null and marketId != null">
+            	and o.SALES_ORG_ID in (select SALES_ORG_ID from spm_sales_organization_b WHERE market_id = #{marketId,jdbcType=DECIMAL})
+            </if>
+        </where>
+        order by o.ORDER_DATE desc, o.ORDER_NUMBER desc 
+  </select>
+  <select id="queryNumberwithGiftRule" resultType="java.lang.Long">
+  
+      SELECT
+        COUNT (1)
+      FROM
+        (
+            SELECT
+                temp.PAY
+            FROM
+                (
+                    SELECT
+                        TO_CHAR (salesorder.PAY_DATE,'yyyymm') pay
+                    FROM
+                        OM_SALES_ORDER salesorder
+                    WHERE
+                        salesorder.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+                    AND salesorder.ORDER_STATUS = 'COMP'
+                    AND salesorder.CHANNEL = 'AUTOS'
+                    AND salesorder.PAY_DATE &gt; #{startTime,jdbcType=TIMESTAMP}
+                    AND salesorder.PAY_DATE &lt; #{endTime,jdbcType=TIMESTAMP}
+                    AND salesorder.PAY_DATE IS NOT NULL
+                    AND salesorder.AUTOSHIP_GIFT_RULE_FLAG = 'Y'
+                ) temp
+            GROUP BY
+                temp.PAY
+        ) temp2
+  
+  </select>
+
+  <update id="updateSalesOrderGiftRuleFlag">
+        UPDATE OM_SALES_ORDER 
+        SET    AUTOSHIP_GIFT_RULE_FLAG = 'S'
+        WHERE  MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+        AND    ORDER_STATUS = 'COMP'
+        AND    CHANNEL = 'AUTOS'
+        AND    PAY_DATE &gt; #{startTime,jdbcType=TIMESTAMP}
+        AND    PAY_DATE &lt; #{endTime,jdbcType=TIMESTAMP}
+        AND    PAY_DATE IS NOT NULL
+        AND    AUTOSHIP_GIFT_RULE_FLAG = 'Y'
+  </update>
+  <select id="getOrderStatusByPrimaryKey" resultType="java.lang.String" parameterType="java.lang.Long">
+    SELECT ORDER_STATUS FROM OM_SALES_ORDER WHERE HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </select>
+  <!-- 查订单详情，用于发票报表 -->
+  <select id="selectSalesOrderByHeadId" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" resultMap="BaseResultMap">
+        SELECT
+        (
+            SELECT
+                sl.address_line1
+            FROM
+                SPM_LOCATION sl
+            WHERE
+                oso.delivery_location_id = sl.location_id
+        ) address,
+        oso.HEADER_ID,
+        oso.SALES_ORG_ID,
+        oso.ORDER_NUMBER,
+        oso.INVOICE_NUMBER,
+        oso.ORDER_STATUS,
+        oso.ORDER_DATE,
+        oso.ORDER_TYPE,
+        oso.MEMBER_ID,
+        oso.CHANNEL,
+        oso.SERVICE_CENTER_ID,
+        oso.CREATE_USER_ID,
+        oso.PERIOD_ID,
+        oso.CURRENCY,
+        oso.ORDER_AMT,
+        oso.DISCOUNT_AMT,
+        oso.TAX_AMT,
+        oso.ACTRUAL_PAY_AMT,
+        oso.REMARK,
+        oso.DELIVERY_TYPE,
+        oso.COD_FLAG,
+        oso.DELIVERY_LOCATION_ID,
+        oso.DELIVERY_TO,
+        oso.BILLING_LOCATION_ID,
+        oso.BILLING_TO,
+        oso.SOURCE_TYPE,
+        oso.SOURCE_KEY,
+        oso.BATCH_NUMBER,
+        oso.creation_date,
+        oso.pay_date
+     FROM
+        OM_SALES_ORDER oso
+     WHERE
+        oso.HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </select>
+  
+  <!-- 发票获取memberCode,memberName BR_NO,GST_ID -->
+  <select id="getBrNo" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder" resultMap="BaseResultMap">
+    select
+<!--     (CASE WHEN mm.MEMBER_TYPE IN 'COMP' AND mm.REF_COMPANY is not null THEN mm.REF_COMPANY
+    WHEN mm.MEMBER_TYPE IN 'COMP' AND mm.REF_COMPANY is null THEN mm.REF_COMPANY_EN
+    WHEN mm.MEMBER_TYPE NOT IN 'COMP' AND mm.chinese_name IS NOT NULL THEN mm.chinese_name
+    ELSE mm.english_name END) MEMBER_NAME -->
+    (CASE
+         WHEN (MM.MEMBER_TYPE = 'COMP') THEN
+          	(COALESCE(MM.REF_COMPANY, MM.REF_COMPANY_EN))
+         ELSE
+           (decode(mm.english_first_name,null,mm.chinese_last_name||mm.chinese_first_name,mm.english_first_name||'  '||mm.english_last_name))
+       END) MEMBER_NAME
+    ,MM.MEMBER_CODE
+    ,scb.BR_NO
+    ,scb.GST_ID
+    from
+    mm_member_v mm,
+    spm_market_b smb,
+    SPM_COMPANY_B scb
+    where mm.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+    AND SCB.COMPANY_ID = smb.COMPANY_ID
+    AND MM.market_id = smb.market_id
+  </select>
+  <update id="updateQueryOrder" >
+    UPDATE OM_SALES_ORDER
+    <set>
+       <if test="attribute15 != null">
+         ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+       </if>
+    </set>
+    WHERE ORDER_NUMBER=#{orderNumber,jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateOrderPeriodAndPayDate">
+    update OM_SALES_ORDER
+    <set >
+        <if test="periodId != null" >
+        PERIOD_ID = #{periodId,jdbcType=DECIMAL,javaType=java.lang.Long},
+        </if>
+        <if test="payDate != null" >
+        PAY_DATE = #{payDate,jdbcType=TIMESTAMP,javaType=java.util.Date},
+      </if>
+    </set>
+     where HEADER_ID = #{headerId,jdbcType=DECIMAL,javaType=java.lang.Long}
+  </update>
+  
+  <update id="updateSyncFlag">
+    update OM_SALES_ORDER
+    <set >
+        <if test="dappSyncFlag != null" >
+        DAPP_SYNC_FLAG = #{dappSyncFlag,jdbcType=VARCHAR},
+        </if>
+    </set>
+     where HEADER_ID = #{headerId,jdbcType=DECIMAL,javaType=java.lang.Long}
+  </update>
+  <select id="selectOrderForVIP" resultMap="OrderWithLine" parameterType="java.util.Map">
+    select oso.HEADER_ID,osl.PV,osl.QUANTITY,osl.unit_selling_price,iib.STARTER_AID,oso.ACTRUAL_PAY_AMT
+      from OM_SALES_ORDER oso
+      LEFT OUTER JOIN OM_SALES_LINE osl
+        ON oso.HEADER_ID = osl.HEADER_ID
+      LEFT OUTER JOIN INV_ITEM_B iib
+        ON osl.ITEM_ID = iib.ITEM_ID
+      LEFT OUTER JOIN MM_MEMBER mm
+        ON mm.member_id = oso.member_id
+     where oso.order_status in ('COMP','WPAY','PAYIN') 
+       and oso.order_date &gt;= #{beginDate,jdbcType=DATE} 
+       and oso.order_date &lt;= #{endDate,jdbcType=DATE}
+       and oso.member_id = #{memberId,jdbcType=DECIMAL}
+       and mm.member_role = 'VIP'
+       and not exists(SELECT 1
+  FROM mm_mem_distributor mmd
+ WHERE mmd.member_id = #{memberId,jdbcType=DECIMAL}
+   AND to_char(mmd.message_date,
+               'YYYYMM') &gt;= to_char(sysdate,
+                                    'YYYYMM')) 
+  </select>
+  
+  <select id="getPvForVIP" resultType="java.math.BigDecimal" parameterType="java.util.Map">
+    SELECT coalesce(SUM(pv), 0)
+  FROM om_sales_order oso,
+       om_sales_line  osl,
+       inv_item_b iib
+ WHERE oso.header_id = osl.header_id
+   AND oso.member_id = #{memberId,jdbcType=DECIMAL}
+   AND oso.order_type = 'VIPP'
+   and iib.item_id = OSL.item_id
+   and iib.STARTER_AID = 'N'
+   <if test="dateTo != null" >
+   AND oso.order_date &lt;= #{dateTo,jdbcType=DATE}
+   </if>
+   <if test="dateFrom != null" >
+   AND oso.order_date >= #{dateFrom,jdbcType=DATE}
+   </if>
+   <if test="dateFrom == null and dateTo == null" >
+    AND oso.order_date &lt;= SYSDATE
+   	AND oso.order_date >= add_months(trunc(SYSDATE, 'MM'), -2)
+   </if>
+   AND oso.order_number !=
+       (SELECT MIN(t.order_number)
+          FROM om_sales_order t
+         WHERE t.member_id = oso.member_id)
+  </select>
+  <select id="selectOrderBySubNumber" resultMap="BaseResultMap" parameterType="java.util.Map">
+      select <include refid="Base_Column_List" />
+       from om_sales_order so
+      where (
+      	(so.object_version_number &lt; 0
+        and SUBSTR(so.order_number, 2, length(so.order_number)) = #{orderNumber,jdbcType=VARCHAR})
+        or (so.object_version_number >= 0
+        and so.order_number = #{orderNumber,jdbcType=VARCHAR})
+            )
+        and so.sales_org_id in
+            (select ssob.sales_org_id
+              from spm_sales_organization_b ssob
+             where ssob.market_id in (select smb.market_id
+                                       from spm_market_b smb
+                                      where smb.code = #{market,jdbcType=VARCHAR}))
+  </select>
+
+
+    <select id="querySaveAndWPayOrderbyMarketCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+            o.header_Id ,o.order_number,o.order_status
+        FROM
+            om_sales_order o,
+            spm_market_b market,
+            spm_sales_organization_b salesorg
+        WHERE
+            o.sales_org_id = salesorg.sales_org_id
+        AND salesorg.market_id = market.market_id
+        AND market.code = #{marketCode,jdbcType=VARCHAR}
+        AND (
+            o.order_status = 'SAV'
+         OR o.order_status = 'WPAY'
+         )
+    </select>
+    <select id="selectMemberLastOrderDate" parameterType="java.lang.Long" resultType="java.util.Date">
+        select *
+            from (select oso.order_date
+                    from om_sales_order oso
+                  where order_status = 'COMP'
+                    and oso.member_id = #{memberId,jdbcType=DECIMAL}
+                  order by oso.header_id desc)
+        where rownum &lt;= 1
+    </select>
+    
+    
+     <select id="notReturnedQuantity" resultType="java.math.BigDecimal">
+         SELECT
+            COALESCE (
+                (
+                    SELECT
+                        "SUM" (salesline.QUANTITY)
+                    FROM
+                        OM_SALES_LINE salesline
+                    WHERE
+                        salesline.HEADER_ID = #{headerId,jdbcType=DECIMAL}
+        ),
+        0
+    ) - COALESCE (
+        (
+            SELECT
+                "SUM" (l.QUANTITY)
+            FROM
+                OM_SALES_RTN_LINE l,
+                OM_SALES_RETURN r
+            WHERE
+                l.RETURN_ID = r.RETURN_ID
+            AND r.RETURN_STATUS != 'NEW'
+            AND r.ORDER_HEADER_ID = #{headerId,jdbcType=DECIMAL}
+        ),
+        0
+    ) qu
+FROM
+    dual
+         
+ </select>
+
+  <update id="updateOrderStatusRefunds" parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder">
+    update OM_SALES_ORDER
+    <set >
+        ORDER_STATUS ='COMP'
+    </set>
+    where ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR}
+
+  </update>
+
+  <select id="selectHeaderId" resultMap="BaseResultMap"  parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder">
+    SELECT o.* FROM OM_SALES_ORDER o WHERE o.ORDER_NUMBER= #{orderNumber,jdbcType=VARCHAR}
+  </select>
+</mapper>

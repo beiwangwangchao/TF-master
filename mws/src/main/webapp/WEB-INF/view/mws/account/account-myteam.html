@@ -1,0 +1,569 @@
+<#include "/mws/include/header.html">
+<!-- <link href="${base.contextPath}/resources/css/metro${resource_suffix!}.css" rel="stylesheet"> -->
+<link href="${base.contextPath}/resources/css/date/bootstrap-datetimepicker${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/date/bootstrap-datetimepicker${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/awesomeStyle/awesome${resource_suffix!}.css" rel="stylesheet">
+<style>
+ul.base-info{
+    text-align: center;
+    padding-top: 20px;
+    font-size: 10px;
+}
+ul.base-info li {
+    float: left;
+    list-style: none;
+}
+    
+.ztree li span.button.pIcon01_ico_close{
+    margin-right:2px;
+     background: url(${base.contextPath}/resources/img/myteam/u04.jpg) no-repeat scroll 0 0 transparent; 
+     vertical-align:top;
+      *vertical-align:middle
+      }
+      
+.ztree li span.button.pIcon01_ico_open{
+    margin-right:2px;
+    background: url(${base.contextPath}/resources/img/myteam/04.png) no-repeat scroll 0 0 transparent;
+    vertical-align:top; 
+    *vertical-align:middle
+    }
+.top-name{
+    margin-top:20px;
+    font-weight: bold;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+}
+.table-td{
+    background-color: #CEE2FA;
+}
+.lable{
+    white-space:nowrap;
+    width: 60%;
+    text-align: right;
+    display:inline;
+}
+</style>
+<script src="${base.contextPath}/resources/js/jquery.ztree.core${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/jquery.ztree.all${resource_suffix!}.js"></script>
+
+<script type="text/javascript">
+$l('type.hand.commom.date.days.sunday','<@spring.message "type.hand.commom.date.days.sunday"/>');
+$l('type.hand.commom.date.days.monday','<@spring.message "type.hand.commom.date.days.monday"/>');
+$l('type.hand.commom.date.days.tuesday','<@spring.message "type.hand.commom.date.days.tuesday"/>');
+$l('type.hand.commom.date.days.wednesday','<@spring.message "type.hand.commom.date.days.wednesday"/>');
+$l('type.hand.commom.date.days.thursday','<@spring.message "type.hand.commom.date.days.thursday"/>');
+$l('type.hand.commom.date.days.friday','<@spring.message "type.hand.commom.date.days.friday"/>');
+$l('type.hand.commom.date.days.saturday','<@spring.message "type.hand.commom.date.days.saturday"/>');
+
+$l('type.hand.commom.date.daysshort.sunday','<@spring.message "type.hand.commom.date.daysshort.sunday"/>');
+$l('type.hand.commom.date.daysshort.monday','<@spring.message "type.hand.commom.date.daysshort.monday"/>');
+$l('type.hand.commom.date.daysshort.tuesday','<@spring.message "type.hand.commom.date.daysshort.tuesday"/>');
+$l('type.hand.commom.date.daysshort.wednesday','<@spring.message "type.hand.commom.date.daysshort.wednesday"/>');
+$l('type.hand.commom.date.daysshort.thursday','<@spring.message "type.hand.commom.date.daysshort.thursday"/>');
+$l('type.hand.commom.date.daysshort.friday','<@spring.message "type.hand.commom.date.daysshort.friday"/>');
+$l('type.hand.commom.date.daysshort.saturday','<@spring.message "type.hand.commom.date.daysshort.saturday"/>');
+
+$l('type.hand.commom.date.daysmin.sunday','<@spring.message "type.hand.commom.date.daysmin.sunday"/>');
+$l('type.hand.commom.date.daysmin.monday','<@spring.message "type.hand.commom.date.daysmin.monday"/>');
+$l('type.hand.commom.date.daysmin.tuesday','<@spring.message "type.hand.commom.date.daysmin.tuesday"/>');
+$l('type.hand.commom.date.daysmin.wednesday','<@spring.message "type.hand.commom.date.daysmin.wednesday"/>');
+$l('type.hand.commom.date.daysmin.thursday','<@spring.message "type.hand.commom.date.daysmin.thursday"/>');
+$l('type.hand.commom.date.daysmin.friday','<@spring.message "type.hand.commom.date.daysmin.friday"/>');
+$l('type.hand.commom.date.daysmin.saturday','<@spring.message "type.hand.commom.date.daysmin.saturday"/>');
+
+$l('type.hand.commom.date.months.january','<@spring.message "type.hand.commom.date.months.january"/>');
+$l('type.hand.commom.date.months.february','<@spring.message "type.hand.commom.date.months.february"/>');
+$l('type.hand.commom.date.months.march','<@spring.message "type.hand.commom.date.months.march"/>');
+$l('type.hand.commom.date.months.april','<@spring.message "type.hand.commom.date.months.april"/>');
+$l('type.hand.commom.date.months.may','<@spring.message "type.hand.commom.date.months.may"/>');
+$l('type.hand.commom.date.months.june','<@spring.message "type.hand.commom.date.months.june"/>');
+$l('type.hand.commom.date.months.july','<@spring.message "type.hand.commom.date.months.july"/>');
+$l('type.hand.commom.date.months.august','<@spring.message "type.hand.commom.date.months.august"/>');
+$l('type.hand.commom.date.months.september','<@spring.message "type.hand.commom.date.months.september"/>');
+$l('type.hand.commom.date.months.october','<@spring.message "type.hand.commom.date.months.october"/>');
+$l('type.hand.commom.date.months.november','<@spring.message "type.hand.commom.date.months.november"/>');
+$l('type.hand.commom.date.months.december','<@spring.message "type.hand.commom.date.months.december"/>');
+
+$l('type.hand.commom.date.monthsshort.january','<@spring.message "type.hand.commom.date.monthsshort.january"/>');
+$l('type.hand.commom.date.monthsshort.february','<@spring.message "type.hand.commom.date.monthsshort.february"/>');
+$l('type.hand.commom.date.monthsshort.march','<@spring.message "type.hand.commom.date.monthsshort.march"/>');
+$l('type.hand.commom.date.monthsshort.april','<@spring.message "type.hand.commom.date.monthsshort.april"/>');
+$l('type.hand.commom.date.monthsshort.may','<@spring.message "type.hand.commom.date.monthsshort.may"/>');
+$l('type.hand.commom.date.monthsshort.june','<@spring.message "type.hand.commom.date.monthsshort.june"/>');
+$l('type.hand.commom.date.monthsshort.july','<@spring.message "type.hand.commom.date.monthsshort.july"/>');
+$l('type.hand.commom.date.monthsshort.august','<@spring.message "type.hand.commom.date.monthsshort.august"/>');
+$l('type.hand.commom.date.monthsshort.september','<@spring.message "type.hand.commom.date.monthsshort.september"/>');
+$l('type.hand.commom.date.monthsshort.october','<@spring.message "type.hand.commom.date.monthsshort.october"/>');
+$l('type.hand.commom.date.monthsshort.november','<@spring.message "type.hand.commom.date.monthsshort.november"/>');
+$l('type.hand.commom.date.monthsshort.december','<@spring.message "type.hand.commom.date.monthsshort.december"/>');
+
+$l('type.hand.commom.date.today','<@spring.message "type.hand.commom.date.today"/>');
+
+$l('type.hand.commom.date.meridiem.am','<@spring.message "type.hand.commom.date.meridiem.am"/>');
+$l('type.hand.commom.date.meridiem.pm','<@spring.message "type.hand.commom.date.meridiem.pm"/>');
+
+</script>
+
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker.zh-CN${resource_suffix!}.js"></script>
+
+<script src="${base.contextPath}/common/code?memberRank=MM.MEMBER_RANK" type="text/javascript"></script>
+<!-- <script type="text/javascript">
+var ch_en = '';
+        $(function(){
+            //加载页面带出当前登录用户信息
+            $.ajax({
+                type: "POST",
+                url: "${base.contextPath}/account/selectTeamByMemberId",
+                data: {},
+                async:false,
+                dataType: "json",
+                success: function(data){
+                    if(data.success){
+                        var data = data.rows;
+                        if(data.length>0){
+                                var item = data[0];
+                                $("span[name='memberId']").text(item.memberId);
+                                $("span[name='deadLine']").text(item.deadLine == null ? '' : item.deadLine);
+                                $("span[name='chineseName']").text(item.chineseName == null ? '' : item.chineseName);
+                                $("span[name='englishName']").text(item.englishName == null ? '' : item.englishName);
+                                $("span[name='memberCode']").text(item.memberCode);
+                                $("span[name='jointDate']").text(item.jointDate);
+                                $("span[name='memberCntNew']").text(item.memberCntNew == null ? '0' : item.memberCntNew);
+                                $("span[name='tt']").text(item.omkTt == null ? '0' : item.omkTt);
+                                for (var i = 0; i < memberRank.length; i++) {
+                                    if (memberRank[i]['value'] == item.dealerPostCode){
+                                        $("span[name='dealerPostCode']").text(memberRank[i]['meaning'] == null ? '' : memberRank[i]['meaning']);
+                                    }
+                                }
+                                var chineseName = item.chineseName;
+                                var englishName = item.englishName;
+                                ch_en = chineseName+"/"+englishName;
+                                if(chineseName == ""){
+                                    ch_en = englishName;
+                                }else if(englishName == ""){
+                                    ch_en = chineseName
+                                }
+                        }
+                    }
+                }
+            });
+            
+            function dateLoading(){
+            	//默认当前时间上一个月
+                var nowDate = new Date();
+                var year = nowDate.getFullYear();
+                var month = nowDate.getMonth()+1;
+                month = month < 10 ? '0'+month : month;
+                var date = year + "-" + month;
+                $("#begin").val(date);
+                $("#end").val(date);
+                //日期插件加载
+                $("#begin").datetimepicker({
+                    format: "yyyy-mm",
+                    autoclose: true,
+                    todayBtn: true,
+                    keyboardNavigation:true,
+                    pickerPosition: "bottom-left",
+                    language: "zh-CN",
+                    startView:3,
+                    minView:3,
+                    maxView:3
+                });
+                $("#end").datetimepicker({
+                    format: "yyyy-mm",
+                    autoclose: true,
+                    todayBtn: true,
+                    keyboardNavigation:true,
+                    pickerPosition: "bottom-left",
+                    language: "zh-CN",
+                    startView:3,
+                    minView:3,
+                    maxView:3
+                });
+            }
+            
+            var setting = {
+                    data : {
+                        simpleData : {
+                            enable : true
+                        }
+                    },
+                    async : {
+                        enable : true,
+                        url : "${base.contextPath}/account/getMemberTree",
+                        autoParam : [ "id=memberId","memberCode"],
+                    //异步返回后经过Filter 
+                    },
+                    callback : {
+                        onAsyncSuccess : zTreeOnAsyncSuccess,//异步加载成功的fun 
+                        onAsyncError : zTreeOnAsyncError, //加载错误的fun 
+                        onClick : zTreeOnClick
+                    //捕获单击节点之前的事件回调函数 
+                    }
+            };
+            
+            function zTreeOnClick(event, treeId, treeNode) {
+                //每次点击树枝，都会清空日期查询值
+                $("#queryPeriodMessage").html('');
+                $("#myQueryPeriodMessage").html('');
+                if(treeNode.id == $("#myId").text()){
+                    $("#PeriodDiv").show();
+                    $("#myPeriodDiv").show();
+                }else{
+                    $("#myPeriodDiv").show();
+                    $("#PeriodDiv").hide();
+                }
+                    $.ajax({
+                        type: "POST",
+                        url: "${base.contextPath}/account/query",
+                        data: {
+                            memberId : treeNode.id,
+                            memberCode : treeNode.memberCode
+                        },
+                        async:false,
+                        dataType: "json",
+                        success: function(data){
+                            if(data.success){
+                                var data = data.rows;
+                                if(data.length>0){
+                                        var item = data[0];
+                                	if(treeNode.id == null){
+                                		$("#memberId").text(item.memberId == null ? '' : item.memberId);
+                                		$("#chineseName").text(item.chineseName == null ? '' : item.chineseName);
+                                        $("#englishName").text(item.englishName == null ? '' : item.englishName);
+                                        $("#memberCode").text(item.memberCode);
+                                        $("#jointDate").text(item.typeEffectiveDate == null ? '' : item.typeEffectiveDate);
+                                        $("#memberCntNew").text(item.memberCntNew == null ? 0 : item.memberCntNew);
+                                        $("#tt").text(item.omkTt == null ? 0 : item.omkTt);
+                                        $("#deadLine").text(item.deadLine == null ? '' : item.deadLine);
+                                        /* $("#dealerPostCode").text(item.dealerPostCode == null ? '' : item.dealerPostCode); */
+                                        for (var i = 0; i < memberRank.length; i++) {
+                                            if (memberRank[i]['value'] == item.dealerPostCode){
+                                                $("span[name='dealerPostCode']").text(memberRank[i]['meaning'] == null ? '' : memberRank[i]['meaning']);
+                                            }
+                                        }
+                                	}else{
+                                        $("#memberId").text(item.memberId);
+                                        /* $("#dealerPostCode").text(item.dealerPostCode == null ? '0' : item.dealerPostCode); */
+                                        $("#deadLine").text(item.deadLine == null ? '' : item.deadLine);
+                                        $("#chineseName").text(item.chineseName == null ? '' : item.chineseName);
+                                        $("#englishName").text(item.englishName == null ? '' : item.englishName);
+                                        $("#memberCode").text(item.memberCode);
+                                        $("#jointDate").text(item.jointDate == null ? '' : item.jointDate);
+                                        $("#memberCntNew").text(item.memberCntNew == null ? '0' : item.memberCntNew);
+                                        $("#tt").text(item.omkTt == null ? '0' : item.omkTt);
+                                        for (var i = 0; i < memberRank.length; i++) {
+                                            if (memberRank[i]['value'] == item.dealerPostCode){
+                                                $("span[name='dealerPostCode']").text(memberRank[i]['meaning'] == null ? '' : memberRank[i]['meaning']);
+                                            }
+                                        }
+                                	}
+                                }
+                            }
+                        }
+                    });
+                    if(treeNode.id != "" && treeNode.id != null){
+                    	f_button(treeNode.memberCode);
+                    }else{
+                    	selectNotMemberId(treeNode.memberCode);
+                    }
+            }
+            var zNodes = [ 
+                { id:$("#memberId").text(), pId:0, name:ch_en,memberCode:$("#memberCode").text(), open:true, isParent:true, icon:"${base.contextPath}/resources/img/ztree/diy/ccc.png"}
+            ];
+            
+            function zTreeOnAsyncError(event, treeId, treeNode) {
+                alert("异步加载失败!");
+            }
+            function zTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+            }
+            
+            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+            
+            
+            f_button(${Session.memberCode});
+        });
+        
+        // 当时中国会员时
+        function selectNotMemberId(code){
+        	$.ajax({
+                type: "POST",
+                url: "${base.contextPath}/account/selectNotMemberId",
+                data: {
+                    memberCode : code
+                },
+                dataType: "json",
+                success: function(data){
+                    if(data.success){
+                        var html = [];
+                        var data = data.rows;
+                        if(data.length>0){
+                            for(var i=0;i<data.length;i++){
+                                var item = data[i];
+                                    html.push('<tr class="warning">\
+                                        <td style="width: 12%;"><span>'+ item.period +'</span></td>\
+                                        <td style="width: 12%;"><span>'+ (item.ps || 0) +'</span></td>\
+                                        <td style="width: 12%;"><span>'+ (item.gpv || 0) +'</span></td>\
+                                        <td style="width: 12%;"><span>'+ (item.omkOvLocal || 0) +' </span></td>\
+                                        <td style="width: 12%;"><span>'+ (item.omkOv||0) +' </span></td>\
+                                    </tr>');
+                                      $("#myQueryPeriodMessage").html(html.join(''));
+                                }
+                        }else{
+                            $("#queryPeriodMessage").html('');
+                            $("#myQueryPeriodMessage").html('');
+                            $("#memberCntNew").text(0);
+                            $("#tt").text(0);
+                        }
+                    }
+                }
+            });
+        }
+        
+        //查询时间段数据
+        function f_button(code){
+//         	var memberId = $("#memberId").text();
+//             if(memberId == ""){
+//             	return;
+//             }
+            $.ajax({
+                type: "POST",
+                url: "${base.contextPath}/account/queryDatePeriod",
+                data: {
+                    memberCode : code
+                },
+                dataType: "json",
+                success: function(data){
+                    if(data.success){
+                        var html = [];
+                        var str=[];
+                        var data = data.rows;
+                        if(data.length>0){
+                        	var tourismIntegral = 0;
+                        	var cntNew = 0;
+                            for(var i=0;i<data.length;i++){
+                                var item = data[i];
+                                tourismIntegral = tourismIntegral + item.omkTt;
+                                cntNew = cntNew + item.memberCntNew;
+                                if($("#myId").text() == $("#memberId").text()){
+                                	if(item.flag == 'N'){
+                                		html.push('<tr class="warning">\
+                                                <td style="width: 12%;"><span>'+ item.period +'</span></td>\
+                                                <td style="width: 12%;"><span>'+ (item.localBonus || 0) +' </span></td>\
+                                                <td style="width: 12%;"><span>'+ (item.interBonus || 0) +' </span></td>\
+                                                <td style="width: 12%;"></td>\
+                                            </tr>');
+                                            str.push('<tr class="warning">\
+                                                    <td style="width: 10%;"><span>'+ item.period +'</span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.ps || 0) +'</span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.gpv || 0) +'</span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkOvLocal || 0) +' </span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkOv||0) +' </span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkPgv || 0) +'</span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkRecruitCnt || 0) +'</span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkQualifiedLeg || 0) +' </span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkTt || 0) +' </span></td>\
+                                                    <td style="style="width: 10%;white-space:nowrap;"><span>'+ (item.memberCntNew || 0) +'</span></td>\
+                                                </tr>');
+                                	}else{
+                                		html.push('<tr class="warning">\
+                                                <td style="width: 12%;"><span>'+ item.period +'</span></td>\
+                                                <td style="width: 12%;"><span>'+ (item.localBonus || 0) +' </span></td>\
+                                                <td style="width: 12%;"><span>'+ (item.interBonus || 0) +' </span></td>\
+                                                <td style="width: 12%;"><a href="#" onclick="bonusDetail('+ item.period +')"><span><@spring.message "mws.accountinfo.bonus_detail"/></span></a></td>\
+                                            </tr>');
+                                            str.push('<tr class="warning">\
+                                                    <td style="width: 10%;"><span>'+ item.period +'</span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.ps || 0) +'</span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.gpv || 0) +'</span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkOvLocal || 0) +' </span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkOv||0) +' </span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkPgv || 0) +'</span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkRecruitCnt || 0) +'</span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkQualifiedLeg || 0) +' </span></td>\
+                                                    <td style="width: 10%;"><span>'+ (item.omkTt || 0) +' </span></td>\
+                                                    <td style="style="width: 10%;white-space:nowrap;"><span>'+ (item.memberCntNew || 0) +'</span></td>\
+                                                </tr>');
+                                	}
+                                    $("#queryPeriodMessage").html(html.join(''));
+                                    $("#myQueryPeriodMessage").html(str.join(''));
+                                }else{
+                                    html.push('<tr class="warning">\
+                                        <td style="width: 10%;"><span>'+ item.period +'</span></td>\
+                                        <td style="width: 10%;"><span>'+ (item.ps || 0) +'</span></td>\
+                                        <td style="width: 10%;"><span>'+ (item.gpv || 0) +'</span></td>\
+                                        <td style="width: 10%;"><span>'+ (item.omkOvLocal || 0) +' </span></td>\
+                                        <td style="width: 10%;"><span>'+ (item.omkOv||0) +' </span></td>\
+                                        <td style="width: 10%;"><span>'+ (item.omkPgv || 0) +'</span></td>\
+                                        <td style="width: 10%;"><span>'+ (item.omkRecruitCnt || 0) +'</span></td>\
+                                        <td style="width: 10%;"><span>'+ (item.omkQualifiedLeg || 0) +' </span></td>\
+                                        <td style="width: 10%;"><span>'+ (item.omkTt || 0) +' </span></td>\
+                                        <td style="width: 10%;white-space:nowrap;"><span>'+ (item.memberCntNew || 0) +'</span></td>\
+                                    </tr>');
+                                      $("#myQueryPeriodMessage").html(html.join(''));
+                                }
+                            }
+                            //$("#tt").text(tourismIntegral);
+                            //$("#memberCntNew").text(cntNew);
+                        }else{
+                        	$("#queryPeriodMessage").html('');
+                            $("#myQueryPeriodMessage").html('');
+                        	$("#memberCntNew").text(0);
+                        	$("#tt").text(0);
+                        }
+                    }
+                }
+            });
+        }
+        
+        function bonusDetail(period){
+        	window.location.href="${base.contextPath}/account/myTeamBonusDetail?period="+period;
+        }
+    </script> -->
+
+    <!-- Header -->
+    <!-- ========== MENU END ========== -->
+    <!-- ========== CONTENT START ========== -->
+    
+    
+    <section id="content">
+    <div class="container">
+
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.nav.myteam"/></li>
+        </ol>
+        <div class="row" style="margin-bottom: 50px">
+        <!-- Sidebar Start -->
+        <div class="row">
+                <#include "../include/myteam-menu.html">
+        <div class="col-sm-8 col-md-9" style="margin: 10px 0px 2px 0px; padding: 0;">
+            <div class="form-group" style="padding: 2px;margin-left: 5px;background-color: #CEE2FA;margin-right:0px;height: 10px;"></div>
+        </div>
+        <!-- Sidebar End -->
+
+
+          <!-- Posts Start -->
+          <div class="col-sm-8 col-md-9">
+          <article class="account-details-wrap">
+<!--               <h4 style="font-weight: 600;color: #000000;border-bottom: 2px dashed #EEEEEE;"><span id="top"></span></h4> -->
+              <div style="margin-top: 20px;">
+              <table class="table shop_table table-hover" frame=void>
+                <tbody id="messageTbody">
+                </tbody>
+              </table>
+              </div>
+          </article>
+          </div>
+          <!-- Posts End -->
+        </div>
+
+        <div style="height: 150px" class="hidden-lg hidden-md hidden-sm"></div><!--拉开底边距-->
+    </div>
+    </div>
+</section>
+
+<!--     <section id="content">
+        <div class="container">
+        
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.nav.myteam"/></li>
+        </ol>
+            <div class="row"><span style="font-size: 24px;font-weight: bold;"><@spring.message "mws.nav.myteam"/></span></div>
+            我的信息
+            <div class="row">
+            <div class="col-sm-4 col-md-3 sidebar"
+                style="margin: 10px 0px 0px 0px; padding: 0;">
+                <div align="center" style="background-color: #CEE2FA;" class="form-group">
+                    <h3 style="height: 10px;line-height: 34px;"></h3>
+                </div>
+                <div class="zTreeDemoBackground left" style="overflow: auto;">
+                    <ul id="treeDemo" class="ztree"></ul>
+                </div>
+            </div>
+            <div class="col-sm-8 col-md-9" style="margin: 10px 0px 2px 0px; padding: 0;">
+                <div class="form-group" style="padding: 2px;margin-left: 5px;background-color: #CEE2FA;margin-right:0px;height: 10px;"></div>
+                <div class="col-md-12 col-sm-12">
+                    <div class="col-md-4 col-sm-4" style="width: 33%;">
+                        <label for="chineseName" class="lable" style=""><@spring.message "mws.myaccount.accountinfo.member_chinese_name"/>:</label> 
+                        <span name="chineseName" id="chineseName"></span>
+                    </div>
+                    <div class="col-md-4 col-sm-4"  style="width: 33%;">
+                        <label for="englishName" class="lable"><@spring.message "mws.myaccount.accountinfo.member_english_name"/>:</label> 
+                        <span name="englishName" id="englishName"></span>
+                    </div>
+                    <div class="col-md-4 col-sm-4" style="width: 33%;">
+                        <label for="memberCode" class="lable"><@spring.message "mws.myaccount.accountinfo.member_id"/>:</label> 
+                        <span name="memberCode" id="memberCode"></span>
+                        <span name="memberId" id="myId" style="display: none;"></span>
+                        <span name="memberId" id="memberId" style="display: none;"></span>
+                    </div>
+                    <div class="col-md-4 col-sm-4" style="width: 33%;display:inline;">
+                        <label for="dealerPostCode" class="lable"><@spring.message "mws.myaccount.accountinfo.member_rank"/>:</label> 
+                        <span name="dealerPostCode" id="dealerPostCode"></span>
+                    </div>
+                    <div class="col-md-4 col-sm-4" style="width: 33%;">
+                        <label for="jointDate" class="lable"><@spring.message "mws.myaccount.accountinfo.joint_date"/>:</label> 
+                        <span name="jointDate" id="jointDate"></span>
+                    </div> 
+                    <div class="col-md-4 col-sm-4" style="width: 33%;">
+                        <label for="deadLine" class="lable"><@spring.message "mws.myaccount.accountinfo.termination_period"/>:</label> 
+                        <span name="deadLine" id="deadLine"></span>
+                    </div>
+                    <div class="col-md-4 col-sm-4" style="width: 33%;">
+                        <label for="tt" class="lable"><@spring.message "mws.myaccount.accountinfo.member_tp"/>:</label> 
+                        <span name="tt" id="tt"></span>
+                    </div>
+                    <div class="col-md-4 col-sm-4" style="width: 33%;">
+                        <label for="memberCntNew"><@spring.message "mws.myaccount.accountinfo.member_recruit_count"/>:</label> 
+                        <span name="memberCntNew" id="memberCntNew"></span>
+                    </div>
+                </div>
+                <div class="col-md-12" style="padding: 2px;margin: 10px 0 20px 0px;background-color: #CEE2FA;margin-right:0px;height: 3px;"></div>
+                <div id="myPeriodDiv">
+                        <table class="table table-hover" style="margin-top: 20px;">
+                            <thead>
+                                <tr class="table-td" style="font-size: 12px;text-align: center;font-weight: bold;">
+                                    <td data-title="<@spring.message 'type.com.lkkhpg.dsis.common.member.dto.memberdetails.month'/>"><@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.month"/></td>
+                                    <td data-title="<@spring.message 'mws.myaccount.accountinfo.member_pv'/>"><@spring.message "mws.myaccount.accountinfo.member_pv"/></td>
+                                    <td data-title="<@spring.message 'mws.myaccount.accountinfo.member_pgv'/>"><@spring.message "mws.myaccount.accountinfo.member_pgv"/></td>
+                                    <td data-title="<@spring.message 'mws.myaccount.accountinfo.member_local_ov'/>"><@spring.message "mws.myaccount.accountinfo.member_local_ov"/></td>
+                                    <td data-title="<@spring.message 'mws.myaccount.accountinfo.member_ov'/>"><@spring.message "mws.myaccount.accountinfo.member_ov"/></td>
+                                    <td data-title="<@spring.message 'mws.myaccount.accountinfo.member_pv'/>">TP(PGV)</td>
+                                    <td data-title="<@spring.message 'mws.myaccount.accountinfo.member_pgv'/>">TP(Recruit)</td>
+                                    <td data-title="<@spring.message 'mws.myaccount.accountinfo.member_local_ov'/>">TP(Q.Leg)</td>
+                                    <td data-title="<@spring.message 'mws.myaccount.accountinfo.member_ov'/>">TP</td>
+                                    <td style="white-space:nowrap;"><@spring.message "mws.myaccount.accountinfo.member_recruit_count"/></td>
+                                </tr>
+                            </thead>
+                            <tbody id="myQueryPeriodMessage" style="font-size: 12px;text-align: center;">
+                            </tbody>
+                        </table>
+                </div>
+                <div id="PeriodDiv" class="">
+                        <table class="table table-hover col-md-12" style="width: 62%;">
+                            <thead>
+                                <tr class="table-td" style="font-size: 12px;text-align: center;font-weight: bold;">
+                                    <td data-title="<@spring.message 'type.com.lkkhpg.dsis.common.member.dto.memberdetails.month'/>" style="width: 12%;"><@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.month"/></td>
+                                    
+                                    <td data-title="<@spring.message 'mws.myaccount.accountinfo.member_bonus_local'/>" style="width: 12%;"><@spring.message "mws.myaccount.accountinfo.member_bonus_local"/></td>
+                                    <td data-title="<@spring.message 'mws.myaccount.accountinfo.member_bonus_international'/>" style="width: 12%;"><@spring.message "mws.myaccount.accountinfo.member_bonus_international"/></td>
+                                    <td data-title="<@spring.message 'mws.bonus.bonusdetail'/>" style="width: 12%;"></td>
+                                </tr>
+                            </thead>
+                            <tbody id="queryPeriodMessage" style="font-size: 12px;text-align: center;">
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- ========== CONTENT END ========== -->
+
+    <#include "/mws/include/footer.html">

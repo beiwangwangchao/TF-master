@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgSoHeaderMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgSoHeader" >
+    <id column="INTERFACE_ID" property="interfaceId" jdbcType="DECIMAL" />
+    <result column="SO_NO" property="soNo" jdbcType="VARCHAR" />
+    <result column="SO_TYPE" property="soType" jdbcType="VARCHAR" />
+    <result column="SO_ORG_CODE" property="soOrgCode" jdbcType="VARCHAR" />
+    <result column="SO_DEALER_NO" property="soDealerNo" jdbcType="VARCHAR" />
+    <result column="SO_PERIOD" property="soPeriod" jdbcType="VARCHAR" />
+    <result column="SO_ENTRY_CLASS" property="soEntryClass" jdbcType="VARCHAR" />
+    <result column="SO_ENTRY_TIME" property="soEntryTime" jdbcType="VARCHAR" />
+    <result column="SO_ENTRY_BY" property="soEntryBy" jdbcType="VARCHAR" />
+    <result column="ORDER_DEALER_NO" property="orderDealerNo" jdbcType="VARCHAR" />
+    <result column="ORDER_DATE" property="orderDate" jdbcType="VARCHAR" />
+    <result column="ORDER_AMT" property="orderAmt" jdbcType="DECIMAL" />
+    <result column="ORDER_DEALER_NAME" property="orderDealerName" jdbcType="VARCHAR" />
+    <result column="ORDER_DEALER_TELE" property="orderDealerTele" jdbcType="VARCHAR" />
+    <result column="FIRST_SO_NO" property="firstSoNo" jdbcType="VARCHAR" />
+    <result column="REF_SO_NO" property="refSoNo" jdbcType="VARCHAR" />
+    <result column="LOCAL_CURRENCY_CODE" property="localCurrencyCode" jdbcType="VARCHAR" />
+    <result column="LOCAL_TOTAL_AMT" property="localTotalAmt" jdbcType="DECIMAL" />
+    <result column="LOCAL_TOTAL_ECOUPON" property="localTotalEcoupon" jdbcType="DECIMAL" />
+    <result column="LOCAL_TOTAL_POINT" property="localTotalPoint" jdbcType="DECIMAL" />
+    <result column="LOCAL_TOTAL_REBATE" property="localTotalRebate" jdbcType="DECIMAL" />
+    <result column="REAL_TIME_PROC_FLAG" property="realTimeProcFlag" jdbcType="VARCHAR" />
+    <result column="REAL_TIME_PROC_TIME" property="realTimeProcTime" jdbcType="VARCHAR" />
+    <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="PROCESS_STATUS" property="processStatus" jdbcType="VARCHAR" />
+    <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP" />
+    <result column="PROCESS_MESSAGE" property="processMessage" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INTERFACE_ID, SO_NO, SO_TYPE, SO_ORG_CODE, SO_DEALER_NO, SO_PERIOD, SO_ENTRY_CLASS, 
+    SO_ENTRY_TIME, SO_ENTRY_BY, ORDER_DEALER_NO, ORDER_DATE, ORDER_AMT, ORDER_DEALER_NAME, 
+    ORDER_DEALER_TELE, FIRST_SO_NO, REF_SO_NO, LOCAL_CURRENCY_CODE, LOCAL_TOTAL_AMT, 
+    LOCAL_TOTAL_ECOUPON, LOCAL_TOTAL_POINT, LOCAL_TOTAL_REBATE, REAL_TIME_PROC_FLAG, 
+    REAL_TIME_PROC_TIME, COMMENTS, ADVISE_NO, PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+    REQUEST_ID, PROGRAM_ID, OBJECT_VERSION_NUMBER, HEADER_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from ISG_SO_HEADER
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from ISG_SO_HEADER
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgSoHeader" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      SELECT ISG_SO_HEADER_S.nextval from dual
+    </selectKey>
+    insert into ISG_SO_HEADER (INTERFACE_ID, SO_NO, SO_TYPE, 
+      SO_ORG_CODE, SO_DEALER_NO, SO_PERIOD, 
+      SO_ENTRY_CLASS, SO_ENTRY_TIME, SO_ENTRY_BY, 
+      ORDER_DEALER_NO, ORDER_DATE, ORDER_AMT, 
+      ORDER_DEALER_NAME, ORDER_DEALER_TELE, FIRST_SO_NO, 
+      REF_SO_NO, LOCAL_CURRENCY_CODE, LOCAL_TOTAL_AMT, 
+      LOCAL_TOTAL_ECOUPON, LOCAL_TOTAL_POINT, LOCAL_TOTAL_REBATE, 
+      REAL_TIME_PROC_FLAG, REAL_TIME_PROC_TIME, COMMENTS, 
+      ADVISE_NO, PROCESS_STATUS, PROCESS_DATE, 
+      PROCESS_MESSAGE, REQUEST_ID, PROGRAM_ID, 
+      OBJECT_VERSION_NUMBER, HEADER_ID)
+    values (#{interfaceId,jdbcType=DECIMAL}, #{soNo,jdbcType=VARCHAR}, #{soType,jdbcType=VARCHAR}, 
+      #{soOrgCode,jdbcType=VARCHAR}, #{soDealerNo,jdbcType=VARCHAR}, #{soPeriod,jdbcType=VARCHAR}, 
+      #{soEntryClass,jdbcType=VARCHAR}, #{soEntryTime,jdbcType=VARCHAR}, #{soEntryBy,jdbcType=VARCHAR}, 
+      #{orderDealerNo,jdbcType=VARCHAR}, #{orderDate,jdbcType=VARCHAR}, #{orderAmt,jdbcType=DECIMAL}, 
+      #{orderDealerName,jdbcType=VARCHAR}, #{orderDealerTele,jdbcType=VARCHAR}, #{firstSoNo,jdbcType=VARCHAR}, 
+      #{refSoNo,jdbcType=VARCHAR}, #{localCurrencyCode,jdbcType=VARCHAR}, #{localTotalAmt,jdbcType=DECIMAL}, 
+      #{localTotalEcoupon,jdbcType=DECIMAL}, #{localTotalPoint,jdbcType=DECIMAL}, #{localTotalRebate,jdbcType=DECIMAL}, 
+      #{realTimeProcFlag,jdbcType=VARCHAR}, #{realTimeProcTime,jdbcType=VARCHAR}, #{comments,jdbcType=VARCHAR}, 
+      #{adviseNo,jdbcType=VARCHAR}, #{processStatus,jdbcType=VARCHAR}, current_timestamp, 
+      #{processMessage,jdbcType=VARCHAR}, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+      #{objectVersionNumber,jdbcType=DECIMAL}, #{headerId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgSoHeader" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      SELECT ISG_SO_HEADER_S.nextval from dual
+    </selectKey>
+    insert into ISG_SO_HEADER
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INTERFACE_ID,
+      <if test="soNo != null" >
+        SO_NO,
+      </if>
+      <if test="soType != null" >
+        SO_TYPE,
+      </if>
+      <if test="soOrgCode != null" >
+        SO_ORG_CODE,
+      </if>
+      <if test="soDealerNo != null" >
+        SO_DEALER_NO,
+      </if>
+      <if test="soPeriod != null" >
+        SO_PERIOD,
+      </if>
+      <if test="soEntryClass != null" >
+        SO_ENTRY_CLASS,
+      </if>
+      <if test="soEntryTime != null" >
+        SO_ENTRY_TIME,
+      </if>
+      <if test="soEntryBy != null" >
+        SO_ENTRY_BY,
+      </if>
+      <if test="orderDealerNo != null" >
+        ORDER_DEALER_NO,
+      </if>
+      <if test="orderDate != null" >
+        ORDER_DATE,
+      </if>
+      <if test="orderAmt != null" >
+        ORDER_AMT,
+      </if>
+      <if test="orderDealerName != null" >
+        ORDER_DEALER_NAME,
+      </if>
+      <if test="orderDealerTele != null" >
+        ORDER_DEALER_TELE,
+      </if>
+      <if test="firstSoNo != null" >
+        FIRST_SO_NO,
+      </if>
+      <if test="refSoNo != null" >
+        REF_SO_NO,
+      </if>
+      <if test="localCurrencyCode != null" >
+        LOCAL_CURRENCY_CODE,
+      </if>
+      <if test="localTotalAmt != null" >
+        LOCAL_TOTAL_AMT,
+      </if>
+      <if test="localTotalEcoupon != null" >
+        LOCAL_TOTAL_ECOUPON,
+      </if>
+      <if test="localTotalPoint != null" >
+        LOCAL_TOTAL_POINT,
+      </if>
+      <if test="localTotalRebate != null" >
+        LOCAL_TOTAL_REBATE,
+      </if>
+      <if test="realTimeProcFlag != null" >
+        REAL_TIME_PROC_FLAG,
+      </if>
+      <if test="realTimeProcTime != null" >
+        REAL_TIME_PROC_TIME,
+      </if>
+      <if test="comments != null" >
+        COMMENTS,
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO,
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS,
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE,
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER,
+      </if>
+      <if test="headerId != null" >
+        HEADER_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{interfaceId,jdbcType=DECIMAL},
+      <if test="soNo != null" >
+        #{soNo,jdbcType=VARCHAR},
+      </if>
+      <if test="soType != null" >
+        #{soType,jdbcType=VARCHAR},
+      </if>
+      <if test="soOrgCode != null" >
+        #{soOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="soDealerNo != null" >
+        #{soDealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="soPeriod != null" >
+        #{soPeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="soEntryClass != null" >
+        #{soEntryClass,jdbcType=VARCHAR},
+      </if>
+      <if test="soEntryTime != null" >
+        #{soEntryTime,jdbcType=VARCHAR},
+      </if>
+      <if test="soEntryBy != null" >
+        #{soEntryBy,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDealerNo != null" >
+        #{orderDealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDate != null" >
+        #{orderDate,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmt != null" >
+        #{orderAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="orderDealerName != null" >
+        #{orderDealerName,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDealerTele != null" >
+        #{orderDealerTele,jdbcType=VARCHAR},
+      </if>
+      <if test="firstSoNo != null" >
+        #{firstSoNo,jdbcType=VARCHAR},
+      </if>
+      <if test="refSoNo != null" >
+        #{refSoNo,jdbcType=VARCHAR},
+      </if>
+      <if test="localCurrencyCode != null" >
+        #{localCurrencyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="localTotalAmt != null" >
+        #{localTotalAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="localTotalEcoupon != null" >
+        #{localTotalEcoupon,jdbcType=DECIMAL},
+      </if>
+      <if test="localTotalPoint != null" >
+        #{localTotalPoint,jdbcType=DECIMAL},
+      </if>
+      <if test="localTotalRebate != null" >
+        #{localTotalRebate,jdbcType=DECIMAL},
+      </if>
+      <if test="realTimeProcFlag != null" >
+        #{realTimeProcFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="realTimeProcTime != null" >
+        #{realTimeProcTime,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="objectVersionNumber != null" >
+        #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="headerId != null" >
+        #{headerId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgSoHeader" >
+    update ISG_SO_HEADER
+    <set >
+      <if test="soNo != null" >
+        SO_NO = #{soNo,jdbcType=VARCHAR},
+      </if>
+      <if test="soType != null" >
+        SO_TYPE = #{soType,jdbcType=VARCHAR},
+      </if>
+      <if test="soOrgCode != null" >
+        SO_ORG_CODE = #{soOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="soDealerNo != null" >
+        SO_DEALER_NO = #{soDealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="soPeriod != null" >
+        SO_PERIOD = #{soPeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="soEntryClass != null" >
+        SO_ENTRY_CLASS = #{soEntryClass,jdbcType=VARCHAR},
+      </if>
+      <if test="soEntryTime != null" >
+        SO_ENTRY_TIME = #{soEntryTime,jdbcType=VARCHAR},
+      </if>
+      <if test="soEntryBy != null" >
+        SO_ENTRY_BY = #{soEntryBy,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDealerNo != null" >
+        ORDER_DEALER_NO = #{orderDealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDate != null" >
+        ORDER_DATE = #{orderDate,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmt != null" >
+        ORDER_AMT = #{orderAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="orderDealerName != null" >
+        ORDER_DEALER_NAME = #{orderDealerName,jdbcType=VARCHAR},
+      </if>
+      <if test="orderDealerTele != null" >
+        ORDER_DEALER_TELE = #{orderDealerTele,jdbcType=VARCHAR},
+      </if>
+      <if test="firstSoNo != null" >
+        FIRST_SO_NO = #{firstSoNo,jdbcType=VARCHAR},
+      </if>
+      <if test="refSoNo != null" >
+        REF_SO_NO = #{refSoNo,jdbcType=VARCHAR},
+      </if>
+      <if test="localCurrencyCode != null" >
+        LOCAL_CURRENCY_CODE = #{localCurrencyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="localTotalAmt != null" >
+        LOCAL_TOTAL_AMT = #{localTotalAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="localTotalEcoupon != null" >
+        LOCAL_TOTAL_ECOUPON = #{localTotalEcoupon,jdbcType=DECIMAL},
+      </if>
+      <if test="localTotalPoint != null" >
+        LOCAL_TOTAL_POINT = #{localTotalPoint,jdbcType=DECIMAL},
+      </if>
+      <if test="localTotalRebate != null" >
+        LOCAL_TOTAL_REBATE = #{localTotalRebate,jdbcType=DECIMAL},
+      </if>
+      <if test="realTimeProcFlag != null" >
+        REAL_TIME_PROC_FLAG = #{realTimeProcFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="realTimeProcTime != null" >
+        REAL_TIME_PROC_TIME = #{realTimeProcTime,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        COMMENTS = #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="headerId != null" >
+        HEADER_ID = #{headerId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgSoHeader" >
+    update ISG_SO_HEADER
+    set SO_NO = #{soNo,jdbcType=VARCHAR},
+      SO_TYPE = #{soType,jdbcType=VARCHAR},
+      SO_ORG_CODE = #{soOrgCode,jdbcType=VARCHAR},
+      SO_DEALER_NO = #{soDealerNo,jdbcType=VARCHAR},
+      SO_PERIOD = #{soPeriod,jdbcType=VARCHAR},
+      SO_ENTRY_CLASS = #{soEntryClass,jdbcType=VARCHAR},
+      SO_ENTRY_TIME = #{soEntryTime,jdbcType=VARCHAR},
+      SO_ENTRY_BY = #{soEntryBy,jdbcType=VARCHAR},
+      ORDER_DEALER_NO = #{orderDealerNo,jdbcType=VARCHAR},
+      ORDER_DATE = #{orderDate,jdbcType=VARCHAR},
+      ORDER_AMT = #{orderAmt,jdbcType=DECIMAL},
+      ORDER_DEALER_NAME = #{orderDealerName,jdbcType=VARCHAR},
+      ORDER_DEALER_TELE = #{orderDealerTele,jdbcType=VARCHAR},
+      FIRST_SO_NO = #{firstSoNo,jdbcType=VARCHAR},
+      REF_SO_NO = #{refSoNo,jdbcType=VARCHAR},
+      LOCAL_CURRENCY_CODE = #{localCurrencyCode,jdbcType=VARCHAR},
+      LOCAL_TOTAL_AMT = #{localTotalAmt,jdbcType=DECIMAL},
+      LOCAL_TOTAL_ECOUPON = #{localTotalEcoupon,jdbcType=DECIMAL},
+      LOCAL_TOTAL_POINT = #{localTotalPoint,jdbcType=DECIMAL},
+      LOCAL_TOTAL_REBATE = #{localTotalRebate,jdbcType=DECIMAL},
+      REAL_TIME_PROC_FLAG = #{realTimeProcFlag,jdbcType=VARCHAR},
+      REAL_TIME_PROC_TIME = #{realTimeProcTime,jdbcType=VARCHAR},
+      COMMENTS = #{comments,jdbcType=VARCHAR},
+      ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+      HEADER_ID = #{headerId,jdbcType=DECIMAL}
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateProccessStatusByAdviseNoAndSONO">
+    update ISG_SO_HEADER
+    set
+      PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR}
+      where ADVISE_NO = #{adviseNo,jdbcType=VARCHAR} AND SO_NO = #{soNo,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="countBySoNo" resultType="java.lang.Long">
+    select count(1) from ISG_SO_HEADER WHERE SO_NO = #{soNo,jdbcType=VARCHAR}
+    and PROCESS_STATUS = 'S'
+  </select>
+  
+  <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select <include refid="Base_Column_List" />
+      from ISG_SO_HEADER
+    <where>
+        PROCESS_DATE &gt; #{processDateFrom,jdbcType=TIMESTAMP}
+        <if test="requestDateTo != null" >
+            AND PROCESS_DATE &lt; #{processDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="processStatus != null" >
+            AND PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="advoiseNo != null" >
+            AND ADVISE_NO = #{advoiseNo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by interface_id desc
+  </select>
+</mapper>

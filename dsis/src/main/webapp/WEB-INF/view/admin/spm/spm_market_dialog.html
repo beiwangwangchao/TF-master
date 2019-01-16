@@ -1,0 +1,224 @@
+ <#--  
+ * description: 销售组织树结构
+ * version: 1.0 
+ * author: huangjiajing
+ * Copyright LKK Health Products Group Limited.    
+ * 
+-->  
+<#include "../include/head.html">
+<body style="padding: 10px">
+<script type="text/javascript">
+    var manager = null;
+    $(function() {
+    	manager=$("#spm_market_tree").ligerTree({
+            url : '${base.contextPath}/spm/salesOrganization/queryFu?marketId='+${RequestParameters.marketId},
+            checkbox: false,
+            idFieldName:'salesOrgId',
+            parentIDFieldName:'parentOrgId',
+            textFieldName:'name'
+        });
+
+    	window['spm_sales_form'] = $("#spm_sales_form").ligerForm({
+            fields: [
+                { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.orgcode"/>',newline:false,  name: 'code'},
+                { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.orgname"/>',newline:false,  name: 'name' }
+            ], 
+            buttons: [
+                { text: '<@spring.message "sys.hand.btn.query"/>',
+                    disabled:false, 
+                    width: 60,
+                    click: function(){
+                        Hap.gridQuery({
+                            form:spm_sales_form,
+                            grid:spm_sales_grid
+                        })
+                   
+                }}
+            ]
+        });
+    
+        window['spm_sales_grid'] = $("#spm_sales_grid").ligerGrid({
+            columns: [ { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.orgcode"/>',
+                name: 'code', align: 'left', width:200
+              }, { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.orgname"/>',
+                name: 'name', align: 'left', width:200
+              }
+            ], 
+            url:'${base.contextPath}/spm/salesOrganizationNull/query?companyId='+${RequestParameters.companyId},
+            enabledEdit: false,
+            width: '99%', 
+            height: '98%', 
+            checkbox:true,
+            rownumbers: true
+        }); 
+
+    });
+    /* 
+     *展开全部类别点击事件 
+     */
+    function expandAll() {
+    	manager.expandAll();
+    }
+
+    /* 
+     *收缩全部类别点击事件 
+     */
+    function collapseAll() {
+    	 manager.collapseAll();
+    }
+    
+    function addTreeItems(){
+    	var node = manager.getSelected();
+        var nodes = [];
+        nodes.push({
+        	"salesOrgId": node.data.salesOrgId,
+            "name": node.data.name,
+            "children": [],
+            "parentOrgId": node.data.parentOrgId
+        });
+        if (node){
+            manager.append(node.target, nodes); 
+        }else{
+            manager.append(null, nodes);
+        }
+    }
+    function addTreeItem(){
+    	var node = manager.getSelected();
+    	$.ligerDialog.open({
+    		
+            title: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.salesorg.salesorgquery" />',
+            width:700,
+            height:300,
+            slide: false,
+            target: $("#spm_grid"),
+            buttons: [{
+                text: '<@spring.message "sys.hand.btn.ok" />',
+                onclick: function(i, d) {
+                    insertData();
+                    d.hide();
+                }
+            },
+            {
+                text: '<@spring.message "sys.hand.btn.cancel" />',
+                onclick: function(i, d) {
+                    d.hide();
+                }
+            }]
+        });
+    	spm_sales_grid.loadData();
+
+    }
+    
+    function insertData() {
+        if (spm_sales_grid) {
+        	var salesOrgId=spm_sales_grid.getSelectedRow().salesOrgId;
+            var salesName = spm_sales_grid.getSelectedRow().name; // 新增类别名称
+            var marketId=${RequestParameters.marketId};
+            var node = manager.getSelected(); // 选中的树节点
+            var parentOrgId = 0;
+            if (node) {
+            	parentOrgId = node.data.salesOrgId; //新增类别的父ID
+            }
+            var newData = {
+            	"marketId":marketId,
+                "parentOrgId": parentOrgId,
+                "salesOrgId":salesOrgId
+                };
+            
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON2.stringify(newData),
+                url:"${base.contextPath}/spm/salesOrganization/submit",
+                error: function(data) {
+                    Hap.showError(data);
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Hap.showSuccess("<@spring.message "msg.warning.dto.system.addsuccess" />");
+                        var data = response.rows[0];
+                        var nodes = [];
+                        nodes.push({
+                        	"name": salesName,
+                            "parentOrgId": data.parentOrgId,
+                            "salesOrgId":data.salesOrgId,
+                            "children": []
+                        });
+                        manager.append(node ? node.target: null, nodes);
+                        if (node) {
+                            detailGrid.grid.hide()
+                        }
+                    }
+                }
+            });
+        }
+    }
+    
+    function deleteAll() {
+        // 获取选中的节点信息 
+        var node = manager.getSelected();
+        if(node.data.children.length>0){
+        	for(var i = 0; i< node.data.children.length; i++) {
+        		if( node.data.children[i].__status != 'delete'){
+                    $.ligerDialog.warn("<@spring.message "msg.warning.dto.system.checkchilren"/>");
+                    return false;
+        		}
+        	}
+        }
+        // 选中的商品类别ID
+        var deleteData = {
+            "salesOrgId": node.data.salesOrgId,
+            "parentOrgId":null,
+            "marketId":null
+        }
+
+        $.ligerDialog.confirm('<@spring.message "msg.warning.system.delete_or_not"/>',
+        function(yes) {
+        	if(yes){
+        		 $.ajax({
+                     type: "post",
+                     contentType: "application/json",
+                     data: JSON2.stringify(deleteData),
+                     url:"${base.contextPath}/spm/salesOrganization/submit",
+                     error: function(data) {
+                         Hap.showError(data);
+                     },
+                     success: function(response) {
+                         if (response.success) {
+                             Hap.showSuccess("<@spring.message "msg.info.system.delete_successful"/>");
+                             manager.remove(node);
+                             $("#d_pm_001_detailDiv").hide();
+                         }
+                     }
+                 });
+        	}else{
+        		dialog.close();
+        	}
+           
+           }
+        );
+
+    }
+
+
+</script>
+   <button class="l-button" onclick="expandAll()"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.launchAll"/></button>
+   <button class="l-button" onclick="collapseAll()"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.foldAll"/></button>
+   <button class="l-button" onclick="addTreeItem()"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.add"/></button>
+   <button class="l-button" onclick="deleteAll()"><@spring.message "sys.hand.btn.delete"/></button> 
+
+
+    <div id="spm_grid" style="display: none;">
+        <form id="spm_sales_form" ></form>
+        <div id="spm_sales_grid" style="margin: 0; padding: 0"></div>
+    </div>
+            
+    </div>
+    <ul id="spm_market_tree">
+    </ul>
+
+</body>
+</html>

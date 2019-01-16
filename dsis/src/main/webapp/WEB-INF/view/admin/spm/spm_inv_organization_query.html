@@ -1,0 +1,102 @@
+<#--
+ * description: 库存组织查询界面
+ * version: 1.0
+ * author: shenqiubin
+ * .
+ *
+-->
+<#include "../include/head.html">
+
+<body>
+	<form id="spm_invOrganization_form" ></form>  
+	
+    <div id="spm_invOrganization_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function(){
+    		window['spm_invOrganization_form'] = $("#spm_invOrganization_form").ligerForm({
+                fields: [
+					{     display : "invOrgId",     name : "invOrgId",     type : "popup",     newline : false,     textField:'name', 
+							 group : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcountry.baseinfo" />',     options:${lovService.getLov(base.contextPath,base.locale, "lov_inv_organization")} },
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.organizationcode" />', newline:false, name: 'code',valueField : 'text'},
+					{ type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.name" />', newline:false, name: 'name' },
+					{ type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.code.description" />', newline:true, name: 'description' }
+                ], 
+                buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                    	var datas = spm_invOrganization_form.getData();
+                    	var is_empty = true;
+                    	
+                        Hap.gridQuery({
+                            form:spm_invOrganization_form,
+                            grid:spm_invOrganization_grid
+                        })
+                       
+                    }}
+                ]
+            });
+        
+            window['spm_invOrganization_grid'] = $("#spm_invOrganization_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [ { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.organizationcode" />', 
+                	name: 'code', align: 'left', width: '12%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.name" />', 
+                	name: 'name', align: 'left', width: '12%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.code.description" />', 
+                	name: 'description', align: 'left', width: '12%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.locationname" />', 
+                	name: 'locationId', align: 'left', width: '12%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.default" />', 
+                	name: 'defaultFlag', align: 'left', width: '12%', editor: { type: 'text' }
+                  }, { 
+                	display: 'OU ID', 
+                	name: 'operationUnitId', align: 'left', width: '12%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.enabledflag" />', 
+                	name: 'enabledFlag', align: 'left', width: '12%', editor: { type: 'text' }
+                  }, { 
+                	display:'<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.startactivedate" />', 
+                	name: 'startDate', align: 'left', width: '12%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.endactivedate" />', 
+                	name: 'endDate', align: 'left', width: '12%', editor: { type: 'text' }
+                  }
+                ], 
+                url:'${base.contextPath}/spm/invOrganization/query',
+                toolbar: { items: [
+                                   { text: '<@spring.message "sys.hand.btn.new" />',disable:false, click: function(){spm_invOrganization_grid.addRow({})}, icon: 'add' },
+                                   { line: true },
+                                   { text: '<@spring.message "sys.hand.btn.delete" />', click: function(){
+                                        Hap.gridDelete({
+                                           grid:spm_invOrganization_grid
+                                       }) 
+                                       
+                                   }, icon: 'delete'},
+                                   { line: true },
+                                   { text: '<@spring.message "sys.hand.btn.save" />', click: function(){
+                                       Hap.gridSave({
+                                           grid:spm_invOrganization_grid,
+                                           url:'${base.contextPath}/spm/invOrganization/save'
+                                       })
+                                   }, icon: 'save'}
+                     ]
+                     },
+                enabledEdit: true,
+                //usePager:true,
+                width: '100%', 
+                height: '99%', 
+                checkbox: true,
+                rownumbers: true,
+                pageSizeOptions:[10,20],
+                pageSize:'10' 
+            }); 
+    	
+           
+    	});//$function
+    </script>
+</body>
+</html>

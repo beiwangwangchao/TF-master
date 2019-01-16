@@ -1,0 +1,128 @@
+<#-- 
+* description: 事件查询界面
+* version: 1.0 
+* author: wangc 
+* Copyright LKK Health Products Group Limited.
+* --> 
+<#include "../../include/head.html">
+<script src="${base.contextPath}/common/code?eventType=SYS.EVENT_TYPE&eventSecret=SYS.EVENT_PRIVACY&eventStatus=SYS.EVENT_STATUS"
+	type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<body style="padding: 10px;">
+<form id="em_query_form"></form>
+<div id="em_query_grid"></div>
+<script type="text/javascript">
+window['em_query_form'] = $("#em_query_form").ligerForm({
+    fields: [{
+        label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventname"/>',
+        name: "eventName",
+        type: "text",
+    },
+    {
+        label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventtype"/>',
+        type: 'select',
+        name: 'eventType',
+        options: {
+            valueField: 'value',
+            textField: 'meaning',
+            data: eventType
+        },
+        newline : false
+    },
+    {
+    	label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventsecret"/>',
+        type: 'select',
+        name: 'eventSecret',
+        options: {
+            valueField: 'value',
+            textField: 'meaning',
+            data: eventSecret
+        }
+    },
+    {
+    	label: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventstatus"/>',
+        type: 'select',
+        name: 'status',
+        options: {
+            valueField: 'value',
+            textField: 'meaning',
+            data: eventStatus
+        },
+        newline : false
+    }],
+    buttons: [{
+        text: '<@spring.message "sys.hand.btn.query"/>',
+        disabled: false,
+        width: 60,
+        click: function() {
+            Hap.gridQuery({
+                form: em_query_form,
+                grid: em_query_grid
+            })
+        }
+    }, {
+        text: '<@spring.message "sys.hand.btn.create"/>',
+        disabled: false,
+        width: 60,
+        click: function() {
+            window.top.f_addTab('event_create','<@spring.message "type.com.lkkhpg.dsis.common.event.dto.detailcreate"/>','sys/em/em_event_edit.html');
+        }
+    }]
+});
+
+window['em_query_grid'] = $("#em_query_grid").ligerGrid({
+    columns: [{
+        display: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventnumber"/>',
+        name: 'eventNumber',
+        isSort : true,
+        render : function(rowdata){
+        	 return "<a href='javascript:void(0);' onclick='openEventEdit("+ rowdata.eventId + ")'>"+rowdata.eventNumber+"</a>"
+        }
+    },
+    {
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventname"/>',
+        name: 'eventName',
+    },
+    {
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventmarket"/>',
+        name : 'marketId',
+        textField : 'marketName',
+    },
+    {
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventtype"/>',
+        name: 'eventType',
+        render : function(item){
+        	for(var i in eventType){
+        		if(item.eventType == eventType[i].value){
+        			return eventType[i].meaning;
+        		}
+        	}
+        }
+    },
+    {
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.eventstatus"/>',
+        name: 'status',
+        render : function(item){
+        	for(var i in eventStatus){
+        		if(item.status == eventStatus[i].value){
+        			return eventStatus[i].meaning;
+        		}
+        	}
+        }
+    }],
+    url: '${base.contextPath}/em/event/queryEvents',
+    enabledEdit: true,
+    rownumbers: true,
+    width: '99%',
+    height: '98%',
+    pageSize: 20,
+});
+
+function openEventEdit(eventId){
+	window.top.f_removeTab('em_event_edit');
+    window.top.f_addTab('em_event_edit', '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.detail"/>', 
+    		'sys/em/em_event_edit.html?isedit=1&eventId=' + eventId);    		
+}
+</script>
+
+</html>

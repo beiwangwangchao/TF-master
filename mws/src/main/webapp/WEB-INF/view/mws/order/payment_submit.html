@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>天府电商</title>
+    <link href="${base.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css">
+    <link href="${base.contextPath}/resources/img/favicon.ico" rel="shortcut icon"/>
+    <link href="${base.contextPath}/resources/css/bootstrap${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/owl.carousel${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/owl.theme${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/owl.transitions${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/style${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/config${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/dialog${resource_suffix!}.css" rel="stylesheet">
+    <script src="${base.contextPath}/resources/js/jquery-1.11.3${resource_suffix!}.js"></script>
+    <script src="${base.contextPath}/resources/js/dialog${resource_suffix!}.js"></script>
+    <script src="${base.contextPath}/lib/json2${resource_suffix!}.js"></script>
+<script>
+
+//表单序列化为Json对象
+( function ($){
+$.fn.serializeJson= function (){
+var serializeObj={};
+$( this .serializeArray()).each( function (){
+serializeObj[ this .name]= this .value;
+});
+return serializeObj;
+};
+})(jQuery);
+
+$(function(){
+	$.ajax({
+        type : 'POST',
+        url : "${base.contextPath}/salesorder/paying",
+        dataType : "json",
+    	<#if payType == 'UNION'>
+        data : {sourceKey:${sourceKey},transactionCode:"${model.lidm}" },
+        </#if> <#if payType=='MIGS'>
+        data : {sourceKey:${sourceKey},transactionCode:"${model.vpc_OrderInfo}" },
+        </#if> <#if payType=='NON'>
+        data : {sourceKey:${sourceKey},transactionCode:"${model.lidm}" },
+        </#if> 
+       
+        success : function(data) {
+            if(data.success){
+				<#if payType == 'MIGS'>
+            		document.migs_pay_form.submit();
+            	</#if>
+            	<#if payType == 'UNION'>
+            		document.union_pay_form.submit();
+            	</#if>
+            	<#if payType == 'NON'>
+            		document.non_union_pay_form.submit();
+            	</#if>
+            }else{
+                window.location.href="${base.contextPath}/order/payment_result.html";
+            }
+        }
+    });
+	
+});
+</script>
+</head>
+<body>
+    <header id="header">
+        <div>
+            <img src="${base.contextPath}/resources/img/top-line.jpg" style="width: 100%; height: 24px"/>
+        </div>
+        <nav id="main-nav">
+            <div class="navbar">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".main-nav">
+                            <span class="icon-bar"></span> 
+                            <span class="icon-bar"></span> 
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="${base.contextPath}/index.html">
+                            <img src="${base.contextPath}/resources/img/logo.png" alt="Infinitus" class="img-responsive">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+<section id="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2 col-sm-2" style="margin-top: 30px"></div>
+            <div class="col-md-6 col-sm-6"style="margin-top: 110px">
+	            <div class="row">
+	                <div class="col-sm-6 form-group" style="font-weight: bolder;font-size:20px;color: black">
+	                   <@spring.message "mws.payment.jumpwait"/><!-- 正在跳转，请稍后... -->
+	                </div>
+	            </div>
+	            <div style="margin-bottom: 160px;margin-top: 80px">
+	                <@spring.message "mws.payment.selector.relatecustomer"/>
+	            </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+	<#if payType == 'UNION'>
+	<form method="POST" action=${action} name="union_pay_form">
+		<input type="hidden" name="merId" value=${model.merId} /> <input type="hidden" name="lidm" value=${model.lidm} /> <input
+			type="hidden" name="purchAmt" value=${model.purchAmt} /> <input type="hidden" name="inMac" value=${model.inMac} />
+	</form>
+	</#if> <#if payType=='MIGS'>
+	<form name="migs_pay_form" action=${action} method="post">
+		<table width="80%" align="center" border="0" cellpadding='0' cellspacing='0' style="display:none;">
+
+			<!-- Replaced by TestMIGS.java output -- Begin -->
+
+			<tr>
+				<td><input type="hidden" name="vpc_AccessCode" value=${model.vpc_AccessCode}>vpc_AccessCode:&nbsp;</td>
+				<td>${model.vpc_AccessCode}</td>
+			</tr>
+			<tr>
+				<td><input type="hidden" name="vpc_Amount" value=${model.vpc_Amount}>vpc_Amount:&nbsp;</td>
+				<td>${model.vpc_Amount}</td>
+			</tr>
+			<tr>
+				<td><input type="hidden" name="vpc_Version" value=${model.vpc_Version}>vpc_Version:&nbsp;</td>
+				<td>${model.vpc_Version}</td>
+			</tr>
+			<tr>
+				<td><input type="hidden" name="vpc_MerchTxnRef" value=${model.vpc_MerchTxnRef}>vpc_MerchTxnRef:&nbsp;</td>
+				<td>${model.vpc_MerchTxnRef}</td>
+			</tr>
+			<tr>
+				<td><input type="hidden" name="vpc_Command" value=${model.vpc_Command}>vpc_Command:&nbsp;</td>
+				<td>${model.vpc_Command}</td>
+			</tr>
+			<tr>
+				<td><input type="hidden" name="vpc_Merchant" value=${model.vpc_Merchant}>vpc_Merchant:&nbsp;</td>
+				<td>${model.vpc_Merchant}</td>
+			</tr>
+			<tr>
+				<td><input type="hidden" name="vpc_Locale" value=${model.vpc_Locale}>vpc_Locale:&nbsp;</td>
+				<td>${model.vpc_Locale}</td>
+			</tr>
+			<tr>
+				<td><input type="hidden" name="vpc_ReturnURL" value=${model.vpc_ReturnURL}>vpc_ReturnURL:&nbsp;</td>
+				<td>${model.vpc_ReturnURL}</td>
+			</tr>
+			<tr>
+				<td><input type="hidden" name="vpc_SecureHash" value=${model.vpc_SecureHash}>vpc_SecureHash:&nbsp;</td>
+				<td>${model.vpc_SecureHash}</td>
+			</tr>
+			<tr>
+				<td><input type="hidden" name="vpc_SecureHashType" value=${model.vpc_SecureHashType}>vpc_SecureHashType:&nbsp;</td>
+				<td>${model.vpc_SecureHashType}</td>
+			</tr>
+
+			<tr>
+				<td><input type="hidden" name="vpc_OrderInfo" value=${model.vpc_OrderInfo}>vpc_SecureHashType:&nbsp;</td>
+				<td>${model.vpc_OrderInfo}</td>
+			</tr>
+
+			<!-- Replaced by TestMIGS.java output -- End -->
+
+
+			<tr>
+				<td colspan="2">&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan="2" align="center"><input type="submit" name="submit11" value="Continue" /></td>
+			</tr>
+		</table>
+	</form>
+	</#if> <#if payType =='NON'>
+	<form method="POST" action=${action} name="non_union_pay_form" >
+		<table width=540 bgcolor=#999999 style="display:none;">
+			<tr>
+				<TD width="100%">Merchant ID: <INPUT value="${model.merID}" name=merID>
+				</TD>
+			</tr>
+			<tr>
+				<td><input type="hidden" name="URLEnc" value=${model.urlEnc}>URLEnc:&nbsp;</td>
+				<td>${model.urlEnc}</td>
+			</tr>
+			<TR bgColor=#aedcff>
+				<TD align=middle><INPUT type=submit value="Pay by credit card" border=0 name=imageField height="32"></TD>
+			</TR>
+			</tr>
+		</table>
+	</form>
+	</#if>
+
+<#include "/mws/include/footer.html">
+
+

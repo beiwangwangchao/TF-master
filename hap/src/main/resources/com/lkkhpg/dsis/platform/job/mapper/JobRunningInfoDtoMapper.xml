@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- ~ Copyright LKK Health Products Group Limited -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.job.mapper.JobRunningInfoDtoMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.job.dto.JobRunningInfoDto">
+        <id column="JOB_RUNNING_INFO_ID" property="jobRunningInfoId" jdbcType="DECIMAL" />
+        <result column="JOB_NAME" property="jobName" jdbcType="VARCHAR" />
+        <result column="JOB_GROUP" property="jobGroup" jdbcType="VARCHAR" />
+        <result column="JOB_RESULT" property="jobResult" jdbcType="VARCHAR" />
+        <result column="JOB_STATUS" property="jobStatus" jdbcType="VARCHAR" />
+        <result column="EXECUTION_SUMMARY" property="executionSummary" jdbcType="VARCHAR" />
+        <result column="JOB_STATUS_MESSAGE" property="jobStatusMessage" jdbcType="VARCHAR" />
+        <result column="TRIGGER_NAME" property="triggerName" jdbcType="VARCHAR" />
+        <result column="TRIGGER_GROUP" property="triggerGroup" jdbcType="VARCHAR" />
+        <result column="PREVIOUS_FIRE_TIME" property="previousFireTime" jdbcType="TIMESTAMP" />
+        <result column="FIRE_TIME" property="fireTime" jdbcType="TIMESTAMP" />
+        <result column="NEXT_FIRE_TIME" property="nextFireTime" jdbcType="TIMESTAMP" />
+        <result column="REFIRE_COUNT" property="refireCount" jdbcType="DECIMAL" />
+        <result column="FIRE_INSTANCE_ID" property="fireInstanceId" jdbcType="VARCHAR" />
+        <result column="SCHEDULER_INSTANCE_ID" property="schedulerInstanceId" jdbcType="VARCHAR" />
+        <result column="SCHEDULED_FIRE_TIME" property="scheduledFireTime" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        JOB_RUNNING_INFO_ID, JOB_NAME, JOB_GROUP, JOB_RESULT, JOB_STATUS, JOB_STATUS_MESSAGE,EXECUTION_SUMMARY,
+        TRIGGER_NAME, TRIGGER_GROUP, PREVIOUS_FIRE_TIME, FIRE_TIME, NEXT_FIRE_TIME, REFIRE_COUNT,
+        FIRE_INSTANCE_ID,
+        SCHEDULER_INSTANCE_ID, SCHEDULED_FIRE_TIME, CREATED_BY, CREATION_DATE,
+        LAST_UPDATED_BY, LAST_UPDATE_DATE,
+        ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11,
+        ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from SYS_JOB_RUNNING_INFO
+        where JOB_RUNNING_INFO_ID = #{jobRunningInfoId,jdbcType=DECIMAL}
+    </select>
+    <select id="select" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.job.dto.JobRunningInfoDto">
+        select
+        <include refid="Base_Column_List" />
+        from sys_job_running_info
+        <where>
+            <if test="jobRunningInfoId != null">
+                JOB_RUNNING_INFO_ID = #{jobRunningInfoId,jdbcType=DECIMAL}
+            </if>
+            <if test="jobName != null">
+                AND JOB_NAME like concat('%',concat(#{jobName,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="jobGroup != null">
+                AND JOB_GROUP like concat('%',concat(#{jobGroup,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="jobStatus != null">
+                AND lower(JOB_STATUS) like lower(concat('%',concat(#{jobStatus,jdbcType=VARCHAR},'%')))
+            </if>
+        </where>
+
+        order by SCHEDULED_FIRE_TIME desc
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from SYS_JOB_RUNNING_INFO
+        where
+        JOB_RUNNING_INFO_ID =
+        #{jobRunningInfoId,jdbcType=DECIMAL}
+    </delete>
+    <delete id="deleteByNameGroup" parameterType="com.lkkhpg.dsis.platform.job.dto.JobRunningInfoDto">
+        delete from
+        SYS_JOB_RUNNING_INFO
+        where job_name =
+        #{jobName,jdbcType=VARCHAR} and job_group = #{jobGroup,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.platform.job.dto.JobRunningInfoDto">
+        <selectKey resultType="java.lang.Long" keyProperty="jobRunningInfoId" order="BEFORE">
+            select
+            SYS_JOB_RUNNING_INFO_s.nextval from dual
+        </selectKey>
+        insert into SYS_JOB_RUNNING_INFO (JOB_RUNNING_INFO_ID, JOB_NAME, JOB_GROUP,EXECUTION_SUMMARY,
+        JOB_RESULT,
+        JOB_STATUS, JOB_STATUS_MESSAGE,
+        TRIGGER_NAME, TRIGGER_GROUP, PREVIOUS_FIRE_TIME,
+        FIRE_TIME, NEXT_FIRE_TIME,
+        REFIRE_COUNT,
+        FIRE_INSTANCE_ID, SCHEDULER_INSTANCE_ID,
+        SCHEDULED_FIRE_TIME, CREATED_BY, CREATION_DATE,
+        LAST_UPDATED_BY, LAST_UPDATE_DATE, ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10,
+        ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14, ATTRIBUTE15)
+        values (#{jobRunningInfoId,jdbcType=DECIMAL}, #{jobName,jdbcType=VARCHAR},
+        #{jobGroup,jdbcType=VARCHAR},#{executionSummary,jdbcType=VARCHAR},
+        #{jobResult,jdbcType=VARCHAR},
+        #{jobStatus,jdbcType=VARCHAR}, #{jobStatusMessage,jdbcType=VARCHAR},
+        #{triggerName,jdbcType=VARCHAR},
+        #{triggerGroup,jdbcType=VARCHAR}, #{previousFireTime,jdbcType=TIMESTAMP},
+        #{fireTime,jdbcType=TIMESTAMP},
+        #{nextFireTime,jdbcType=TIMESTAMP}, #{refireCount,jdbcType=DECIMAL},
+        #{fireInstanceId,jdbcType=VARCHAR},
+        #{schedulerInstanceId,jdbcType=VARCHAR},
+        #{scheduledFireTime,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP,
+        #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR},
+        #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR},
+        #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.platform.job.dto.JobRunningInfoDto">
+        update SYS_JOB_RUNNING_INFO
+        <set>
+            <if test="jobName != null">
+                JOB_NAME = #{jobName,jdbcType=VARCHAR},
+            </if>
+            <if test="jobGroup != null">
+                JOB_GROUP = #{jobGroup,jdbcType=VARCHAR},
+            </if>
+            <if test="jobGroup != null">
+                EXECUTION_SUMMARY = #{executionSummary,jdbcType=VARCHAR},
+            </if>
+            <if test="jobResult != null">
+                JOB_RESULT = #{jobResult,jdbcType=VARCHAR},
+            </if>
+            <if test="jobStatus != null">
+                JOB_STATUS = #{jobStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="jobStatusMessage != null">
+                JOB_STATUS_MESSAGE = #{jobStatusMessage,jdbcType=VARCHAR},
+            </if>
+            <if test="triggerName != null">
+                TRIGGER_NAME = #{triggerName,jdbcType=VARCHAR},
+            </if>
+            <if test="triggerGroup != null">
+                TRIGGER_GROUP = #{triggerGroup,jdbcType=VARCHAR},
+            </if>
+            <if test="previousFireTime != null">
+                PREVIOUS_FIRE_TIME = #{previousFireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="fireTime != null">
+                FIRE_TIME = #{fireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="nextFireTime != null">
+                NEXT_FIRE_TIME = #{nextFireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="refireCount != null">
+                REFIRE_COUNT = #{refireCount,jdbcType=DECIMAL},
+            </if>
+            <if test="fireInstanceId != null">
+                FIRE_INSTANCE_ID = #{fireInstanceId,jdbcType=VARCHAR},
+            </if>
+            <if test="schedulerInstanceId != null">
+                SCHEDULER_INSTANCE_ID = #{schedulerInstanceId,jdbcType=VARCHAR},
+            </if>
+            <if test="scheduledFireTime != null">
+                SCHEDULED_FIRE_TIME = #{scheduledFireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where JOB_RUNNING_INFO_ID = #{jobRunningInfoId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.job.dto.JobRunningInfoDto">
+        update
+        SYS_JOB_RUNNING_INFO
+        set JOB_NAME =
+        #{jobName,jdbcType=VARCHAR},
+        JOB_GROUP = #{jobGroup,jdbcType=VARCHAR},EXECUTION_SUMMARY =
+        #{executionSummary,jdbcType=VARCHAR},
+        JOB_RESULT = #{jobResult,jdbcType=VARCHAR},
+        JOB_STATUS =
+        #{jobStatus,jdbcType=VARCHAR},
+        JOB_STATUS_MESSAGE = #{jobStatusMessage,jdbcType=VARCHAR},
+        TRIGGER_NAME =
+        #{triggerName,jdbcType=VARCHAR},
+        TRIGGER_GROUP = #{triggerGroup,jdbcType=VARCHAR},
+        PREVIOUS_FIRE_TIME =
+        #{previousFireTime,jdbcType=TIMESTAMP},
+        FIRE_TIME = #{fireTime,jdbcType=TIMESTAMP},
+        NEXT_FIRE_TIME =
+        #{nextFireTime,jdbcType=TIMESTAMP},
+        REFIRE_COUNT = #{refireCount,jdbcType=DECIMAL},
+        FIRE_INSTANCE_ID =
+        #{fireInstanceId,jdbcType=VARCHAR},
+        SCHEDULER_INSTANCE_ID =
+        #{schedulerInstanceId,jdbcType=VARCHAR},
+        SCHEDULED_FIRE_TIME = #{scheduledFireTime,jdbcType=TIMESTAMP},
+        LAST_UPDATED_BY =
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        ATTRIBUTE1 =
+        #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+        ATTRIBUTE3 =
+        #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 =
+        #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 =
+        #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 =
+        #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 =
+        #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 =
+        #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 =
+        #{attribute15,jdbcType=VARCHAR}
+        where JOB_RUNNING_INFO_ID = #{jobRunningInfoId,jdbcType=DECIMAL}
+    </update>
+</mapper>

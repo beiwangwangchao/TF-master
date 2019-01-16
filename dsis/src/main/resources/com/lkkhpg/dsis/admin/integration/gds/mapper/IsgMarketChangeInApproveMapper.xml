@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgMarketChangeInApproveMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMarketChangeInApprove" >
+    <result column="INTERFACE_ID" property="interfaceId" jdbcType="DECIMAL" />
+    <result column="GDS_ID" property="gdsId" jdbcType="DECIMAL" />
+    <result column="APP_CERTIFICATE_TYPE" property="appCertificateType" jdbcType="VARCHAR" />
+    <result column="APP_CERTIFICATE_NO" property="appCertificateNo" jdbcType="VARCHAR" />
+    <result column="NEW_DEALER_TYPE" property="newDealerType" jdbcType="VARCHAR" />
+    <result column="APP_AUDITED_BY" property="appAuditedBy" jdbcType="VARCHAR" />
+    <result column="GDS_TRAN_STATUS" property="gdsTranStatus" jdbcType="VARCHAR" />
+    <result column="APP_AUDITED_MEMO" property="appAuditedMemo" jdbcType="VARCHAR" />
+    <result column="PROCESS_STATUS" property="processStatus" jdbcType="VARCHAR" />
+    <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP" />
+    <result column="PROCESS_MESSAGE" property="processMessage" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+  </resultMap>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMarketChangeInApprove" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      select ISG_MARKET_CHANGE_IN_APPROVE_S.nextval from dual
+    </selectKey>
+    insert into ISG_MARKET_CHANGE_IN_APPROVE (INTERFACE_ID, GDS_ID, APP_CERTIFICATE_TYPE, 
+      APP_CERTIFICATE_NO, NEW_DEALER_TYPE, APP_AUDITED_BY, 
+      GDS_TRAN_STATUS, APP_AUDITED_MEMO, PROCESS_STATUS, 
+      PROCESS_DATE, PROCESS_MESSAGE, REQUEST_ID, 
+      PROGRAM_ID)
+    values (#{interfaceId,jdbcType=DECIMAL}, #{gdsId,jdbcType=DECIMAL}, #{appCertificateType,jdbcType=VARCHAR}, 
+      #{appCertificateNo,jdbcType=VARCHAR}, #{newDealerType,jdbcType=VARCHAR}, #{appAuditedBy,jdbcType=VARCHAR}, 
+      #{gdsTranStatus,jdbcType=VARCHAR}, #{appAuditedMemo,jdbcType=VARCHAR}, #{processStatus,jdbcType=VARCHAR}, 
+      current_timestamp, #{processMessage,jdbcType=VARCHAR}, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMarketChangeInApprove" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      select ISG_MARKET_CHANGE_IN_APPROVE_S.nextval from dual
+    </selectKey>
+    insert into ISG_MARKET_CHANGE_IN_APPROVE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INTERFACE_ID,
+      <if test="gdsId != null" >
+        GDS_ID,
+      </if>
+      <if test="appCertificateType != null" >
+        APP_CERTIFICATE_TYPE,
+      </if>
+      <if test="appCertificateNo != null" >
+        APP_CERTIFICATE_NO,
+      </if>
+      <if test="newDealerType != null" >
+        NEW_DEALER_TYPE,
+      </if>
+      <if test="appAuditedBy != null" >
+        APP_AUDITED_BY,
+      </if>
+      <if test="gdsTranStatus != null" >
+        GDS_TRAN_STATUS,
+      </if>
+      <if test="appAuditedMemo != null" >
+        APP_AUDITED_MEMO,
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS,
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE,
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{interfaceId,jdbcType=DECIMAL},
+      <if test="gdsId != null" >
+        #{gdsId,jdbcType=DECIMAL},
+      </if>
+      <if test="appCertificateType != null" >
+        #{appCertificateType,jdbcType=VARCHAR},
+      </if>
+      <if test="appCertificateNo != null" >
+        #{appCertificateNo,jdbcType=VARCHAR},
+      </if>
+      <if test="newDealerType != null" >
+        #{newDealerType,jdbcType=VARCHAR},
+      </if>
+      <if test="appAuditedBy != null" >
+        #{appAuditedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="gdsTranStatus != null" >
+        #{gdsTranStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="appAuditedMemo != null" >
+        #{appAuditedMemo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  
+  <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select *
+      from ISG_MARKET_CHANGE_IN_APPROVE
+    <where>
+        PROCESS_DATE &gt; #{processDateFrom,jdbcType=TIMESTAMP}
+        <if test="requestDateTo != null" >
+            AND PROCESS_DATE &lt; #{processDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="processStatus != null" >
+            AND PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="advoiseNo != null" >
+            AND ADVISE_NO = #{advoiseNo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by interface_id desc
+  </select>
+</mapper>

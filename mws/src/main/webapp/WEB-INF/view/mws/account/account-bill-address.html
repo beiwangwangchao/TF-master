@@ -1,0 +1,680 @@
+<#include "/mws/include/header.html">
+<!-- ========== MENU END ========== -->
+
+<!-- ========== CONTENT START ========== -->
+<style>
+    .row-hover > td{
+        background-color: #FEEAEB !important;
+    }
+    .row-hover > td > button{
+        visibility: visible !important;
+    }
+    td > button{
+        visibility: hidden;
+    }
+    td > a{
+        cursor:pointer;
+    }
+    table th, table td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+    .no-wrap {
+        white-space: nowrap;
+    }
+    .defaultText {
+        padding: 3px;
+        background-color: #999999;
+        color: white;
+        font-size:14px;
+    }
+</style>
+<script src="${base.contextPath}/common/code?telAreaCode=SYS.TEL_COUNTRY_CODE" type="text/javascript"></script>
+<script type="text/javascript">
+    //全局变量--所有账单地址详情！
+    var sitesData = null;
+    //全局变量--正在编辑的账单地址详情
+    var isEditingSite = null;
+    var phoneReg = /^[0-9]{1,14}$/;
+    var zipCodeReg = /^[0-9]{1,10}$/;
+    //DOM Load完成时,请求数据初始化页面
+    $(function(){
+        //首先注册下拉框的change事件
+        $("select[name='countryCode']").change(function(e){
+            //这样的逻辑保证了如果query失败,后面两个select都不会轻举妄动
+            if($("select[name='countryCode']").val()){
+                queryState(function(){
+                    $("select[name='cityCode']").empty();
+                });
+            }else{
+                $("select[name='stateCode']").empty();
+                $("select[name='cityCode']").empty();
+            }
+        });
+        $("select[name='stateCode']").change(function(e){
+            if($("select[name='stateCode']").val()){
+                queryCity();
+            }else{
+                $("select[name='cityCode']").empty();
+            }
+        });
+        //注册新增地址按钮事件
+        $("#addSites").click(function(e){
+            if(isEditingSite == null){
+                $("#addressMyModalLabel").text("<@spring.message 'mws.addressbook.createbilling'/>");
+            }else{
+                $("#addressMyModalLabel").text("<@spring.message 'mws.addressbook.editbilling'/>");
+            }
+        });
+        //为第一个下拉框求取值范围
+        queryCountry();
+        //请求填充页面
+        initPage();
+    });
+    
+    /*******************************************************/
+    /* 页面初始化 -                                             /
+    /*******************************************************/
+    //初始化页面
+    function initPage(){
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : "${base.contextPath}/account/queryAddress",
+            data : { siteUseCode : "BILL" },
+            success : function(data) {
+                if(data.rows){
+                    //记录到全局变量备用-点击编辑填充数据
+                    sitesData = data.rows;
+                    //填充页面数据
+                    initTable(data.rows);
+                    //注册tr的hover事件
+                    $("#billAddressTable tbody").find("tr").hover(function(){
+                        $(this).addClass('row-hover');
+                    },function(){
+                        $(this).removeClass('row-hover');
+                    });
+                    areaCodeSetData();
+
+                }
+            }
+        });
+    }
+    //初始化表格
+    function initTable(rows){
+        for(var i=0; i<rows.length; i++){
+            addRow(rows[i]);
+        }
+    }
+    //为下拉框areaCode设值
+    function areaCodeSetData(){
+        $("select[name='areaCode']").empty();
+        $("select[name='areaCode']").append("<option value='' selected></option>");
+        for(var i=0; i<telAreaCode.length; i++){
+            $("select[name='areaCode']").append("<option value='"+$.escapeHtml(telAreaCode[i].value)+"'>"+$.escapeHtml(telAreaCode[i].meaning)+"</option>");
+        }
+    }
+    //未表格添加新行
+    function addRow(rowdata){
+        var address = (rowdata.spmLocation.addressLine1?rowdata.spmLocation.addressLine1:"")+
+            (rowdata.spmLocation.addressLine2?rowdata.spmLocation.addressLine2:"")+
+            (rowdata.spmLocation.addressLine3?rowdata.spmLocation.addressLine3:"");
+        var location = rowdata.attribute1+rowdata.attribute2+rowdata.attribute3;
+        var tbody = $("#billAddressTable tbody");
+        var button = null;
+        if(rowdata.defaultFlag == "Y"){
+            button = "<span class='no-wrap defaultText'>&nbsp;<@spring.message 'mws.addressbook.defaultaddress'/>&nbsp;</span>"+
+                     "<input type='hidden' name='"+rowdata.siteId+"' value='"+$.escapeHtml(rowdata.defaultFlag)+"'>";
+        }else{
+            button = "<span>&nbsp;</span>"+
+                     "<button onclick='changeDefault(this)' type='button' class='btn btn-primary'><@spring.message 'mws.addressbook.setdefault'/></button>"+
+                     "<input type='hidden' name='"+rowdata.siteId+"' value='"+$.escapeHtml(rowdata.defaultFlag)+"'>";
+        }
+        var link = "<a class='no-wrap' onclick='editAddress("+rowdata.siteId+")'><@spring.message 'sys.hand.btn.edit'/></a> | <a class='no-wrap' onclick='deleteAddress("+rowdata.siteId+",\""+rowdata._token+"\")'><@spring.message 'sys.hand.btn.delete'/></a>";
+        var tr = "<tr id='siteId_"+rowdata.siteId+"'>"+
+                     "<td data-title=\"<@spring.message 'mws.addressbook.contact'/>\">"+$.escapeHtml(rowdata.name)+"</td>"+
+                     "<td data-title=\"<@spring.message 'mws.addressbook.location'/>\">"+$.escapeHtml(location)+"</td>"+
+                     "<td data-title=\"<@spring.message 'mws.addressbook.address'/>\">"+$.escapeHtml(address)+"</td>"+
+                     "<td data-title=\"<@spring.message 'mws.addressbook.zipcode'/>\">"+$.escapeHtml((rowdata.spmLocation.zipCode?rowdata.spmLocation.zipCode:''))+"</td>"+
+                     "<td data-title=\"<@spring.message 'mws.addressbook.phoneno'/>\">"+$.escapeHtml(rowdata.phone)+"</td>"+
+                     "<td data-title=\"<@spring.message 'mws.addressbook.operation'/>\">"+link+"</td>"+
+                     "<td data-title=\"\">"+button+"</td>"+
+                 "<tr>";
+        tbody.append(tr);
+    }
+    
+    /*******************************************************/
+    /* 增删改 -                                                /
+    /*******************************************************/
+    //保存地址
+    function saveMemAddress(e){
+        var formData = mergeAndObjectify(
+                $("#editAddress").serializeArray(),
+                [{name:"defaultFlag", value:$("input[name='defaultFlag']").prop("checked")==true?"Y":"N"}]
+        );
+        //必输校验-6个字段不能为空
+        if(!(formData.countryCode && formData.stateCode && formData.cityCode && formData.addressLine1 && formData.name && formData.areaCode && formData.phone)){
+            //处理报错信息
+            var errorMsg = "<@spring.message 'msg.error.mws.required_fields_is_empty'/>\n";
+            if(!formData.name){
+                errorMsg += "<@spring.message 'mws.addressbook.name'/>\n";
+            }
+            if(!formData.countryCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.country'/>\n";
+            }
+            if(!formData.stateCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.state'/>\n";
+            }
+            if(!formData.cityCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.city'/>\n";
+            }
+            if(!formData.addressLine1){
+                errorMsg += "<@spring.message 'mws.addressbook.address1'/>\n";
+            }
+            if(!formData.areaCode){
+                errorMsg += "<@spring.message 'mws.addressbook.areacode'/>\n";
+            }
+            if(!formData.phone){
+                errorMsg += "<@spring.message 'mws.addressbook.phone'/>\n";
+            }
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", errorMsg);
+            e = e||window.event;
+            if(e.stopPropagation){
+                e.stopPropagation();
+            }else{
+                e.cancelBubble = true;
+            }
+            return;
+        }
+        //格式校验
+        if (formData.zipCode) {
+            if (zipCodeReg.test(formData.zipCode) == false) {
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.zipcode.format.incorrect'/>");
+                e = e||window.event;
+                if(e.stopPropagation){
+                    e.stopPropagation();
+                }else{
+                    e.cancelBubble = true;
+                }
+                return;
+            }
+        }
+        if (phoneReg.test(formData.phone) == false) {
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.phone.format.incorrect'/>");
+            e = e||window.event;
+            if(e.stopPropagation){
+                e.stopPropagation();
+            }else{
+                e.cancelBubble = true;
+            }
+            return;
+        }
+        var memSite = {
+            siteUseCode:"BILL",
+            spmLocation:{}
+        };
+        //如果是编辑已存在的地址,检查是否做过变更
+        if(isEditingSite != null){
+            memSite = isEditingSite;
+            var needSaveFlag = false;
+            if(formData.name != isEditingSite.name){
+                needSaveFlag = true;
+            }
+            if(formData.areaCode != isEditingSite.areaCode){
+                needSaveFlag = true;
+            }
+            if(formData.phone != isEditingSite.phone){
+                needSaveFlag = true;
+            }
+            if(formData.countryCode != isEditingSite.spmLocation.countryCode){
+                needSaveFlag = true;
+            }
+            if(formData.stateCode != isEditingSite.spmLocation.stateCode){
+                needSaveFlag = true;
+            }
+            if(formData.cityCode != isEditingSite.spmLocation.cityCode){
+                needSaveFlag = true;
+            }
+            if(formData.addressLine1 != isEditingSite.spmLocation.addressLine1){
+                needSaveFlag = true;
+            }
+            if(formData.addressLine2 != isEditingSite.spmLocation.addressLine2){
+                needSaveFlag = true;
+            }
+            if(formData.addressLine3 != isEditingSite.spmLocation.addressLine3){
+                needSaveFlag = true;
+            }
+            if(formData.zipCode != isEditingSite.spmLocation.zipCode){
+                needSaveFlag = true;
+            }
+            if(formData.defaultFlag != isEditingSite.defaultFlag){
+                needSaveFlag = true;
+            }
+            if(!needSaveFlag){
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.nothing_changed'/>");
+                e = e||window.event;
+                if(e.stopPropagation){
+                    e.stopPropagation();
+                }else{
+                    e.cancelBubble = true;
+                }
+                return;
+            }
+        }
+        //准备memSite传到后台
+        memSite._token = formData._token;
+        memSite.name = formData.name;
+        memSite.areaCode = formData.areaCode;
+        memSite.phone = formData.phone;
+        memSite.defaultFlag = formData.defaultFlag;
+        memSite.spmLocation.name = formData.name;
+        memSite.spmLocation.countryCode = formData.countryCode;
+        memSite.spmLocation.stateCode = formData.stateCode;
+        memSite.spmLocation.cityCode = formData.cityCode;
+        memSite.spmLocation.addressLine1 = formData.addressLine1;
+        memSite.spmLocation.addressLine2 = formData.addressLine2;
+        memSite.spmLocation.addressLine3 = formData.addressLine3;
+        memSite.spmLocation.zipCode = formData.zipCode;
+        //发送保存请求
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            contentType : "application/json",
+            url : "${base.contextPath}/account/saveAddress",
+            data : JSON2.stringify(memSite),
+            success : function(data) {
+                if(data.success){
+                    $.dialog.success("<@spring.message 'mws.dialog.success'/>", "<@spring.message 'msg.error.mws.operation_succeed'/>",
+                            function(){
+                                location.reload(true);
+                            }
+                    );
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                }
+            }
+        });
+    }
+    //创建新地址
+    function createSite(){
+        //显示defaultFlag的复选框
+        $("#defaultCheckBox").removeClass("hide");
+        $("#defaultCheckBox").addClass("show");
+        $("#addressModal").modal("show");
+    }
+    
+    //编辑地址
+    function editAddress(siteId){
+        //初始化模态框
+        initModel(siteId);
+        if(isEditingSite == null){
+            $("#addressMyModalLabel").text("<@spring.message 'mws.addressbook.createbilling'/>");
+        }else{
+            $("#addressMyModalLabel").text("<@spring.message 'mws.addressbook.editbilling'/>");
+        }
+        //打开模态框
+        $("#addressModal").modal("show");
+    }
+    //删除地址
+    function deleteAddress(siteId,_token){
+        $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", "<@spring.message 'msg.warning.system.delete_or_not'/>",
+                function(){
+                    $.ajax({
+                        type : "POST",
+                        dataType : "json",
+                        url : "${base.contextPath}/account/deleteAddress",
+                        data : { siteId : siteId, _token: _token },
+                        success : function(data) {
+                            if(data.success){//删除成功
+                                //刷新页面
+                                $.dialog.success("<@spring.message 'mws.dialog.success'/>", "<@spring.message 'msg.error.mws.operation_succeed'/>",
+                                        function(){
+                                            location.reload(true);
+                                        }
+                                );
+                            }else{//删除失败
+                                $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                            }
+                        }
+                    });
+                }
+        );
+    }
+    //修改默认标记
+    function changeDefault(e){
+        var obj = $(e).siblings("input");
+        var site = null;
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == obj.attr("name")){
+                site = sitesData[i];
+                break;
+            }
+        }
+        //ajax保存变更
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : "${base.contextPath}/account/changeDefaultFlag",
+            data : { siteId : site.siteId, locationId : site.locationId, defaultFlag : obj.attr("value")=="Y"?"N":"Y", siteUseCode : site.siteUseCode, _token: site._token },
+            success : function(data) {
+                //刷新页面
+                $.dialog.success("<@spring.message 'mws.dialog.success'/>", "<@spring.message 'msg.error.mws.operation_succeed'/>",
+                        function(){
+                            location.reload(true);
+                        }
+                );
+            }
+        });
+    }
+    
+    /*******************************************************/
+    /* 增删改- 子函数实现 -                                       /
+    /*******************************************************/
+    //编辑时-初始化模态框
+    function initModel(siteId){
+        //从全局匹配到地址详细信息
+        var site = null;
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == siteId){
+                site = sitesData[i];
+                break;
+            }
+        }
+        //编辑时,存一个全局,这样既可以区别新建和编辑状态,又可以不用传递而得到正在编辑的数据
+        isEditingSite = site;
+        //填入到模态框
+        $("input[name='name']").val(site.name);
+        queryCountry(function(){
+            $("select[name='countryCode']").val(site.spmLocation.countryCode);
+            queryState(function(){
+                $("select[name='stateCode']").val(site.spmLocation.stateCode);
+                queryCity(function(){
+                    $("select[name='cityCode']").val(site.spmLocation.cityCode);
+                });
+            });
+        });
+        $("input[name='_token']").val(site._token);
+        $("input[name='addressLine1']").val(site.spmLocation.addressLine1);
+        $("input[name='addressLine2']").val(site.spmLocation.addressLine2);
+        $("input[name='addressLine3']").val(site.spmLocation.addressLine3);
+        $("input[name='zipCode']").val(site.spmLocation.zipCode);
+        $("select[name='areaCode']").val(site.areaCode);
+        $("input[name='phone']").val(site.phone);
+        //隐藏defaultFlag的复选框
+        $("#defaultCheckBox").removeClass("show");
+        $("#defaultCheckBox").addClass("hide");
+    }
+    //取消编辑时,清空
+    function cancelEditAddress(){
+        //清空数据
+        queryCountry(function(){
+            $("select[name='stateCode']").empty();
+            $("select[name='cityCode']").empty();
+        });
+        $("input[name='name']").val("");
+        $("input[name='addressLine1']").val("");
+        $("input[name='addressLine2']").val("");
+        $("input[name='addressLine3']").val("");
+        $("input[name='zipCode']").val("");
+        $("select[name='areaCode']").val("");
+        $("input[name='phone']").val("");
+        //默认标记默认是true
+        $("input[name='defaultFlag']").prop("checked", true);
+        //如果是编辑已存在的,更新相应全局的值
+        isEditingSite = null;
+    }
+    
+    /*******************************************************/
+    /* 下拉框联动实现 -                                          /
+    /*******************************************************/
+    //查询country下拉框
+    function queryCountry(callback){//callback就是函数套函数而已~
+        $.ajax({
+            url: '${base.contextPath}/account/queryCountry',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+            data : {},
+            success : function(data) {
+                if(data.success){
+                    countrySetData(data.rows);
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                }
+                if(callback){
+                    callback();
+                }
+            },
+            error : function() {
+                //alert("获取country下拉框失败");
+            }
+        })
+    }
+    //查询state下拉框
+    function queryState(callback){
+        $.ajax({
+            url: '${base.contextPath}/account/queryState',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+            data : {countryCode:$("select[name='countryCode']").val()},
+            success : function(data) {
+                if(data.success){
+                    stateSetData(data.rows);
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                }
+                if(callback){
+                    callback();
+                }
+            },
+            error : function() {
+                //alert("获取state下拉框失败");
+            }
+        })
+    }
+    //查询city下拉框
+    function queryCity(callback){
+        $.ajax({
+            url: '${base.contextPath}/account/queryCity',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+               data : {stateCode:$("select[name='stateCode']").val()},
+               success : function(data) {
+                   if(data.success){
+                       citySetData(data.rows);
+                   }else{
+                       $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                   }
+                   if(callback) callback();
+               },
+               error : function() {
+                   //alert("获取state下拉框失败");
+               }
+        })
+    }
+    //为下拉框countryCode设值
+    function countrySetData(options){
+        $("select[name='countryCode']").empty();
+        $("select[name='countryCode']").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("select[name='countryCode']").append("<option value='"+$.escapeHtml(options[i].countryCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    //为下拉框stateCode设值
+    function stateSetData(options){
+        $("select[name='stateCode']").empty();
+        $("select[name='stateCode']").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("select[name='stateCode']").append("<option value='"+$.escapeHtml(options[i].stateCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    //为下拉框cityCode设值
+    function citySetData(options){
+        $("select[name='cityCode']").empty();
+        $("select[name='cityCode']").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("select[name='cityCode']").append("<option value='"+$.escapeHtml(options[i].cityCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    
+    //工具函数-合并多个serialize数组为一个对象(Map)
+    function mergeAndObjectify(){
+        var argsLength = arguments.length;
+        if(argsLength < 1){
+            return null;
+        }
+        var obj = {};
+        for(var i=0; i<argsLength; i++){
+            for(var j=0; j<arguments[i].length; j++){
+                obj[arguments[i][j].name] = arguments[i][j].value;
+            }
+        }
+        return obj;
+    }
+</script>
+
+<!-- 修改联系地址模态框 -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button onclick="cancelEditAddress()" type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="addressMyModalLabel"></h4>
+            </div>
+            <div class="modal-body" class="col-sm-12">
+                <div class="row">
+                    <form id="editAddress">
+                        <input type="hidden" name="_token">
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="name"><@spring.message "mws.addressbook.name"/></label>
+                            <input type="text" class="form-control" name="name" placeholder="<@spring.message 'mws.addressbook.name'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="location"><@spring.message "mws.addressbook.location"/></label>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <select name="countryCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="国家">
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select name="stateCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="省">
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select name="cityCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="市">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="addressLine1"><@spring.message "mws.addressbook.address1"/></label>
+                            <input type="text" class="form-control" name="addressLine1" placeholder="<@spring.message 'mws.addressbook.address1'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="addressLine2"><@spring.message "mws.addressbook.address2"/></label>
+                            <input type="text" class="form-control" name="addressLine2" placeholder="<@spring.message 'mws.addressbook.address2'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="addressLine3"><@spring.message "mws.addressbook.address3"/></label>
+                            <input type="text" class="form-control" name="addressLine3" placeholder="<@spring.message 'mws.addressbook.address3'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="phone"><@spring.message "mws.addressbook.phone"/></label>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <select name="areaCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="areaCode">
+                                    </select>
+                                </div>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="phone" placeholder="<@spring.message 'mws.addressbook.phone'/>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="zipCode"><@spring.message "mws.addressbook.zipcode"/></label>
+                            <input type="text" class="form-control" name="zipCode" placeholder="<@spring.message 'mws.addressbook.zipcode'/>">
+                        </div>
+
+
+
+
+                        <div id="defaultCheckBox" class="col-sm-10 col-sm-offset-2 form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input name="defaultFlag" type="checkbox" checked="checked"><span><@spring.message "mws.addressbook.setdefault"/></span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="saveMemAddress(event)" type="button" class="btn btn-primary" data-dismiss="modal"><@spring.message "sys.hand.btn.save"/></button>
+                <button onclick="cancelEditAddress()" type="button" class="btn btn-default" data-dismiss="modal"><@spring.message "sys.hand.btn.cancel"/></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section id="content">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.menu.billingaddress"/></li>
+        </ol>
+        <div class="row">
+            <!-- Sidebar Start -->
+            <#include "../include/account-menu.html">
+            <!-- Sidebar End -->
+
+            <!-- Posts Start -->
+            <div class="col-sm-8 col-md-9">
+                <!--表格 -->
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><@spring.message "mws.addressbook.billingaddress"/></h3>
+                    </div>
+                    <div class="panel-body">
+                        <h3 class="entry-title"><span class="glyphicon glyphicon-plus"></span><@spring.message "mws.addressbook.createbilling"/></h3>
+                        <div class="row">
+                            <div class="col-sm-3 col-sm-offset-1">
+                                <button id="addSites" onclick="createSite()" type="button" class="btn btn-default"><@spring.message "mws.addressbook.createbilling"/></button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- List group -->
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <h3 class="entry-title"><span class="glyphicon glyphicon-list"></span><@spring.message "mws.addressbook.billinglist"/></h3>
+                            <div class="portlet-body no-more-tables">
+                                <table id="billAddressTable" class="table table-bordered table-condensed table-striped">
+                                    <thead>
+                                        <tr style="font-size: 10px">
+                                            <th class=""><@spring.message "mws.addressbook.contact"/></th>
+                                            <th class=""><@spring.message "mws.addressbook.location"/></th>
+                                            <th class=""><@spring.message "mws.addressbook.address"/></th>
+                                            <th class=""><@spring.message "mws.addressbook.zipcode"/></th>
+                                            <th class=""><@spring.message "mws.addressbook.phoneno"/></th>
+                                            <th class=""><@spring.message "mws.addressbook.operation"/></th>
+                                            <th class=""></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Posts End -->
+        </div>
+    </div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

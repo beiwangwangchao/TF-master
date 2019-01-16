@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.discount.mapper.DiscountTrxQueryMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.discount.dto.DiscountTrxQuery">
+        <result column="DISCOUNT_TRX_LINE_ID" property="discountTrxLineId" jdbcType="DECIMAL"/>
+        <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL"/>
+        <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR"/>
+        <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR"/>
+        <result column="PROCESS_AMT" property="processAmt" jdbcType="DECIMAL"/>
+        <result column="ADJUST_TYPE" property="adjustType" jdbcType="VARCHAR"/>
+        <result column="ADJUST_REASON" property="adjustReason" jdbcType="VARCHAR"/>
+        <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP"/>
+        <result column="SOURCE_TRX_NUM" property="sourceTrxNum" jdbcType="DECIMAL"/>
+        <result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+        <!--default column-->
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL"/>
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL"/>
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL"/>
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="queryBasic" parameterType="com.lkkhpg.dsis.common.discount.dto.DiscountTrxQuery"
+            resultMap="BaseResultMap">
+        SELECT
+        l.DISCOUNT_TRX_LINE_ID,
+        l.MEMBER_ID,
+        m.member_code,
+        m.CHINESE_FIRST_NAME member_name,
+        l.DISCOUNT_ADJUST_AMT process_amt,
+        h.ADJUST_TYPE,
+        h.ADJUST_REASON,
+        h.PROCESS_DATE,
+        h.DISCOUNT_TRX_NUM source_trx_num,
+        l.REMARK,
+        l.ATTRIBUTE1
+        FROM TF_DISCOUNT_TRX_LINE l, TF_DISCOUNT_TRX_HEAD h, MM_MEMBER m
+        <where>
+            h.DISCOUNT_TRX_HEAD_ID = l.DISCOUNT_TRX_HEAD_ID
+            AND l.MEMBER_ID = m.MEMBER_ID
+            and m.SALES_ORG_ID in (SELECT sura.ASSIGN_VALUE
+            FROM SYS_USER_ROLE_ASSIGN sura LEFT OUTER JOIN SPM_SALES_ORGANIZATION_TL ssol
+            ON (sura.ASSIGN_VALUE = ssol.SALES_ORG_ID AND ssol.LANG = #{request.locale, jdbcType=VARCHAR})
+            WHERE sura.USER_ID = #{request.userId, jdbcType=DECIMAL} AND sura.ROLE_ID =
+            #{request.roleId, jdbcType=DECIMAL} AND sura.ASSIGN_TYPE = 'SALES')
+            and h.status = 'COMP'
+            <if test='discountTrxQuery.salesOrgId != null'>
+                and m.SALES_ORG_ID = #{discountTrxQuery.salesOrgId, jdbcType=DECIMAL}
+            </if>
+            <if test='discountTrxQuery.discountTrxNum != null'>
+                AND upper(h.discount_trx_num) LIKE CONCAT ('%', CONCAT (upper(#{discountTrxQuery.discountTrxNum, jdbcType= VARCHAR}), '%'))
+            </if>
+            <if test='discountTrxQuery.adjustType != null'>
+                and h.adjust_type = #{discountTrxQuery.adjustType, jdbcType=VARCHAR}
+            </if>
+            <if test="list != null">
+                AND h.adjust_reason in
+                <foreach collection="list" item="item" index="index"
+                         open="(" separator="," close=")">#{item}
+                </foreach>
+            </if>
+            <if test='discountTrxQuery.processDateFrom != null'>
+                and h.process_date &gt;= #{discountTrxQuery.processDateFrom , jdbcType=DATE}
+            </if>
+            <if test='discountTrxQuery.processDateTo != null'>
+                and h.process_date &lt;= #{discountTrxQuery.processDateTo, jdbcType=DATE}
+            </if>
+            <if test="discountTrxQuery.attribute1 != null">
+                and upper(l.ATTRIBUTE1)  LIKE CONCAT ('%', CONCAT (upper(#{discountTrxQuery.attribute1,jdbcType=VARCHAR}), '%'))
+            </if>
+            <if test="discountTrxQuery.memberCode != null">
+                and upper(m.MEMBER_CODE) like concat('%', concat(upper(#{discountTrxQuery.memberCode,jdbcType=VARCHAR}), '%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="query" parameterType="com.lkkhpg.dsis.common.discount.dto.DiscountTrxQuery"
+            resultMap="BaseResultMap">
+        SELECT
+        l.DISCOUNT_TRX_LINE_ID,
+        l.MEMBER_ID,
+        m.member_code,
+        m.CHINESE_FIRST_NAME member_name,
+        l.DISCOUNT_ADJUST_AMT process_amt,
+        h.ADJUST_TYPE,
+        h.ADJUST_REASON,
+        h.PROCESS_DATE,
+        h.DISCOUNT_TRX_NUM source_trx_num,
+        l.REMARK,
+        l.ATTRIBUTE1
+        FROM TF_DISCOUNT_TRX_LINE l, TF_DISCOUNT_TRX_HEAD h, MM_MEMBER m
+        <where>
+            h.DISCOUNT_TRX_HEAD_ID = l.DISCOUNT_TRX_HEAD_ID
+            AND l.MEMBER_ID = m.MEMBER_ID
+            <if test='discountTrxQuery.salesOrgId != null'>
+                and m.SALES_ORG_ID = #{discountTrxQuery.salesOrgId, jdbcType=DECIMAL}
+            </if>
+            <if test='discountTrxQuery.discountTrxNum != null'>
+                AND upper(h.discount_trx_num) LIKE CONCAT ('%', CONCAT (upper(#{discountTrxQuery.discountTrxNum, jdbcType= VARCHAR}), '%'))
+            </if>
+            <if test='discountTrxQuery.adjustType != null'>
+                and h.adjust_type = #{discountTrxQuery.adjustType, jdbcType=VARCHAR}
+            </if>
+            <if test='discountTrxQuery.processDateFrom != null'>
+                and h.process_date &gt;= #{discountTrxQuery.processDateFrom , jdbcType=DATE}
+            </if>
+            <if test='discountTrxQuery.processDateTo != null'>
+                and h.process_date &lt;= #{discountTrxQuery.processDateTo, jdbcType=DATE}
+            </if>
+            <if test="discountTrxQuery.attribute1 != null">
+                and upper(l.ATTRIBUTE1)  LIKE CONCAT ('%', CONCAT (upper(#{discountTrxQuery.attribute1,jdbcType=VARCHAR}), '%'))
+            </if>
+        </where>
+    </select>
+</mapper>

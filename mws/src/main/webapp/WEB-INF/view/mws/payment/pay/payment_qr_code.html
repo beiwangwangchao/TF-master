@@ -1,0 +1,294 @@
+<#include "/mws/include/header.html">
+
+<style type="text/css">
+        .hover {
+            color: #000000;
+            background: #F4EFCF;
+        }
+
+        .pw-box-hd {
+            margin: 10px 10px;
+            border: 1px solid #ddd;
+            width: 298px;
+            height: 298px
+        }
+
+        .pw-box-hd img {
+            width: 308px;
+            height: 308px;
+            background: url(/mws/resources/images/loading.gif) center center no-repeat
+        }
+
+        .pw-box-ft {
+            margin-left: 10px;
+            height: 40px;
+            width: 298px;
+            padding: 8px 10px 8px 100px;
+            background: center center no-repeat #ff7674
+        }
+
+        .pw-box-ft p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 22px;
+            color: #fff;
+            font-weight: 700
+        }
+
+        .payment-change .pc-wrap {
+            display: block;
+            height: 60px;
+            line-height: 56px;
+            padding: 0 20px;
+            -moz-transition: all .1s;
+            -o-transition: all .1s;
+            -webkit-transition: all .1s;
+            transition: all .1s
+        }
+
+        .payment-change .pc-wrap .pc-w-arrow-left {
+            float: left;
+            margin-right: 15px
+        }
+
+        .p-w-hd {
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-family: "Microsoft Yahei"
+        }
+
+        .p-w-bd {
+            padding-left: 130px;
+            margin-bottom: 30px
+        }
+
+        .p-w-box {
+            float: left;
+            width: 300px
+        }
+
+        .pay-weixin {
+            zoom: 1
+        }
+
+        .p-w-bd:after, .pay-weixin:after {
+            display: table;
+            content: "";
+            clear: both
+        }
+    </style>
+<!-- ========== MENU END ========== -->
+<!-- ========== CONTENT START ========== -->
+<script type="text/javascript">
+
+    //获取指定form中的所有的<input>对象
+    function getElements(formId) {
+        var form = document.getElementById(formId);
+        var elements = new Array();
+        var tagElements = form.getElementsByTagName("input");
+        for (var j = 0; j < tagElements.length; j++) {
+            elements.push(tagElements[j]);
+        }
+        return elements;
+    }
+
+    //获取单个input中的【name,value】数组
+    function inputSelector(element) {
+        if (element.checked)
+            return [element.name, element.value];
+    }
+
+    function input(element) {
+        switch (element.type.toLowerCase()) {
+            case 'submit':
+            case 'hidden':
+            case 'password':
+            case 'text':
+                return [element.name, element.value];
+            case 'checkbox':
+            case 'radio':
+                return inputSelector(element);
+        }
+        return false;
+    }
+
+    //组合URL
+    function serializeElement(element) {
+        var method = element.tagName.toLowerCase();
+        var parameter = input(element);
+
+        if (parameter) {
+            var key = encodeURIComponent(parameter[0]);
+            if (key.length == 0) return;
+
+            if (parameter[1].constructor != Array)
+                parameter[1] = [parameter[1]];
+
+            var values = parameter[1];
+            var results = [];
+            for (var i = 0; i < values.length; i++) {
+                if (values[i] != "")
+                    results.push(key + '=' + values[i]);
+            }
+            return results.join('&');
+        }
+    }
+
+    //调用方法
+    function serializeForm(formId) {
+        var elements = getElements(formId);
+        var queryComponents = new Array();
+
+        for (var i = 0; i < elements.length; i++) {
+            var queryComponent = serializeElement(elements[i]);
+            if (queryComponent)
+                queryComponents.push(queryComponent);
+        }
+
+        return queryComponents.join('&');
+    }
+
+
+</script>
+
+<section id="content">
+    <div class="container">
+        <div class="row" style="margin-top: 0px;margin-left: 120px">
+            <div class="col-md-2 col-sm-2" style="margin-top: 30px">
+                <div class="col-md-offset-6"><img src="${base.contextPath}/resources/img/u100.png"></div>
+            </div>
+            <div class="col-md-6 col-sm-6" style="margin-top: 35px">
+                <div class="row">
+                    <div class="col-sm-6 form-group" style="font-weight: bolder;font-size:20px;color: black">
+                        <@spring.message "mws.autoship.submit.success"/>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-8 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+                        <label><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>:</label>
+                        <span id="orderNumber">${orderNumber}</span>
+                    </div>
+                    <div class="col-sm-4 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+                        <label><@spring.message "mws.myaccount.accountinfo.waiting_payment"/>:</label>
+                        <span style="color: red;" id="actrualPayAmt">${actrualPayAmt}</span>
+                    </div>
+                    <!--                         <div class="col-sm-4 form-group" style="color: black;height: 24px;">
+                                                <label><@spring.message "mws.myaccount.accountinfo.obtain_pv"/>:</label>
+                                                <span>300</span>
+                                            </div> -->
+                </div>
+            </div>
+        </div>
+
+
+        <div class="payment" style="margin-top: 5px;margin-left: 210px">
+            <div class="pay-weixin">
+                <div class="p-w-hd">扫码支付</div>
+                <div class="p-w-bd" style="position:relative">
+                    <div class="sytTable_p" style="position:absolute; top: -36px; left: 130px;">加载失败请刷新页面重新获取二维码<span
+                            class="j_qrCodeCountdown" style="color: red;font-style: oblique"></span>
+                    </div>
+                    <div class="p-w-box">
+                        <div class="pw-box-hd">
+                            <img id="ImageURL"   style=" width:296px; height: 297px"/>
+                        </div>
+                        <div class="pw-box-ft">
+                            <p style="padding-left: -190px">扫描二维码支付</p>
+                        </div>
+
+                        <div class="payment-change">
+                            <a class="pc-wrap" onclick="window.history.go(-1)">
+                                <i class="pc-w-arrow-left">&lt; <strong>选择其他支付方式</strong></i>
+
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 10px;margin-top: 10px;margin-left: 200px">
+            <@spring.message "mws.payment.selector.relatecustomer"/>
+        </div>
+    </div>
+
+</section>
+
+<script>
+    var transMethod = "${transChannel}";
+    $(function () {
+//    	$("input[name='radios']").click(function(){
+//    	});
+        $.ajax({
+            type: "POST",
+            url: "${base.contextPath}/payment/pay/queryStatus",
+            data: {orderNumber: $("#orderNumber").text(), transChannel: transMethod},
+            dataType: "json",
+            async: false,
+            success: function (result) {
+                if (result.success == true) {
+                    window.location.href = "${base.contextPath}/payment/pay/payment_success?orderNumber=" + orderNo;
+                }else {
+                    getImage();
+                }
+            }
+        });
+    });
+
+    var num = 45;
+    var  timeout=55;
+    var timer1;//检查订单状态
+    var timer2;//超时提醒
+    var timer3;//定时器清空
+    function ImageTimeout() {
+        num = num - 1;
+        if (1 <= num) {
+            $("#num").text(num);
+        } else if (1 > num) {
+            $('.sytTable_p').html('二维码已过期，<a href="javascript:getImage();"><span>刷新</span></a>页面重新获取二维码。');
+            $("#ImageURL").attr("src", "${base.contextPath}/resources/image/timeout.png");
+            clearInterval(timer2);
+        }
+    }
+
+    function queryStatusTimeout() {
+        timeout = timeout - 1;
+        if(timeout<1) {
+            clearInterval(timer1);
+            clearInterval(timer3);
+      }
+    }
+
+    function getImage() {
+        num = 45;
+        timeout=55;
+        $("#ImageURL").attr("src", "${base.contextPath}/payment/pay/getImage?orderNumber=" + $("#orderNumber").text() + "&transChannel=" + transMethod);
+        $('.sytTable_p').html('距离二维码过期还剩<span id="num" style="color: red">45</span>秒，过期后请刷新页面重新获取二维码。');
+        timer1 = setInterval(function () {
+            queryOrderState($("#orderNumber").text());
+        }, 2500);//设置2.5秒循环查询
+        // 二维码超时提醒
+        timer2 = setInterval(ImageTimeout, 1000);
+        timer3 = setInterval(queryStatusTimeout, 1000);
+    }
+
+    function queryOrderState(orderNo) {
+        $.ajax({
+            type: "POST",
+            url: "${base.contextPath}/payment/pay/queryStatus",
+            data: {orderNumber: orderNo, transChannel: transMethod},
+            dataType: "json",
+//            timeout: 3000,
+            async: false,
+            success: function (result) {
+                if (result.success == true) {
+                    window.location.href = "${base.contextPath}/payment/pay/payment_success?orderNumber=" + orderNo;
+                }
+            }
+        });
+    }
+
+</script>
+
+<#include "/mws/include/footer.html">

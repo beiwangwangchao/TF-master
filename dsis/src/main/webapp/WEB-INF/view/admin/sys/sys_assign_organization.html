@@ -1,0 +1,328 @@
+<#-- 
+* description: 分配角色界面的组织模板编辑器
+* version: 1.0 
+* author: liang.rao 
+* .
+* --> 
+<#include "../include/head.html">
+<body style="padding: 15px">
+    <script
+        src="${base.contextPath}/common/code?yes_no=SYS.YES_NO&organizationTypeData=SYS.ORGANIZATION_TYPE"
+        type="text/javascript"></script>
+    <form id="mainform" method="post"
+        enctype="application/json;charset=UTF-8">
+        <input type="hidden" name="orgTemplateDtls" id="orgTemplateDtls"
+            value="" />
+    </form>
+    <div id="orgTemplateDtlsGrid"
+        style="margin-left: 2px; margin-top: 2px;"></div>
+    <script type="text/javascript">
+        var aroleId = ${RequestParameters.roleId!};
+        var auserId = ${RequestParameters.userId!};
+        
+        <#assign isedit = (RequestParameters.isedit!'0')/> 
+        //表单底部按钮 
+        Hap.setFormDefaultBtn(f_cancel, f_save);
+        var gridDatas;
+
+        var salesEditor = $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_template_salesOrg")}, {
+        	onSelect : function(selectData) {
+        		if(gridDatas != ''){
+        			for (var i=0; i<gridDatas.length; i++) {
+        				if (gridDatas[i].assignType == 'SALES' && gridDatas[i].assignValue == selectData.value) {
+        					Hap.showError("<@spring.message 'msg.error.config.sales_org_is_repeat' />");
+        					return false;
+        				}
+        			}
+        		}
+        	}
+        });
+        /*销售组织查到的进行了屏蔽的数据*/
+        var salesEditor1 = $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_template_salesOrg2")}, {
+            onSelect : function(selectData) {
+                if(gridDatas != ''){
+                    for (var i=0; i<gridDatas.length; i++) {
+                        if (gridDatas[i].assignType == 'SALES' && gridDatas[i].assignValue == selectData.value) {
+                            Hap.showError("<@spring.message 'msg.error.config.sales_org_is_repeat' />");
+                            return false;
+                        }
+                    }
+                }
+            }
+        });
+        var invEditor = $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_template_invOrg")}, {
+        	onSelect : function(selectData) {
+        		if(gridDatas != ''){
+        			for (var i=0; i<gridDatas.length; i++) {
+        				if (gridDatas[i].assignType == 'INV' && gridDatas[i].assignValue == selectData.value) {
+        					Hap.showError("<@spring.message 'msg.error.config.inv_org_is_repeat' />");
+        					return false;
+        				}
+        			}
+        		}
+        	}
+        });
+        /*库存组织查到的进行了屏蔽的数据*/
+        var invEditor1 = $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_template_invOrg2")}, {
+            onSelect : function(selectData) {
+                if(gridDatas != ''){
+                    for (var i=0; i<gridDatas.length; i++) {
+                        if (gridDatas[i].assignType == 'INV' && gridDatas[i].assignValue == selectData.value) {
+                            Hap.showError("<@spring.message 'msg.error.config.inv_org_is_repeat' />");
+                            return false;
+                        }
+                    }
+                }
+            }
+        });
+
+        /* 获取Cookie中的值 */
+        function getCookie(cookie_name) {
+            var allcookies = document.cookie;
+            var cookie_pos = allcookies.indexOf(cookie_name);//索引的长度
+
+            if (cookie_pos != -1) {
+                // 把cookie_pos放在值的开始，只要给值加1即可。
+                cookie_pos += cookie_name.length + 1;
+                var cookie_end = allcookies.indexOf(";", cookie_pos);
+                if (cookie_end == -1) {
+                    cookie_end = allcookies.length;
+                }
+                var value = unescape(allcookies.substring(cookie_pos, cookie_end));
+            }
+            return value;
+        }
+
+        orgTemplateDtlsGrid = $("#orgTemplateDtlsGrid").ligerGrid({
+            columns : [
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.orgtemplatedtl.assigntype"/>',
+                name : 'assignType',
+                id : 'assignType',
+                width : 150,
+                align : 'left',
+                valueField : 'value',
+                textField : 'meaning',
+                validate : {
+                    required : true
+                },
+                editor : {
+                    type : 'select',
+                    data : organizationTypeData,
+                    valueField : 'value',
+                    textField : 'meaning'
+                },
+                render : function(item) {
+                    for (var i = 0; i < organizationTypeData.length; i++) {
+                        if (organizationTypeData[i]['value'] == item.assignType)
+                            return organizationTypeData[i]['meaning']
+                    }
+                    return item.assignType;
+                }
+            },   
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.orgtemplatedtl.assignvalue"/>',
+                name : 'assignValue',
+                id : 'assignValue',
+                textField : 'assignMeaning',
+                validate : {
+                    required : true
+                },
+                editor  : salesEditor,
+                render : function(item) {
+                    if (item.__status != 'add') {
+	                    return item.assignValueName;        
+                    } else {
+                    	return item.assignMeaning;
+                    }
+                }   
+            }, 
+            { 
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.defaultflag"/>',
+                name: 'defaultFlag',
+                align: 'left', 
+                width: '80',
+                validate : {
+                    required : true
+                },
+                editor : {
+                    type : 'select',
+                    data : yes_no,
+                    valueField : 'value',
+                    textField : 'meaning'
+                },
+                render : function(item) {
+                    for (var i = 0; i < yes_no.length; i++) {
+                        if (yes_no[i]['value'] == item.defaultFlag)
+                            return yes_no[i]['meaning']
+                    }
+                    return item.defaultFlag;
+                }
+            }
+            ],
+            showToggleColBtn : false,
+            onAfterEdit : f_onAfterEdit,
+            width : '100%',
+            height : '99%',
+            rowHeight : 24,
+            columnWidth : 100,
+            root: 'rows',
+            record: 'total',
+            usePager : false,
+            mouseoverRowCssClass : null,
+            enabledEdit : true,
+            checkbox : true,
+            onBeforeEdit: function(e){return f_onBeforeEdit(e);},
+            <#if isedit == '1'>
+             url: '${base.contextPath}/sys/assign/queryById?roleId=${RequestParameters.roleId!}&userId=${RequestParameters.userId!}', 
+            </#if>
+            toolbar : {
+                items : [ {
+                    text : '<@spring.message "sys.hand.btn.new"/>',
+                    disable : false,
+                    click : function() {
+                    	gridDatas = orgTemplateDtlsGrid.getData();
+                        orgTemplateDtlsGrid.addRow({})
+                    },
+                    icon : 'add'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click : function() {
+                    	Hap.gridDelete({
+                            grid : orgTemplateDtlsGrid
+                        })
+                    },
+                    icon : 'delete'
+                } ]
+            }
+        });
+        
+		/*控制默认值只能有一个Y*/      	
+        function f_onAfterEdit(rowdata){
+    	  	var num = 0;
+            var id = rowdata.record.__index;
+            if(rowdata.record.assignType == 'SALES'){
+                var defaultFlag = rowdata.record.defaultFlag;
+                var allRow = orgTemplateDtlsGrid.getData();
+                for(var i = 0;i<allRow.length;i++){
+                    if(allRow[i].assignType == 'SALES' && i != id && defaultFlag == 'Y'){
+                        orgTemplateDtlsGrid.updateRow(orgTemplateDtlsGrid.getRow(i),{defaultFlag : 'N'});
+                    }
+                }
+            }else if(rowdata.record.assignType == 'INV'){
+                var defaultf = rowdata.record.defaultFlag;
+                var allRow = orgTemplateDtlsGrid.getData();
+                for(var i = 0;i<allRow.length;i++){
+                    if(allRow[i].assignType == 'INV' && i != id && defaultf == 'Y'){
+                        orgTemplateDtlsGrid.updateRow(orgTemplateDtlsGrid.getRow(i),{defaultFlag : 'N'});
+                    }
+                }
+            }
+            if (rowdata.column.columnname == 'assignType') {
+                orgTemplateDtlsGrid.updateRow(orgTemplateDtlsGrid.getRow(id),{
+                	assignValue : '',
+                	assignMeaning : ''
+                });
+        	}
+        }
+        
+        function f_onBeforeEdit(rowdata){
+        	if (rowdata.column.name == "defaultFlag") {
+        		return true;
+        	}
+            if(rowdata.record.__status != 'add'){
+                return false;
+            }
+            //如果在分配值上点击，则根据分配类型更改LOV
+            if(rowdata.column.name == "assignValue"){
+                var assignType = rowdata.record.assignType;
+                if(assignType == null || assignType == ""){
+                    return false;
+                } 
+                //销售组织
+                if(rowdata.record.assignType == 'SALES'){
+                    /*不是sysadmin的用户只能维护自己的销售组织*/
+                    if(getCookie('loginName') != 'sysadmin') {
+                        rowdata.column.editor = salesEditor1;
+                    }else {
+                        rowdata.column.editor = salesEditor;
+                    }
+                    orgTemplateDtlsGrid.setCellEditing(rowdata.record, rowdata.column, true);
+                }
+                //库存组织
+                else if(rowdata.record.assignType == 'INV'){
+                    /*不是sysadmin的用户只能维护自己的库存组织*/
+                    if( getCookie('loginName') != 'sysadmin') {
+                        rowdata.column.editor = invEditor1;
+                    }else{
+                        rowdata.column.editor = invEditor;
+                    }
+                    orgTemplateDtlsGrid.setCellEditing(rowdata.record, rowdata.column, true);
+                }
+            }       
+            return true;
+        }
+        /*保存*/
+        function f_save() {
+        	if (!f_validator()) {
+        		return false;
+        	}
+       		if (orgTemplateDtlsGrid.rows.length == 0) {
+       			Hap.showSuccess($l('sys.hand.tip.success'), function() {
+                    f_cancel();
+                });
+       		}
+            Hap.gridSave({
+                grid:orgTemplateDtlsGrid,
+                url:"${base.contextPath}/sys/assign/save",
+                success:function(json) {
+                    if (json.success) {
+                        Hap.showSuccess($l('sys.hand.tip.success'), function() {
+	                        f_cancel();
+                        });
+                    }
+                }
+            });
+        }
+       /*关闭弹出框*/
+       function f_cancel() {
+       		var dialog = frameElement.dialog;
+       		dialog.close();      
+	   }
+       /*校验*/
+       function f_validator() {
+    	   var salesNum = 0;
+	       var invNum = 0;
+	       var salesTypeNum = 0;
+	       var invTypeNum = 0;
+           var data = orgTemplateDtlsGrid.rows;
+           for (var i = 0; i < data.length; i++) {
+               orgTemplateDtlsGrid.updateRow(orgTemplateDtlsGrid.getRow(i),{roleId : aroleId,userId : auserId});
+               if (orgTemplateDtlsGrid.getRow(i).assignType == 'SALES') {
+	               	salesTypeNum ++;
+	               	if (orgTemplateDtlsGrid.getRow(i).defaultFlag == "Y") {
+                   		salesNum ++;
+                   	}
+               }
+               if (orgTemplateDtlsGrid.getRow(i).assignType == 'INV') {
+	               	invTypeNum ++;
+	               	if (orgTemplateDtlsGrid.getRow(i).defaultFlag == "Y") {
+                   		invNum ++;
+                   	}
+               }
+           }
+           if (salesNum != 1 && salesTypeNum > 0) {
+           		Hap.showError("<@spring.message 'msg.error.config.sales_org_has_one_defalut' />");
+      	   		return false;
+           }
+           if (invNum != 1 && invTypeNum > 0) {
+           		Hap.showError("<@spring.message 'msg.error.config.inv_org_has_one_defalut' />");
+      	   		return false;
+           }
+    	   return true;
+       }
+ </script>
+</body>
+</html>

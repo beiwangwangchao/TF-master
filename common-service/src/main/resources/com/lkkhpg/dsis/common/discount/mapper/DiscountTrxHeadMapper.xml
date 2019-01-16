@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.discount.mapper.DiscountTrxHeadMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.discount.dto.DiscountTrxHeadDto">
+        <result column="DISCOUNT_TRX_HEAD_ID" property="discountTrxHeadId" jdbcType="DECIMAL"/>
+        <result column="DISCOUNT_TRX_NUM" property="discountTrxNum" jdbcType="VARCHAR"/>
+        <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL"/>
+        <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP"/>
+        <result column="ADJUST_TYPE" property="adjustType" jdbcType="VARCHAR"/>
+        <result column="ADJUST_REASON" property="adjustReason" jdbcType="VARCHAR"/>
+        <result column="STATUS" property="status" jdbcType="VARCHAR"/>
+        <result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+        <!--default column-->
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL"/>
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL"/>
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL"/>
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        DISCOUNT_TRX_HEAD_ID,DISCOUNT_TRX_NUM,SALES_ORG_ID,PROCESS_DATE,ADJUST_TYPE, ADJUST_REASON,STATUS,REMARK,
+        OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2,
+        ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+    </sql>
+    <delete id="deleteDiscount">
+        delete from tf_discount_trx_head
+    </delete>
+    <delete id="deleteByPrimaryKey"></delete>
+
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.discount.dto.DiscountTrxHeadDto">
+        insert into tf_discount_trx_head(discount_trx_head_id,discount_trx_num, sales_org_id,
+        process_date, adjust_type, adjust_reason,status,
+        REMARK, OBJECT_VERSION_NUMBER,
+        REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+        CREATED_BY,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10,
+        ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14, ATTRIBUTE15)
+        values (#{discountTrxHeadId, jdbcType=DECIMAL}, #{discountTrxNum, jdbcType=VARCHAR},#{salesOrgId,jdbcType=DECIMAL},
+        #{processDate,jdbcType=TIMESTAMP}, #{adjustType,jdbcType=VARCHAR}, #{adjustReason,jdbcType=VARCHAR},
+        #{status,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 1,
+        #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},CURRENT_TIMESTAMP,
+         #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR},
+        #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR},
+        #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tf_discount_trx_head
+        where discount_trx_head_id = #{discountTrxHeadId, jdbcType=DECIMAL}
+    </select>
+
+    <select id="getDiscountTrxHeadId" resultType="java.lang.Long">
+        select tf_discount_trx_head_s.nextval from dual
+    </select>
+    <select id="queryDiscountTrxHead" parameterType="com.lkkhpg.dsis.common.discount.dto.DiscountTrxHeadDto"
+            resultMap="BaseResultMap">
+        SELECT
+        h.DISCOUNT_TRX_HEAD_ID,
+        h.DISCOUNT_TRX_NUM,
+        h.STATUS,
+        h.CREATION_DATE,
+        h.PROCESS_DATE,
+        h.ADJUST_TYPE,
+        h.REMARK
+        FROM TF_DISCOUNT_TRX_HEAD h
+        <where>
+            h.sales_org_id in (SELECT sura.ASSIGN_VALUE
+            FROM SYS_USER_ROLE_ASSIGN sura LEFT OUTER JOIN SPM_SALES_ORGANIZATION_TL ssol
+            ON (sura.ASSIGN_VALUE = ssol.SALES_ORG_ID AND ssol.LANG = #{request.locale, jdbcType=VARCHAR})
+            WHERE sura.USER_ID = #{request.userId, jdbcType=DECIMAL} AND sura.ROLE_ID =
+            #{request.roleId, jdbcType=DECIMAL} AND sura.ASSIGN_TYPE = 'SALES')
+            <if test="salesOrgId != null">
+                and h.sales_org_id = #{salesOrgId, jdbcType= DECIMAL}
+            </if>
+            <if test="discountTrxNum != null">
+                AND h.discount_trx_num LIKE CONCAT ('%', CONCAT (#{discountTrxNum, jdbcType= VARCHAR}, '%'))
+            </if>
+            <if test="status != null">
+                AND h.status = #{status, jdbcType= VARCHAR}
+            </if>
+            <if test="adjustType != null">
+                AND h.adjust_type = #{adjustType, jdbcType= VARCHAR}
+            </if>
+            <if test="reasonList != null">
+                AND h.adjust_reason in
+                <foreach collection="reasonList" item="item" index="index"
+                         open="(" separator="," close=")">#{item}
+                </foreach>
+            </if>
+            <if test="processDateFrom != null">
+                AND h.process_date &gt;= #{processDateFrom, jdbcType= TIMESTAMP}
+            </if>
+            <if test="processDateTo != null">
+                AND h.process_date &lt;= #{processDateTo, jdbcType= TIMESTAMP}
+            </if>
+            <if test="creationDateFrom != null">
+                AND h.creation_date &gt;= #{creationDateFrom, jdbcType= TIMESTAMP}
+            </if>
+            <if test="creationDateTo != null">
+                AND h.creation_date &lt;= #{creationDateTo, jdbcType= TIMESTAMP}
+            </if>
+            <if test="attribute1 != null">
+                and h.DISCOUNT_TRX_HEAD_ID in (select l.DISCOUNT_TRX_HEAD_ID from tf_discount_trx_line l where upper(l.ATTRIBUTE1)  LIKE CONCAT ('%', CONCAT (upper(#{attribute1,jdbcType=VARCHAR}), '%')))
+            </if>
+            <if test="memberCode != null">
+                and h.DISCOUNT_TRX_HEAD_ID in (select l.DISCOUNT_TRX_HEAD_ID from tf_discount_trx_line l,MM_MEMBER m
+                             where l.MEMBER_ID = m.MEMBER_ID
+                             and upper(m.MEMBER_CODE) like concat('%', concat(upper(#{memberCode,jdbcType=VARCHAR}), '%'))
+                            )
+            </if>
+        </where>
+    </select>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.discount.dto.DiscountTrxHeadDto">
+        update tf_discount_trx_head
+        <set>
+            <if test="salesOrgId != null">
+                sales_org_id = #{salesOrgId, jdbcType=DECIMAL},
+            </if>
+            <if test="discountTrxNumber">
+                discount_trx_num = #{discountTrxNum, jdbcType=VARCHAR},
+            </if>
+            <if test="processDate != null">
+                process_date = #{processDate, jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where discount_trx_head_id = #{discountTrxHeadId, jdbcType=DECIMAL}
+    </update>
+
+    <update id="updateByPrimaryKey">
+        update tf_discount_trx_head
+        set
+        sales_org_id = #{salesOrgId, jdbcType=DECIMAL},
+        discount_trx_num = #{discountTrxNum, jdbcType=VARCHAR},
+        process_date = #{processDate, jdbcType=TIMESTAMP},
+        STATUS = #{status,jdbcType=VARCHAR},
+        REMARK = #{remark,jdbcType=VARCHAR},
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateDiscountTrxStatus" parameterType="java.lang.Long">
+        update tf_discount_trx_head
+        set status = 'COMP'
+        <where>
+            <if test="discountTrxHeadId != null">
+                discount_trx_head_id = #{discountTrxHeadId, jdbcType = DECIMAL}
+            </if>
+        </where>
+    </update>
+
+    <update id="canclDiscountTrxStatus" parameterType="java.lang.String">
+        update tf_discount_trx_head h
+        set status = 'CANCL'
+        <where>
+            <if test="orderNumber != null">
+                h.DISCOUNT_TRX_HEAD_ID=(SELECT l.DISCOUNT_TRX_HEAD_ID from  tf_discount_trx_line l
+                         where l.ATTRIBUTE1 = #{orderNumber, jdbcType = VARCHAR})
+            </if>
+        </where>
+    </update>
+
+    <select id="queryByMemOrd" resultMap="BaseResultMap">
+         SELECT
+        h.DISCOUNT_TRX_HEAD_ID,
+        h.DISCOUNT_TRX_NUM,
+        h.STATUS,
+        h.CREATION_DATE,
+        h.PROCESS_DATE,
+        h.ADJUST_TYPE,
+        h.REMARK
+        FROM TF_DISCOUNT_TRX_HEAD h
+        where h.DISCOUNT_TRX_HEAD_ID=(
+          SELECT l.DISCOUNT_TRX_HEAD_ID from TF_DISCOUNT_TRX_LINE l
+          where l.MEMBER_ID= #{memberId,jdbcType=DECIMAL}
+            and l.ATTRIBUTE1=#{orderNumber,jdbcType=VARCHAR}
+        )
+    </select>
+</mapper>

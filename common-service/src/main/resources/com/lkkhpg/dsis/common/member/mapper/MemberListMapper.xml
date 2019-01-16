@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.member.mapper.MemberListMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.member.dto.MemberList" >
+    <id column="UNIQUE_ID" property="uniqueId" jdbcType="DECIMAL" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="GROUP_ID" property="groupId" jdbcType="DECIMAL" />
+    <result column="GROUP_TYPE" property="groupType" jdbcType="VARCHAR" />
+    <result column="VALIDATE_FLAG" property="validateFlag" jdbcType="VARCHAR" />
+    <result column="REASON_CODE" property="reasonCode" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="member_list" type="com.lkkhpg.dsis.common.member.dto.Member" extends="BaseResultMap">
+    <id column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+     <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+    <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR" />
+    <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+    <result column="area_phone" property="areaPhone" jdbcType="VARCHAR" />
+    <result column="PHONE_NO" property="phoneNo" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    UNIQUE_ID, MEMBER_ID, MEMBER_CODE, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+    CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+    GROUP_ID, GROUP_TYPE, VALIDATE_FLAG, REASON_CODE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.math.BigDecimal" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEMBER_LIST
+    where UNIQUE_ID = #{uniqueId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.math.BigDecimal" >
+    delete from MM_MEMBER_LIST
+    where UNIQUE_ID = #{uniqueId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemberList" >
+    <selectKey resultType="java.lang.Long" keyProperty="uniqueId" order="BEFORE" >
+      select MM_MEMBER_LIST_S.nextval from dual
+    </selectKey>
+    insert into MM_MEMBER_LIST (UNIQUE_ID, MEMBER_ID, MEMBER_CODE, 
+      OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, GROUP_ID, 
+      GROUP_TYPE, VALIDATE_FLAG, REASON_CODE
+      )
+    values (#{uniqueId,jdbcType=DECIMAL}, #{memberId,jdbcType=DECIMAL}, #{memberCode,jdbcType=VARCHAR}, 
+      1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, -1, -1, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{groupId,jdbcType=DECIMAL}, 
+      #{groupType,jdbcType=VARCHAR}, #{validateFlag,jdbcType=VARCHAR}, #{reasonCode,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemberList" >
+    <selectKey resultType="java.math.BigDecimal" keyProperty="uniqueId" order="BEFORE" >
+      select MM_MEMBER_LIST_S.nextval from dual
+    </selectKey>
+    insert into MM_MEMBER_LIST
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      UNIQUE_ID,
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="memberCode != null" >
+        MEMBER_CODE,
+      </if>
+        OBJECT_VERSION_NUMBER,
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="groupId != null" >
+        GROUP_ID,
+      </if>
+      <if test="groupType != null" >
+        GROUP_TYPE,
+      </if>
+      <if test="validateFlag != null" >
+        VALIDATE_FLAG,
+      </if>
+      <if test="reasonCode != null" >
+        REASON_CODE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{uniqueId,jdbcType=DECIMAL},
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="memberCode != null" >
+        #{memberCode,jdbcType=VARCHAR},
+      </if>
+      1,
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="groupId != null" >
+        #{groupId,jdbcType=DECIMAL},
+      </if>
+      <if test="groupType != null" >
+        #{groupType,jdbcType=VARCHAR},
+      </if>
+      <if test="validateFlag != null" >
+        #{validateFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="reasonCode != null" >
+        #{reasonCode,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemberList" >
+    update MM_MEMBER_LIST
+    <set >
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="memberCode != null" >
+        MEMBER_CODE = #{memberCode,jdbcType=VARCHAR},
+      </if>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="groupId != null" >
+        GROUP_ID = #{groupId,jdbcType=DECIMAL},
+      </if>
+      <if test="groupType != null" >
+        GROUP_TYPE = #{groupType,jdbcType=VARCHAR},
+      </if>
+      <if test="validateFlag != null" >
+        VALIDATE_FLAG = #{validateFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="reasonCode != null" >
+        REASON_CODE = #{reasonCode,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where UNIQUE_ID = #{uniqueId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.member.dto.MemberList" >
+    update MM_MEMBER_LIST
+    set MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      MEMBER_CODE = #{memberCode,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      GROUP_ID = #{groupId,jdbcType=DECIMAL},
+      GROUP_TYPE = #{groupType,jdbcType=VARCHAR},
+      VALIDATE_FLAG = #{validateFlag,jdbcType=VARCHAR},
+      REASON_CODE = #{reasonCode,jdbcType=VARCHAR}
+    where UNIQUE_ID = #{uniqueId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="getMemberListByGroupId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+     select 
+    <include refid="Base_Column_List" />
+    from MM_MEMBER_LIST
+    where GROUP_ID = #{groupId,jdbcType=DECIMAL}
+    and VALIDATE_FLAG = 'Y'
+  </select>
+  
+  <delete id="deleteByGroupId" parameterType="java.lang.Long" >
+    delete from MM_MEMBER_LIST
+    where GROUP_ID = #{groupId,jdbcType=DECIMAL}
+  </delete>
+  
+  <select id="getNextGroupId" resultType="java.lang.Long">
+    select MM_MEMBER_LIST_GROUP_S.NEXTVAL from dual 
+  </select>
+  
+  <select id="getByMemberCode" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select count(0)
+    from MM_MEMBER_LIST 
+    where MEMBER_CODE = #{memberCode,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="getAllMemberListByGroupId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+     select 
+    <include refid="Base_Column_List" />
+    from MM_MEMBER_LIST
+    where GROUP_ID = #{groupId,jdbcType=DECIMAL}
+  </select>
+  
+  <select id="getAllMember" resultMap="member_list" parameterType="java.lang.Long">
+     select 
+    mmv.member_id,mmv.member_name,mmv.member_code,mmv.email,mmv.phone_no,mmv.status
+    from MM_MEMBER_LIST mml, mm_member_v mmv
+    where mml.member_id = mmv.member_id
+    and GROUP_ID = #{groupId,jdbcType=DECIMAL}
+  </select>
+</mapper>

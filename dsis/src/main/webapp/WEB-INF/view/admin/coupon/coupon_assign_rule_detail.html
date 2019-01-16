@@ -1,0 +1,1231 @@
+<#--
+        * description: 优惠券分配规则详情页
+        * version: 1.0
+        * author: yuheng.lin
+        * Copyright LKK Health Products Group Limited.
+        *
+        -->
+
+    <#include "../include/head.html">
+        <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+        <script src="${base.contextPath}/common/code?assignRuleStatus=PDM.ASSIGN_RULE_STATUS&assignApplyOccasion=PDM.ASSIGN_APPLY_OCCASION" type="text/javascript"></script>
+        <style>
+            .l-group span {
+                float: left;
+                width: 40px;
+                text-align: left;
+            }
+            .add-rule-btn {
+                margin-left: 80%;
+                position: relative;
+                top: -10px;
+                right : -25px;
+            }
+            .del-rule-btn {
+                margin-left: 80%;
+                position: relative;
+                top: 20px;
+                right : -25px;
+            }
+        </style>
+        <body style="padding: 3px;padding-bottom:400px">
+        <div id="save_btn"></div>
+        <form id="coupon_assign_rule_form"></form>
+        <div class="l-toolbar-item l-panel-btn l-toolbar-item-hasicon add-rule-btn" style="float:right;margin-right:92px;" onclick="addRuleGrid()">
+            <span><@spring.message "type.com.lkkhpg.dsis.common.coupon.addrule"/></span>
+            <div class="l-panel-btn-l"></div>
+            <div class="l-panel-btn-r"></div>
+            <div class="l-icon l-icon-add"></div>
+        </div>
+        <div id="ruleGroup">
+            <div id="coupon_assign_rule_group_1" style="clear:both">
+                <form id="coupon_assign_rule_toggle_1" style="clear:both"></form>
+                <div id="delete_btn_1" class="l-toolbar-item l-panel-btn l-toolbar-item-hasicon del-rule-btn" style="float:right;margin-right:92px;" onClick="deleteRule(1)">
+                    <span><@spring.message "sys.hand.btn.delete"/></span>
+                    <div class="l-panel-btn-l"></div>
+                    <div class="l-panel-btn-r"></div>
+                    <div class="l-icon l-icon-delete"></div>
+                </div>
+                <div id="coupon_assign_rule_condition_grid_1" style="float:left"></div>
+                <div id="coupon_assign_rule_result_grid_1" style="float:left"></div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            //原值保存
+            var oldValue = null;
+            var salesOrgId = _salesOrgId;
+            var marketId = _marketId;
+            var marketCode;
+            var salesOrgData = [];
+            var marketData = [];
+            var oldMarketIdValue = null;
+            var salesOrgByMarket = [];
+            var ruleNum = 1;
+            var toggleNum = 1;
+            var rules = [];
+            var ruleCode;
+            var selectTextCache = new Object();
+            var deleteRules = [];
+            var applyOnOldValue;
+            var firstChooseApplyOn = true;
+
+            var hasDataFlag = false;
+
+            //编辑模式参数
+            <#assign isedit = (RequestParameters.isedit ! '0') />
+            <#assign status = (RequestParameters.status ! 'ENABL') />
+            //编辑模式
+            var isedit = '0';
+            <#if isedit = '1'>
+            isedit = ${RequestParameters.isedit};
+            </#if>
+            <#if isedit == '1'>
+                var loadFinished = false;
+            <#else>
+            var loadFinished = true;
+            </#if>
+            $(function(){
+                salesOrgId = ${RequestParameters.salesOrgIdValue!_salesOrgId};
+                marketId = ${RequestParameters.marketId!_marketId};
+                initButton();
+                //编辑模式加载分配规则数据
+                <#if isedit == '1' >
+                $.ligerDialog.waitting('<@spring.message "sys.hand.tip.loading"/>');
+                Hap.ajax({
+                    type: "GET",
+                    url: '${base.contextPath}/coupon/assignrule/get?groupCode=${RequestParameters.groupCode}',
+                    success: function(data) {
+                        if (data.rows == undefined || data.rows[0] == null) {
+//                         Hap.showError('<@spring.message "msg.error.sys.data_no_found"/>',
+//                                 function() {
+//                                     if (window.top.f_removeTab  != undefined) {
+//                                         window.top.f_removeTab('MEMBER_DETAIL')
+//                                     } else {
+//                                         window.opener=null;
+//                                         window.open('','_self');
+//                                         window.close();
+//                                     }
+//                            });
+                        } else {
+                            rules = data.rows;
+                            if (rules == null) {
+                                return;
+                            }
+                            init(rules);
+                        }
+                    },
+                    failure: function(data) {
+                        Hap.showError(data.message,
+                            function() {
+                                if (window.top.f_removeTab  != undefined) {
+                                    window.top.f_removeTab('MEMBER_DETAIL')
+                                } else {
+                                    window.opener=null;
+                                    window.open('','_self');
+                                    window.close();
+                                }
+                            });
+                        return;
+                    }
+                });
+                <#else>
+                initForm();
+                initGroup();
+                initConditionGrid();
+                initResultGrid();
+                </#if>
+            });
+            function init(rules) {
+                marketId = rules[0].marketId;
+                initForm();
+                initFormData(rules[0]);
+                initGroup();
+                initConditionGrid();
+                initResultGrid();
+                for(var i = 0; i<rules.length-1; i++) {
+                    addRuleGrid();
+                }
+                initGridData(rules);
+
+
+                setLayoutDisable(rules[0].status,rules[0].effectiveEndDate);
+
+                loadFinished = true;
+
+                hasDataFlag = true;
+
+            }
+            function initFormData(rule) {
+                salesOrgId = rule.salesOrgId;
+                liger.get('status').setValue(rule.status);
+                liger.get('groupCode').setValue(rule.groupCode);
+                liger.get('groupName').setValue(rule.groupName);
+                liger.get('groupDesc').setValue(rule.groupDesc);
+
+                liger.get('applyOn').setValue(rule.applyOn);
+                liger.get('effectiveStartDate').setValue(rule.effectiveStartDate);
+                liger.get('effectiveEndDate').setValue(rule.effectiveEndDate);
+
+                if(rule.status != 'ENABL'){
+                    marketCode = rule.marketCode;
+                    liger.get('marketId').setValue(rule.marketId);
+                    liger.get('marketId').setText(rule.marketName);
+                    liger.get('salesOrgId').setValue(rule.salesOrgId);
+                    liger.get('salesOrgId').setText(rule.salesOrgName);
+                }
+            }
+            function initGridData(rules) {
+                for(var i = 1; i <= ruleNum; i++){
+                    liger.get('ruleId_'+i).setValue(rules[i-1].id);
+                    liger.get('ruleCode_'+i).setValue(rules[i-1].code);
+
+                    var conditionGrid = liger.get('coupon_assign_rule_condition_grid_' + i);
+                    conditionGrid.options.url = "${base.contextPath}/coupon/condition/query?ruleCode="+rules[i-1].code;
+                    conditionGrid.reload();
+
+                    var resultGrid = liger.get('coupon_assign_rule_result_grid_' + i);
+                    resultGrid.options.url = "${base.contextPath}/coupon/action/query?ruleCode="+rules[i-1].code;
+                    resultGrid.reload();
+                }
+            }
+            function initButton() {
+                window['save_btn'] = $("#save_btn").ligerForm({
+                    buttons : [ {
+                        id : 'saveBtn',
+                        text : '<@spring.message "sys.hand.btn.save"/>',
+                        disabled : false,
+                        width : 60,
+                        click : function() {
+                            save('ENABL');
+                        }
+                    },{
+                        id : 'enableBtn',
+                        text : '<@spring.message "sys.hand.common.enable"/>',
+                    <#if isedit = '0'>
+                    disabled : true,
+            </#if>
+                width : 60,
+                    click : function() {
+                    enableRule();
+                }
+            },{
+                    id : 'disableBtn',
+                        text : '<@spring.message "sys.hand.common.disable"/>',
+                <#if isedit = '0'>
+                        disabled : true,
+                </#if>
+                    width : 60,
+                        click : function() {
+                        disableRule();
+                    }
+                }]
+            });
+            }
+            function initForm() {
+                window['coupon_assign_rule_form'] = $("#coupon_assign_rule_form").ligerForm({
+                    fields: [
+                        {
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+                            name : "marketId",
+                            newline : false,
+                            type : "select",
+                            options : {
+                                value : marketId,
+                                valueField : 'marketId',
+                                textField : 'name',
+                                cancelable : false,
+                                async : false,
+                            <#if status = 'ENABL'>
+                    url : '${base.contextPath}/om/order/queryMarketList',
+                    onSuccess : function(data){
+                    for(var i =0; i < data.rows.length; i++){
+                        if(data.rows[i].marketId == marketId) {
+                            marketCode = data.rows[i].code
+                        }
+                    }
+                    this.setValue(marketId);
+                },
+                onBeforeSelect : function(){ //该事件用于将初次加载标志置false,记录原值以及将重复标记置为true
+                    oldMarketIdValue = $.ligerui.get('marketId').getValue();
+                },
+                onSelected : function (value){
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        async : false,
+                        data : {marketId : value},
+                        url : "${base.contextPath}/om/order/getSalesOrgData",
+                        success: function(data) {
+                            salesOrgByMarket = data.rows;
+                        }
+                    });
+                    liger.get("salesOrgId").setData(salesOrgByMarket);
+                    if (!value) {
+                        return false;
+                    }
+                    if (marketId != value) {
+                        $.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.refresh_page"/>', $l('sys.hand.tip.info'),function(yes) {
+                            if(yes){
+                                var newMarketId = $.ligerui.get('marketId').getValue();
+
+                                var tabid = window.top.tab.selectedTabId;
+                                var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                window.top.f_removeTab(tabid);
+                                parent.f_addTab(tabid,tabname,"${base.contextPath}/coupon/coupon_assign_rule_detail.html?marketId="+newMarketId);
+                            }else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+                                $.ligerui.get('marketId').setValue(oldMarketIdValue);
+                            }
+                        });
+                    }
+
+                }
+            </#if>
+            },
+                validate : {
+                    required : true
+                }
+            },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.salesOrg"/>',
+                        name : "salesOrgId",
+                    newline : false,
+                    type : "select",
+                    textField: 'name',
+                    options : {
+                    valueField : 'salesOrgId',
+                        textField : 'name',
+                        isShowCheckBox: false,
+                        isMultiSelect: false,
+                        onAfterShowData:function(){
+                        liger.get('salesOrgId').setValue(salesOrgId);
+                        if(liger.get('salesOrgId').getText() == "") {
+                            liger.get('salesOrgId').setValue("");
+                        }
+                    }
+                }
+
+                },
+                {
+                    type: 'select',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.status"/>',
+                    name: 'status',
+                    newline : false,
+                    textField: 'name',
+                    options : {
+                    valueField : 'value',
+                        textField : 'meaning',
+                        data : assignRuleStatus,
+                        isShowCheckBox: false,
+                        isMultiSelect: false
+                }
+                },
+                { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.dto.coupon.assignrulenumber"/>', newline : true, name: 'groupCode',rightToken : ' ' ,
+                },
+                { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.dto.coupon.assignrulename"/>', newline : false, name: 'groupName',rightToken : ' ' ,
+                    validate : {
+                    required : true,
+                        maxlength:200
+                } },
+                { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.dto.coupon.assignruledesc"/>', newline : false, name: 'groupDesc',rightToken : ' ' ,
+                    validate : {
+                    maxlength:200
+                }
+                },
+
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.dto.coupon.startactivedate"/>',
+                        type : 'date', name : 'effectiveStartDate', newline : true,
+                    options:{
+
+                    onChangeDate : function(date){
+                        var effectiveEndDate =liger.get("effectiveEndDate").getValue();
+                        if(effectiveEndDate){
+                            if(new Date(getDateStr(new Date(date)))>new Date(effectiveEndDate)){
+                                $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "sys.hand.tip.info"/>',
+                                    function(){
+                                        liger.get("effectiveStartDate").clear();
+                                    });
+                            }
+                        }
+
+                    }
+                },
+                    validate : {
+                        required : true
+                    }
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.dto.coupon.endactivedate"/>',
+                        type : 'date', name : 'effectiveEndDate', newline : false,
+                    options:{
+                    onChangeDate : function(date){
+                        var effectiveStartDate =liger.get("effectiveStartDate").getValue();
+                        if(effectiveStartDate){
+                            if(new Date(date)<new Date(effectiveStartDate)){
+                                $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "sys.hand.tip.info"/>',
+                                    function(){
+                                        liger.get("effectiveEndDate").clear();
+                                    });
+                                return false;
+                            }
+                        }
+                        if(new Date(getDateStr(new Date(date))) < new Date(getDateStr(new Date()))){
+                            $.ligerDialog.warn('<@spring.message "msg.error.coupon.coupon_assign_enddate_cannot_less_than_the_current_date"/>', '<@spring.message "sys.hand.tip.info"/>',
+                                function(){
+                                    liger.get("effectiveEndDate").clear();
+                                });
+                            return false;
+                        }
+
+                    }
+                },
+                },
+                { type: 'select',
+                    label: '<@spring.message "type.com.lkkhpg.dsis.dto.coupon.applicationoccasion"/>',
+                    name: 'applyOn',
+                    newline : false,
+                    options : {
+                    valueField : 'value',
+                        textField : 'meaning',
+                        data : assignApplyOccasion,
+                        isShowCheckBox: false,
+                        isMultiSelect: false,
+
+                        onBeforeSelect : function(){ //该事件用于记录原值以及将重复标记置为true
+
+                        firstChooseApplyOn = true;
+                        applyOnOldValue = liger.get('applyOn').getValue();
+                    },
+                    onChangeValue : function(value){
+                        if(loadFinished){
+
+                            if(firstChooseApplyOn && hasDataFlag){
+                                var tmp = liger.get('applyOn').getValue();
+                                $.ligerDialog.confirm('<@spring.message "sys.dsis.clear.grid.confirm"/>', function (isyes) {
+                                    if(isyes){
+                                        if(isedit == '1'){
+                                            var selector = $("div[id*=coupon_assign_rule_group]");
+                                            for(var i = 0 ; i < selector.length ; i++){
+                                                selector[i].remove();
+                                                var id = selector[i].id;
+                                                var index = id.substr(id.length-1, id.length);
+                                                deleteRules.push({"id":liger.get('ruleId_'+index).getValue()})
+                                            }
+                                            toggleNum = 0;
+                                            ruleNum = 0;
+                                            hasDataFlag = false;
+                                        } else {
+                                            var condition_selector = $("div[ligeruiid*=coupon_assign_rule_condition_grid_]");
+                                            var result_selector = $("div[ligeruiid*=coupon_assign_rule_result_grid_]");
+                                            for(var i = 0 ; i < condition_selector.length ; i = i + 2){
+                                                liger.get(condition_selector[i].id).currentData = [];
+                                                liger.get(condition_selector[i].id).reRender();
+
+                                                liger.get(result_selector[i].id).currentData = [];
+                                                liger.get(result_selector[i].id).reRender();
+                                            }
+                                            hasDataFlag = false;
+                                        }
+
+                                    } else {
+                                        firstChooseApplyOn = false;
+                                        liger.get('applyOn').setValue(applyOnOldValue);
+                                    }
+                                })
+                            }
+                        }
+
+                    }
+
+                },
+                    validate : {
+                        required : true
+                    }
+                }
+            ]
+            });
+                liger.get('status').setValue('ENABL');
+                liger.get('status').setDisabled();
+                liger.get('groupCode').setDisabled();
+            }
+            function addRuleGrid() {
+                var newRuleGroup = "<div id='coupon_assign_rule_group_"+(ruleNum+1)+"'>";
+                var newDeleteBtn = "<div id='delete_btn_"+(ruleNum+1)+"' class='l-toolbar-item l-panel-btn l-toolbar-item-hasicon del-rule-btn' style='float:right;margin-right:92px;' onClick='deleteRule("+(ruleNum+1)+")'>"
+                    +"<span><@spring.message 'sys.hand.btn.delete'/></span>"
+                    +"<div class='l-panel-btn-l'></div>"
+                    +"<div class='l-panel-btn-r'></div>"
+                    +"<div class='l-icon l-icon-delete'></div>"
+                    +"</div>";
+                var newRuleToggle = "<form id='coupon_assign_rule_toggle_"+(ruleNum+1)+"' style='clear:both'></form>";
+                var newRuleConditionGrid = "<div id='coupon_assign_rule_condition_grid_"+(ruleNum+1)+"' style='float:left'></div>";
+                var newRuleResultGrid = "<div id='coupon_assign_rule_result_grid_"+(ruleNum+1)+"' style='float:left'></div>";
+                var group = $(".appendFlag:eq("+(ruleNum-1)+")");
+                $("#ruleGroup").append(newRuleGroup + newRuleToggle + newDeleteBtn + newRuleConditionGrid + newRuleResultGrid + "</div>");
+                ruleNum = ruleNum + 1;
+                toggleNum = toggleNum + 1;
+                initGroup();
+                initConditionGrid();
+                initResultGrid();
+            }
+            function ruleGridToggle(index) {
+                $("#coupon_assign_rule_condition_grid_"+index).toggle();
+                $("#coupon_assign_rule_result_grid_"+index).toggle();
+                $("#delete_btn_"+index).toggle();
+            }
+            function initGroup() {
+                window['coupon_assign_rule_toggle_'+ruleNum] = $("#coupon_assign_rule_toggle_"+ruleNum).ligerForm({
+                    fields: [{
+                        name:'coupon_assign_rule_toggle_line_'+ruleNum,
+                        group:'<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.rule"/>'+ruleNum
+                    },{
+                        name: "ruleId_"+ruleNum
+                    },{
+                        name: "ruleCode_"+ruleNum
+                    }]
+                });
+                liger.get('coupon_assign_rule_toggle_'+ruleNum).setVisible('ruleId_'+ruleNum,false);
+                liger.get('coupon_assign_rule_toggle_'+ruleNum).setVisible('ruleCode_'+ruleNum,false);
+                var selector = $(".togglebtn:eq("+(toggleNum-1)+")");
+                selector.attr("onClick","ruleGridToggle("+ruleNum+")");
+                $("input[ligeruiid=coupon_assign_rule_toggle_line_"+ruleNum+"]").parent().remove();
+            }
+            //删除规则
+            function deleteRule(index) {
+                if(isedit == '1') {
+                    var ruleId = liger.get('ruleId_'+index).getValue();
+                    $.ligerDialog.confirm('<@spring.message "msg.alert.pub.delete_or_not"/>', function (isyes) {
+                        if(isyes){
+                            $.ajax({
+                                async:false,
+                                type : 'POST',
+                                dataType : "json",
+                                contentType : "application/json",
+                                url:"${base.contextPath}/coupon/deleteRuleById?ruleId="+ruleId,
+                                success:function(data){
+                                    $("#coupon_assign_rule_group_"+index).remove();
+                                    toggleNum = toggleNum - 1;
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    $("#coupon_assign_rule_group_"+index).remove();
+                    toggleNum = toggleNum - 1;
+                }
+            }
+            //初始化条件表格
+            function initConditionGrid() {
+                window['coupon_assign_rule_condition_grid_'+ruleNum] = $("#coupon_assign_rule_condition_grid_"+ruleNum).ligerGrid({
+                        columns : [
+                            {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.platform.drools.domain.conditiontemplate.templatename"/>',
+                                name : 'templateName',
+                                isSort: false,
+                                width : '50%',
+                            },
+                            {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.value"/>',
+                                name : 'templateValue',
+                                isSort: false,
+                                width : '50%',
+                                type:'text',
+                                editor: {
+                                    type:'text',
+                                    onFocus :function() {
+                                        var templateType = 'rule_condition';
+                                        var targetObj = this;
+                                        var paramStr = window['coupon_assign_rule_condition_grid_'+ruleNum].getRow(targetObj.options.host_grid_row).tValue;
+                                        f_param_edit('${base.contextPath}', targetObj, paramStr, function(resultText, resultValue){
+                                            targetObj.setValue(resultText);
+                                            window['coupon_assign_rule_condition_grid_'+ruleNum].updateRow(targetObj.options.host_grid_row,{"tValue":resultValue});
+                                            window['coupon_assign_rule_condition_grid_'+ruleNum].reRender();
+                                        },templateType);
+                                    }
+                                },
+                                render : function(item) {
+                                    if(item.fieldSelectSource == 'url' && item.fieldType == 'select'){
+                                        var resultText = '';
+                                        var tValue = null;
+                                        var data = selectTextCache[item.paramName];
+                                        if(this.getData() && this.getData()[item.__index] && this.getData()[item.__index].tValue){
+                                            tValue = this.getData()[item.__index].tValue;
+                                        }
+                                        if(!data){
+                                            $.ajax({
+                                                url : "${base.contextPath}" + item.fieldSelectUrl,
+                                                type : "POST",
+                                                dataType : "json",
+                                                async : false,
+                                                contentType : "application/json",
+                                                success : function(json) {
+                                                    data = json.rows;
+                                                    selectTextCache[item.paramName] = data;
+                                                }
+                                            });
+                                        }
+                                        var valueArray = f_getParamArray(tValue)[0].valueField.split(',');
+                                        for (var i in valueArray) {
+                                            for (var j in data) {
+                                                if(data[j][item.fieldSelectVf] == valueArray[i]){
+                                                    resultText = resultText + data[j][item.fieldSelectTf] + ",";
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        resultText = item.templateName + ":" + resultText.substr(0, resultText.length-1);
+                                        item.templateValue = resultText;
+                                        return resultText;
+                                    } else {
+                                        return item.templateValue;
+                                    }
+                                },
+                                validate : {
+                                    required : true
+                                }
+                            },
+                            {
+                                display : '',
+                                name : 'tValue',width : '0%',hide: true
+                            }
+                        ],
+                        title : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.condition"/>',
+                        parms : {marketId : marketId},
+                        delayLoad : true,
+                        dateFomat : "yyyy-MM-dd",
+                        enabledEdit : true,
+                        checkbox: true,
+                        isSingleCheck : false,
+                        usePager : true,
+                        width: '43%',
+                        height: '300',
+                        rowHeight : 'auto',
+                        fixedCellHeight : false,
+                        async: false,
+                    <#if isedit == '1'>
+                url: '${base.contextPath}/coupon/condition/query',
+            </#if>
+                onAfterEdit:function(obj){
+                    adjustWrap(this);
+                },
+                onAfterShowData:function(a){
+                    adjustWrap(this);
+                },
+                toolbar : {
+                    id : 'coupon_assign_rule_condition_grid_toolbar_'+ruleNum,
+                        items : [{
+                        text: '<@spring.message "sys.hand.btn.new"/>',
+                        click: function(a){
+                            var applyOn = liger.get('applyOn').getValue();
+                            if(!applyOn){
+                                Hap.showError('<@spring.message "msg.error.must_be_choose_applyon"/>');
+                                return;
+                            }
+                            var top = ($("#"+this.id).offset().top - 200) + "px";
+                            popupConditionDialog(a,top);
+                        }, icon: 'add',id : "coupon_assign_rule_condition_grid_"+ruleNum
+                    },
+                        { line: true },
+                        {
+                            text : '<@spring.message "sys.hand.btn.delete"/>',
+                            click : function(a){
+                                Hap.gridDelete({
+                                    grid : liger.get(a.id)
+                                })
+                            },
+                            icon : 'delete',id : "coupon_assign_rule_condition_grid_"+ruleNum
+                        }]
+                }
+            });
+            }
+            //初始化结果表格
+            function initResultGrid(){
+                window['coupon_assign_rule_result_grid_'+ruleNum] = $("#coupon_assign_rule_result_grid_"+ruleNum).ligerGrid({
+                        columns : [
+                            {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.platform.drools.domain.actiontemplate.templatename"/>',
+                                name : 'templateName',
+                                isSort: false,
+                                width : '50%',
+                            },
+                            {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.value"/>',
+                                name : 'templateValue',
+                                isSort: false,
+                                width : '50%',
+                                editor: {
+                                    type:'text',
+                                    onFocus :function() {
+                                        var templateType = 'rule_action';
+                                        var targetObj = this;
+                                        var paramStr = window['coupon_assign_rule_result_grid_'+ruleNum].getRow(targetObj.options.host_grid_row).tValue;
+                                        f_param_edit('${base.contextPath}', targetObj, paramStr, function(resultText, resultValue){
+                                            targetObj.setValue(resultText);
+                                            window['coupon_assign_rule_result_grid_'+ruleNum].updateRow(targetObj.options.host_grid_row,{"tValue":resultValue});
+                                            window['coupon_assign_rule_result_grid_'+ruleNum].reRender();
+                                        },templateType);
+                                    }
+                                },
+                                render : function(item) {
+                                    if(item.fieldSelectSource == 'url' && item.fieldType == 'select'){
+                                        var resultText = '';
+                                        var tValue = null;
+                                        var data = selectTextCache[item.paramName];
+                                        if(this.getData() && this.getData()[item.__index] && this.getData()[item.__index].tValue){
+                                            tValue = this.getData()[item.__index].tValue;
+                                        }
+                                        if(!data){
+                                            $.ajax({
+                                                url : "${base.contextPath}" + item.fieldSelectUrl,
+                                                type : "POST",
+                                                dataType : "json",
+                                                async : false,
+                                                contentType : "application/json",
+                                                success : function(json) {
+                                                    data = json.rows;
+                                                    selectTextCache[item.paramName] = data;
+                                                }
+                                            });
+                                        }
+                                        var valueArray = f_getParamArray(tValue)[0].valueField.split(',');
+                                        for (var i in valueArray) {
+                                            for (var j in data) {
+                                                if(data[j][item.fieldSelectVf] == valueArray[i]){
+                                                    resultText = resultText + data[j][item.fieldSelectTf] + ",";
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        resultText = item.templateName + ":" + resultText.substr(0, resultText.length-1);
+                                        item.templateValue = resultText;
+                                        return resultText;
+                                    } else {
+                                        return item.templateValue;
+                                    }
+                                },
+                                validate : {
+                                    required : true,
+                                    validateRequired : true
+                                }
+                            },
+                            {
+                                display : '',
+                                name : 'tValue',width : '0%',hide: true
+                            }
+                        ],
+                        title : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.result"/>',
+                        parms : {marketId : marketId},
+                        delayLoad : true,
+                        dateFomat : "yyyy-MM-dd",
+                        enabledEdit : true,
+                        checkbox: true,
+                        isSingleCheck : false,
+                        usePager : true,
+                        width: '43%',
+                        height: '300',
+                        rowHeight : 'auto',
+                        fixedCellHeight : false,
+                        async: false,
+                    <#if isedit == '1'>
+                url: '${base.contextPath}/coupon/condition/query',
+            </#if>
+                onAfterEdit:function(obj){
+                    adjustWrap(this);
+                },
+                onAfterShowData:function(a){
+                    adjustWrap(this);
+                },
+                toolbar : {
+                    id : 'coupon_assign_rule_result_grid_toolbar_'+ruleNum,
+                        items : [{
+                        text: '<@spring.message "sys.hand.btn.new"/>',
+                        click: function(a){
+                            var applyOn = liger.get('applyOn').getValue();
+                            if(!applyOn){
+                                Hap.showError('<@spring.message "msg.error.must_be_choose_applyon"/>');
+                                return;
+                            }
+                            var top = ($("#"+this.id).offset().top - 200) + "px";
+                            popupResultDialog(a,top);
+                        }, icon: 'add', id:"coupon_assign_rule_result_grid_"+ruleNum
+                    },
+                        { line: true },
+                        {
+                            text : '<@spring.message "sys.hand.btn.delete"/>',
+                            click : function(a){
+                                Hap.gridDelete({
+                                    grid : liger.get(a.id)
+                                })
+                            },
+                            icon : 'delete', id:"coupon_assign_rule_result_grid_"+ruleNum
+                        }]
+                }
+            });
+            }
+            //弹出新增条件行的lov
+            function popupConditionDialog(obj,top) {
+                var options = ${lovService.getLov(base.contextPath,base.locale, "lov_pe_condition")};
+                options.grid.checkbox = true;
+                options.grid.isSingleCheck = false;
+                options.grid.isChecked = null;
+                options.grid.onCheckRow = null;
+                options.grid.onCheckAllRow = null;
+                options.grid.onLoadData = function(){
+                    this.setParm('contionType','ASSIGN');
+                    var applyOn = liger.get('applyOn').getValue();
+                    if(applyOn == 'MEREG'){
+                        this.setParm('activePoint','MEMBER');
+                    } else if(applyOn == 'SCJOB'){
+                        this.setParm('activePoint','JOB');
+                    } else {
+                        this.setParm('activePoint','ORDER');
+                    }
+                }
+                var fn = $.ligerui.getPopupFn({
+                    onSelect : function(e){
+                        addGridRow(e,obj);
+
+                        hasDataFlag = true;
+
+                    },
+                    condition: options.condition,
+                    grid: options.grid,
+                    title: options.title,
+                    delayLoad : false,
+                    top:top,
+                });
+                fn();
+                $("#pop_cancel").click(function(){   //popupFn弹出框的取消按钮
+                    //checkedCustomerMem = [];
+                })
+            }
+            //弹出新增结果行的lov
+            function popupResultDialog(obj,top) {
+                var options = ${lovService.getLov(base.contextPath,base.locale, "lov_pe_action")};
+                options.grid.checkbox = false;
+                options.grid.isSingleCheck = true;
+                options.grid.isChecked = null;
+                options.grid.onCheckRow = null;
+                options.grid.onCheckAllRow = null;
+                options.grid.onLoadData = function(){
+                    this.setParm('applyType','ASSIGN');
+                    var applyOn = liger.get('applyOn').getValue();
+                    if(applyOn == 'MEREG'){
+                        this.setParm('activePoint','MEMBER');
+                    } else if(applyOn == 'SCJOB'){
+                        this.setParm('activePoint','JOB');
+                    } else {
+                        this.setParm('activePoint','ORDER');
+                    }
+                }
+                var fn = $.ligerui.getPopupFn({
+                    onSelect : function(e){
+                        addGridRow(e,obj);
+
+                        hasDataFlag = true;
+
+                    },
+                    condition: options.condition,
+                    grid: options.grid,
+                    title: options.title,
+                    delayLoad : false,
+                    top:top,
+                });
+                fn();
+                $("#pop_cancel").click(function(){   //popupFn弹出框的取消按钮
+                    //checkedCustomerMem = [];
+                })
+            }
+            //添加一列
+            function addGridRow(e,obj) {
+                liger.get(obj.id).addRows(e.data);
+            }
+            //设置弹出框
+            function setValueDialog(tourl,templateName,paramStr,ruleParams,callback) {
+                $.ligerDialog.open({
+                    height : 450,
+                    width : 680,
+                    title : templateName,
+                    name : 'param_edit',
+                    allowClose:false,
+                    url : tourl,
+                    isResize : true,
+                    center:0,
+                    data : {
+                        'paramStr': paramStr,
+                        'ruleParams': ruleParams,
+                        'marketId': marketId
+                    },
+                    buttons : [{
+                        text : $l("sys.hand.btn.ok"),
+                        onclick : function(item, dialog) {
+                            var form = dialog.frame.coupon_param_edit_form;
+                            if (form.valid()) {
+                                var resultText = '';
+                                var resultValue = '';
+                                var textField = '';
+                                var valueField = '';
+                                for(var i in ruleParams){
+                                    if(ruleParams[i].isHide == 'Y'){
+                                        textField = '';
+                                        valueField = '';
+                                        resultValue = resultValue + ruleParams[i].fieldType + ':' + ruleParams[i].paramName + ':' + textField + ':' + valueField + ':' + ';';
+                                        continue;
+                                    }
+                                    textField = param_edit.window.f_getTextField(ruleParams[i].fieldType, ruleParams[i].paramName);
+                                    valueField = param_edit.window.f_getValueField(ruleParams[i].fieldType, ruleParams[i].paramName);
+
+                                    if(ruleParams[i].paramName == 'giveAway' && !valueField){
+                                        valueField = textField;
+                                    }
+                                    if(textField){
+                                        resultText = resultText + ruleParams[i].display + ':' + textField + ';';
+                                    }
+                                    resultValue = resultValue + ruleParams[i].fieldType + ':' + ruleParams[i].paramName + ':' + textField + ':' + valueField + ':';
+                                    if(paramStr) {
+                                        var paramArray = f_getParamArray(paramStr);
+                                        for(var j in paramArray) {
+                                            if(paramArray[j].paramName == ruleParams[i].paramName){
+                                                resultValue = resultValue + paramArray[j].id;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    resultValue = resultValue + ';';
+
+                                }
+                                resultText = resultText.substr(0, resultText.length-1);
+                                resultValue = resultValue.substr(0, resultValue.length-1);
+                                dialog.close();
+                                callback(resultText, resultValue);
+                            }
+                        }
+                    }, {
+                        text : $l("sys.hand.btn.cancel"),
+                        onclick : function(item, dialog) {
+                            dialog.close();
+                        }
+                    }]
+                })
+            }
+            //根据templateId获取参数组
+            function f_param_edit(contextpath, targetObj, paramStr, callback, templateType) {
+                var ruleParams;
+                var templateId = targetObj.element.row.id;
+                var templateName = targetObj.element.row.templateName;
+                var tourl = contextpath+'/coupon/coupon_param_edit.html';
+                tourl = tourl + '?templateType='+templateType+'&templateId='+templateId;
+                $.ajax({
+                    type: "POST",
+                    data: {
+                        'templateType': templateType,
+                        'templateId': templateId
+                    },
+                    async: false,
+                    url: "${base.contextPath}/coupon/param/getByTemplateId",
+                    success: function(data) {
+                        ruleParams = data.rows;
+                        if(ruleParams){
+                            setValueDialog(tourl, templateName, paramStr, ruleParams, callback);
+                        }
+                    }
+                });
+            }
+            //保存按钮触发
+            function save(status){
+                var form = liger.get('coupon_assign_rule_form');
+                if (Hap.validateForm(form) && validate()) {
+                    var formData = form.getData();
+                    mergeRuleData(formData);
+                    $.ajax({
+                        type: "POST",
+                        data: JSON.stringify(rules),
+                        async: false,
+                        contentType: "application/json;utf-8",
+                        url: "${base.contextPath}/coupon/assignrule/save",
+                        success: function(data) {
+                            if(data.success){
+                                Hap.showSuccess('<@spring.message "sys.hand.preferences.save.success"/>',
+                                    //显示保存成功后回调刷新界面
+                                    function() {
+                                        if(isedit == '1') {
+                                            window.top.f_removeTab("COUPON_ASSIGN_RULE_DETAIL_"+data.rows[0].groupCode);
+                                        } else {
+                                            window.top.f_removeTab("COUPON_ASSIGN_RULE_DETAIL");
+                                        }
+                                        window.top.f_addTab('COUPON_ASSIGN_RULE_DETAIL_'+data.rows[0].groupCode, '<@spring.message "type.com.lkkhpg.dsis.dto.coupon.assignruledetail"/>', "coupon/coupon_assign_rule_detail.html?isedit=1&groupCode="+data.rows[0].groupCode+"&status="+liger.get('status').getValue());
+                                    },{allowClose : false}
+                                );
+                            } else {
+                                //若报错则恢复原来的状态
+                                liger.get('status').setValue(status);
+                            }
+                        }
+                    });
+                }
+            }
+            //合并所有规则数据
+            function mergeRuleData(formData) {
+                rules = new Array();
+                for(var i = 1; i<=ruleNum; i++){
+                    if(window['coupon_assign_rule_group_'+i]){
+                        var rule = new Object();
+                        var conditionParameters = new Array();
+                        var actionParameters = new Array();
+                        if(formData.status != 'DISAB'){
+                            var conGrid = window['coupon_assign_rule_condition_grid_'+i];
+                            //获取当前的条件行
+                            getConditionCurrentRows(conditionParameters,conGrid);
+                            //获取被删除的条件行
+                            getConditionDeleteRows(conditionParameters,conGrid);
+
+                            var actGrid = window['coupon_assign_rule_result_grid_'+i];
+                            //获取当前的结果行
+                            getResultCurrentRows(actionParameters,actGrid);
+                            //获取被删除的结果行
+                            getResultDeleteRows(actionParameters,actGrid);
+                        }
+                        mergeFormData(rule,formData);
+                        rule['marketCode'] = marketCode;
+                        rule['id'] = liger.get('ruleId_'+i).getValue();
+                        rule['code'] = liger.get('ruleCode_'+i).getValue();
+                        rule['conTempParameters'] = conditionParameters;
+                        rule['actTempParameters'] = actionParameters;
+                        rules.push(rule);
+                    }
+                }
+                if(deleteRules && deleteRules.length > 0) {
+                    for(var i in deleteRules){
+                        if(deleteRules[i].id) {
+                            var rule = new Object();
+                            rule['id'] = deleteRules[i].id;
+                            rule['__status'] = 'delete';
+                            rules.push(rule);
+                        }
+                    }
+                }
+            }
+            //获取当前条件行数据
+            function getConditionCurrentRows(conditionParameters,conGrid) {
+                var conGridData = conGrid.rows;
+                for (var j in conGridData) {
+                    var paramArray = f_getParamArray(conGridData[j].tValue);
+                    for(var k in paramArray) {
+                        var conditionParameter = new Object();
+                        conditionParameter['paramName'] = paramArray[k].paramName;
+                        conditionParameter['value'] = paramArray[k].valueField;
+                        conditionParameter['id'] = paramArray[k].id;
+                        conditionParameter['conTemplateCode'] = conGridData[j].templateCode;
+                        conditionParameter['templateId'] = conGridData[j].id;
+
+                        conditionParameter['templateName'] = conGridData[j].templateName;
+                        conditionParameter['templateCode'] = conGridData[j].templateCode;
+
+                        conditionParameter['sequenceNumber'] = conGridData[j].__index;
+                        conditionParameter['__status'] = conGridData[j].__status;
+                        conditionParameters.push(conditionParameter);
+                    }
+                }
+            }
+            //获取删除的条件行数据
+            function getConditionDeleteRows(conditionParameters,conGrid) {
+                var conGridData = conGrid.getChanges();
+                for (var j in conGridData) {
+                    var paramArray = f_getParamArray(conGridData[j].tValue);
+                    for(var k in paramArray) {
+                        if(conGridData[j].__status == 'delete'){
+                            var conditionParameter = new Object();
+                            conditionParameter['id'] = paramArray[k].id;
+                            conditionParameter['__status'] = conGridData[j].__status;
+                            conditionParameters.push(conditionParameter);
+                        }
+                    }
+                }
+            }
+            //获取当前行数据
+            function getResultCurrentRows(actionParameters,actGrid) {
+                var actGridData = actGrid.rows;
+                for (var j in actGridData) {
+                    var paramArray = f_getParamArray(actGridData[j].tValue);
+                    for(var k in paramArray) {
+                        var actionParameter = new Object();
+                        actionParameter['paramName'] = paramArray[k].paramName;
+                        actionParameter['value'] = paramArray[k].valueField;
+                        actionParameter['id'] = paramArray[k].id;
+                        actionParameter['actTemplateCode'] = actGridData[j].templateCode;
+                        actionParameter['templateId'] = actGridData[j].id;
+
+                        actionParameter['templateName'] = actGridData[j].templateName;
+                        actionParameter['templateCode'] = actGridData[j].templateCode;
+
+                        actionParameter['sequenceNumber'] = actGridData[j].__index;
+                        actionParameter['__status'] = actGridData[j].__status;
+                        actionParameters.push(actionParameter);
+                    }
+                }
+            }
+            //获取删除的结果行数据
+            function getResultDeleteRows(actionParameters,actGrid) {
+                var actGridData = actGrid.getChanges();
+                for (var j in actGridData) {
+                    var paramArray = f_getParamArray(actGridData[j].tValue);
+                    for(var k in paramArray) {
+                        if(actGridData[j].__status == 'delete'){
+                            var actionParameter = new Object();
+                            actionParameter['id'] = paramArray[k].id;
+                            actionParameter['__status'] = actGridData[j].__status;
+                            actionParameters.push(actionParameter);
+                        }
+                    }
+                }
+            }
+            //合并表单数据
+            function mergeFormData(rule,formData) {
+                rule['applyOn'] = formData.applyOn;
+                rule['effectiveStartDate'] = formData.effectiveStartDate;
+                rule['effectiveEndDate'] = formData.effectiveEndDate;
+                rule['groupCode'] = formData.groupCode;
+                rule['groupDesc'] = formData.groupDesc;
+                rule['groupName'] = formData.groupName;
+                rule['marketId'] = formData.marketId;
+                rule['name'] = formData.name;
+                rule['salesOrgId'] = formData.salesOrgId;
+                rule['status'] = formData.status;
+            }
+            //获取参数数组
+            function f_getParamArray(paramStr){
+                var paramArray = [];
+                var array = paramStr.split(';');
+                for (var i=0; i<array.length; i++){
+                    var obj = new Object();
+                    var tempArray = array[i].split(':');
+                    obj['fieldType'] = tempArray[0];
+                    obj['paramName'] = tempArray[1];
+                    obj['textField'] = tempArray[2];
+                    obj['valueField'] = tempArray[3];
+                    obj['id'] = tempArray[4];
+                    paramArray.push(obj);
+                }
+                return paramArray;
+            }
+            //启用按钮触发
+            function enableRule(){
+                $.ligerDialog.confirm('<@spring.message "msg.info.coupon.enable_rule"/>', function (isyes) {
+                    if(isyes){
+                        var oldStatus = liger.get('status').getValue();
+                        liger.get('status').setValue('ABLED');
+                        save(oldStatus);
+                    }
+                })
+            }
+            //禁用按钮触发
+            function disableRule(){
+                $.ligerDialog.confirm('<@spring.message "msg.info.coupon.disable_rule"/>', function (isyes) {
+                    if(isyes){
+                        var oldStatus = liger.get('status').getValue();
+                        liger.get('status').setValue('DISAB');
+                        save(oldStatus);
+                    }
+                })
+            }
+            //设置布局的禁用属性
+
+            function setLayoutDisable(status,effectiveEndDate) {
+                var date = new Date();
+                if(status == 'ABLED' || status == 'DISAB' || (effectiveEndDate && status != 'ENABL' && new Date(effectiveEndDate + ' 23:59:59') < date)){
+
+                    liger.get('coupon_assign_rule_form').setEditable(false);
+                    $($('.add-rule-btn')[0]).addClass('l-toolbar-item-disable').removeAttr('onclick');
+                    liger.get('saveBtn').setDisabled();
+                    liger.get('enableBtn').setDisabled();
+                    for(var i=1;i<=ruleNum;i++){
+                        liger.get('coupon_assign_rule_condition_grid_' + i).options.enabledEdit=false;
+                        liger.get('coupon_assign_rule_condition_grid_' + i).reRender();
+                        liger.get('coupon_assign_rule_condition_grid_toolbar_' + i).setEditable(false);
+                        liger.get('coupon_assign_rule_result_grid_' + i).options.enabledEdit=false;
+                        liger.get('coupon_assign_rule_result_grid_' + i).reRender();
+                        liger.get('coupon_assign_rule_result_grid_toolbar_' + i).setEditable(false);
+
+                        $($('.del-rule-btn')[i-1]).addClass('l-toolbar-item-disable').removeAttr('onclick');
+                    }
+                }
+                if(status == 'DISAB' || (effectiveEndDate && status != 'ENABL' && new Date(effectiveEndDate + ' 23:59:59') < date)){
+
+                    liger.get('disableBtn').setDisabled();
+                }
+            }
+
+            function validate(){
+
+                //校验时间
+                var effectiveStartDate =liger.get("effectiveStartDate").getValue();
+                var effectiveEndDate =liger.get("effectiveEndDate").getValue();
+                if(effectiveStartDate && effectiveEndDate){
+                    if(new Date(effectiveEndDate)<new Date(effectiveStartDate)){
+                        $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "sys.hand.tip.info"/>',
+                            function(){});
+                        return false;
+                    }
+                }
+                if(effectiveEndDate && new Date(getDateStr(new Date(effectiveEndDate))) < new Date(getDateStr(new Date()))){
+                    $.ligerDialog.warn('<@spring.message "msg.error.coupon.coupon_assign_enddate_cannot_less_than_the_current_date"/>', '<@spring.message "sys.hand.tip.info"/>',
+                        function(){});
+                    return false;
+                }
+
+                //至少设置一条规则
+                if(toggleNum == 0) {
+                    Hap.showError('<@spring.message "com.lkkhpg.dsis.admin.coupon.msg_error_set_at_least_one_rule"/>');
+                    return false;
+                }
+                //条件和结果必须有值
+                for(var i=1; i<=ruleNum;i++){
+                    if(window['coupon_assign_rule_group_'+i]){
+                        var conditionData = liger.get('coupon_assign_rule_condition_grid_'+i).getData();
+                        if(conditionData.length == 0){
+                            Hap.showError("<@spring.messageArgs 'msg.error.coupon.rule_condition_info_incomplete',['"+i+"']/>");
+                            return false;
+                        }
+                        for(var j=0; j < conditionData.length;j++){
+                            if(!conditionData[j].tValue){
+                                Hap.showError("<@spring.messageArgs 'msg.error.coupon.rule_condition_info_incomplete',['"+i+"']/>");
+                                return false;
+                            }
+                        }
+
+                        var actionData = liger.get('coupon_assign_rule_result_grid_'+i).getData();
+                        if(actionData.length == 0){
+                            Hap.showError("<@spring.messageArgs 'msg.error.coupon.rule_result_info_incomplete',['"+i+"']/>");
+                            return false;
+                        }
+                        for(var j=0; j < actionData.length;j++){
+                            if(!actionData[j].tValue){
+                                Hap.showError("<@spring.messageArgs 'msg.error.coupon.rule_result_info_incomplete',['"+i+"']/>");
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+            //表格文字换行调整及复选框高度调整
+            function adjustWrap(grid){
+                var rowData = liger.get(grid.id).rows;
+                var columnData = liger.get(grid.id).columns;
+                for(var i = 0; i < rowData.length; i++) {
+                    var textSelector = $("td[id*='" + grid.id + '|2|' + rowData[i].__id + '|' + columnData[2].__id + "']");
+                    var checkBoxSelector = $("td[id*='" + grid.id + '|1|' + rowData[i].__id + '|' + columnData[0].__id + "']")
+                    textSelector.html(textSelector.text().replace(/;/g,'<br />'));
+                    checkBoxSelector.height(textSelector.height());
+                }
+            }
+            function getDateStr(date){
+                var y = date.getFullYear();
+                var m = date.getMonth() + 1;
+                m = m < 10 ? '0' + m : m;
+                var d = date.getDate();
+                d = d < 10 ? ('0' + d) : d;
+                return y + '/' + m + '/' + d;
+            }
+        </script>
+        </body>
+        </html>

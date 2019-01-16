@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.SalesSitesMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.SalesSites" >
+    <id column="SALES_SITE_ID" property="salesSiteId" jdbcType="DECIMAL" />
+    <result column="HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="SITE_TYPE" property="siteType" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="PHONE" property="phone" jdbcType="VARCHAR" />
+    <result column="CITY_CODE" property="cityCode" jdbcType="VARCHAR" />
+    <result column="STATE_CODE" property="stateCode" jdbcType="VARCHAR" />
+    <result column="COUNTRY_CODE" property="countryCode" jdbcType="VARCHAR" />
+    <result column="ADDRESS" property="address" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR" />
+    <result column="ZIP_CODE" property="zipCode" jdbcType="VARCHAR" />
+    <result column="ADDRESS1" property="address1" jdbcType="VARCHAR" />
+    <result column="ADDRESS2" property="address2" jdbcType="VARCHAR" />
+    <result column="ADDRESS3" property="address3" jdbcType="VARCHAR" />
+    <result column="CITY_NAME" property="cityName" jdbcType="VARCHAR" />
+    <result column="STATE_NAME" property="stateName" jdbcType="VARCHAR" />
+    <result column="COUNTRY_NAME" property="countryName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    SALES_SITE_ID, HEADER_ID, SALES_ORG_ID, SITE_TYPE, NAME, PHONE, CITY_CODE, STATE_CODE, 
+    COUNTRY_CODE, ADDRESS, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15, AREA_CODE,ZIP_CODE,ADDRESS1,ADDRESS2,ADDRESS3
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from OM_SALES_SITES
+    where SALES_SITE_ID = #{salesSiteId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from OM_SALES_SITES
+    where SALES_SITE_ID = #{salesSiteId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.SalesSites" >
+    <selectKey resultType="java.lang.Long" keyProperty="salesSiteId" order="BEFORE" >
+      SELECT OM_SALES_SITES_S.nextval from dual
+    </selectKey>
+    insert into OM_SALES_SITES (SALES_SITE_ID, HEADER_ID, SALES_ORG_ID, 
+      SITE_TYPE, NAME, PHONE, 
+      CITY_CODE, STATE_CODE, COUNTRY_CODE, 
+      ADDRESS, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+      PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+      ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+      ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, 
+      ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+      ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+      ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+      ATTRIBUTE15, AREA_CODE,ZIP_CODE,AUTOSHIP_FLAG,ADDRESS1,ADDRESS2,ADDRESS3)
+    values (#{salesSiteId,jdbcType=DECIMAL}, #{headerId,jdbcType=DECIMAL}, #{salesOrgId,jdbcType=DECIMAL}, 
+      #{siteType,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{cityCode,jdbcType=VARCHAR}, #{stateCode,jdbcType=VARCHAR}, #{countryCode,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, 1, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, 
+      #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, 
+      #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, 
+      #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, 
+      #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, 
+      #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, 
+      #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR},#{zipCode,jdbcType=VARCHAR},
+      #{autoshipFlag,jdbcType=VARCHAR},#{address1,jdbcType=VARCHAR}, #{address2,jdbcType=VARCHAR},#{address3,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesSites" >
+    <selectKey resultType="java.lang.Long" keyProperty="salesSiteId" order="BEFORE" >
+      SELECT OM_SALES_SITES_S.nextval from dual
+    </selectKey>
+    insert into OM_SALES_SITES
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      SALES_SITE_ID,
+      <if test="headerId != null" >
+        HEADER_ID,
+      </if>
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID,
+      </if>
+      <if test="siteType != null" >
+        SITE_TYPE,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="phone != null" >
+        PHONE,
+      </if>
+      <if test="cityCode != null" >
+        CITY_CODE,
+      </if>
+      <if test="stateCode != null" >
+        STATE_CODE,
+      </if>
+      <if test="countryCode != null" >
+        COUNTRY_CODE,
+      </if>
+      <if test="address != null" >
+        ADDRESS,
+      </if>
+        OBJECT_VERSION_NUMBER,
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="areaCode != null" >
+        AREA_CODE,
+      </if>
+      <if test="zipCode !=null">
+        ZIP_CODE,
+      </if>
+      <if test="autoshipFlag !=null">
+        AUTOSHIP_FLAG,
+      </if>
+      <if test="address1 != null" >
+        ADDRESS1,
+      </if>
+      <if test="address2 !=null">
+        ADDRESS2,
+      </if>
+      <if test="address3 !=null">
+        ADDRESS3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{salesSiteId,jdbcType=DECIMAL},
+      <if test="headerId != null" >
+        #{headerId,jdbcType=DECIMAL},
+      </if>
+      <if test="salesOrgId != null" >
+        #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="siteType != null" >
+        #{siteType,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null" >
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateCode != null" >
+        #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="countryCode != null" >
+        #{countryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+        1,
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="areaCode != null" >
+        #{areaCode,jdbcType=VARCHAR},
+      </if>
+      <if test="zipCode !=null">
+        #{zipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="autoshipFlag !=null">
+        #{autoshipFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="address1 != null" >
+        #{address1,jdbcType=VARCHAR},
+      </if>
+      <if test="address2 !=null">
+        #{address2,jdbcType=VARCHAR},
+      </if>
+      <if test="address3 !=null">
+        #{address3,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.order.dto.SalesSites" >
+    update OM_SALES_SITES
+    <set >
+      <if test="headerId != null" >
+        HEADER_ID = #{headerId,jdbcType=DECIMAL},
+      </if>
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="siteType != null" >
+        SITE_TYPE = #{siteType,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        PHONE = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null" >
+        CITY_CODE = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateCode != null" >
+        STATE_CODE = #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="countryCode != null" >
+        COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        ADDRESS = #{address,jdbcType=VARCHAR},
+      </if>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="areaCode != null" >
+        AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+      </if>
+      <if test="zipCode !=null">
+        ZIP_CODE = #{zipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="autoshipFlag !=null">
+        AUTOSHIP_FLAG = #{autoshipFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="address1 != null" >
+        ADDRESS1 = #{address1,jdbcType=VARCHAR},
+      </if>
+      <if test="address2 !=null">
+        ADDRESS2 = #{address2,jdbcType=VARCHAR},
+      </if>
+      <if test="address3 !=null">
+        ADDRESS3 = #{address3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where SALES_SITE_ID = #{salesSiteId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.order.dto.SalesSites" >
+    update OM_SALES_SITES
+    set HEADER_ID = #{headerId,jdbcType=DECIMAL},
+      SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      SITE_TYPE = #{siteType,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      PHONE = #{phone,jdbcType=VARCHAR},
+      CITY_CODE = #{cityCode,jdbcType=VARCHAR},
+      STATE_CODE = #{stateCode,jdbcType=VARCHAR},
+      COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR},
+      ADDRESS = #{address,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = CURRENT_TIMESTAMP,
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+      ZIP_CODE = #{zipCode,jdbcType=VARCHAR},
+      AUTOSHIP_FLAG = #{autoshipFlag,jdbcType=VARCHAR},
+      ADDRESS1 = #{address1,jdbcType=VARCHAR},
+      ADDRESS2 = #{address2,jdbcType=VARCHAR},
+      ADDRESS3 = #{address3,jdbcType=VARCHAR}
+    where SALES_SITE_ID = #{salesSiteId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="selectSitesByHeaderIdAndAutoshipFlag" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List"/>
+    FROM OM_SALES_SITES 
+    WHERE HEADER_ID = #{headerId,jdbcType=DECIMAL} AND AUTOSHIP_FLAG = #{isAutoship,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <select id="selectSitesByHeaderIdAndSiteType" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List"/>
+    FROM OM_SALES_SITES 
+    WHERE HEADER_ID = #{headerId,jdbcType=DECIMAL} AND SITE_TYPE = #{siteType,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectSitesByHeaderIdAndSiteTypeCAN" resultMap="BaseResultMap">
+    SELECT oss.*, sct.name city_name, sctt.name country_name
+  FROM OM_SALES_SITES oss,
+       spm_city_tl sct,    
+       spm_country_tl sctt
+ WHERE oss.city_code = sct.city_code
+   and sct.lang = #{request.locale,jdbcType=VARCHAR}
+   and oss.country_code = sctt.country_code
+   and sctt.lang = #{request.locale,jdbcType=VARCHAR}
+   and SITE_TYPE = #{siteType,jdbcType=VARCHAR}
+   and HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </select>
+  
+  <delete id="deleteByHeaderIdAndAutoshipFlag">
+    DELETE FROM OM_SALES_SITES
+    WHERE HEADER_ID = #{headerId,jdbcType=DECIMAL} AND AUTOSHIP_FLAG = #{isAutoship,jdbcType=VARCHAR}
+  </delete>
+  <select id="selectSites" resultMap="BaseResultMap">
+    SELECT 
+    oss.SALES_SITE_ID, oss.HEADER_ID, oss.SALES_ORG_ID, oss.SITE_TYPE, oss.NAME, oss.PHONE, oss.CITY_CODE, oss.STATE_CODE, OSS.ZIP_CODE,
+    oss.COUNTRY_CODE, oss.ADDRESS,oss.ADDRESS1,oss.ADDRESS2,oss.ADDRESS3,SCT.NAME CITY_NAME,sst.NAME STATE_NAME,st.name COUNTRY_NAME
+    FROM OM_SALES_SITES OSS, 
+    spm_city_tl sct,
+    spm_state_tl sst,
+    spm_country_tl st
+    WHERE HEADER_ID = #{headerId,jdbcType=DECIMAL} AND SITE_TYPE = #{siteType,jdbcType=VARCHAR}
+    AND oss.CITY_CODE = sct.CITY_CODE 
+    AND oss.STATE_CODE = sst.STATE_CODE
+    AND oss.COUNTRY_CODE = st.COUNTRY_CODE
+    AND sct.lang = #{request.locale,jdbcType=VARCHAR}
+    AND sst.lang = #{request.locale,jdbcType=VARCHAR}
+    AND st.lang = #{request.locale,jdbcType=VARCHAR}
+  </select>
+</mapper>

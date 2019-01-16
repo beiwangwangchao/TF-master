@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.member.mapper.MemWithdrawMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.member.dto.MemWithdraw" >
+    <id column="WITHDRAW_ID" property="withdrawId" jdbcType="DECIMAL" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+    <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+    <result column="PERIOD" property="period" jdbcType="DECIMAL" />
+    <result column="WRITEOFF_TYPE" property="writeoffType" jdbcType="VARCHAR" />
+    <result column="ADJUSTMENT_TYPE" property="adjustmentType" jdbcType="VARCHAR" />
+    <result column="AMOUNT" property="amount" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="VARCHAR" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR" />
+    <result column="REF_COMPANY" property="refCompany" jdbcType="VARCHAR" />
+    <result column="MARKET_BELONG" property="marketBelong" jdbcType="VARCHAR" />
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+     <result column="PERIOD_NAME" property="periodName" jdbcType="VARCHAR" />
+     <result column="SOURCE_TYPE" property="sourceType" jdbcType="VARCHAR" />
+     <result column="SOURCE_key" property="sourceKey" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    WITHDRAW_ID, MEMBER_ID, MARKET_ID, COMPANY_ID, PERIOD, WRITEOFF_TYPE, ADJUSTMENT_TYPE, 
+    AMOUNT, STATUS, REMARK, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15, SALES_ORG_ID,source_type,source_key
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.math.BigDecimal" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEM_WITHDRAW
+    where WITHDRAW_ID = #{withdrawId,jdbcType=DECIMAL}
+  </select>
+  
+  
+  <!-- 根据会员ID查询 -->
+  <select id="selectByMemberId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEM_WITHDRAW
+    where MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+  </select>
+  
+  <!-- 根据会员ID+月份期间查询 -->
+  <select id="selectByPeriodRang" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEM_WITHDRAW t
+    <where>
+        <if test="withdrawId != null">
+            t.widthraw_id = #{withdrawId,jdbcType=DECIMAL}
+        </if>
+        <if test="memberId != null">
+            t.member_id = #{memberId,jdbcType=DECIMAL}
+        </if>
+        <if test="periodFrom != null">
+            AND t.period >= #{periodFrom,jdbcType=VARCHAR}
+        </if>
+        <if test="periodTo != null">
+            AND t.month >= #{periodTo,jdbcType=VARCHAR}
+        </if>
+    </where>
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from MM_MEM_WITHDRAW
+    where WITHDRAW_ID = #{withdrawId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemWithdraw" >
+    <selectKey resultType="java.lang.Long" keyProperty="withdrawId" order="BEFORE" >
+      select MM_MEM_WITHDRAW_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_WITHDRAW (WITHDRAW_ID, MEMBER_ID, MARKET_ID, 
+      COMPANY_ID, PERIOD, WRITEOFF_TYPE, 
+      ADJUSTMENT_TYPE, AMOUNT, STATUS, 
+      remark, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+      PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+      ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+      ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, 
+      ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+      ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+      ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+      ATTRIBUTE15)
+    values (#{withdrawId,jdbcType=DECIMAL}, #{memberId,jdbcType=DECIMAL}, #{marketId,jdbcType=DECIMAL}, 
+      #{companyId,jdbcType=DECIMAL}, #{period,jdbcType=VARCHAR}, #{writeoffType,jdbcType=VARCHAR}, 
+      #{adjustmentType,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, 1, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL},CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, 
+      #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, 
+      #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, 
+      #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, 
+      #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, 
+      #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, 
+      #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemWithdraw" >
+    <selectKey resultType="java.lang.Long" keyProperty="withdrawId" order="BEFORE" >
+      select MM_MEM_WITHDRAW_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_WITHDRAW
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      WITHDRAW_ID,
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID,
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID,
+      </if>
+      <if test="period != null" >
+        PERIOD,
+      </if>
+      <if test="writeoffType != null" >
+        WRITEOFF_TYPE,
+      </if>
+      <if test="adjustmentType != null" >
+        ADJUSTMENT_TYPE,
+      </if>
+      <if test="amount != null" >
+        AMOUNT,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{withdrawId,jdbcType=DECIMAL},
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="marketId != null" >
+        #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=DECIMAL},
+      </if>
+      <if test="period != null" >
+        #{period,jdbcType=VARCHAR},
+      </if>
+      <if test="writeoffType != null" >
+        #{writeoffType,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustmentType != null" >
+        #{adjustmentType,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null" >
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if> 
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+       CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+       <if test="salesOrgId != null" >
+        #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemWithdraw" >
+    update MM_MEM_WITHDRAW
+    <set >
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID = #{companyId,jdbcType=DECIMAL},
+      </if>
+      <if test="period != null" >
+        PERIOD = #{period,jdbcType=DECIMAL},
+      </if>
+      <if test="writeoffType != null" >
+        WRITEOFF_TYPE = #{writeoffType,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustmentType != null" >
+        ADJUSTMENT_TYPE = #{adjustmentType,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null" >
+        AMOUNT = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if> 
+       OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+       <if test="salesOrgId != null" >
+        SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where WITHDRAW_ID = #{withdrawId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.member.dto.MemWithdraw" >
+    update MM_MEM_WITHDRAW
+    set MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      COMPANY_ID = #{companyId,jdbcType=DECIMAL},
+      PERIOD = #{period,jdbcType=DECIMAL},
+      WRITEOFF_TYPE = #{writeoffType,jdbcType=VARCHAR},
+      ADJUSTMENT_TYPE = #{adjustmentType,jdbcType=VARCHAR},
+      AMOUNT = #{amount,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+    where WITHDRAW_ID = #{withdrawId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="queryWithdraws" resultMap="BaseResultMap" parameterType="java.util.Map">
+    select
+    w.WITHDRAW_ID,(SELECT coalesce(smt.name, sm.name)
+              FROM spm_market_b sm
+              LEFT OUTER JOIN spm_market_tl smt
+                ON (sm.market_id = smt.market_id AND smt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+             WHERE w.market_id = sm.market_id) as MARKET_BELONG,c.name as REF_COMPANY,m.MEMBER_CODE,m.MEMBER_ID,p.PERIOD_NAME,
+    (select vb.MEANING from SYS_CODE_VALUE_B vb LEFT JOIN SYS_CODE_B cb on CB.CODE_ID = vb.CODE_ID
+    where vb.value = 'RB' and CB.code = 'MM.ACCOUNTING_TYPE') as WRITEOFF_TYPE,
+    ADJUSTMENT_TYPE,AMOUNT,w.STATUS,w.REMARK,
+    concat(m.CHINESE_NAME,concat('/',m.ENGLISH_NAME)) as MEMBER_NAME from mm_mem_withdraw w
+    LEFT JOIN MM_MEMBER_V m on w.MEMBER_ID = m.MEMBER_ID
+    LEFT JOIN SPM_COMPANY_B c on c.COMPANY_ID = m.COMPANY_ID
+    LEFT JOIN spm_period p on p.period_id = w.period
+    <where>
+    <if test="marketId != null">
+    	AND w.market_id = #{marketId,jdbcType=DECIMAL} 
+    </if>
+    <if test="marketId == null">
+    	AND w.market_id = #{request.marketId,jdbcType=DECIMAL} 
+    </if>
+    <if test="status != null">
+        AND w.status = #{status,jdbcType=VARCHAR}
+    </if>
+    <if test="memberCode != null">
+    	and m.MEMBER_CODE =  #{memberCode,jdbcType=VARCHAR}
+    </if>
+    <if test="memberId !=null">
+     and m.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+    </if>
+    <if test="memberId == null and memberName != null">
+                and ((upper(m.english_name) LIKE upper(concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%'))) OR
+                   m.member_id IN
+                   (SELECT member_id
+                        FROM MM_MEM_RELATIONSHIP rel
+                       WHERE rel.rel_type = 'SUPSE'
+                         AND (rel.chinese_name LIKE concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')) OR
+                             upper(rel.english_name) LIKE
+                             concat('%', concat(upper(#{memberName,jdbcType=VARCHAR}), '%'))))) OR
+                   (m.chinese_name LIKE concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')) OR
+                   m.member_id IN
+                   (SELECT member_id
+                        FROM MM_MEM_RELATIONSHIP rel
+                       WHERE rel.rel_type = 'SUPSE'
+                         AND (rel.chinese_name LIKE concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')) OR
+                             upper(rel.english_name) LIKE
+                             concat('%', concat(upper(#{memberName,jdbcType=VARCHAR}), '%'))))))
+    </if>
+     <!-- <if test="periodFrom != null">
+    and to_char(p.start_date,'yyyy-MM') >= #{periodFrom,jdbcType=VARCHAR}
+    </if>
+    <if test="periodTo != null">
+    and to_char(p.end_date,'yyyy-MM') <![CDATA[<]]>= #{periodTo,jdbcType=VARCHAR}
+    </if> -->
+    <!-- Mclin 修改 -->
+    <if test="periodFrom != null and periodTo == null">
+    	and to_date(p.period_name,'yyyy-MM') <![CDATA[>]]>= to_date(#{periodFrom,jdbcType=VARCHAR}, 'yyyy-MM')
+    </if>
+    <if test="periodFrom == null and periodTo != null">
+    	and to_date(p.period_name,'yyyy-MM') <![CDATA[<]]>= to_date(#{periodTo,jdbcType=VARCHAR}, 'yyyy-MM')
+    </if>
+    <if test="periodFrom != null and periodTo != null and (periodFrom.toString() == periodTo.toString())">
+    	and to_date(p.period_name,'yyyy-MM') = to_date(#{periodTo,jdbcType=VARCHAR}, 'yyyy-MM')
+    </if>
+    <if test="periodFrom != null and periodTo != null and (periodFrom.toString() != periodTo.toString())">
+    	and to_date(p.period_name,'yyyy-MM') between to_date(#{periodFrom,jdbcType=VARCHAR}, 'yyyy-MM')
+    	and to_date(#{periodTo,jdbcType=VARCHAR}, 'yyyy-MM')
+    </if>
+    </where>
+    ORDER BY w.WITHDRAW_ID desc
+  </select>
+  
+    <insert id="addWithdraw" parameterType="com.lkkhpg.dsis.common.member.dto.MemWithdraw" >
+    <selectKey resultType="java.lang.Long" keyProperty="withdrawId" order="BEFORE" >
+      select MM_MEM_WITHDRAW_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_WITHDRAW
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      WITHDRAW_ID,
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID,
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID,
+      </if>
+      <if test="period != null" >
+        PERIOD,
+      </if>
+      <if test="writeoffType != null" >
+        WRITEOFF_TYPE,
+      </if>
+      <if test="adjustmentType != null" >
+        ADJUSTMENT_TYPE,
+      </if>
+      <if test="amount != null" >
+        AMOUNT,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      
+        OBJECT_VERSION_NUMBER,
+      
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{withdrawId,jdbcType=DECIMAL},
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="marketId != null" >
+        #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=DECIMAL},
+      </if>
+      <if test="period != null" >
+        #{period,jdbcType=DECIMAL},
+      </if>
+      <if test="writeoffType != null" >
+        #{writeoffType,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustmentType != null" >
+        #{adjustmentType,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null" >
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if> 
+        1,
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+       CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <select id="isActive" parameterType="java.util.Map" resultType="java.lang.Long">
+    select count(m.MEMBER_ID) from MM_MEMBER m
+    where m.member_id = #{memberId,jdbcType=DECIMAL}
+    and m.STATUS = #{memberStatus,jdbcType=VARCHAR}
+    AND m.market_id = #{request.marketId,jdbcType=DECIMAL} 
+  </select>
+  
+  <select id="isBalance" parameterType="java.util.Map" resultType="java.lang.Long">
+    select count(b.MEMBER_ID) from MM_ACCOUNTING_BALANCE b
+    where b.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+    and b.ACCOUNTING_TYPE = #{accountingType,jdbcType=VARCHAR}
+    and b.BALANCE >= #{amount,jdbcType=DECIMAL}
+  </select>
+  
+   <select id="getBalanceByMemberId" parameterType="java.util.Map" resultType="java.lang.String">
+  select (BALANCE-coalesce((select sum(coalesce(omop.payment_amount, 0)) payment_amount
+      from om_sales_order oso, om_mws_order_payment omop
+     where oso.header_id = omop.order_header_id
+       and oso.order_status in ('WPAY', 'PAYIN')
+       and omop.payment_method='RBPAY'
+       and omop.status = 'NEW'
+       and oso.member_id = #{memberId,jdbcType=DECIMAL}), 0)) BALANCE from MM_ACCOUNTING_BALANCE b
+ where b.MEMBER_ID = #{memberId,jdbcType=DECIMAL} 
+ and b.ACCOUNTING_TYPE = #{accountingType,jdbcType=VARCHAR}
+  </select>
+  
+    <select id="getPeriodByNow" resultType="java.lang.Long">
+    select p.PERIOD_ID from SPM_PERIOD p
+    where
+			p.PERIOD_YEAR = TO_NUMBER(TO_CHAR(CURRENT_DATE, 'yyyy'))
+			and
+			p.PERIOD_MONTH = TO_NUMBER(TO_CHAR(CURRENT_DATE, 'MM'))
+      and p.ORG_ID = #{marketId,jdbcType=DECIMAL}
+  </select>
+  
+  
+ <update id="updateBalance" parameterType="java.util.Map" >
+    UPDATE MM_ACCOUNTING_BALANCE b
+    set b.BALANCE = b.BALANCE - #{amount,jdbcType=DECIMAL}
+    where b.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+    and b.ACCOUNTING_TYPE = #{accountingType,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateWithdrawStatus">
+    update mm_mem_withdraw w
+        set w.status = #{status,jdbcType = VARCHAR}
+        ,source_type='BONUS'
+        ,SOURCE_KEY=(SELECT bbf.bonus_id
+  FROM bm_bonus_final bbf
+ WHERE bbf.member_id = w.member_id
+       and bbf.period_id = #{combine.periodId,jdbcType = VARCHAR}
+       and bbf.market_id = #{combine.marketId,jdbcType = VARCHAR}
+       and bbf.bonus_type =#{combine.bonusType,jdbcType = VARCHAR})
+        where w.WITHDRAW_ID in 
+          <foreach item="memWithdraw" index="index" collection="memWithdraws" open="(" separator=","
+                    close=")">
+                    #{memWithdraw.withdrawId}
+                </foreach>
+        
+  </update>
+  
+  <update id="rollbackWithdraw">
+  update mm_mem_withdraw w
+  set w.status = #{status,jdbcType = VARCHAR},
+  source_type= null,
+  SOURCE_KEY= null
+  where w.SOURCE_KEY in 
+  <foreach item="bonus" index="index" collection="bonusFinal" open="(" separator="," close=")">
+       #{bonus.bonusId}
+  </foreach>
+  </update>
+</mapper>

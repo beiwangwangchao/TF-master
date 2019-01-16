@@ -1,0 +1,362 @@
+<#--
+ * description: 公司维护界面
+ * version: 1.0
+ * author: liang.rao
+ * Copyright LKK Health Products Group Limited.
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/resources/js/spm/location_edit.min.js"
+    type="text/javascript"></script>
+<body>
+    <script src="${base.contextPath}/common/code?companyTypeCode=SPM.COMPANY_TYPE&telCountryCode=SYS.TEL_COUNTRY_CODE&payReservedTime=OM.COM_WAIT_PAY_TIME" type="text/javascript"></script>
+    <form id="spm_company_create_form" ></form>
+    <div id="spm_save"></div>
+    <script type="text/javascript">
+    $l('sys.hand.title.addressinfo','<@spring.message "sys.hand.title.addressinfo"/>');
+    var spmLocation = {};
+    var userId='${Session.userId}';
+    var Location = {};
+    var clickFormRecord;
+    /*add furong.tang*/
+    var isDisplay = [{value:'Y',meaning:'是'},{value:'N',meaning:'否'}];
+    //var payReservedTime = [{value:0.5,meaning:0.5},{value:1,meaning:1},{value:2,meaning:2},{value:4,meaning:4},{value:6,meaning:6},{value:8,meaning:8},{value:12,meaning:12},{value:24,meaning:24}];
+    /*add furong.tang*/
+    $(function(){
+        var companyId = "${RequestParameters.companyId!}";
+        var companyFormUrl = '${base.contextPath}/spm/company/queryById?companyId=' + companyId;
+        window['spm_company_create_form'] = $("#spm_company_create_form").ligerForm({
+            fields: [
+            {   type: 'hidden',
+                name: 'companyId'
+            },
+            {   type: 'hidden',
+                name: 'countryName'
+            },
+            {   type: 'hidden',
+                name: 'countryCode'
+            },
+            {   type: 'hidden',
+                name: 'stateName'
+            },
+            {   type: 'hidden',
+                name: 'stateCode'
+            },
+            {   type: 'hidden',
+                name: 'cityName'
+            },
+            {   type: 'hidden',
+                name: 'cityCode'
+            },
+            {   type: 'hidden',
+                name: 'addressLine1'
+            },
+            {   type: 'hidden',
+                name: 'addressLine2'
+            },
+            {   type: 'hidden',
+                name: 'addressLine3'
+            },
+            {   type: 'hidden',
+                name: 'zipCode'
+            },
+            {   type: 'hidden',
+                name: 'locationId'
+            },
+            {   type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.code"/>',
+                newline:false,
+                validate:{required:true },
+                name: 'code'
+            },
+            {    label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.name"/>',
+                newline:false,
+                validate:{required:true },
+                name: 'name' ,
+                type: 'tl',
+                options: {
+                    idField: 'companyId',
+                    dto: 'com.lkkhpg.dsis.common.config.dto.SpmCompany'
+                }
+            },
+            {   label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.shortname"/>',
+                newline:false,
+                name: 'shortName' ,
+                type: 'tl',
+                options: {
+                    idField: 'companyId',
+                    dto: 'com.lkkhpg.dsis.common.config.dto.SpmCompany'
+                },
+                validate: {
+                	required: true,
+	                maxlength: 30
+	            }
+            },
+            {   type: 'select', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.companytype"/>',
+                newline:true,
+                name: 'companyType',
+                validate:{required:true },
+                options: {
+                      valueField: 'value',
+                      textField: 'meaning',
+                      data: companyTypeCode,
+                    onSelected: function() {
+                        var companyType = $.ligerui.get('companyType').getValue();
+                        if (companyType == "HDQTR") {
+                            $.ligerui.get('gstId').setValue("");
+                            $.ligerui.get('gstId').setText("");
+                            $.ligerui.get('gstId').set('disabled', true);
+                            window['spm_company_create_form'] .setFieldValidate("gstId", {required : false});
+                        }else if (companyType == "BRNCH"){
+                            $.ligerui.get('gstId').setEnabled();
+                            window['spm_company_create_form'] .setFieldValidate("gstId", {required : true});
+                        }
+                    }
+                }
+            },
+            {   type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.contacts"/>',
+                newline:false,
+                validate:{required:true },
+                name: 'contacts'
+            },
+            {
+                name : 'areaCode',
+                type : 'select',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phoneno"/>',
+                attr : { placeHolder : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.countrycode"/>' },
+                width : 42,
+                space : 8,
+                newline:false,
+                options: {
+                    valueField: "value",
+                    textField: "meaning",
+                    data: telCountryCode
+                },
+                validate : {
+                    required : true
+                }
+            },
+            {   type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.phone"/>',
+                newline:false,
+                hideLabel: true,
+                width:130,
+                validate:{required:true },
+                name: 'phone'
+            },
+            {   type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.fax"/>',
+                newline:true,
+                name: 'fax'
+            },
+            {   type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.email"/>',
+                newline:false,
+                name: 'email'
+            },
+            /*{
+            	type: 'text',
+            	label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.brno"/>',
+            	name: 'brNo',
+                type: 'select',
+                newline: false,
+                options: {
+                    valueField: "value",
+                    textField: "meaning",
+                    data: isDisplay
+                },
+                //validate:{required:true }
+            },*/
+                {type: 'text',
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.publicSubparter"/>',
+                    name: 'publicSubparter',
+                    newline: true//false
+
+                },
+                {type: 'text',
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.privateSubparter"/>',
+                    name: 'privateSubparter',
+                    newline: false
+
+                },
+                {type: 'text',
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.parter"/>',
+                    name: 'parter',
+                    newline: false
+
+                },
+            {   type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.location"/>',
+                newline:true,
+                validate:{required:true },
+                width: 495,
+                name: 'locationName',
+                options:{
+                    onFocus: function(){
+                        var e = this;
+                        clickFormRecord = liger.get("spm_company_create_form").getData();
+                        if (clickFormRecord.countryName != null && clickFormRecord.countryName != "") {
+                            Location = {
+                                    addressLine1:clickFormRecord.addressLine1,
+                                    addressLine2:clickFormRecord.addressLine2,
+                                    addressLine3:clickFormRecord.addressLine3,
+                                    cityCode:clickFormRecord.cityCode,
+                                    cityName:clickFormRecord.cityName,
+                                    countryCode:clickFormRecord.countryCode,
+                                    countryName:clickFormRecord.countryName,
+                                    stateCode:clickFormRecord.stateCode,
+                                    stateName:clickFormRecord.stateName,
+                                    zipCode:clickFormRecord.zipCode
+                            };
+                        }
+                        location_edit('${base.contextPath}',Location,function(data){
+                            e.setValue(data.address);
+                            spmLocation = data;
+                            spmLocation.locationId = clickFormRecord.locationId;
+                            Location = data;
+                        })
+                    }
+                }
+            },
+            {
+                display: '所属公司',
+                name: 'gstId',
+                type: 'popup',
+                newline: false,
+                valueField: 'gstId',/*'parentCompanyName',*/
+                textField:'parentCompanyName',
+                id: "gstId",
+                //validate:{required:true},
+            <#if userId==1>
+        options:
+        $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_parent_company")}, {
+            onLoadData: function () {
+                this.setParm('gstId', liger.get('gstId').selectedValue)
+            },
+            onChangeValue: function () {
+                this.setParm('gstId', liger.get('gstId').selectedValue)
+            }
+        }),
+        <#else>
+        options:
+            $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_attributed_company")}, {
+                onLoadData: function () {
+                    this.setParm('gstId', liger.get('gstId').selectedValue)
+                },
+                onChangeValue: function () {
+                    this.setParm('gstId', liger.get('gstId').selectedValue)
+                }
+            })
+            </#if>
+            },{/*add furong.tang*/
+                display: '是否显示库存',
+                name: 'attribute1',
+                type: 'select',
+                options: {
+                        valueField: "value",
+                        textField: "meaning",
+                        data: isDisplay
+                }
+            },{
+                display: '付款预留时间（分钟）',
+                name: 'attribute2',
+                type: 'select',
+                newline: false,
+                options: {
+                    valueField: "value",
+                    textField: "meaning",
+                    data: payReservedTime
+                }
+            },{/*add mingqing.wei*/
+                    display: '订单是否审核',
+                    name: 'attribute3',
+                    type: 'select',
+                    newline: false,
+                    options: {
+                        valueField: "value",
+                        textField: "meaning",
+                        data: isDisplay
+                    },
+                    validate:{required:true }
+
+            },{
+                type: 'textarea', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.remark"/>',
+                newline:true,
+                name: 'remark',
+                width:810,
+                validate: {
+	                maxlength: 80
+	            }
+            }]
+        });
+        //默认公司类型为分公司  update by 15750 at 2018/03/20
+        $.ligerui.get('companyType').setValue('BRNCH');
+        if(companyId != null && companyId != ""){
+            Hap.loadForm({
+                form: spm_company_create_form,
+                url: companyFormUrl,
+                callback: function() {
+                    liger.get('code').setReadonly(true);
+                    liger.get('name').setReadonly(true);
+                }
+            });
+        }
+        window['spm_save'] = $("#spm_save").ligerForm({
+            buttons: [{
+                text: '<@spring.message "sys.hand.btn.save"/>',
+                id: 'saveBtn',
+                align: 'right',
+                width: 60,
+                click: function() {
+                    saveCompany();
+                    /* Hap.gridSave({
+                            grid : inv_details_grid,
+                            url:'${base.contextPath}/inv/details/save'
+                    }) */
+                }
+            }]
+        });
+
+    });
+    function saveCompany(){
+        var emailReg = /^([\s\S]*)+@([\S\s]*)+(\.([\S\s]*)+)+$/;
+        var form = new liger.get("spm_company_create_form");
+        if(Hap.validateForm(form)){
+        	 var data = form.getData();
+             if(data.email != null && data.email != ""){
+                 if (emailReg.test(data.email) == false) {
+                     $.ligerDialog.error("<@spring.message 'msg.error.user.email_format'/>".replace("{0}", "<@spring.message 'type.com.lkkhpg.dsis.platform.dto.system.user.email'/>"), $l("sys.hand.tip.info"));
+                     return;
+                 }
+             }
+             if(data.companyType == "BRNCH" ) {
+                 if (data.gstId ==null || data.gstId =="") {
+                     $.ligerDialog.error(data.gstId);
+                 $.ligerDialog.error('<@spring.message "msg.error.config.parentcompany"/>');
+                     return;
+                 }
+             }
+           /* console.log(data.attribute2);
+             if(data.attribute2 != null && data.attribute2 != ""){
+                 if(numberReg.test(data.attribute2) == false){
+                     $.ligerDialog.error("<@spring.message 'msg.error.user.number_format'/>".replace("{0}", "<@spring.message '付款预留时间（小时）'/>"), $l("sys.hand.tip.info"));
+                     return;
+                 }
+             }*/
+             data.spmLocation = spmLocation;
+             $.ajax({
+                 type : "POST",
+                 url : '${base.contextPath}/spm/company/save',
+                 contentType : "application/json",
+                 data : JSON2.stringify(data),
+                 dataType : "json",
+                 success : function(data) {
+                     if (data.success) {
+                         Hap.showSuccess($l('sys.hand.tip.success'), function() {
+	                             window.top.f_removeTab('spm_company_edit');
+                             window.top.f_addTab('spm_company_edit','<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.companycreate" />','${base.contextPath}/spm/spm_company_edit.html?companyId=' + data.rows[0].companyId);
+                         });
+                     }
+                 }
+             });
+        }
+
+    }
+    </script>
+</body>
+</html>

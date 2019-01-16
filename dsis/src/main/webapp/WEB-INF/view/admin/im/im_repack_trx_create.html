@@ -1,0 +1,829 @@
+<#-- 
+* description: 创建分包记录-查询商品包界面 
+* version: 1.0 
+* author:hanrui.huang@hand-china.com 
+* Copyright LKK Health Products Group Limited 
+* --> 
+<#include "../include/head.html">
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script
+    src="${base.contextPath}/common/code?yesno=SYS.YES_NO&operType=INV.REPACK_TYPE&repackStatus=INV.REPACK_STATUS"
+    type="text/javascript"></script>
+<script src="${base.contextPath}/resources/js/im/im_repack.min.js"
+    type="text/javascript"></script>
+<body style="padding: 10px;zoom: 1;">
+<input type="hidden" id="contextPath" name="contextPath" value="${base.contextPath}">
+<form id="inv_item_form" style="margin: 8px 8px;"></form>
+<div id="inv_item_detail" style="margin: 8px 8px;"></div>
+<div id="im_repack_trx_create_grid" style="margin: 8px 8px;"></div>
+<div id="im_repack_trx_create_btns" style="float:right;padding: 8px;">
+        <div id="repack_submit" style="float:right;margin: 15px 10px"></div>
+        <div id="repack_save" style="float:right;margin: 15px 10px"></div>
+        <div id="repack_delete" style="float:right;margin: 15px 10px"></div>
+    </div>
+
+    <script type="text/javascript">
+    <#assign isedit = (RequestParameters.isedit!'0')/>
+    //定义map对象
+    var map = new Map();
+    var organizationId = _invOrgId;
+    //lastSavedRepackTrx赞存最近保存的RepackTrx
+    var lastSavedRepackTrx =null;
+    //暂存库存信息
+    var invOqData =null;
+    //当前储商品信息
+    window.itemDetail=null;
+    //整个表单的状态 NEW SAVED COMP 新建  已保存  提交
+    var status;
+    //判断是否是第一次加载
+    var isFirstLoad = true;
+    //原值保存
+    var oldValue = null;
+    //重置标志
+    var isResetOldValue = true;
+    $(function () {
+    	//分单编码
+    	var trxId = ${RequestParameters.trxId!-1},trxNumber='',status =  '${RequestParameters.status!""}';
+    	organizationId = ${RequestParameters._invOrgId!_invOrgId};
+    	//分包单form
+    	window['inv_item_form'] = $('#inv_item_form').ligerForm({
+    		fields : [
+//                       {
+//                     	  label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.organization"/>',
+//                     	  type : 'hidden', name : 'organizationId', newline : false, readonly : true, options : 
+//                     	  {
+//                     		  value : _invOrgId
+//                     	  }
+//                       },
+//                       {
+//                     	  label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.organization"/>',
+//                     	  type : 'text', name : 'organizationName', newline : false, readonly : true, options : 
+//                     	  {
+//                     		  value : _invOrgName
+//                     	  }
+//                       }
+                      {
+                        type : 'combobox',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.organization"/>',
+                        name : 'organizationId',
+                        newline : false,
+                        options : {
+                            value : organizationId,
+                            valueField : 'invOrgId',
+                            textField : 'name',
+                            url : "${base.contextPath}/spm/invOrganization/queryInvOrgsByRole",
+                            cancelable : false ,
+                            autocomplete:false,
+                            onBeforeSelect : function(){ //该事件用于将初次加载标志置false,记录原值以及将重复标记置为true
+                            	isFirstLoad = false;
+                            	oldValue = $.ligerui.get('organizationId').getValue();
+                            	isResetOldValue = true;
+                            },
+                            onSelected : function(e){
+                            	if(isResetOldValue){//如果重复标记为true
+                            		if(!isFirstLoad){
+                                        $.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.refresh_page"/>', $l('sys.hand.tip.info'),function(yes) {
+                                            if(yes){
+                                                var newInvOrgId = $.ligerui.get('organizationId').getValue()
+                                                window.top.f_removeTab(window.top.tab.selectedTabId);
+                                                parent.f_addTab(window.top.tab.selectedTabId,'<@spring.message "sys.hand.btn.newsubpackage"/>',"${base.contextPath}/im/im_repack_trx_create.html?status=NEW&_invOrgId="+newInvOrgId);
+                                            } else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+                                                isResetOldValue = false;
+                                                $.ligerui.get('organizationId').setValue(oldValue);
+                                            }
+                                        });
+                                    }
+                            		isResetOldValue = false;
+                            	}
+                            	
+                            }
+                         },
+                         validate : {
+                             required : true
+                         }
+                      }, 
+                      {
+                    	  name: "trxId", type: "hidden" ,newline: false
+                      }, 
+                      {
+                    	  type : 'text', label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.trxnumber"/>',
+                    	  name : 'trxNumber',newline: false,
+                    	  options : {
+                    		  readonly : true, //是否可编辑
+                    		  valueField : 'trxNumber', textField : 'trxNumber', value : trxNumber, 
+                    	  }
+                      },
+                      {
+                    	  type : 'select', label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.status"/>',
+                    	  name : 'status', newline : false,options : {
+                    		  readonly : true, //是否可编辑
+                    		  valueField : 'value', textField : 'meaning', data : repackStatus, cancelable : false, 
+                    		  value : repackStatus[0].value
+                    	  }
+                      },
+                      {
+                    	  type : 'popup', label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.packageitemid"/>',
+                    	  name : 'packageItemId', newline : true, rightToken : ' ',
+                    	  validate : {
+                    		  required : true
+                    	  },
+                    	  options  : function(){
+                    		  var o = ${lovService.getLov(base.contextPath, base.locale, "lov_packageItem")};
+                    		  o.onSelected = f_buttonclick;
+                    		  o.grid.columns[0].render = function(item){
+                    			  var html = "<a href='#' onClick='a_click(" + item.itemId + ")'>" + item.itemNumber + "</a>";
+                    			  return html;
+                    		  }
+                    		  o.grid.delayLoad = true;
+                    		  return o;
+                    	  }()
+                      },
+                      {
+                    	  type : 'text', label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.repackqty"/>',
+                    	  name : 'repackQty',type:'int', newline : false,validate : {
+                    		  required : true 
+                    	  },
+                    	  options : {
+                    		  onChangeValue : function(data) {
+                    			  if(data < 0){
+                    				  liger.get('repackQty').setValue('');
+                    				  Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.allocateqty.error"/>');
+                    			  }else{
+                    				  var operType = liger.get('operType').getValue();
+                    				  var quantity = liger.get('quantity').getValue();
+                    				  if(operType == 'DECOM' && parseInt(data) > parseInt(quantity)){
+                    					  liger.get('repackQty').setValue('');
+                    					  Hap.showError('<@spring.message "msg.error.stock.not_allowed_more_than_current_qty"/>');
+                    				  }
+                    			  }
+                    		  }
+                    	  }
+                      },
+                      {
+                    	  type : 'text', label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.quantity"/>',
+                    	  name : 'quantity', newline : false, readonly : true, //是否可编辑
+                    	  readonly : true
+                      },
+                      {
+                    	  label :'<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.package.packagename"/>',
+                    	  readonly : true,
+                    	  name : 'itemName', newline : true
+                      },
+                      {
+                    	  type : 'date', label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.trxdate"/>',
+                    	  name : 'trxDate', newline : false,options : {
+                    		  format : 'yyyy-MM-dd hh:mm:ss',
+                    		  showTime : true,
+                    		  value : new Date(${.now?long}),
+                    		  onChangeDate : function(value) {
+                    			  var now = new Date(${.now?long});
+                    			  var trxDate = new Date(value);
+                    			  if (trxDate > now) {
+                    				  $.ligerDialog.warn('<@spring.message "msg.warning.inventory.trx_date_must_less_than_now_date"/>', null, function(){$.ligerui.get('trxDate').setValue(now);});
+                    			  }
+                    		  }
+                    	  },
+                    	  validate : {
+                    		  required : true//, trxDateLessSysDate : true 
+                    	  }
+                      },
+                      {
+                    	  type : 'date', label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.createdate"/>',
+                    	  name : 'creationDate', newline : false,options : {
+                    		  format : 'yyyy-MM-dd hh:mm:ss', showTime : true, readonly : true, value : new Date(${.now?long}) 
+                    	  },
+                    	  validate : {
+                    		  required : true 
+                    	  }
+                      },
+                      {
+                    	  type : 'textarea', label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.remarks"/>',
+                    	  name : 'remark', newline : true
+                      },
+                      {
+                    	  type : 'select', label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.opertype"/>',
+                    	  name : 'operType', newline : false,options : 
+                    	  {
+                    		  valueField : 'value', textField : 'meaning', data : operType, cancelable : false, value : operType[0].value,
+                    		  onBeforeSelect : function(newValue) {
+                    			  Hap.gridQuery({
+                    				  form : inv_item_form, 
+                    				  grid : inv_item_detail 
+                    			  });
+                    			  var gridData = im_repack_trx_create_grid.rows;
+                    			  deleteRows(im_repack_trx_create_grid, gridData);
+                    			  var repackQty = liger.get('repackQty').getValue();
+                    			  var quantity = liger.get('quantity').getValue();
+                    			  if(newValue == 'DECOM' && parseInt(repackQty) > parseInt(quantity)){
+                    				  Hap.showError('<@spring.message "msg.error.stock.not_allowed_more_than_current_qty"/>');
+                    				  liger.get('operType').setValue('COMPS');
+                    				  return false;
+                    			  }
+                    			  map.clear();
+                    		  }
+                    	  },
+                    	  validate : {
+                    		  required : true 
+                    	  }
+                      }
+                      ],
+                      onAfterSetFields : function () 
+                      {
+                    	  $.ligerui.get('status').set('value', status);
+                      }
+    	});
+    	$.extend($.ligerui.get('packageItemId').options,{
+    		parms : {"organizationId":organizationId},
+            onLoadData: function(){
+                this.setParm('organizationId', organizationId);
+            } 
+        })
+    	<#if accessService.access("EDITABLE") == false>
+            window['inv_item_form'].setEditable(false);
+        </#if>
+
+      //在输入包数量之后  blur事件    必须方这里，不然不会有效果
+      $.ligerui.get('repackQty').bind('blur', function () {
+    	  var repackQty = $.ligerui.get('repackQty').getValue();
+    	  refreshItems(repackQty,inv_item_detail)
+      });
+
+      //商品包代码选择框    选择  触发事件
+      function f_buttonclick(data) {
+    	  inv_item_form.setData({'itemName':data.data[0].itemName});
+    	  reset();
+    	  var packageItemId = $.ligerui.get('packageItemId').getValue();
+    	  //查询查询库存现有量
+    	  $.ajax({
+    		  url : '${base.contextPath}/im/repack/getOnhandQuantity', async : false, type : "POST",
+    		  data : {"packageItemId" : packageItemId, "organizationId" : organizationId },
+    		  dataType : "json", contentType : "application/x-www-form-urlencoded;charset=UTF-8",
+    		  success : function (json) {
+    			  var onhandQuatitySel = json.rows;
+    			  //如果选择商品包和最近保存的一样，则 将之前的数据载入进去
+    			  if(lastSavedRepackTrx && lastSavedRepackTrx==packageItemId){
+    				  reload(trxId,inv_item_form,inv_item_detail,map,readOnly,function(repackTrx){
+    					  lastSavedRepackTrx=repackTrx.packageItemId; 
+    				  });
+    				  return;
+    			  }
+    			  //将商品包代码和库存组织 信息写入   分包单form
+    			  Hap.gridQuery({
+    				  form : inv_item_form, 
+    				  grid : inv_item_detail, 
+    			  });
+    			  //刷新批次行  
+    			  Hap.gridQuery({
+    				  form : inv_item_form, grid : im_repack_trx_create_grid, 
+    			  });
+    			  if (onhandQuatitySel != null) {
+    				  //如果商品包代码不一样就请空map
+    				  $.ligerui.get('quantity').set('value', onhandQuatitySel[0].quantity);
+    			  }else{
+    				  $.ligerui.get('quantity').set('value',0);
+    			  }
+    		  },
+    		  error : function () 
+    		  {
+    			  return;
+    		  }
+    	  }); //end ajax
+      }
+        
+        //商品明细 Grid
+        window['inv_item_detail'] = $('#inv_item_detail').ligerGrid({
+        	title : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.item.details"/>',
+        	unSetValidateAttr : false, delayLoad : true, 
+        	columns : [
+        	           {
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>', 
+        	        	   name : 'itemNumber', align : 'left'
+        	           },
+        	           {
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname"/>', name : 'itemName',
+        	        	   align : 'left'
+        	           },
+        	           {
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.actualitemnumber"/>', name : 'invCountItemNumber',
+        	        	   align : 'left'
+        	           },
+        	           {
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.actualitemname"/>', name : 'invCountItemName',
+        	        	   align : 'left'
+        	           },
+        	           {
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.common.product.invitemhierarchy.quantity"/>',
+        	        	   name : 'quantity', align : 'left' 
+        	           },
+        	           {
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.allocateqty"/>', name : 'allocateQty',
+        	        	   align : 'left',
+        	        	   render : function (data) 
+        	        	   {
+        	        		   var repackQty = $.ligerui.get('repackQty').getValue();
+        	        		   if (repackQty >= 1) {
+        	        			   return data.quantity * repackQty;
+        	        		   }
+        	        		   return 0;
+        	        	   }
+        	           }], 
+        	           url : '${base.contextPath}/im/repack/queryItemsDetail', 
+        	           enabledEdit : true, 
+        	           width : '99%', 
+        	           height : '90%'
+        });
+        var invCountItemId = null;
+        inv_item_detail.bind('selectRow', function (item){
+        	invCountItemId = item.invCountItemId;
+        	//缓存上次编辑批次行数据
+        	cacheRepackTrx(im_repack_trx_create_grid,map,itemDetail,true);
+        	//记录此次商品明细，待下一次进入此方法保存相关数据
+        	itemDetail=item;
+        	//根据商品行点击事件的商品编码获取表格数据
+        	var newData = map.get(item.itemId+'');
+        	// 设置newData
+        	if(newData != null){
+        		//im_repack_trx_create_grid 批次行grid ,newData map里暂时的批次行 ,data当前选择的商品明细对象
+        		addRows(im_repack_trx_create_grid,newData,item);
+        	}
+        	var packageItemId = $.ligerui.get('packageItemId').getValue();
+        	var url;
+        	var operType = $.ligerui.get('operType').getValue();
+        	if (operType == 'COMPS') 
+        		url = '${base.contextPath}/im/repack/queryOnhandLot'; //组合则查询现有量批次
+        		else {
+        			url = '${base.contextPath}/im/repack/queryComposeLot'; //分解则查询已存在的组合批次
+        		}
+        	//hap ajax start
+        	var sum = 0;
+        	//查询批次信息
+        	ajaxTrx({
+        		url : url, async : false, 
+        		data : {"packageItemId" : packageItemId, "organizationId" : organizationId,"itemId":item.invCountItemId },
+        		success : function (data){
+        			//暂存批次信息，取消上一次查询的影响，在addPackage是需要用
+        			invOqData = null;
+        			if (data.success) {
+        				invOqData = data.rows;
+        				if(invOqData == ''){
+        					ajaxTrx({
+        						url : $('#contextPath').val() + '/im/repack/getOnhandQuantity',
+        						async : false,
+        						data : {
+        							"packageItemId" : item.invCountItemId,
+        							"organizationId" : organizationId,
+        						},
+        						success : function(json) {
+        							if (json.success) {
+        								if(json.rows){
+        									sum = json.rows[0].quantity;
+        								}
+        								var gridDetails = im_repack_trx_create_grid .getData();
+        								var repackQty = $.ligerui.get('repackQty').getValue();
+        								if(gridDetails == ''){
+        									im_repack_trx_create_grid.addRow({
+        										invCountItemId : item.invCountItemId,
+        										itemPackageComponents : item.itemId,
+        										lotNumber:'',
+        										expiryDate:'',
+        										quantity:sum,
+        										allocateQty :item.quantity*repackQty
+        									});
+        								}
+        							}
+        						}
+        					});
+        					liger.get('repack_trx_create_tool').setDisabled('trx_btn_add');
+        					liger.get('repack_trx_create_tool').setDisabled('trx_btn_delete');
+        				}else{
+        					var gridDetails = im_repack_trx_create_grid .getData();
+        					if(gridDetails == ''){
+        						im_repack_trx_create_grid.addRow({
+        							invCountItemId : item.invCountItemId,
+        							itemPackageComponents : item.itemId
+        						});
+        					}
+        					liger.get('repack_trx_create_tool').setEnabled('trx_btn_add');
+        					liger.get('repack_trx_create_tool').setEnabled('trx_btn_delete');
+        				}
+        			}
+        		}
+        	});
+        });
+
+        //分批次信息grid
+        window['im_repack_trx_create_grid'] = $("#im_repack_trx_create_grid").ligerGrid({
+            usePager : false,
+        	unSetValidateAttr : false, delayLoad : true, //1.在每次编辑之前,更新下拉框的取值范围
+        	//编辑之前
+        	onBeforeEdit : function (e)  {
+        		var testData = e.record;
+        		//invOqData分批次信息  并且有分批次次信息 (且启用批次控制，在库存量存在批次)
+        		if(e.column.columnname == 'lotNumber'){
+        			//未启用批次控制，显示商品现有量
+        			if (itemDetail.lotControlFlag == 'N' && testData.quantity == undefined) {
+        				this.updateCell("quantity", invOqData[0].quantity - invOqData[0].pendingQty, e.record);
+        			}
+        			//未启用批次控制或商品不计算库存量，返回flase批次不允许编辑批次
+        			if (e.column.columnname == 'lotNumber' && (itemDetail.lotControlFlag == 'N' || itemDetail.countStockFlag == 'N')) {
+        				return false;
+        			}
+        			e.column.editor = {
+    					type : 'select',
+    					data : invOqData,
+    					valueField : 'lotNumber',
+    					textField : 'lotNumber',
+    					onSelected : function(newValue) {
+    						var sun = $.ligerui.get('repackQty').getValue();
+    						refreshItems(sun,inv_item_detail);
+    						for (var i = 0; i < invOqData.length; i++) {
+    							if (newValue == invOqData[i].lotNumber) {
+    								testData.expiryDate = invOqData[i].expiryDate;
+    								testData.quantity = invOqData[i].availableQty;
+    								testData.allocateQty = itemDetail.allocateQty;
+    								break;
+    							}
+    						}
+    					},
+    					onBeforeSelect : function(newValue) {
+    						var items = im_repack_trx_create_grid.rows;
+    						for (var i = 0; i < items.length; i++) {
+    							if (items[i].lotNumber == newValue
+    									&& items[i].__id != testData.__id) {
+    								Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.image.tip.onlyonebatch"/>');
+    								return false;
+    							}
+    						}
+    					}
+        			}
+        			
+        		}
+        		im_repack_trx_create_grid.setCellEditing(e.record, e.column, true);
+        		return true;
+        	},
+        	onBeforeSubmitEdit : function(e) {
+        		var testData = e.record;
+        		if (e.column.columnname == "allocateQty") {
+        			if(testData.lotNumber != null){
+        				var packageItemId = $.ligerui.get('packageItemId').getValue();
+        				ajaxTrx({
+        					url:"${base.contextPath}/im/repackTrx/getLotQty",
+        					data : {
+        						"packageItemId" : packageItemId, 
+        						"itemId" : invCountItemId,
+        						"lotNumber" : testData.lotNumber
+        						},
+        					success:function(data){
+        						var operType = liger.get('operType').getValue();
+        						if(parseInt(e.value)> data && operType == 'DECOM'){
+        							Hap.showError('<@spring.message "msg.error.invrepacktrx.allocateqty"/>');
+        							return false;
+        						}
+        					}
+        				})
+        			}
+        		}
+        	},
+        	columns : [
+        	           {//批次号
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotnum"/>',
+        	        	   name : 'lotNumber', align : 'left', isMultiSelect : false, //为了初始值的便利暂将编辑器设为text(后面会保证每次启用编辑时是select)
+        	        	   editor : {
+        	        		   type : 'select' 
+        	        	   },
+        	        	   validate : {
+        	        		   validateLotRequired : true,
+        	        		   required:true
+        	        	   }
+        	           },
+        	           {
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.expirydate"/>', name : 'expiryDate',
+        	        	   align : 'left', format : 'yyyy-MM-dd hh:mm:ss'
+        	           },
+        	           {
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage"/>',
+        	        	   name : 'quantity', align : 'left'
+        	           },
+        	           {
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.quantity"/>',
+        	        	   name : 'allocateQty', align : 'left',editor : {
+        	        		   type : 'int' ,sign:false
+        	        	   },
+        	        	   validate : {
+        	        		   required : true
+        	        	   }
+        	           },
+        	           {
+        	        	   display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.remarks"/>',
+        	        	   name : 'remark', align : 'left', editor : {
+        	        		   type : 'text' 
+        	        	   }
+        	           }], 
+        	           toolbar : 
+        	           {
+        	        	   id:'repack_trx_create_tool',
+        	        	   items : [
+        	        	            {
+        	        	            	id:'trx_btn_add',
+        	        	            	<#if accessService.access("EDITABLE") == false>
+        	                            disable:true, 
+        	                            </#if> 
+        	        	            	text : '<@spring.message "sys.hand.btn.new"/>',
+        	        	            	//disable : false,
+        	        	            	click : function(){
+        	        	            		//验证通过才做添加
+        	        	            		if(Hap.validateForm(inv_item_form)){
+        	        	            			var repackQty = $.ligerui.get('repackQty').getValue();
+        	        	            			refreshItems(repackQty,inv_item_detail);
+        	        	            			im_repack_trx_create_grid.addRow({itemPackageComponents : itemDetail.itemId});
+//         	        	            			addPackage(invOqData,itemDetail, status, organizationId,im_repack_trx_create_grid);
+        	        	            		}
+        	        	            	} ,
+        	        	            	icon : 'add' 
+        	        	            },
+        	        	            {
+        	        	            	line : true 
+        	        	            },
+        	        	            {
+        	        	            	id:'trx_btn_delete',
+        	        	            	<#if accessService.access("EDITABLE") == false>
+        	                            disable:true, 
+        	                            </#if> 
+        	        	            	text : '<@spring.message "sys.hand.btn.delete"/>',
+        	        	            	click : function () {
+        	        	            		Hap.gridDelete({
+        	        	            			grid:im_repack_trx_create_grid,
+        	        	            			url:'${base.contextPath}/im/repackTrx/trxDetail/remove',
+        	        	            			isNewFunc: function(data){
+        	        	            				return !data['trxDetailId'];
+        	        	            			}
+        	        	            		});
+        	        	            	},
+        	        	            	icon : 'delete' 
+        	        	            }] 
+        	           },
+        	           enabledEdit : true, rownumbers : true, width : '99%', height : '60%', checkbox : true,
+        	           title : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.item.lot"/>'
+        });
+        //3行按钮
+        //提交
+        repack_submit = $("#repack_submit").ligerButton({
+        	text:'<@spring.message "sys.hand.btn.submit"/>',
+        	click: function (){
+        		//必须重新刷新一下inv_item_detail 计算一下allocateQty
+        		var repackQty = $.ligerui.get('repackQty').getValue();
+        		refreshItems(repackQty,inv_item_detail);
+        		save(function(data){
+        			$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.member.marketchange.submit.sure"/>', function (isyes) { //提交
+        				if(isyes){
+        					addCountItemProperties(inv_item_detail,map);
+        					ajaxRepackTrx({ map:map, repackTrx:inv_item_form.getData(),
+        						url:"${base.contextPath}/im/repackTrx/submit",
+        						callback:function(json){ 
+        							if(json.success){
+        								$.ligerui.get('status').setValue(json.rows[0].status);
+        								//添加按钮不能编辑
+        								liger.get('repack_trx_create_tool').setDisabled('trx_btn_add');
+        								liger.get('repack_trx_create_tool').setDisabled('trx_btn_delete');
+        								readOnly(); 
+        								var manager = $.ligerDialog.open({ cls: 'success', type: 'success', content: '<div style="padding:4px">'+$l('sys.hand.tip.success')+'</div>', allowClose: false });
+        								setTimeout(function (){  manager.close();  }, 1000);
+        							}
+        						}
+        					});
+        				}
+        			});
+        		});
+        	}
+        });
+        
+        //添加
+        repack_save = $("#repack_save").ligerButton({
+        	text:'<@spring.message "sys.hand.btn.save"/>',
+        	click: function (){
+        		//必须重新刷新一下inv_item_detail 计算一下allocateQty
+        		var repackQty = $.ligerui.get('repackQty').getValue();
+        		refreshItems(repackQty,inv_item_detail);
+        		save(function(data){
+        			Hap.showSuccess('<@spring.message "sys.hand.tip.success"/>');
+        		});
+        	}
+        });
+
+        //删除
+        repack_delete = $("#repack_delete").ligerButton({
+        	text:'<@spring.message "sys.hand.btn.delete"/>',
+        	click: function (){
+        		if (liger.get('status').getValue() == 'NEW'){
+        			$.ligerDialog.confirm('<@spring.message "msg.warning.sys.delete_or_not"/>', function (isyes) { 
+        				if(isyes){
+        					ajaxRepackTrx({ 
+        						map:map, repackTrx:inv_item_form.getData(),
+        						url:"${base.contextPath}/im/repack/remove",
+        						callback:function(json){
+        							<#if isedit != '1'>
+        							window.top.f_removeTab("im_repack_trx_create");
+        							</#if>
+        							<#if isedit == '1'>
+        							window.top.f_removeTab("im_repack_trx_create_1");
+        							</#if>
+        						}
+        					});
+        				}
+        			})
+        		}
+        	}
+        });
+        repack_delete.setDisabled();
+        function readOnly(){
+        	//3行按钮 不可用
+        	repack_save.setDisabled();
+        	repack_delete.setDisabled();
+        	repack_submit.setDisabled();
+        	//添加按钮不能编辑
+        	liger.get('repack_trx_create_tool').setDisabled('trx_btn_add');
+        	liger.get('repack_trx_create_tool').setDisabled('trx_btn_delete');
+        	//头信息
+        	liger.get('inv_item_form').setEditable(false);
+        	$("#remark").attr('disabled','disabled');
+        	//商品明细不能编辑
+        	inv_item_detail.options.enabledEdit=false;
+        	//分包行不能编辑
+        	im_repack_trx_create_grid.options.enabledEdit=false;
+        	status='COMP';
+        }
+
+        function save(callback){
+        	var fal = true;
+        	if(Hap.validateForm(inv_item_form)){
+        		//添加当前
+        		im_repack_trx_create_grid.endEdit();
+        		cacheRepackTrx(im_repack_trx_create_grid,map,itemDetail,false);
+        		if(!valiData()){
+        			return;
+        		};
+        		var packageItemId = $.ligerui.get('packageItemId').getValue();
+        		var operType = liger.get('operType').getValue();
+        		var dmap = new Map();
+        		for (var i = 0; i < map.arr.length; i++) {
+        			if(map.arr[i].value[0].allocateQty < 0){
+        				Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.allocateqty.error"/>');
+        				fal = false;
+        				return false;
+        			}else{
+        				var allocateQty = map.arr[i].value[0].allocateQty;
+        				if(operType == 'DECOM' && map.arr[i].value[0].lotNumber !=''){
+        					var detail = dmap.get(map.arr[i].value[0].lotNumber);
+        					if(detail == null){
+        						var a = map.arr[i].value[0].lotNumber;
+        						dmap.put(a,map.arr[i].value[0].allocateQty);
+        					}else{
+        						var dqty = detail + map.arr[i].value[0].allocateQty;
+        						dmap.put(map.arr[i].value[0].lotNumber,dqty);
+        					}
+        					$.ajax({
+        						url:"${base.contextPath}/im/repackTrx/getLotQty",
+        						async : false,
+        						data : {
+        							"packageItemId" : packageItemId, 
+        							"itemId" : map.arr[i].value[0].invCountItemId,
+        							"lotNumber" : map.arr[i].value[0].lotNumber
+        						},
+        						success:function(data){
+        							if(allocateQty > data){
+        								Hap.showError('<@spring.message "msg.error.invrepacktrx.allocateqty"/>');
+        								fal = false;
+        								return false;
+        							}
+        							if(dmap.get(map.arr[i].value[0].lotNumber) > data){
+        								Hap.showError('<@spring.message "msg.error.invrepacktrx.allocateqty"/>');
+        								fal = false;
+        								return false;
+        							}
+        						}
+        					})
+        				}
+        			}
+        		}
+        		if(fal){
+        			ajaxRepackTrx({ map:map, repackTrx:inv_item_form.getData(),
+        				url:"${base.contextPath}/im/repack/save",
+        				callback:function(json){
+        					if(json.success && json.rows && json.rows.length > 0){
+        						repack_delete.setEnabled();
+        						$.ligerui.get('trxNumber').setValue(json.rows[0].trxNumber);
+        						reRenderData(map,json.rows,im_repack_trx_create_grid,itemDetail);
+        						status='SAVED'; trxId=json.rows[0].trxId;
+        						$('#trxId').val(json.rows[0].trxId);
+        						lastSavedRepackTrx=json.rows[0].packageItemId;
+        						if(callback){ callback(json.rows[0]);}
+        						return true;
+        					}
+        				}
+        			});
+        		}
+        	}
+        }
+          //验证当数据是否正确  allocateQty 数量 quantity数量
+        var valiData=function(){
+        	  //如果当前是分包 
+        	  var operType=$.ligerui.get('operType').getValue();
+        	  //分解的时候 分包数量不许大于当前包数量
+        	  if (parseInt($.ligerui.get('repackQty').getValue()) > parseInt($.ligerui.get('quantity').getValue()) 
+        			  && operType == 'DECOM'){
+        		  $.ligerDialog.alert('<@spring.message "msg.error.stock.not_allowed_more_than_current_qty"/>', 
+        				  $l('sys.hand.tip.info'), 'error');
+        		  return false;
+        	  }
+        	  var result='false';
+        	  var rs = inv_item_detail.rows;
+        	  for(var i=0;i<rs.length;i++){
+        		  var datas=map.get(rs[i].itemId+'');
+        		  if(datas !=null && datas.length >0){
+        			  //只有商品计算库存量才需要校验分配数量是否大于库存量
+        			  if (rs[i].countStockFlag != 'N') {
+        				  result=vali(rs[i],datas,operType);
+        				  if(result != 'true'){
+        					  break;
+        				  }
+        			  }
+        		  }
+        	  }
+        	  //组合的时候，同一批次下的数量不许大于库存量
+        	  if(result == 'lotnumber_not_allowed_out_of_stock'){
+        		  $.ligerDialog.alert('<@spring.message "msg.error.inv.lotnumber _not_allowed_out_of_stock"/>',
+        				  $l('sys.hand.tip.info'), 'error');
+        		  return false;
+        	  }
+        	  //同一商品Id下的所有批次数量之和必须等于商品明细的总数量
+        	  else if(result == 'must_equal_with_sum_qty'){
+        		  $.ligerDialog.alert('<@spring.message "msg.error.inv.must_equal_with_sum_qty"/>', 
+        				  $l('sys.hand.tip.info'), 'error');
+        		  return false;
+        	  }
+        	  //批次行的库存和数量不能为0
+        	  else if(result=='allocateQty_or_quantity_empty_error'){
+        		  $.ligerDialog.alert('<@spring.message "msg.error.inv.allocateQty_or_quantity_empty_error"/>', 
+        				  $l('sys.hand.tip.info'), 'error');
+        		  return false; 
+        	  }
+        	  if(result == 'true') return true; else return false;
+          }
+          
+          //初始化
+          function reset(){
+        	  deleteRows(inv_item_detail, inv_item_detail.rows);
+        	  map.clear();
+        	  itemDetail=null;
+        	  invOqData=null;
+        	  status='NEW';
+        	  $("#remark").val('');
+          }
+          if( trxId!=null && trxId > 0){
+        	  reload(trxId,inv_item_form,inv_item_detail,map,readOnly,function(repackTrx){
+        		  lastSavedRepackTrx=repackTrx.packageItemId; 
+        	  });
+        	  repack_delete.setEnabled();
+          }
+          <#if accessService.access("EDITABLE") == false>
+          repack_delete.set({disabled:true});
+          repack_save.set({disabled:true});
+          repack_submit.set({disabled:true});
+          </#if> 
+    });
+    
+    /**
+     * 校验批次必输
+     */
+     jQuery.validator.addMethod("validateLotRequired", function(value, element) {
+        //商品计算库存量、且启用批次控制
+        
+        if (itemDetail.lotControlFlag != 'N' && itemDetail.lotControlFlag == 'Y') {
+        	if (value == '') {
+        		return false;
+        	} else {
+        		return true;
+        	}
+        } else {
+            return false;
+        }
+     }, '<@spring.message "msg.error.inventory.repack.lot_reuired"/>');
+    //弹出框
+    function a_click(data) {
+    	$.ligerDialog.open({
+    		id : 'dialog1',
+    		height : 400,
+    		width : 600,
+    		title : '<@spring.message "sys.hand.btn.query"/>',
+    		url : 'im_repack_trx_items.html?packageItemId=' + data
+    				+ '&organizationId=' + organizationId,
+    				showMax : false,
+    				showToggle : true,
+    				showMin : false,
+    				isResize : true,
+    				slide : false,
+    				center : 0
+    	});
+    }
+</script>
+</body>

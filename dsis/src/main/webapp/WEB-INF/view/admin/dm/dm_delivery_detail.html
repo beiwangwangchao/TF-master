@@ -1,0 +1,1366 @@
+<#--
+ * description: 发运单详情界面
+ * version: 1.0
+ * author: liang.rao
+ * Copyright LKK Health Products Group Limited.
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/resources/js/spm/location_edit.min.js?v=20170802"
+    type="text/javascript"></script>
+    <body style="padding: 3px; ">
+        <script src="${base.contextPath}/common/code?resourceTypeData=SYS.RESOURCE_TYPE&deliveryType=DM.DELIVERY_TYPE&deliveryStatusdata=DM.DELIVERY_STATUS&yesnoData=SYS.YES_NO" type="text/javascript"></script>
+
+        <form id="deliveryForm">
+        </form>
+         
+         <div id="billPannel" style="margin: 10px; clear: both;">
+                    <div style="margin: 10px;">
+                        <div id="addressgrid"></div>
+                    </div>
+        </div>
+         
+        <div id="deliveryLineGrid">
+        </div>
+        <div id="deliverylotGrid">
+        </div>
+        <div id="deliverysubForm">
+        </div>
+          
+        <div id="deliveryReturnDialog" style="display: none;">
+            <div id="deliveryReturnLineGrid">
+            </div>
+            <div id="deliveryReturnLotGrid">
+            </div>
+        </div>
+        <script type="text/javascript">
+        $l('sys.hand.title.addressinfo','<@spring.message "sys.hand.title.addressinfo"/>');
+            var allData = {};
+            var deliveryId;
+            var deliveryLineId;
+            var lineData = {};
+            var row = {};
+            var addressgrid
+            var currentRowId;
+            $(function() {
+                var itemId;
+                var orgId;
+                var urlParam = window.location.search;
+                var deliveryId = urlParam.substring(urlParam.lastIndexOf('=') + 1, urlParam.length);
+                var deliveryFormUrl = '${base.contextPath}/dm/delivery/details?deliveryId=' + deliveryId;
+
+                /* deliveryForm表单提交 */
+                window['deliveryForm'] = $("#deliveryForm").ligerForm({
+                    fields: [{
+                        type: 'hidden',
+                        name: 'deliveryId'
+                    },
+                    {
+                        type: 'text',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.deliveryid"/>',
+                        name: 'deliveryNumber',
+                        readonly: true
+                    },
+                    {
+                        type: 'text',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.operationunitid"/>',
+                        name: 'ouName',
+                        readonly: true,
+                        newline: false
+                    },
+                    {
+                        type: 'text',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.invorgid"/>',
+                        name: 'invOrgName',
+                        readonly: true,
+                        newline: false
+                    },
+                    {
+                        type: 'hidden',
+                        name: 'invOrgId'
+                    },
+                    {
+                        type: 'text',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.orderheaderid"/>',
+                        name: 'orderNumber',
+                        readonly: true
+                    },
+                    {
+                        type: 'hidden',
+                        name:'orderHeaderId'
+                    },
+                    {
+                        type: 'select',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.deliverytype"/>',
+                        name: 'deliveryType',
+                        newline: false,
+                        options: {
+                            valueField: 'value',
+                            textField: 'meaning',
+                            data: deliveryType,
+                            onSelected :function(value,text){
+                                if(value == 'SHIPP'){
+                                     $("#addressgrid").show();
+                                     /* liger.get("remark").setRequired(true);
+                                     $("textarea[name='remark']").attr("validate", '{"required":true}'); */
+                                     
+                                }else{
+                                     $("#addressgrid").hide();
+                                    /*  liger.get("remark").setRequired(false);
+                                     $("textarea[name='remark']").removeAttr("validate"); */
+                                }
+                            }
+                        },
+                        validate : {
+                            required : true
+                        }
+                    },
+                    {
+                        type: 'text',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.creationdate"/>',
+                        name: 'creationDate',
+                        readonly: true,
+                        newline: false
+                    },
+                    {
+                        type: 'text',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.memberid"/>',
+                        name: 'memberCode',
+                        readonly: true
+                    },
+                    {
+                        type: 'select',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.deliverystatus"/>',
+                        name: 'deliveryStatus',
+                        newline: false,
+                        options : {
+                            valueField : "value",
+                            textField : "meaning",
+                            delayLoad : true,
+                            data:deliveryStatusdata
+                        },
+                        validate : {
+                            required : true
+                        }
+                        
+                    },
+                    {
+                        type: 'date',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.deliverydate"/>',
+                        name: 'deliveryDate',
+                        newline: false,
+                        format: "yyyy-MM-dd hh:mm:ss",
+                        editor : {
+                            type: "date",
+                            showTime : true,
+                            format: "yyyy-MM-dd hh:mm:ss",
+                            onChangeDate : function(value) {
+                            	var trxDate = new Date(value);
+                            	 if(trxDate.getTime() > (new Date()).getTime()){
+                                     $.ligerDialog.error('<@spring.message "msg.error.dm.not_allowed_more_than_current_date"/>');
+                                     liger.get('deliveryDate').setValue("");
+                                  }
+                            }
+                        },
+                        validate : {
+                            required : true
+                        }
+                    },
+                    {
+                        type: 'select',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.receiptflag"/>',
+                        name: 'receiptFlag',
+                        id: 'receiptFlag',
+                        options : {
+                            valueField : "value",
+                            textField : "meaning",
+                            delayLoad : true,
+                            data:yesnoData
+                        },
+                        readonly: true,
+                        newline: true
+                    },
+                    {
+                        type: 'text',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.logisticscompany"/>',
+                        newline: false,
+                        name: 'logisticsCompany',
+                        id: 'logisticsCompany'
+                    },
+                    {
+                        type: 'text',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.trackernumber"/>',
+                        newline: false,
+                        name: 'trackerNumber',
+                        id: 'trackerNumber'
+                    },
+                    {
+                        type: 'textarea',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.orderremark"/>',
+                        name: 'orderRemark',
+                        id: 'orderRemark',
+                        newline: true
+                    },
+                    {
+                        type: 'textarea',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.orderInternalremark"/>',
+                        name: 'orderInternalRemark',
+                        id: 'orderInternalRemark',
+                        newline: false
+                    },  {
+                        type: 'textarea',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.remark"/>',
+                        name: 'remark',
+                        id: 'remark',
+                        newline: false
+                    }],
+
+                });
+                
+                addressgrid = $("#addressgrid").ligerGrid(o_addressGridOptions());
+                Hap.loadForm({
+                    form: deliveryForm,
+                    url: deliveryFormUrl,
+                    callback: function(d,json) {
+                        var deliveryStatus = deliveryForm.getData().deliveryStatus;
+                        var deliveryType = deliveryForm.getData().deliveryType;
+                        liger.get('orderInternalRemark').setDisabled(true);
+                        liger.get('orderRemark').setDisabled(true);
+                        if (deliveryStatus == 'CANCL' || deliveryStatus == 'SHIPP' || deliveryStatus == 'PCKUP') {
+                            liger.get('saveBtn').setDisabled(true);
+                            liger.get('submitBtn').setDisabled(true);
+                            liger.get('returnBtn').setDisabled(true);
+                            liger.get('cancelBtn').setDisabled(true);
+                            
+                            liger.get("deliveryStatus").setReadonly(true);
+                            liger.get("deliveryStatus").setData(deliveryStatusdata);
+                            liger.get('deliveryStatus').selectValue(deliveryStatus);
+                            liger.get("deliveryType").setReadonly(true);
+                            liger.get("deliveryDate").setReadonly(true);
+                            
+                            liger.get("logisticsCompany").setReadonly(true);
+                            liger.get("trackerNumber").setReadonly(true);
+                            //$('#remark').attr('disabled','disabled')
+                            //deliveryForm.setVisible("remark",false);
+                            liger.get('remark').setDisabled(true);
+                            
+                            $("[ toolbarid='addLotBtn']").hide();
+                            $("[ toolbarid='deleteLotBtn']").hide();
+                            
+                        } else {
+                            if(deliveryStatus == 'NEW'){
+                                liger.get('submitBtn').setDisabled(true);
+                            }
+                            else if(deliveryStatus == 'PDDL'){
+                                 $("[ toolbarid='addLotBtn']").hide();
+                                 $("[ toolbarid='deleteLotBtn']").hide();
+                            }
+                            var chooseableStatus = [];
+                            for(var i = 0; i< deliveryStatusdata.length; i++ ) {
+                                var val = deliveryStatusdata[i].value;
+                                if( val == 'NEW' || val == 'PDDL' ) {
+                                    chooseableStatus.push(deliveryStatusdata[i]);
+                                }
+                            }
+                            liger.get('deliveryStatus').setData(chooseableStatus);
+                            liger.get('deliveryStatus').selectValue(deliveryStatus);
+                        }
+                        if('SHIPP' == deliveryType ){
+                                 addressgrid.set({data:json});
+                        }else{
+                            $("#addressgrid").hide()
+                            addressgrid.set({data:json});
+                        }
+                        if('SHIPP' != deliveryType ||deliveryStatus != 'SHIPP' ){
+                            deliveryForm.setVisible("receiptFlag",false);
+                            liger.get("receipt").setDisabled();
+                        }
+                    }
+                });
+                /* deliveryLineGrid表格提交 */
+                window['deliveryLineGrid'] = $("#deliveryLineGrid").ligerGrid({
+                    unSetValidateAttr: false,
+                    columns: [{
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.orderrow"/>',
+                        name: 'orderLineId',
+                        align: 'left',
+                        width: 50
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.itemid"/>',
+                        name: 'itemNumber',
+                        width: 120,
+                        align: 'center'
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.itemname"/>',
+                        name: 'itemName',
+                        align: 'left',
+                        width: 200
+                    },
+                    { name : 'countItemNumber',
+                      display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.actualitemid"/>', 
+                      width: 120,
+                      align : 'center' 
+                    },
+                    { 
+                     name : 'countItemName', 
+                     display :'<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.actualitemname"/>',
+                     width: 120,
+                     align : 'center' 
+                     },
+//                   /*modified by furong.tang*/
+                     /*{
+                         name : 'packageItemName',
+                         display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.source.commodity.package"/>',
+                         width: 120,
+                         align : 'center'
+                         },*/
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.uomcode"/>',
+                        name: 'uomName',
+                        width: 80,
+                        align: 'center'
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.ordernum"/>',
+                        name: 'orderLineQuantity',
+                        type: 'number',
+                        align: 'left',
+                        width: 100
+                    },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.unitPrice"/>',
+                            name: 'unitPrice',
+                            type: 'number',
+                            align: 'left',
+                            width: 100
+                        },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.totalMoney"/>',
+                            name: 'totalMoney',
+                            type: 'number',
+                            align: 'left',
+                            width: 100
+                        },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage"/>',
+                        name: 'onhandQuantity',
+                        type: 'number',
+                        width: 80,
+                        align: 'center'
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.shipquantity"/>',
+                        name: 'shippedQuantity',
+                        type: 'number',
+                        align: 'left',
+                        width: 100
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.unshipquantity"/>',
+                        name: 'unShippedQuantity',
+                        type: 'number',
+                        align: 'left',
+                        width: 100
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliverydetail.pickquantity"/>',
+                        name: 'pickQuantity',
+                        type: 'number',
+                        align: 'left',
+                        width: 100
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.nowshipquantity"/>',
+                        name: 'outstandingQty',
+                        type: 'number',
+                        align: 'left',
+                        width: 100,
+                        editor: { 
+                            type: 'int'
+                        },
+                        validate : {
+                            required : true
+                           }
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.returnquantity"/>',
+                        name: 'returnQty',
+                        type: 'number',
+                        align: 'left',
+                        width: 100 
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.saleslinestatus"/>',
+                        name: 'orderLineStatusDesc',
+                        align: 'left',
+                        width: 100
+                    },
+                    ],
+                    url: '${base.contextPath}/dm/deliveryline/details?deliveryId=' + deliveryId,
+                    toolbar: {
+                        items: [{
+                            text: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.detail"/>',
+                        },
+                        {
+                            line: true
+                        },
+                        ]
+                    },
+                    enabledEdit: true,
+                    allowUnSelectRow: false,
+                    usePager: false,
+                    width: '100%',
+                    height: 'auto',
+                    onSelectRow: function(data, rowid, rowobj) {
+                        pushLotIntoLine();
+                        currentRowId = rowid;
+                        liger.get('deliverylotGrid').loadData(null);
+                        var deliveryStatus = deliveryForm.getData().deliveryStatus;
+                        if (deliveryStatus == 'CANCL' || deliveryStatus == 'SHIPP' || deliveryStatus == 'PCKUP') {
+                            liger.get('returnBtn').setDisabled(true);
+                        } else {
+                            liger.get('returnBtn').setEnabled(true);
+                        }
+                        if (data.batchCtrlFlag == "Y") {
+                            $("#deliverylotGrid").show();
+                        } else {
+                            $("#deliverylotGrid").hide();
+                        }
+
+                        var obj = {};
+                        obj.rows = data.lots;
+                        liger.get('deliverylotGrid').loadData(obj);
+                    },
+                    onBeforeEdit: function(e){
+                        if(e.record.batchCtrlFlag == 'Y'){
+                             return false;
+                        }else if (liger.get("deliveryStatus").getValue() != 'NEW' ) {
+                            return false;
+                        }
+                        else{
+                             return true;
+                        }
+                    }, onAfterEdit: function(e){
+                        if(e.column.columnname == "outstandingQty"){
+                        	//发运数量
+                            var outstandingQty = e.value;
+                            if(!outstandingQty){
+                               return ;
+                            }
+                        	//挑库数量
+                            var pickQuantity = e.record.pickQuantity;
+                           // 退回数量
+                        	var returnQty = e.record.returnQty;
+                        	if(!returnQty){
+                                returnQty = 0 ;
+                             }
+                        
+                           if(returnQty + outstandingQty > pickQuantity ){
+                        	   $.ligerDialog.error('<@spring.message "msg.error.dm.can_not_more_than_picked_qty"/>');
+                        	   deliveryLineGrid.updateRow(e.record ,{'outstandingQty': ''});
+                        	   return false;
+                           }
+                        }
+                    }
+                   
+                });
+
+                /* deliverylotGrid表格提交 */
+                window['deliverylotGrid'] = $("#deliverylotGrid").ligerGrid({
+                   /*  unSetValidateAttr: false, */
+                    columns: [{
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotnum"/>',
+                        name: 'lotNumber',
+                        textField: 'lotNumber',
+                        width: 120,
+                        align: 'center',
+                        editor: {
+                            type: 'popup',
+                            cancelable : false,
+                            autocomplete : false,
+                            valueField: 'lotNumber',
+                            textField: 'lotNumber',
+                            grid: {
+                            	isSingleCheck : true,
+                                columns: [{
+                                    display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotnum"/>',
+                                    name: 'lotNumber'
+                                },
+                                {
+                                    display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.validateto"/>',
+                                    name: 'expiryDate'
+                                },
+                                {
+                                    display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage"/>',
+                                    name: 'quantity'
+                                }],
+                                url: "${base.contextPath}/dm/delivery/getItemLots",
+                                parms: function() {
+                                    var itemId = liger.get("deliveryLineGrid").getRow(currentRowId).countItemId;
+                                    var orgId = liger.get('deliveryForm').getData().invOrgId;
+                                    return {
+                                        'itemId': itemId,
+                                        'orgId': orgId
+                                    };
+                                }
+                            },
+                            onSelected: lotSelected,
+                            onButtonClick: function() {
+                                var grid = this.options.grid;
+                            }
+
+                        },
+                        validate : {
+                            required : true
+                        }
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.validateto"/>',
+                        name: 'expiryDate',
+                        align: 'left',
+                        width: 100
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage"/>',
+                        name: 'onhandQuantity',
+                        type: 'number',
+                        width: 80,
+                        align: 'center'
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.quantityqty"/>',
+                        name: 'outstandingQty',
+                        align: 'left',
+                        type: 'number',
+                        width: 100,
+                        editor: {
+                            type: 'number'
+                        },
+                        validate : {
+                         required : true
+                        }
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.returnquantity"/>',
+                        name: 'returnQty',
+                        align: 'left',
+                        type: 'number',
+                        width: 80
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.remark"/>',
+                        name: 'remark',
+                        align: 'left',
+                        width: 150,
+                        editor: {
+                            type: 'text'
+                        }
+                    },
+                    ],
+                    toolbar: {
+                        items: [{
+                            text: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotdetail"/>',
+                        },
+                        {
+                            line: true
+                        },
+                        {
+                            text: '<@spring.message "sys.hand.btn.new"/>',
+                            <#if accessService.access("EDITABLE") == false>
+                            disable: true,
+                            </#if>
+
+                            click: function() {
+                                deliverylotGrid.addRow({
+                                    deliveryId: deliveryId,
+                                    deliveryLineId: deliveryLineId
+                                });
+                            },
+                            id: "addLotBtn",
+                            icon: 'add'
+                        },
+                        {
+                            line: true
+                        },
+                        {
+                            text: '<@spring.message "sys.hand.btn.delete"/>',
+                            <#if accessService.access("EDITABLE") == false>
+                            disable: true,
+                            </#if>
+                            click: function() {
+                               $.ligerDialog.confirm( $l('sys.hand.tip.delete_confirm'), $l('sys.hand.tip.info'),function(yes) {
+                                    if (yes) {
+                                      deleteLot();
+                                    }
+                               });
+                            },
+                            icon: 'delete',
+                            id: 'deleteLotBtn'
+                        },
+                        {
+                            line: true
+                        },
+                        ]
+                    },
+                    enabledEdit: true,
+                    usePager: false,
+                    width: '100%',
+                    height: 'auto',
+                    checkbox: true,
+                    rownumbers: true,
+                    onAfterEdit: function(e) {
+                        // 修改本次发运数量联动
+                        if (e.column.columnname == 'outstandingQty') {
+                            var data = deliverylotGrid.rows;
+                            var line = deliveryLineGrid.selected[0];
+
+                            if (!e.record.returnQty) {
+                                e.record.returnQty = 0;
+                            }
+
+                           /*  if (e.record.onhandQuantity < e.record.outstandingQty - e.record.returnQty) {
+                                $.ligerDialog.error('<@spring.message "msg.error.delivery.not_allowed_more_than_onhand"/>');
+                                deliverylotGrid.updateCell('outstandingQty', "", e.record.__id);
+                                return;
+                            } */
+
+                            var sumQty = 0;
+                            for (var i = 0; i < data.length; i++) {
+                                var row = data[i];
+                                sumQty = sumQty + row.outstandingQty;
+                            }
+
+                            if (line.pickQuantity < sumQty) {
+                                // 本次发运数量不能大于挑库数 - 退回数
+                                $.ligerDialog.error('<@spring.message "msg.error.delivery.can_not_more_than_picked_qty"/>');
+                                deliverylotGrid.updateCell('outstandingQty', "", e.record.__id);
+                                return false;
+                            }
+                            deliveryLineGrid.updateCell('outstandingQty', sumQty - line.returnQty, line.__id);
+                        }
+                    },
+                    onBeforeEdit:function(){
+                        var deliveryStatus = deliveryForm.getData().deliveryStatus;
+                        if (deliveryStatus == 'CANCL' || deliveryStatus == 'SHIPP' || deliveryStatus == 'PCKUP' || deliveryStatus == 'PDDL') {
+                            return false;
+                        }
+                        return true;
+                  }
+                });
+
+                $("#deliverylotGrid").hide();
+
+                /*两个隐藏grid,用于在弹出框显示*/
+                window['deliveryReturnLineGrid'] = $("#deliveryReturnLineGrid").ligerGrid({
+                    columns: [{
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.orderrow"/>',
+                        name: 'orderLineId',
+                        align: 'left',
+                        width: 80
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.itemid"/>',
+                        name: 'itemNumber',
+                        width: 120,
+                        align: 'center',
+                        textField: 'typeName'
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.itemname"/>',
+                        name: 'itemName',
+                        align: 'left',
+                        width: 120
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliverydetail.pickquantity"/>',
+                        name: 'pickQuantity',
+                        align: 'left',
+                        width: 120 
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.nowshipquantity"/>',
+                        name: 'outstandingQty',
+                        align: 'left',
+                        width: 120
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.returnquantity"/>',
+                        name: 'returnQty',
+                        align: 'left',
+                        width: 120,
+                        editor: {
+                            type: 'number',
+                            sign:false
+                        }
+                    },
+                    ],
+                    toolbar: {
+                        items: [{
+                            text: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.detail"/>',
+                        },
+                        {
+                            line: true
+                        }
+                        ]
+                    },
+                    enabledEdit: true,
+                    height: 'auto',
+                    usePager: false,
+                    onBeforeEdit:function(){
+                        var line = deliveryLineGrid.selected[0];
+                        if(line.batchCtrlFlag == 'Y') {
+                        	return false;
+                        }
+                        return true;
+                    }
+                });
+
+                window['deliveryReturnLotGrid'] = $("#deliveryReturnLotGrid").ligerGrid({
+                    columns: [{
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotnum"/>',
+                        name: 'lotNumber',
+                        align: 'left',
+                        width: 80
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.validateto"/>',
+                        name: 'expiryDate',
+                        width: 120,
+                        align: 'center',
+                        textField: 'typeName'
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage"/>',
+                        name: 'onhandQuantity',
+                        align: 'left',
+                        width: 120
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.quantityqty"/>',
+                        name: 'outstandingQty',
+                        align: 'left',
+                        width: 120
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.returnquantity"/>',
+                        name: 'returnQty',
+                        align: 'left',
+                        width: 120,
+                        editor: {
+                            type: 'number'
+                        }
+                    }],
+                    toolbar: {
+                        items: [{
+                            text: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotdetail"/>',
+                        },
+                        {
+                            line: true
+                        },
+                        ]
+                    },
+                    enabledEdit: true,
+                    height: 'auto',
+                    usePager: false,
+                    onAfterEdit: function(e) {
+                        // 修改退回数量联动
+                        if (e.column.columnname == 'returnQty') {
+                            var data = deliveryReturnLotGrid.rows;
+                            var sumReturnQty = 0;
+                            for (var i = 0; i < data.length; i++) {
+                                var row = data[i];
+                                sumReturnQty = sumReturnQty + row.returnQty;
+                            }
+                            deliveryReturnLineGrid.updateCell('returnQty', sumReturnQty, deliveryReturnLineGrid.getRow(0).__id);
+                        }
+                    }
+                });
+
+                /*按钮组*/
+                window['deliverysubForm'] = $("#deliverysubForm").ligerForm({
+
+                    buttons: [{
+                        text: '<@spring.message "sys.hand.btn.save"/>',
+                        id: 'saveBtn',
+                        <#if accessService.access("SAVE_EDITABLE") == false>
+                        disabled: true,
+                        </#if>
+                        align: 'right',
+                        width: 60,
+                        click: function() {
+                              saveDelivery();
+                        }
+                    },
+                    {
+                        text: '<@spring.message "sys.hand.btn.submit"/>',
+                        id: 'submitBtn',
+                        // disabled: true,
+                        <#if accessService.access("SUBMIT_EDITABLE") == false>
+                        disabled: true,
+                        </#if>
+                        width: 60,
+                        click: function() {
+                            $.ligerDialog.confirm('<@spring.message "sys.hand.tip.submit_confirm"/>', function (yes)
+                            {
+                                if (yes){
+                                    submitDelivery();
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text: '<@spring.message "sys.hand.btn.cancel"/>',
+                        id: 'cancelBtn',
+                        <#if accessService.access("CANCEL_EDITABLE") == false>
+                        disabled: true,
+                        </#if>
+                        width: 60,
+                        click: function() {
+                        	$.ligerDialog.confirm('<@spring.message "msg.warn.iscancel"/>', function (yes)
+                                    {
+                                        if (yes){
+                                              cancelDelivery();
+                                        }
+                                    });
+                        }
+                    },
+                    {
+                        text: '<@spring.message "sys.hand.btn.return"/>',
+                        id: 'returnBtn',
+                        <#if accessService.access("RETURN_EDITABLE") == false>
+                        disabled: true,
+                        </#if>
+                        width: 60,
+                        click: function() {
+                            var line = deliveryLineGrid.selected[0];
+
+                            var lineObj = {};
+                            lineObj.rows = [line];
+                            liger.get('deliveryReturnLineGrid').loadData(lineObj)
+
+                            if (line.batchCtrlFlag == 'Y') {
+                                $("#deliveryReturnLotGrid").show();
+                                var lotObj = {};
+                                lotObj.rows = liger.get('deliverylotGrid').getData();
+                                liger.get('deliveryReturnLotGrid').loadData(lotObj);
+                            } else {
+                                $("#deliveryReturnLotGrid").hide();
+                                liger.get('deliveryReturnLotGrid').loadData([]);
+                            }
+
+                            var win1 = $.ligerDialog.open({
+                                height: 400,
+                                width: 700,
+                                buttons: [{
+                                    text: '<@spring.message "sys.hand.btn.save"/>',
+                                    onclick: function(item, dialog) {
+                                    	if(setReturnQuantity(item, dialog)){
+                                            dialog.hidden();	
+                                    	}
+                                    }
+                                },
+                                {
+                                    text: '<@spring.message "sys.hand.btn.cancel"/>',
+                                    onclick: function(item, dialog) {
+                                        dialog.hidden();
+                                    }
+                                }],
+                                isResize: true,
+                                title: '<@spring.message "sys.hand.btn.return"/>',
+                                target: $("#deliveryReturnDialog")
+                            });
+                        }
+                    },
+                    {
+                        text: '<@spring.message "msg.info.order.printlist"/>',
+                        id: 'printlist',
+                        <#if accessService.access("PRIN_TLIST") == false>
+                        disabled: true,
+                        </#if>
+                        width: 60,
+                        click: function() {
+                           f_printList();
+                        }
+                    },
+                    /*{
+                        text: '<@spring.message "msg.info.order.printorderlist"/>',
+                        id: 'printOrderlist',
+                        <#if accessService.access("EDITABLE_PRINT_PL") == false>
+                        disabled: true,
+                        </#if>
+                        width: 60,
+                        click: function() {
+                            f_printOrderList();
+                        }
+                    },*/
+                    {
+                        text: '<@spring.message "sys.hand.btn.receipt"/>',
+                        id: 'receipt',
+                        <#if accessService.access("RECEIPT") == false>
+                        disabled: true,
+                        </#if>
+                        width: 60,
+                        click: function() {
+                             $.ligerDialog.confirm('<@spring.message "msg.warn.isreceipt"/>', function (yes)
+                                    {
+                                        if (yes){
+                                             var fromData =  deliveryForm.getData();
+                                             fromData.receiptFlag = 'Y';
+                                             $.ajax({
+                                                  type: "POST",
+                                                  dataType: "json",
+                                                  contentType: "application/json",
+                                                  url: "${base.contextPath}/dm/delivery/saveHead",
+                                                  data: JSON2.stringify(fromData),
+                                                  success: function(data) {
+                                                      if (data.success) {
+                                                          Hap.showSuccess($l('sys.hand.tip.success'),
+                                                          function() {
+                                                             // location.reload();
+                                                            liger.get("receiptFlag").setValue("Y");
+                                                          });
+                                                      }
+                                                  }
+                                              });
+                                        }
+                                    });
+                        }
+                    }/*,
+                    {
+                        text: '<@spring.message "msg.info.order.printaddresslabel"/>',
+                        id: 'printAddressLabel',
+                        <#if accessService.access("EDITBLE_ADDRESS_LABEL") == false>
+                        disabled: true,
+                        </#if>
+                        width: 60,
+                        click: function() {
+                            f_printAddressLabel();
+                        }
+                    }*/]
+                });
+                //$.ligerui.get("deliveryStatus").setValue("new");
+                
+                
+                <#if accessService.access("EDITABLE") == false>
+                $.ligerui.get("deliveryForm").setEditable(false);
+                </#if>
+                
+                
+            })
+
+            //选中后填充批次grid
+            function lotSelected(e) {
+                if (!e.data || !e.data.length) return false;
+                var grid = deliverylotGrid;
+                var updateData = {
+                    'expiryDate': e.data[0].expiryDate,
+                    'lotNumber': e.data[0].lotNumber,
+                    'onhandQuantity': e.data[0].quantity
+                }
+                grid.updateRow(grid.lastEditRow, updateData);
+            }
+            /*每次都清空批次grid的行*/
+            function clearlot() {
+                var data = deliverylotGrid.rows;
+                var d = data.length;
+                if (d != 0) {
+                    for (var i = 0; i < d; i++) {
+                        deliverylotGrid.remove(data[i]);
+                    }
+                }
+            }
+            /*点击退回窗口的确定按钮将退回数量设置到对应批次行中*/
+            function setReturnQuantity(item, dialog) {
+                var data = deliveryReturnLotGrid.rows;
+                var line = deliveryLineGrid.selected[0];
+
+                if (line.batchCtrlFlag == "Y") {
+                    var sumReturnQty = 0;
+                    var sumOutstandQuantity = 0;
+                    for (var i = 0; i < data.length; i++) {
+                        var row = data[i];
+                        if (row.returnQty > row.outstandingQty) {
+                            // 退回数量不能大于发运数量
+                            $.ligerDialog.error('<@spring.message "msg.error.delivery.can_not_more_than_delivery_qty"/>');
+                            return false;
+                        }
+                        sumReturnQty = sumReturnQty + row.returnQty;
+                        sumOutstandQuantity = sumOutstandQuantity + row.outstandingQty;
+                    }
+
+                    if (line.pickQuantity >= sumOutstandQuantity) {
+                        line.returnQty = sumReturnQty;
+                        deliveryLineGrid.updateCell('returnQty', sumReturnQty, line.__id);
+                        deliveryLineGrid.updateCell('outstandingQty', sumOutstandQuantity - sumReturnQty, line.__id);
+
+                        for (var i = 0; i < data.length; i++) {
+                            var row = data[i];
+                            deliverylotGrid.updateCell('returnQty', row.returnQty, row.__id);
+                        }
+
+                    } else {
+                        // 本次发运数量不能大于挑库数 - 退回数
+                        $.ligerDialog.error('<@spring.message "msg.error.delivery.can_not_more_than_picked_qty"/>');
+                        return;
+                    }
+                    dialog.hide();
+
+                } else {
+                    var data = deliveryReturnLineGrid.rows[0];
+                    var line = deliveryLineGrid.selected[0];
+                    if (data.returnQty > line.outstandingQty) {
+                        // 退回数量不能大于发运数量
+                        $.ligerDialog.error('<@spring.message "msg.error.delivery.can_not_more_than_delivery_qty"/>');
+                        return false;
+                    }
+                    deliveryLineGrid.updateCell('returnQty', data.returnQty, line.__id);
+                    deliveryLineGrid.updateCell('outstandingQty', line.outstandingQty - data.returnQty, line.__id);
+                }
+                return true;
+            }
+            /*保存界面信息*/
+            function saveDelivery(row) {
+            	if(!Hap.validateForm(deliveryForm)) return;
+                if(!Hap.validateGrid(deliverylotGrid))return;
+                pushLotIntoLine();
+                var headData = deliveryForm.getData();
+                var lineData = deliveryLineGrid.rows;
+                var lineLength = lineData.length;
+                var obj = headData;
+                var lines = [];
+
+                obj.deliveryLines = lineData;
+
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    url: "${base.contextPath}/dm/delivery/save",
+                    data: JSON2.stringify(obj),
+                    success: function(data) {
+                        if (data.success) {
+                            Hap.showSuccess($l('sys.hand.tip.success'),
+                            function() {
+                                location.reload();
+                            },{allowClose:false});
+                        }
+                    }
+                });
+            }
+
+            /*提交界面信息*/
+            function submitDelivery() {
+                if(!Hap.validateForm(deliveryForm)) return;
+                if(!Hap.validateGrid(deliverylotGrid))return;
+               
+                Hap.showLoading = function(message) {
+                    message = message || $l('sys.hand.tip.loading');
+                    $('body').append("<div class='jloading'>" + message + "</div>");
+                    $.ligerui.win.mask();
+                };
+                pushLotIntoLine();
+                var headData = deliveryForm.getData();
+                
+                if(headData.deliveryStatus != 'PDDL') {
+                	// 待发运才可以提交
+                    $.ligerDialog.error('<@spring.message "msg.error.delivery.status_not_match"/>');
+                    return false;
+                }
+                var lineData = deliveryLineGrid.rows;
+                var lineLength = lineData.length;
+                var obj = headData;
+                var lines = [];
+
+                obj.deliveryLines = lineData;
+
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    url: "${base.contextPath}/dm/delivery/submit",
+                    data: JSON2.stringify(obj),
+                    success: function(data) {
+                        if (data.success) {
+                            Hap.showSuccess($l('sys.hand.tip.success'),
+                            function() {
+                                location.reload();
+                            },{allowClose:false});
+                        }else if(!data.success&&(data.message != null || data.message != '')){
+                            Hap.showError(data.message);
+                        }else{
+                        	 location.reload();
+                        }
+                    }
+                    
+                });
+            }
+            
+            /*取消发运单*/
+            function cancelDelivery() {
+                var headData = deliveryForm.getData();
+                var deliveryId = headData.deliveryId;
+                $.ajax({
+                    type: "POST",
+                    url: "${base.contextPath}/dm/delivery/cancel?deliveryId="+deliveryId,
+                    success: function(data) {
+                        if (data.success) {
+                            Hap.showSuccess($l('sys.hand.tip.success'),
+                            function() {
+                                location.reload();
+                            });
+                        }
+                    }
+                });
+            }
+            
+            // 将批次明细保存到行中
+            function pushLotIntoLine() {
+                if (currentRowId) {
+                    var lots = liger.get('deliverylotGrid').getData();
+                    var deleteRows = liger.get('deliverylotGrid').getDeleted();
+                    lots = lots.concat(deleteRows);
+                    var preRow = liger.get("deliveryLineGrid").getRow(currentRowId);
+                    if (preRow.batchCtrlFlag == 'Y') {
+                        preRow.lots = lots;
+                    } else {
+                    	preRow.lots = [];
+                    }
+                }
+            }
+            // 删除批次
+            function deleteLot() {
+            	var rows =  liger.get('deliverylotGrid').getSelectedRows();
+                var line = deliveryLineGrid.selected[0];
+                var returnQty = 0;
+                var outstandingQty = 0;
+                for(var i=0; i< rows.length; i++){
+                	if(rows[i].returnQty){
+                       returnQty = returnQty + rows[i].returnQty;
+                	}
+                if(rows[i].outstandingQty){
+                    outstandingQty = outstandingQty + rows[i].outstandingQty;
+                }
+                }
+                deliveryLineGrid.updateCell('returnQty', line.returnQty - returnQty, line.__id);
+                deliveryLineGrid.updateCell('outstandingQty', line.outstandingQty - outstandingQty, line.__id);
+            	liger.get('deliverylotGrid').deleteSelectedRow();
+            }
+            
+            
+            /**
+             * 地址表格的参数
+             */
+            function o_addressGridOptions() {
+                var displayName= $l('type.com.lkkhpg.dsis.common.member.dto.membersite.receivegoodsname');
+                var options = {
+                    unSetValidateAttr : false,
+                    usePager : false,
+                    checkbox: false,
+                    isSingleCheck:true,
+                    enabledEdit : false,
+                    width : '98%',
+                    columns : [
+                            {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.receivegoodsname"/>',
+                                name : 'contactName',
+                                type : 'text',
+                                align : 'center'
+                            },
+                            {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.phone"/>',
+                                name : 'phone',
+                                align : 'center'
+                            },
+                            {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.address"/>',
+                                name : 'address',
+                                align : 'center',
+                                width: 400,
+                                type : 'text'
+                            },
+                            {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.spmlocation.zipcode"/>',
+                                name : 'zipCode',
+                                align : 'center',
+                                type : 'text'
+                            },
+                            {
+                                display : $l('sys.hand.btn.action'),
+                                name : 'UnitsInStock3',
+                                align : 'center',
+                                type : 'text',
+                                render : function(rowdata, rowindex, value) {
+                                    var h = "";
+                                    h += "<a href="+"'javascript:void(0)'"+"; onclick = "+ "'editAddress("+rowindex+")'"+">"+$l('sys.hand.btn.edit')+"</a> ";
+                               
+                                    return h;
+                                }
+                            } ],
+                }
+                return options;
+            }
+            
+            function editAddress(rowindex){
+            	if(liger.get('deliveryStatus').getValue() != "NEW")return ;
+            	var fromData =  deliveryForm.getData();
+            	 var editData={
+                         "memberName":fromData.contactName,
+                         "phoneNumber":fromData.phone,
+                         "countryCode": fromData.countryCode,
+                         "stateCode": fromData.stateCode,
+                         "cityCode": fromData.cityCode,
+                         "addressLine1": fromData.address1,
+                         "addressLine2": fromData.address2,
+                         "addressLine3": fromData.address3,
+                         "zipCode": fromData.zipCode,
+                         "save": true,
+                         "address": fromData.address,
+                         "areaCode":fromData.areaCode
+                 } ;
+            	 om_location_edit('${base.contextPath}',editData,function(d){
+            		 fromData.contactName = d.memberName,
+                      fromData.phone= d.phoneNumber;
+                      fromData.countryCode = d.countryCode;
+                      fromData.stateCode = d.stateCode;
+                      fromData.cityCode = d.cityCode;
+                      fromData.address1 = d.addressLine1;
+                      fromData.address2 = d.addressLine2;
+                      fromData.address3 = d.addressLine3;
+                      fromData.zipCode = d.zipCode;
+                      fromData.address = d.address;
+                      fromData.areaCode = d.areaCode;
+                      
+                      var rowData = addressgrid.getRow(rowindex);
+                      
+                      addressgrid.updateRow(rowData,{'contactName': d.memberName,'phone':d.phoneNumber,'address':d.address, 'zipCode':d.zipCode});
+                      
+                      deliveryForm.set({data:fromData});
+                      $.ajax({
+                          type: "POST",
+                          dataType: "json",
+                          contentType: "application/json",
+                          url: "${base.contextPath}/dm/delivery/saveHead",
+                          data: JSON2.stringify(fromData),
+                          success: function(data) {
+                              if (data.success) {
+                                  Hap.showSuccess($l('sys.hand.tip.success'),
+                                  function() {
+                                     // location.reload();
+                                  });
+                              }
+                          }
+                      });
+                });
+            }
+            
+            function f_printList(){
+            	$.ligerDialog.open({
+                    title: '<@spring.message "type.com.lkkhpg.dsis.report.type.choosing"/>',
+                    width:400,
+                    height:300,
+                    slide: false,
+                    url: "${base.contextPath}/sys/report/sys_report_type_dialog.html",
+                    buttons: [{
+                        text: '<@spring.message "sys.hand.btn.ok" />',
+                        onclick: function(i, d) {
+                            var marketCode = deliveryForm.getData().marketCode;
+                            var deliveryNumber = deliveryForm.getData().deliveryNumber;
+                            var deliveryId = deliveryForm.getData().deliveryId;
+                            
+                            if(!marketCode || !deliveryId  || !deliveryNumber){
+                                return;
+                            }else{
+                                var form = d.frame.report_type_form;
+                                if (form.valid()) {
+                                    d.close();
+                                    window.open('${base.contextPath}/report/run?docType='+ form.getData().docType +'&reportProgramCode=RPT-PRINT-DELIVERY-RECORD-'+marketCode+'&deliveryId='+deliveryId + '&deliveryNumber='+deliveryNumber);
+                                }
+                            }
+                        }
+                    },
+                    {
+                        text: '<@spring.message "sys.hand.btn.cancel" />',
+                        onclick: function(i, d) {
+                            d.hide();
+                        }
+                    }]
+                });
+            }
+            
+            /**
+             * 打印订单清单.
+             */
+            function f_printOrderList(){
+                $.ligerDialog.open({
+                    title: '<@spring.message "type.com.lkkhpg.dsis.report.type.choosing"/>',
+                    width:400,
+                    height:300,
+                    slide: false,
+                    url: _basePath + "/sys/report/sys_report_type_dialog.html",
+                    buttons: [{
+                        text: $l("sys.hand.btn.ok" ),
+                        onclick: function(i, d) {
+                            var orderNumber = liger.get("orderNumber").getValue();
+                            var   marketCode = deliveryForm.getData().marketCode
+                            var deliveryNumber = deliveryForm.getData().deliveryNumber;
+                            if(!orderNumber){
+                                return;
+                            }else{
+                                var form = d.frame.report_type_form;
+                                var docType= form.getData().docType;
+                                if (form.valid()) {
+                                    d.close();
+                                    window.open(_basePath+'/report/run?docType='+ docType +'&reportProgramCode=RPT-PACKING-LIST-'+marketCode+'&orderNumber='+orderNumber + '&deliveryNumber='+deliveryNumber);
+                                }
+                            }
+                        }
+                    },
+                    {
+                        text: $l("sys.hand.btn.cancel"),
+                        onclick: function(i, d) {
+                            d.hide();
+                        }
+                    }]
+                });
+            }
+            /**
+             *地址标签.
+             */
+            function f_printAddressLabel(){
+            	$.ligerDialog.open({
+                    title: '<@spring.message "type.com.lkkhpg.dsis.report.type.choosing"/>',
+                    width:400,
+                    height:200,
+                    slide: false,
+                    url: _basePath + "/sys/report/sys_report_type_dialog.html",
+                    buttons: [{
+                        text: $l("sys.hand.btn.ok" ),
+                        onclick: function(i, d) {
+                            var deliveryNumber = liger.get("deliveryNumber").getValue();
+                            var   marketCode = deliveryForm.getData().marketCode
+                            if(!deliveryNumber){
+                                return;
+                            }else{
+                                var form = d.frame.report_type_form;
+                                var docType= form.getData().docType;
+                                if (form.valid()) {
+                                    d.close();
+                                    window.open(_basePath+'/report/run?docType='+ docType +'&reportProgramCode=Delivery-Address-Label-MY&deliveryNumber='+deliveryNumber);
+                                }
+                            }
+                        }
+                    },
+                    {
+                        text: $l("sys.hand.btn.cancel"),
+                        onclick: function(i, d) {
+                            d.hide();
+                        }
+                    }]
+                });
+            }
+        </script>
+    </body>
+
+</html>

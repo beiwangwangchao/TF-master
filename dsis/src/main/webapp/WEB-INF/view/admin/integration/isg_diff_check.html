@@ -1,0 +1,372 @@
+<#--
+ * description: 差异结果查询界面
+ * version: 1.0
+ * author: frank.li
+ * Copyright LKK Health Products Group Limited.  
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?checkEntityTypes=ISG.GDS_CHECKR_ENTITY_TYPE" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?gdsOrgCodes=ISG.GDS_ORG_CODE_MAPPING" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?yesNo=SYS.YES_NO" type="text/javascript"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+<body style="padding: 10px; overflow: hidden;">
+    <form id="diff_check_form"></form>
+    <div id="diff_check_grid"></div>
+    <script type="text/javascript">
+    function init_checkEntityTypes(){
+    	var array = [];
+    	for(var i = 0;i<checkEntityTypes.length;i++){
+    		var o = {};
+    		o.id = checkEntityTypes[i].value;
+    		o.text = checkEntityTypes[i].meaning;
+    		array.push(o);
+    	}
+    	liger.get('checkEntityType').setData(array)
+    }
+    
+    function init_isDelete(){
+    	liger.get('uploadFlag').setData([{id:'Y',text:'<@spring.message "sys.hand.btn.yes"/>'},{id:'N',text:'<@spring.message "sys.hand.btn.no"/>'}])
+    }
+    
+    function isExict(obj,url){
+    	$.ajax({
+			url: url,
+			type:"GET",
+			dataType:"json",
+			contentType : "application/json",
+            data : obj,
+            success : function(json) {
+                if(json.success){
+                	if(json.rows.length>0){
+                		return '<@spring.message "sys.hand.btn.yes"/>';
+                	}else{
+                		return '<@spring.message "sys.hand.btn.no"/>';
+                	}
+                }
+            },
+            error : function() {
+                return '<@spring.message "sys.hand.btn.no"/>';
+            }
+		})
+    }
+    
+    $(function() {
+    	
+        window['diff_check_form'] = $("#diff_check_form").ligerForm({
+            fields : [ {
+                label   : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkEntityType"/>',
+                name    : "checkEntityType",
+                type    : 'select',
+                validate: {
+                    required: true
+                },
+                options : {
+                    data      : checkEntityTypes,
+                },
+                newline : false
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkEntityNo"/>',
+                name : 'checkEntityNo',
+                newline : false
+            }, {
+                type : 'select',
+                label : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.isDelete"/>',
+                name : 'uploadFlag',
+                newline : false
+            } ],
+            buttons : [ {
+                text : '<@spring.message "sys.hand.btn.query"/>',
+                disabled : false,
+                 width : 60,
+                click : function() {
+                	if(liger.get('checkEntityType').getValue()==''){
+                		$.ligerDialog.warn('<@spring.message "msg.warning.sys.no_search_criteria"/>');
+                		return null;
+                	}
+                    Hap.gridQuery({
+                        form : diff_check_form,
+                        grid : diff_check_grid
+                    })
+                }
+            }]
+        });
+    	init_checkEntityTypes();
+    	init_isDelete();
+        
+        window['diff_check_grid'] = $("#diff_check_grid").ligerGrid({
+            //unSetValidateAttr : false,
+            columns : [ 
+                        
+				{
+					type : 'text',
+					display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.adviseno"/>',
+					name : 'adviseNo',
+					align : 'middle',
+					width : 100
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkEntityType"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'checkEntityType',
+				    render:function(rowdata, index, value){
+				    	for(var i = 0;i<checkEntityTypes.length;i++){
+				    		if(checkEntityTypes[i].value == rowdata.checkEntityType){
+				    			return checkEntityTypes[i].meaning
+				    		}
+				    	}
+				    	
+				    }
+				} ,
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkEntityNo"/>',
+				    align : 'middle',
+					width : 100,
+				    name : 'checkEntityNo' //校驗機構
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.isExist"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'isExist',
+				    render:function(rowdata, index, value){
+				    	if(rowdata.isExist == 'Y'){
+				    		return '<@spring.message "sys.hand.btn.yes"/>';
+				    	}else{
+				    		return '<@spring.message "sys.hand.btn.no"/>';
+				    	}
+				    	
+				    }
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkOrgCode"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'checkOrgCode',
+				    render:function(rowdata, index, value){
+				    	for(var i = 0;i<gdsOrgCodes.length;i++){
+				    		if(gdsOrgCodes[i].value == rowdata.checkOrgCode){
+				    			return gdsOrgCodes[i].description
+				    		}
+				    	}
+				    	
+				    }
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.isDelete"/>',
+				    align : 'middle',
+					width : 100,
+				    name : 'uploadFlag',
+				    render:function(rowdata, index, value){
+				    	if(rowdata.checkEntityType == '*DLR' && rowdata.uploadFlag == 'Y'){
+				    		return '<@spring.message "sys.hand.btn.yes"/>';
+				    	}if(rowdata.checkEntityType == '*DLR' && rowdata.uploadFlag == 'N'){
+				    		return '<@spring.message "sys.hand.btn.no"/>';
+				    	}else{
+				    		return '';
+				    	}
+				    	
+				    }
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkDate"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'checkDate' //校驗階段
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkEntityRefPeriod"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'checkEntityRefPeriod' 
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkPhase"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'checkPhase' //校驗結果備註01
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkResultCode"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'checkResultCode' //校驗結果備註02
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkResultMemo01"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'checkResultMemo01' //各機構讀取標誌
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.checkResultMemo02"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'checkResultMemo02' //各機構讀取時間
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.orgReadFlag"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'orgReadFlag' //各機構讀取用戶
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.orgReadTime"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'orgReadTime' //各機構修正標誌
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.orgReadBy"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'orgReadBy' //各機構修正備註
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.orgAmendFlag"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'orgAmendFlag' //各機構修正時間
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.orgAmendMemo"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'orgAmendMemo' //各機構修正用戶
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.orgAmendTime"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'orgAmendTime' //是否有效
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.orgAmendBy"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'orgAmendBy' //備註說明
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.enabled"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'enabled',
+				    render:function(rowdata, index, value){
+				    	if(rowdata.enabled == 'Y'){
+				    		return '<@spring.message "sys.hand.btn.yes"/>';
+				    	}else{
+				    		return '<@spring.message "sys.hand.btn.no"/>';
+				    	}
+				    	
+				    }
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.comments"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'comments' //通知號
+				},
+				{
+				    type : 'text',
+				    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.gds.dto.isgdiffcheck.orgAutoSyn"/>',
+				    align : 'middle',
+					width : 90,
+				    name : 'orgAutoSyn',
+				    render:function(rowdata, index, value){
+				    	if(rowdata.orgAutoSyn == 'Y'){
+				    		return '<@spring.message "sys.hand.btn.yes"/>';
+				    	}else{
+				    		return '<@spring.message "sys.hand.btn.no"/>';
+				    	}
+				    	
+				    }
+				}
+				 ],
+            url : '${base.contextPath}/integration/gds/diffcheck/query',
+            delayLoad  : true,
+             toolbar : {
+                items : [{
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click : function() {
+                    	if(diff_check_grid.getSelected().uploadFlag == 'N' && diff_check_grid.getSelected().checkEntityType == '*DLR'){
+                    		$.ligerDialog.waitting('<@spring.message "sys.hand.tip.processing"/>');
+                    		$.ajax({
+                    			type:"POST",
+                    			dataType:"json",
+                                url: '${base.contextPath}/integration/gds/deleteDealers',
+                                data: diff_check_grid.getSelected(),
+                                success : function(data) {
+                                	if(data.success){
+                                		diff_check_grid.reload();
+                                		$.ligerDialog.success('<@spring.message "msg.info.sys.delete_successful"/>');
+                                		
+                                	}else{
+                                 		$.ligerDialog.error('<@spring.message "msg.info.sys.delete_false"/>');
+                                	}
+                                	
+                                },
+                                error : function(data) {
+                                 	$.ligerDialog.error('<@spring.message "msg.info.sys.delete_false"/>');
+                                }
+                    		})
+                            $.ligerDialog.closeWaitting();
+                    	}else{
+                    		$.ligerDialog.warn('<@spring.message "msg.warn.integeration.diff_check.select_valid_record"/>');
+                    	}
+                   	 
+                    },
+                    icon : 'delete'
+                },
+                { line: true },
+                {                	
+                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                    menu:{ width: 120, items:
+                            [
+	                 			{                	
+	                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+	                 			    click:   function (){exportSelected("diff_check_form","diff_check_grid",{'checkEntityType':checkEntityTypes,'isExist':yesNo,'checkOrgCode':gdsOrgCodes},_basePath);}
+	                 			},
+	                 			{ line: true },
+	                 			{                	
+	                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+	                 			    click: function (){exportDirectAll("diff_check_form","diff_check_grid",{'checkEntityType':checkEntityTypes,'isExist':yesNo,'checkOrgCode':gdsOrgCodes},_basePath);}
+	                 			    
+	                 			}
+                          ]
+                 	}                        
+                }
+                ]
+            }, 
+            width : '99%',
+            height : '98%',
+            checkbox : true,
+            isSingleCheck : true,
+            pageSizeOptions:[10,20,30,40,50],
+            pageSize:'10' 
+        });
+    });
+    </script>
+</body>
+</html>

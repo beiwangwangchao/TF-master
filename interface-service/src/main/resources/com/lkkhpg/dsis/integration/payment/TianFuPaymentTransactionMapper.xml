@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.integration.payment.mapper.TianFuPaymentTransactionMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.integration.payment.dto.TianFuPaymentTransaction" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD">
+
+        <result column="SOURCE_TYPE" property="sourceType" jdbcType="VARCHAR" />
+        <result column="STATUS" property="status" jdbcType="VARCHAR" />
+        <result column="MESSAGE" property="message" jdbcType="VARCHAR" />
+        <result column="PAY_TYPE" property="payType" jdbcType="VARCHAR" />
+        <result column="OUT_TRADE_NO" property="outTradeNo" jdbcType="VARCHAR" />
+        <result column="PARTNER" property="partner" jdbcType="VARCHAR" />
+        <result column="SUBJECT" property="subject" jdbcType="VARCHAR" />
+        <result column="PRODUCT_FEE" property="productFee" jdbcType="DECIMAL" />
+        <result column="TOTAL_FEE" property="totalFee" jdbcType="DECIMAL" />
+        <result column="TRANSPORT_FEE" property="transportFee" jdbcType="DECIMAL" />
+        <result column="PAY_MESSAGE" property="payMessage" jdbcType="VARCHAR" />
+        <result column="IMAGE_PATH" property="imagePath" jdbcType="VARCHAR" />
+        <result column="IMAGE_TYPE" property="imageType" jdbcType="VARCHAR" />
+        <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+        <result column="BUYER_ID" property="buyerId" jdbcType="VARCHAR" />
+        <result column="DISCOUNT" property="discount" jdbcType="DECIMAL" />
+        <result column="SUBPARTNER" property="subPartner" jdbcType="VARCHAR" />
+        <result column="BANKCODE" property="bankCode" jdbcType="VARCHAR" />
+        <result column="TRANS_CHANNNEL" property="transChannel" jdbcType="VARCHAR" />
+        <result column="TRADE_MODE" property="tradeMode" jdbcType="VARCHAR" />
+        <result column="TOTAL_SUM" property="totalSum" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <insert id="insertUnit" parameterType="com.lkkhpg.dsis.integration.payment.dto.TianFuPaymentTransaction">
+        <!--<selectKey resultType="java.lang.Long" keyProperty="payId" order="BEFORE">-->
+        <!--select-->
+        <!--TF_PAY_TRANSACTION_S.nextval from dual-->
+        <!--</selectKey>-->
+        INSERT INTO  TF_PAY_TRANSACTION(SOURCE_TYPE,STATUS,MESSAGE,PAY_TYPE,OUT_TRADE_NO,PARTNER,SUBJECT,
+        PRODUCT_FEE,TOTAL_FEE,TRANSPORT_FEE,PAY_MESSAGE,IMAGE_PATH,IMAGE_TYPE,SUBPARTNER,BANKCODE,TRANS_CHANNNEL,TRADE_MODE)
+        VALUES ( #{sourceType,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR},#{message,jdbcType=VARCHAR},#{payType,jdbcType=VARCHAR},
+        #{outTradeNo,jdbcType=VARCHAR}, #{partner,jdbcType=VARCHAR},#{subject,jdbcType=VARCHAR},#{productFee,jdbcType=DECIMAL},
+        #{totalFee,jdbcType=DECIMAL},#{transportFee,jdbcType=DECIMAL},#{payMessage,jdbcType=VARCHAR},#{imagePath,jdbcType=VARCHAR},#{imageType,jdbcType=VARCHAR},
+        #{subPartner,jdbcType=VARCHAR},#{bankCode,jdbcType=VARCHAR},#{transChannel,jdbcType=VARCHAR},#{tradeMode,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap"  parameterType="com.lkkhpg.dsis.integration.payment.dto.TianFuPaymentTransaction">
+        SELECT tpt.*,tpt.TOTAL_FEE AS TOTAL_SUM
+        FROM TF_PAY_TRANSACTION tpt
+        <where>
+            <if test="outTradeNo !=null">
+                tpt.OUT_TRADE_NO=#{outTradeNo,jdbcType=VARCHAR}
+            </if>
+            <if test="transChannel !=null">
+                AND tpt.TRANS_CHANNNEL=#{transChannel,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="deleteByPrimaryKey"   parameterType="com.lkkhpg.dsis.integration.payment.dto.TianFuPaymentTransaction">
+        DELETE FROM TF_PAY_TRANSACTION tpt
+        <where>
+            <if test="outTradeNo !=null">
+                tpt.OUT_TRADE_NO=#{outTradeNo,jdbcType=VARCHAR}
+            </if>
+            <if test="transChannel !=null">
+                AND tpt.TRANS_CHANNNEL=#{transChannel,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateStatus"  parameterType="java.util.Map">
+
+        UPDATE  TF_PAY_TRANSACTION tpt SET
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+        LAST_UPDATE_DATE =CURRENT_TIMESTAMP,
+        tpt.STATUS= #{status,jdbcType=VARCHAR}
+        <where>tpt.OUT_TRADE_NO=#{outTradeNo,jdbcType=VARCHAR}
+            AND  tpt.TRANS_CHANNNEL=#{transChannel,jdbcType=VARCHAR}
+        </where>
+
+    </update>
+
+
+
+    <select id="queryByOrderNumber" resultType="java.lang.Long" parameterType="java.lang.String" >
+        select
+        HEADER_ID
+        from OM_SALES_ORDER
+        where ORDER_NUMBER= #{orderNumber,jdbcType=VARCHAR}
+    </select>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="java.util.Map" >
+        update OM_SALES_ORDER
+        <set >
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+            LAST_UPDATE_DATE =CURRENT_TIMESTAMP,
+            ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR},
+            PAY_DATE = #{payDate,jdbcType=TIMESTAMP},
+            DAPP_SYNC_FLAG = #{dappSyncFlag,jdbcType=VARCHAR},
+            FREE_SHIPPING = #{freeShipping,jdbcType=VARCHAR}
+        </set>
+        where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+    </update>
+
+
+    <update id="updateOrders"  parameterType="com.lkkhpg.dsis.common.order.dto.SalesOrder">
+        update OM_SALES_ORDER
+        <set >
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+            LAST_UPDATE_DATE =CURRENT_TIMESTAMP,
+            ORDER_STATUS = #{orderStatus,jdbcType=VARCHAR},
+            PAY_DATE = #{payDate,jdbcType=TIMESTAMP},
+            DAPP_SYNC_FLAG = #{dappSyncFlag,jdbcType=VARCHAR},
+            FREE_SHIPPING = #{freeShipping,jdbcType=VARCHAR}
+        </set>
+        where HEADER_ID = #{headerId,jdbcType=DECIMAL}
+    </update>
+
+    <select id="selectList" parameterType="java.lang.String" resultType="java.lang.String">
+        select c.APP_SECRET from ISG_DAPP_AUTH_CODE c
+        <where>
+                c.app_code = #{appCode,jdbcType=VARCHAR} and  c.EXPIRE>CURRENT_TIMESTAMP
+        </where>
+    </select>
+    <select id="selectPartner" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.integration.payment.dto.TianFuPaymentTransaction">
+       SELECT
+	t.*
+FROM
+	TF_PAY_TRANSACTION t
+WHERE
+	t .OUT_TRADE_NO = #{outTradeNo,jdbcType=VARCHAR}
+
+    </select>
+
+</mapper>

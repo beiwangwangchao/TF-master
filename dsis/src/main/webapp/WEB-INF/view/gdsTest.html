@@ -1,0 +1,302 @@
+<#include "./admin/include/head.html">
+<body class="padding: 10px;">
+<form id="gdsForm"></form>
+<form id="gdsForm_closePeriod" style="border:1px solid grey;"></form>
+<form id="gdsForm_deleteMember" style="border:1px solid grey;"></form>
+<form id="jobForm" style="border:1px solid grey;"></form>
+<script>
+    $(function () {
+
+        var methods = [
+            {"methodName": "queryCheckResult"},
+            {"methodName": "batchSaveDealer"},
+            {"methodName": "deleteDealer"},
+            {"methodName": "findForeignSponsors"},
+            {"methodName": "findMoveSponsor"},
+            {"methodName": "treeAlterPrecess"},
+            {"methodName": "findExpelDealer"},
+            {"methodName": "batchSaveSo"},
+            {"methodName": "findTransOutList"},
+            {"methodName": "findTransInList"}
+        ];
+
+        window['gdsForm'] = $("#gdsForm").ligerForm({
+            fields : [
+                {
+                    label   : 'serviceName',
+                    name    : "serviceName",
+                    type    : 'text',
+                    options : {
+                        value: 'gdsService'
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                {
+                    label   : 'methodName',
+                    name    : "methodName",
+                    type    : 'select',
+                    validate: {
+                        required: true
+                    },
+                    options : {
+                        data      : methods,
+                        valueField: 'methodName',
+                        textField : 'methodName'
+                    },
+                    newline : false
+                },
+                {
+                    label   : 'adviseNo',
+                    name    : 'adviseNo',
+                    type    : 'text',
+                    options : {
+                        value: "adviseNo12345"
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                {
+                    label   : 'orgCode',
+                    name    : 'orgCode',
+                    type    : 'text',
+                    options : {
+                        value: "HKG"
+                    },
+                    validate: {
+                        required: true
+                    },
+                    newline : false
+                }
+                ,
+                {
+                    label   : 'invokeType',
+                    name    : 'invokeType',
+                    type    : 'text',
+                    options : {
+                        value: "SYNC"
+                    },
+                    validate: {
+                        required: true
+                    }
+                }
+            ],
+            buttons: [{
+                text    : 'Submit',
+                disabled: false,
+                width   : 60,
+                click   : function () {
+                    if (!gdsForm.valid()) {
+                        return;
+                    }
+                    var manager = $.ligerDialog.waitting('<@spring.message "sys.hand.tip.processing"/>');
+                    $.ajax({
+                        type    : 'POST',
+                        datatype: 'json',
+                        url     : '${base.contextPath}/restful/gds-listener',
+                        data    : gdsForm.getData(),
+                        success : function (args) {
+                            $.ligerDialog.success(JSON2.stringify(args));
+                        },
+                        error   : function (args) {
+                            $.ligerDialog.error(args.responseText);
+                        },
+                        complete: function () {
+                            manager.close();
+                        }
+                    });
+                }
+            }]
+        });
+        
+        window['gdsForm_closePeriod'] = $("#gdsForm_closePeriod").ligerForm({
+            fields : [
+                {
+                    label   : 'Close Period',
+                    name    : "title",
+                    type    : 'text',
+                    width: "0px"
+                },
+                {
+                    label   : 'orgCode',
+                    name    : 'orgCode',
+                    type    : 'text',
+                    options : {
+                        value: "HKG"
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                {
+                    label   : 'period',
+                    name    : 'period',
+                    type    : 'text',
+                    newline : false,
+                    options : {
+                        value: "201512"
+                    },
+                    validate: {
+                        required: true
+                    }
+                }
+            ],
+            buttons: [{
+                text    : 'Submit',
+                disabled: false,
+                width   : 60,
+                click   : function () {
+                    if (!gdsForm_closePeriod.valid()) {
+                        return;
+                    }
+                    var manager = $.ligerDialog.waitting('<@spring.message "sys.hand.tip.processing"/>');
+                    $.ajax({
+                        type    : 'POST',
+                        datatype: 'json',
+                        url     : '${base.contextPath}/integration/gds/closePeriod',
+                        data    : gdsForm_closePeriod.getData(),
+                        success : function (args) {
+                            $.ligerDialog.success(JSON2.stringify(args));
+                        },
+                        complete: function () {
+                            manager.close();
+                        }
+                    });
+                }
+            }]
+        });
+        
+         window['gdsForm_deleteMember'] = $("#gdsForm_deleteMember").ligerForm({
+            fields : [
+                {
+                    label   : 'Delete Member',
+                    name    : "title",
+                    type    : 'text',
+                    width: "0px"
+                },
+                {
+                    label   : 'adviseNo',
+                    name    : 'adviseNo',
+                    type    : 'text',
+                    options : {
+                        value: "adviseNo12345"
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                {
+                    label   : 'orgCode',
+                    name    : 'orgCode',
+                    type    : 'text',
+                    options : {
+                        value: "HKG"
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+//                 {
+//                     label   : 'dealerNo',
+//                     name    : 'dealerNo',
+//                     type    : 'text',
+//                     newline : false,
+//                     validate: {
+//                         required: true
+//                     }
+//                 }
+            ],
+             buttons: [{
+                text    : 'Submit',
+                disabled: false,
+                width   : 60,
+                click   : function () {
+                    if (!gdsForm_deleteMember.valid()) {
+                        return;
+                    }
+                    var manager = $.ligerDialog.waitting('<@spring.message "sys.hand.tip.processing"/>');
+                    $.ajax({
+                        type    : 'POST',
+                        datatype: 'json',
+                        url     : '${base.contextPath}/integration/gds/deleteDealers',
+                        data    : gdsForm_deleteMember.getData(),
+                        success : function (args) {
+                            $.ligerDialog.success(JSON2.stringify(args));
+                        },
+                        complete: function () {
+                            manager.close();
+                        }
+                    });
+                }
+            }] 
+        }); 
+        
+         //测试GDS Job存储过程接口
+         window['jobForm'] = $("#jobForm").ligerForm({
+             fields : [
+                 {
+                    label   : 'Test GDS Job Procedure',
+                    name    : "title",
+                    type    : 'text',
+                    width   : "0px"
+                 },
+                 {
+                     label   : 'Request Parameters',
+                     name    : 'requestParameters',
+                     type    : 'textarea',
+                     width   : '600',
+                     newline : true,
+                     validate: {
+                         required: true
+                     }
+                 },
+                 {
+                     label   : 'Response',
+                     name    : 'response',
+                     type    : 'textarea',
+                     width   : '600',
+                     newline : true,
+                     readonly : true
+                 }
+             ],
+             buttons: [{
+                 text    : 'Submit',
+                 disabled: false,
+                 width   : 60,
+                 click   : function () {
+                     if (!jobForm.valid()) {
+                         return;
+                     }
+                     var manager = $.ligerDialog.waitting('<@spring.message "sys.hand.tip.processing"/>');
+                     var jobFormData = jobForm.getData();
+                     
+                     try{
+                         JSON2.parse(jobFormData.requestParameters)
+                     }catch(e){Hap.showError("Json parse error")}
+                 
+                     $.ajax({
+                         type    : "POST",
+                         dataType : "json",
+                         contentType : "application/json",
+                         url     : '${base.contextPath}/integration/gds/jobProcTest',
+                         data    : jobFormData.requestParameters,
+                         success : function (args) {
+                             jobFormData.response = JSON2.stringify(args);
+                             jobForm.setData(jobFormData);
+                         },
+                         error   : function (args) {
+                             $.ligerDialog.error(args.responseText);
+                         },
+                         complete: function () {
+                             manager.close();
+                         }
+                     });
+                 }
+             }]
+         });
+    });
+</script>
+</body>
+</html>

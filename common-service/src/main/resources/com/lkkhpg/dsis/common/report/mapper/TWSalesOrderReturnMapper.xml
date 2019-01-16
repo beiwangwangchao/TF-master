@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.report.mapper.TWSalesOrderReturnMapper">
+ 	<resultMap type="com.lkkhpg.dsis.common.report.dto.TWSalesOrderReturnHeader" id="ReturnHeadMap">
+		<result column="COMPANY_NAME" property="companyName" jdbcType="VARCHAR"/>
+		<result column="BR_NO" property="brNo" jdbcType="VARCHAR"/>
+		<result column="ADDRESS" property="address" jdbcType="VARCHAR"/>
+		<result column="PRINT_DATE" property="printDate" jdbcType="VARCHAR"/>
+	</resultMap> 
+ 	<resultMap type="com.lkkhpg.dsis.common.report.dto.TWSalesOrderReturnLine" id="returnLineMap">
+		<result column="PAY_YEAR" property="payYear" jdbcType="VARCHAR"/>
+		<result column="PAY_MOM" property="payMom" jdbcType="VARCHAR"/>
+		<result column="PAY_DAY" property="payDay" jdbcType="VARCHAR"/>
+		<result column="ZG" property="zg" jdbcType="VARCHAR"/>
+		<result column="INVOICE_NUM" property="invoiceNum" jdbcType="VARCHAR"/>
+		<result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR"/>
+		<result column="QUANTITY" property="quantity" jdbcType="DECIMAL"/>
+		<result column="SALES_PRICE" property="salesPrice" jdbcType="DECIMAL"/>
+		<result column="TAX" property="tax" jdbcType="DECIMAL"/>
+		<result column="ORDER_HEADER_ID" property="orderHeaderId" jdbcType="DECIMAL"/>
+		<result column="RETURN_ADJUST_FLAG" property="returnAdjustFlag" jdbcType="VARCHAR"/>
+		<result column="SHIPPING_FEE_FLAG" property="shippingFeeFlag" jdbcType="VARCHAR"/>
+	</resultMap>
+	<resultMap type="com.lkkhpg.dsis.common.report.dto.TWSalesOrderReturnfoot" id="returnFootMap">
+		<result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR"/>
+		<result column="BR_NUMBER" property="vbrNember" jdbcType="VARCHAR"/>
+		<result column="ADJUSTMENT_AMOUNT" property="adjustmentAmount" jdbcType="DECIMAL"/>
+		<result column="SHIPPING_FEE" property="shippingFee" jdbcType="DECIMAL"/>
+	</resultMap> 
+	<select id="queryReturnHeader" parameterType="java.lang.String" resultMap="ReturnHeadMap">
+ 		SELECT sct.name company_name,
+		       scb.br_no,
+		       sst.name || sc.name || sl.address_line1 || sl.address_line2 ||
+		       sl.address_line3 address,
+		       '中華民國' || to_char(SYSDATE - 697880, 'yyy') || '年' ||
+		       to_char(SYSDATE, 'MM') || '月' || to_char(SYSDATE, 'dd') || '日' print_date
+		  FROM om_sales_return          osr,
+		       spm_sales_organization_b ssob,
+		       spm_market_b             smb,
+		       spm_company_tl           sct,
+		       spm_location             sl,
+		       spm_city_tl              sc,
+		       spm_state_tl             sst,
+		       spm_company_b            scb
+		 WHERE scb.company_id = smb.company_id
+		   AND sct.company_id = smb.company_id
+		   AND smb.market_id = ssob.market_id
+		   AND ssob.sales_org_id = osr.sales_org_id
+		   AND sl.location_id = scb.location_id
+		   AND sl.city_code = sc.city_code
+		   AND sl.state_code = sst.state_code
+		   AND sct.lang = sc.lang
+		   AND sct.lang = sst.lang
+		   AND sct.lang = #{request.locale,jdbcType=VARCHAR}
+		   AND osr.return_number = #{returnNumber,jdbcType=VARCHAR,javaType=java.lang.String} 
+	</select>
+	<select id="queryReturnfoot" parameterType="java.lang.String" resultMap="returnFootMap">
+		   SELECT decode(m.member_type,
+	              'IDV',
+	              m.english_first_name || m.english_last_name ||
+	              m.chinese_last_name || m.chinese_first_name,
+	              'COMP',
+	              (CASE
+	                WHEN m.ref_company_en IS NULL THEN
+	                 m.ref_company
+	                ELSE
+	                 m.ref_company_en || m.ref_company
+	              END)) member_name,
+		          m.br_number
+		     FROM om_sales_order o, mm_member m, om_sales_return r
+		    WHERE o.member_id = m.member_id
+		      AND o.header_id = r.order_header_id
+		      AND r.return_number = #{returnNumber,jdbcType=VARCHAR}
+	</select>
+	<select id="queryReturnList" parameterType="java.lang.String" resultMap="returnLineMap">
+		SELECT to_char(oso.pay_date - 697880, 'YYY') pay_year,
+		       to_char(oso.pay_date, 'MM') pay_mom,
+		       to_char(oso.pay_date, 'DD') pay_day,
+		       substr(oso.invoice_number, 0, 2) zg,
+		       substr(oso.invoice_number, 3) invoice_num,
+		       CASE
+		         WHEN (SELECT l.parent_line_id
+		                 FROM om_sales_line l
+		                WHERE l.line_id = osrl.order_line_id) IS NOT NULL THEN
+		          NULL
+		         ELSE
+		          iit.item_name
+		       END item_name,
+		       osrl.quantity,
+		       round(osl.unit_selling_price) sales_price,
+		       round(1 +
+		             (SELECT st.tax_percent
+		                FROM spm_org_param_value sopv, spm_org_param sop, spm_tax st
+		               WHERE st.tax_code = sopv.param_value
+		                 AND sopv.org_param_id = sop.org_param_id
+		                 AND sop.parameter = 'SPM.TAX_CODE'
+		                 AND sop.org_id = osr.sales_org_id) / 100,
+		             2) tax,
+		  	   osr.order_header_id,
+		  	   osr.return_adjust_flag,
+		  	   osr.shipping_fee_flag	
+		  FROM inv_item_tl       iit,
+		       om_sales_order    oso,
+		       om_sales_line     osl,
+		       om_sales_return   osr,
+		       om_sales_rtn_line osrl
+		 WHERE oso.header_id = osl.header_id
+		   AND osl.item_id = iit.item_id
+		   AND osr.order_header_id = oso.header_id
+		   AND osr.return_id = osrl.return_id
+		   AND osrl.order_line_id = osl.line_id
+		   AND iit.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+		   AND osr.return_number = #{returnNumber,jdbcType=VARCHAR}	
+	</select>
+	<select id="queryAdjustmentAmount" parameterType="java.lang.Long" resultMap="returnFootMap">
+		SELECT osa.adjustment_amount
+		  FROM om_sales_adjustment osa
+		 WHERE osa.adjustment_type = 'AD'
+		   AND osa.header_id = #{headerId,jdbcType=DECIMAL}
+	</select>
+	<select id="queryShippingFee" parameterType="java.lang.Long" resultMap="returnFootMap">
+		SELECT osl.shipping_fee
+		  FROM om_sales_logistics osl
+		 WHERE osl.header_id = #{headerId,jdbcType=DECIMAL}
+	</select>
+</mapper>

@@ -1,0 +1,226 @@
+<#--
+ * description: 商品查询页面 
+ * version: 1.0 
+ * author:linxixin
+ * .
+-->  
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?yesno=SYS.YES_NO&packTypeData=PM.PACK_TYPE&itemTypeData=INV.PRODUCT_TYPE&publishStatus=PM.PUBLISH_STATUS&availabilty=PM.AVAILABILITY"
+	type="text/javascript"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+<body style="padding: 3px; overflow: hidden;">
+	<div id="item_query_form"></div>
+	<div id="item_query_grid" style="margin: 0; padding: 0"></div>
+
+	<script type="text/javascript">
+	    window['item_query_form'] = $("#item_query_form").ligerForm({
+	        fields: [{
+	            type: 'text',
+	            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemNumber"/>',
+	            name: 'itemNumber'
+	        },
+	        {
+	            type: 'text',
+	            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname"/>',
+	            newline: false,
+	            name: 'itemName',
+	        },
+	        {
+	            type: 'select',
+	            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category"/>',
+	            newline: false,
+	            name: 'categoryId',
+	            options: {
+	                url: '${base.contextPath}/inv/item/queryAllBottomCategory',
+		            valueField: "categoryId",
+		            textField: "categoryName"
+	            }
+	        },
+	        {
+	            type: 'combobox',
+	            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.redeemFlag" />',
+	            name: 'redeemFlag',
+	            options: {
+	                data: yesno,
+	                valueField: "value",
+	                textField: "meaning"
+	            }
+	        },
+	        {
+	            type: 'combobox',
+	            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.starteraid"/>',
+	            newline: false,
+	            name: 'starterAid',
+	            options: {
+	                data: packTypeData,
+	                valueField: "value",
+	                textField: "meaning"
+	            }
+	        },
+	        {
+                type: 'combobox',
+                label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.publishstatus"/>',
+                newline: false,
+                name: 'publishStatus',
+                options: {
+                    data: publishStatus,
+                    valueField: "value",
+                    textField: "meaning"
+                }
+            },
+            {
+                type: 'combobox',
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.channel" />',
+                newline: true,
+                name: 'functionArea',
+                options: {
+                    isMultiSelect : true,
+                    data: availabilty,
+                    valueField: "value",
+                    textField: "meaning"
+                }
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateFrom" />',
+                name: 'validateFrom',
+                format: 'yyyy-MM-dd',
+                newline: false,
+                type : 'date',
+                editor: {
+                    type: 'date',
+                    
+                }
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateTo" />',
+                name: 'validateTo',
+                format: 'yyyy-MM-dd',
+                newline: false,
+                type : 'date',
+                editor: {
+                    type: 'date',
+                    
+                }
+            }
+//			{
+//				type: 'text',
+//				label: 'roleId',
+//				newline: false,
+//				name: 'roleId',
+//            },
+//			{
+//				type: 'text',
+//				label: 'userId',
+//				newline: false,
+//				name: 'userId',
+//            }
+	        ],
+	        buttons: [{
+	            text: '<@spring.message "sys.hand.btn.query"/>',
+	            disabled: false,
+	            width: 60,
+	            click: function() {
+
+	            	if($("input[name='validateTo']").val() != "" && ($("input[name='validateFrom']").val() > $("input[name='validateTo']").val())){
+	            		return $.ligerDialog.error('<@spring.message "msg.error.pm.item_validate_date_error"/>');
+	            	}
+	                Hap.gridQuery({
+	                    form: item_query_form,
+	                    grid: item_query_grid
+	                })
+	            }
+	        }
+	        ]
+	    });
+//        liger.get('roleId').setValue(${roleId});
+//        liger.get('userId').setValue(${userId});
+
+	    window['item_query_grid'] = $("#item_query_grid").ligerGrid({
+	        unSetValidateAttr: false,
+	        rownumbers : true,
+	        columns: [
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemNumber"/>',
+	            name: 'itemNumber',
+	            width: 150,
+	            render : function(rowdata, index, value) {
+	            	return "<a class='a_itemnumber_showitem' href='javascript:openItemDetail(" + rowdata.itemId + ",\"" + rowdata.itemType + "\")'>" + value + "</a>";
+	            }
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname"/>',
+	            name: 'itemName',
+	            align: 'center',
+	            width: 250,
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.description"/>',
+	            name: 'description',
+	            align: 'left',
+	            isSort: false,
+	            width: 500
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.type"/>',
+	            name: 'itemType',
+	            width: 150,
+	            render: function(item) {
+                    for (var i = 0; i < itemTypeData.length; i++) {
+                        if (itemTypeData[i].value == item.itemType) {
+                            return itemTypeData[i].meaning;
+                        }
+                    }
+                }
+	        },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.sort_number"/>',
+                name: 'sortNum',
+                width: 100,
+                isSort: true
+            }],
+	        url: '${base.contextPath}/inv/item/query',
+	        enabledEdit: true,
+	        width: '100%',
+	        height: '99%',
+	        toolbar : {
+                items : [
+                        {                   
+                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                            menu:{ width: 120, items:
+                                    [
+                                        {                   
+                                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                            click:   function (){exportSelected("item_query_form","item_query_grid",{"itemType":itemTypeData},_basePath);}
+                                        },
+                                        { line: true },
+                                        {                   
+                                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                            click: function (){exportDirectAll("item_query_form","item_query_grid",{"itemType":itemTypeData},_basePath);}
+                                            
+                                        }
+                                  ]
+                            }                        
+                        }
+                        ]
+            },
+	        checkbox: true,
+	        rownumbers:true
+	    });
+	    
+	    function openItemDetail(itemId,itemType){
+	    	if('ITEM' == itemType){
+	    		window.top.f_removeTab('ITEM_DETAIL');
+		    	window.top.f_addTab('ITEM_DETAIL','<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.data.details.page"/>','pm/pm_item_show.html?itemId='+itemId);
+	    	}
+	    	else{
+	    		window.top.f_removeTab('PACKAGE_DETAIL');
+		    	window.top.f_addTab('PACKAGE_DETAIL','<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.package.details.page"/>','pm/pm_package_show.html?itemId='+itemId);
+	    	}
+	        }
+
+        //console.log("userId: "+${userId}+"   roleId: "+${roleId})
+  </script>
+</body>
+</html>
+
+

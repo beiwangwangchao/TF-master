@@ -1,0 +1,281 @@
+<#--
+ * description: 业务实体定义界面.
+ * version: 1.0
+ * author: huanghanrui
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/resources/js/spm/location_edit.min.js"
+    type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?operatingUnitTypes=SPM.ORGANIZATION_CLASSIFY" type="text/javascript"></script>
+<body style="padding: 10px;">
+    <form id="spm_operatingUnit_form" ></form>
+    <div id="spm_operatingUnit_grid"></div>
+    <script type="text/javascript">
+    $l('sys.hand.title.addressinfo','<@spring.message "sys.hand.title.addressinfo"/>');
+    <#assign isedit = (RequestParameters.isedit!'0')/>
+    var clickGridRecord;
+    var userId='${Session.userId}';
+    $(function(){
+        window['spm_operatingUnit_form'] = $("#spm_operatingUnit_form").ligerForm({
+            fields: [
+                {id:"__status",name : "__status",type : "hidden",attr:{value:"<#if isedit =='1'>update<#else>add</#if>"},newline : false},
+                {
+                    type: 'text', 
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.operationunitcode"/>',
+                    newline:false, name: 'code',
+                    group : '<@spring.message "sys.hand.btn.query"/>'
+                },
+                { 
+                    
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.operationunitname"/>',
+                    newline:false, 
+                    name: 'name',
+                    newline : false,
+                    type: 'text'
+                }
+            ], 
+            buttons: [
+                { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                    Hap.gridQuery({
+                        form:spm_operatingUnit_form,
+                        grid:spm_operatingUnit_grid
+                    })
+                   
+                }}
+            ]
+        });
+        <#if  userId==1>
+            var companyEditor = ${lovService.getLov(base.contextPath,base.locale, "lov_query_company_sysadmin")};
+        <#else >
+        var companyEditor = ${lovService.getLov(base.contextPath,base.locale, "query_company")};
+        </#if>
+
+        var companyData;
+        Hap.ajax( { url : companyEditor.grid.url, success : structCompanyData});
+        function structCompanyData(json){
+            companyData = json.rows;         
+        }
+        window['spm_operatingUnit_grid'] = $("#spm_operatingUnit_grid").ligerGrid({
+            unSetValidateAttr:false,
+            onBeforeEdit : function(editParm){
+            	var e = this;
+                clickGridRecord = editParm.record;
+                /* if(editParm.column.columnname == 'locationName'){
+                    location_edit('${base.contextPath}', clickGridRecord.spmLocation,
+                    function(data) {
+                        e.updateCell('locationName',data.address,clickGridRecord);
+                        clickGridRecord.spmLocation = data;
+                    })
+                    return false;
+                } */
+                if(editParm.record.__status == 'add'){
+                    return true;
+                }else if(editParm.column.name == 'code'){
+                    return false;            
+                }else if(editParm.column.name == 'name'){
+                    return true;            
+                }else if(editParm.column.name == 'orgType'){
+                    return true;            
+                }else if(editParm.column.name == 'locationName'){
+                    return true;            
+                }else if(editParm.column.name == 'endActiveDate'){
+                    return true;            
+                }else if(editParm.column.name == 'companyId'){
+                    return true;            
+                }else{
+                    return false;
+                }
+            },
+            columns: [ 
+              { 
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.operationunitcode"/>',
+                  name: 'code', align: 'left',
+                  editor : {
+                      type:'text'
+                  },
+                  validate: {
+                      required: true
+                  }
+              }, 
+              { 
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.operationunitname"/>',
+                  name: 'name', align: 'left',
+                  editor: {
+                	  type: 'tl',
+                	  idField: 'operatingUnitId',
+                      dto: 'com.lkkhpg.dsis.common.config.dto.SpmOperatingUnit'
+                  },
+                  validate: {
+                      required: true
+                  }
+              }, 
+              { 
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.orgtype"/>',
+                  name: 'orgType',
+                  align : 'left',
+                  editor : {
+                      type : 'combobox',
+                      data : operatingUnitTypes,
+                      valueField: 'value',
+                      textField: 'meaning',
+                  },
+                  render : function(item) {
+                      for (var i = 0; i < operatingUnitTypes.length; i++) {
+                          if (operatingUnitTypes[i]['value'] == item.orgType)
+                              return operatingUnitTypes[i]['meaning']
+                      }
+                      return item.orgType;
+                  },
+                  validate: {
+                      required: true
+                  }
+              }, 
+              { 
+                  
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.seg"/>',
+                  name: 'locationName',
+                  width: 430,
+                  editor: {
+                      type: 'text',
+                      onFocus: function() {
+                          var e = this;
+                          location_edit('${base.contextPath}', clickGridRecord.spmLocation,
+                          function(data) {
+                              e.setValue(data.address);
+                              clickGridRecord.spmLocation = data;
+                          })
+                       }
+                  },
+                  validate: {
+                      required: true
+                  }
+              }, 
+              { 
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.endActiveDate"/>',
+                  name: 'endActiveDate', 
+                  format: 'yyyy-MM-dd',
+                  type: 'date',
+                  editor: {
+                      type: 'date'
+                  }
+              }, 
+              { 
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.company"/>',
+                  name: 'companyId', align: 'left',
+                  id : 'companyId',
+                  textField : 'companyName',
+                  editor  : companyEditor,
+                  validate: {
+                      required: true
+                  }
+              }, 
+              { 
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.organizational.relationships"/>',
+                  name: 'operationUnitId', align: 'left',
+                  render: function (item) {
+                	  if(item.operatingUnitId != undefined){
+                          var html = "<a href='#' onClick='a_click("+ item.operatingUnitId +")'><@spring.message 'sys.hand.btn.edit'/></a>";
+                          return html;
+                      }
+                      return '<@spring.message 'sys.hand.btn.edit'/>';
+                  }
+              },
+              { 
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.parameter.settings"/>',
+                  name: 'operationUnitId', align: 'left',
+                  render: function (rowdata) {
+                	  if(rowdata.operatingUnitId != undefined){
+                		  rowdata.type = 'OU';
+                          rowdata = JSON2.stringify(rowdata);
+                          var html = "<a href='#' onClick='editOrg("+ rowdata +")'><@spring.message "sys.hand.btn.action"/></a>";
+                          return html;
+                      }else{
+                          return '<@spring.message "sys.hand.btn.action"/>';
+                      }
+                  }
+
+              }
+            ], 
+            url:'${base.contextPath}/spm/operatingUnit/query',
+            toolbar: { 
+                items: [
+                        {
+                            text: '<@spring.message "sys.hand.btn.new"/>',
+                            disable:false,
+                            click: function(){
+                                spm_operatingUnit_grid.addRow({});
+                            },
+                            icon: 'add' 
+                        },
+                        { line: true },
+                        {
+                            text: '<@spring.message "sys.hand.btn.save"/>',
+                            disable:false,
+                            click: function(){
+                                if(Hap.validateGrid(spm_operatingUnit_grid)){
+                                    var gridData = spm_operatingUnit_grid.rows;
+                                    $.ajax({
+                                        type : "POST",
+                                        url : '${base.contextPath}/spm/operatingUnit/save',
+                                        contentType : "application/json",
+                                        data : JSON2.stringify(gridData),
+                                        dataType : "json",
+                                        success : function(data) {
+                                            if (data.success) {
+                                                Hap.showSuccess($l('sys.hand.tip.success'),
+                                                function() {
+                                                    location.reload();
+                                                });
+                                            }
+                                        }
+                                    }); 
+                                }
+                            },
+                            icon: 'save' 
+                        }
+                        ]
+            },
+            enabledEdit: true,
+            width: '99%', 
+            height: '98%', 
+            onBeforeSubmitEdit : function(e) {
+                if (e.column.columnname == "endActiveDate") {
+                    if (e.value == null || e.value == "") {
+                        return true;
+                    }
+                    now = new Date() ;
+                    if (e.value < new Date(now.getFullYear(),now.getMonth(),now.getDate())) {
+                        Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.expiration.date"/>');
+                        return false;
+                    }
+                }
+            },
+            rownumbers: true
+        });
+    });
+    function a_click(data) {
+        $.ligerDialog.open({
+            height: 600,
+            width: 850,
+            title: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.select"/>',
+            url: '${base.contextPath}/spm/spm_operating_unit_organization.html?operationUnitId=' + data,
+            showMax: false,
+            showToggle: true,
+            showMin: false,
+            isResize: true,
+            slide: false
+        });
+    }
+    function editOrg(rowdata) {
+        $.ligerDialog.open({
+            height: 500,
+            width: 800,
+            title: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.type.maintenance.organization"/>',
+            url: 'spm_org_params.html?orgType='+rowdata.type+'&orgId='+rowdata.operatingUnitId,
+        });
+    }
+    </script>
+</body>
+</html>

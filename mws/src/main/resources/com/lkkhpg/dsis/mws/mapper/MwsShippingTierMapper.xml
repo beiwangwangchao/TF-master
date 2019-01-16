@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.mws.mapper.MwsShippingTierMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.delivery.dto.ShippingTier">
+        <id column="SHIPPING_TIER_ID" property="shippingTierId" jdbcType="DECIMAL" />
+        <result column="SHIPPING_TIER_CODE" property="shippingTierCode" jdbcType="VARCHAR" />
+        <result column="SHIPPING_TIER_NAME" property="shippingTierName" jdbcType="VARCHAR" />
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+        <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+        <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+        <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+        <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+        <result column="CALCULATION_TYPE" property="calculationType" jdbcType="VARCHAR" />
+        <result column="PRIVILEGE_FLAG" property="privilegeFlag" jdbcType="VARCHAR" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+        <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+        <result column="GLOBAL_FLAG" property="globalFlag" jdbcType="VARCHAR" />
+        <result column="SALES_ORG_NAME" property="salesOrgName" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        SHIPPING_TIER_ID, SHIPPING_TIER_CODE, SHIPPING_TIER_NAME,
+        DESCRIPTION, ENABLED_FLAG,
+        START_ACTIVE_DATE, END_ACTIVE_DATE,
+        SALES_ORG_ID,
+        CALCULATION_TYPE, PRIVILEGE_FLAG,
+        OBJECT_VERSION_NUMBER,
+        REQUEST_ID,
+        PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11,
+        ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+    </sql>
+    
+    <resultMap type="com.lkkhpg.dsis.common.delivery.dto.ShippingTier" id="DtlResultMap" extends="BaseResultMap">
+        <collection property="shippingTierDtls" ofType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierDtl">
+            <id column="TIER_DTL_ID" property="tierDtlId" jdbcType="DECIMAL" />
+            <result column="SHIPPING_TIER_ID" property="shippingTierId" jdbcType="DECIMAL" />
+            <result column="CURRENCY_CODE" property="currencyCode" jdbcType="VARCHAR" />
+            <result column="INV_AMOUNT_FROM" property="invAmountFrom" jdbcType="DECIMAL" />
+            <result column="INV_AMOUNT_TO" property="invAmountTo" jdbcType="DECIMAL" />
+            <result column="SHIPPING_FEE" property="shippingFee" jdbcType="DECIMAL" />
+        </collection>
+    </resultMap>
+    <select id="selectShippingTierByLocation" resultMap="DtlResultMap">
+        SELECT
+            DST.SHIPPING_TIER_ID,
+            DST.SHIPPING_TIER_CODE,
+            DST.SHIPPING_TIER_NAME,
+            DST.CALCULATION_TYPE,
+            DST.PRIVILEGE_FLAG,
+            DSTD.INV_AMOUNT_FROM,
+            DSTD.INV_AMOUNT_TO,
+            DSTD.SHIPPING_FEE
+        FROM
+            DM_SHIPPING_TIER DST
+            LEFT OUTER JOIN DM_SHIPPING_TIER_DTL DSTD ON (DSTD.SHIPPING_TIER_ID = DST.SHIPPING_TIER_ID AND DSTD.CURRENCY_CODE = #{currencyCode,jdbcType=VARCHAR})
+        WHERE
+            DST.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+        AND DST.ENABLED_FLAG = 'Y'
+        AND START_ACTIVE_DATE <![CDATA[<]]> CURRENT_TIMESTAMP
+        AND (
+            (
+                END_ACTIVE_DATE <![CDATA[>]]> CURRENT_TIMESTAMP
+                AND END_ACTIVE_DATE IS NOT NULL
+            )
+            OR END_ACTIVE_DATE IS NULL
+        )
+        AND DST.SHIPPING_TIER_ID IN (
+            SELECT
+                SHIPPING_TIER_ID
+            FROM
+                DM_SHIPPING_TIER_SEG
+            WHERE
+                COUNTRY_CODE = #{shippingTierSeg.countryCode,jdbcType=VARCHAR}
+            AND STATE_CODE = #{shippingTierSeg.stateCode,jdbcType=VARCHAR}
+            AND CITY_CODE = #{shippingTierSeg.cityCode,jdbcType=VARCHAR}
+            UNION
+                SELECT
+                    SHIPPING_TIER_ID
+                FROM
+                    DM_SHIPPING_TIER_SEG
+                WHERE
+                    COUNTRY_CODE = #{shippingTierSeg.countryCode,jdbcType=VARCHAR}
+                AND STATE_CODE = #{shippingTierSeg.stateCode,jdbcType=VARCHAR}
+                AND CITY_CODE IS NULL
+                UNION
+                    SELECT
+                        SHIPPING_TIER_ID
+                    FROM
+                        DM_SHIPPING_TIER_SEG
+                    WHERE
+                        COUNTRY_CODE = #{shippingTierSeg.countryCode,jdbcType=VARCHAR}
+                    AND STATE_CODE IS NULL
+                    AND CITY_CODE IS NULL
+        )
+        <if test="apptype != null">
+        AND EXISTS (SELECT
+                 dsta.enabled_flag
+             FROM
+                DM_SHIPPING_TIER_AVAIL dsta
+            WHERE
+                dsta.function_area = #{apptype,jdbcType=VARCHAR}
+            AND dsta.enabled_flag ='Y'
+            AND dsta.SHIPPING_TIER_ID = dst.SHIPPING_TIER_ID)
+        </if>
+    </select>
+
+</mapper>

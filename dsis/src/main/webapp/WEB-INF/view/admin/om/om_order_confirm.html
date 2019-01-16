@@ -1,0 +1,607 @@
+
+<#--
+        * description: 订单确认页面
+        * version: 1.0
+        * author:wuyichu
+        * .
+        *
+        -->
+    <#include "../include/head.html">
+        <body style="padding: 0px; margin-left: 10px;">
+        <link href="${base.contextPath}/resources/css/om_order_create.min.css" rel="stylesheet" type="text/css" />
+        <script src="${base.contextPath}/common/language?var=languageData" type="text/javascript"></script>
+        <script src="${base.contextPath}/common/code?orderTypeData=OM.ORDER_TYPE&orderStatusData=OM.SALES_STATUS&channelData=OM.SALES_CHANNEL&productSalesTypeData=OM.PRODUCT_SALES_TYPE&deliveryTypeData=DM.DELIVERY_TYPE&paymentMethodData=OM.PAYMENT_METHOD&posSelectData=OM.SELECT_POS&bankBelongData=OM.BANK_BELONG_TO&payMethodRefund=OM_PAY_METHOD_REFUND&hidePayData=OM.HIDE_PAYDATE&staffInstore=OM.STAFF_PURCHASE_INSTORE"
+                type="text/javascript"></script>
+        <script src="${base.contextPath}/resources/js/spm/location_edit.js"
+                type="text/javascript"></script>
+        <script src="${base.contextPath}/resources/js/app/om_order_create.min.js?v=20161115" type="text/javascript"></script>
+        <script src="${base.contextPath}/resources/js/app/om_order_invalid.min.js" type="text/javascript"></script>
+        <script src="${base.contextPath}/resources/js/pdm/pdm_voucher.min.js?v=20161012" type="text/javascript"></script>
+        <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+        <script type="text/javascript">
+            <#assign isShowPeriod=accessService.access("MODIFY_BONUS_MONTH")/>
+            var _basePath = "${base.contextPath}";
+            $l('msg.error.om.actual_payment_amount_error','<@spring.message "msg.error.om.actual_payment_amount_error"/>');
+            $l('type.com.lkkhpg.dsis.common.user.dto.userinfo.memberid','<@spring.message "type.com.lkkhpg.dsis.common.user.dto.userinfo.memberid"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.memberdetails.chinesename','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.chinesename"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.memberdetails.englishname','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.englishname"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.accountingbalance.exchangebalance','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.accountingbalance.exchangebalance"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.accountingbalance.remainingbalance','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.accountingbalance.remainingbalance"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.memberdetails.pv','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.pv"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.createuserid','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.createuserid"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.shortcut_operation.currentmoneypv','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.shortcut_operation.currentmoneypv"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.autoshiporder.salesscore','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.salesscore"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.servicecenter','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.servicecenter"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.orderdate','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.orderdate"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.period','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.period"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.remark','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.remark"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.invoicenumber','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.invoicenumber"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.ordernumber','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.ordernumber"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.orderstatus','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.orderstatus"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.ordertype','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.ordertype"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.channel','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.channel"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.codflag','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.codflag"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.batchnumber','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.batchnumber"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.adjustment','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.adjustment"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.salesorgid','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.salesorgid"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.currency','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.currency"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.deliverytype','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliverytype"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.sourcekey','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.sourcekey"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.itemid','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.itemid"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.itemname','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.itemname"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.unitsellingprice','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.unitsellingprice"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.itemsalestype','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.itemsalestype"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.pv','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.pv"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.pvsum','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.pvsum"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.amount','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.amount"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.invorg','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.invorg"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.quantity','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.quantity"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.redeempoint','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.redeempoint"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.tax','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.tax"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.unitredeempoint','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.unitredeempoint"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.unitorigprice','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.unitorigprice"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.salesmarket','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.salesmarket"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.paydate','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.paydate"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.unitdiscountprice','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.unitdiscountprice"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesline.discountprice','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.discountprice"/>');
+            $l('type.com.lkkhpg.dsis.common.product.invitem.dto.description','<@spring.message "type.com.lkkhpg.dsis.common.product.invitem.dto.description"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.membersite.receivebillsname','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.receivebillsname"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.membersite.receivegoodsname','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.receivegoodsname"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.membersite.phone','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.phone"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.membersite.spmlocation.name','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.spmlocation.name"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.membersite.address','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.address"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.membersite.spmlocation.zipcode','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.spmlocation.zipcode"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.membersite.defaultflag','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.defaultflag"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.salespointsummary','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.salespointsummary"/>');
+            $l('type.com.lkkhpg.dsis.common.user.dto.userinfo.memberid','<@spring.message "type.com.lkkhpg.dsis.common.user.dto.userinfo.memberid"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.orderamt','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.orderamt"/>')
+
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.refund','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.refund"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.refundConditions','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.refundConditions"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.refundsuccess','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.refundsuccess"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.refundtoremain','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.refundtoremain"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.orderpayment.paymentmethod','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.paymentmethod"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.refundamounts','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.refundamounts"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.addedrefundamounts','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.addedrefundamounts"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.otherinfo','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.otherinfo"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.errorrefundamounts','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.errorrefundamounts"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.confirminvalid','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.confirminvalid"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.accountingtrx.balance','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.accountingtrx.balance"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.orderpayment.creditCardType','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.creditCardType"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.bank','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.bank"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.tailnumber','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.tailnumber"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.pos','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.pos"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.orderpayment.transactionnumber','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.transactionnumber"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.remark','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.remark"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.infoerror','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.infoerror"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.amountError','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.amountError"/>');
+            $l('type.com.lkkhpg.dsis.common.order.orderinvalid.otherinfoerror','<@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.otherinfoerror"/>');
+            $l('msg.error.order.amount_beyond','<@spring.message "msg.error.order.amount_beyond"/>');
+            $l('msg.warning.order.payment_date_adjustment','<@spring.message "msg.warning.order.payment_date_adjustment"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.queryorder.orderinfo','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.orderinfo"/>');
+            $l('sys.hand.btn.submit','<@spring.message "sys.hand.btn.submit"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.orderpayment','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.orderpayment"/>');
+            $l('msg.warning.order.product_order_qty_over_onhand','<@spring.message "msg.warning.order.product_order_qty_over_onhand"/>');
+            $l('msg.warn.iscancel','<@spring.message "msg.warn.iscancel"/>');
+            $l('msg.hand.btn.pause','<@spring.message "msg.hand.btn.pause"/>');
+            $l('msg.warning.order.active','<@spring.message "msg.warning.order.active"/>');
+            $l('type.com.lkkhpg.dsis.common.member.btn.memberdetails.terminate','<@spring.message "type.com.lkkhpg.dsis.common.member.btn.memberdetails.terminate"/>');
+            $l('type.com.lkkhpg.dsis.common.order.payadjustment.number','<@spring.message "type.com.lkkhpg.dsis.common.order.payadjustment.number"/>');
+            $l('type.com.lkkhpg.dsis.common.order.payadjustment.minus','<@spring.message "type.com.lkkhpg.dsis.common.order.payadjustment.minus"/>');
+            $l('type.com.lkkhpg.dsis.common.order.payadjustment.biggerthenorder','<@spring.message "type.com.lkkhpg.dsis.common.order.payadjustment.biggerthenorder"/>');
+            $l('type.com.lkkhpg.dsis.common.order.payadjustment.totalbiggerthenorder','<@spring.message "type.com.lkkhpg.dsis.common.order.payadjustment.totalbiggerthenorder"/>');
+            $l('type.com.lkkhpg.dsis.common.order.payadjustment.adjustbiggerthenorder','<@spring.message "type.com.lkkhpg.dsis.common.order.payadjustment.adjustbiggerthenorder"/>');
+            $l('type.com.lkkhpg.dsis.common.order.salesorder.miss','<@spring.message "type.com.lkkhpg.dsis.common.order.salesorder.miss"/>');
+            $l('type.com.lkkhpg.dsis.common.order.salesorder.delivery_not_null','<@spring.message "type.com.lkkhpg.dsis.common.order.salesorder.delivery_not_null"/>');
+            $l('type.com.lkkhpg.dsis.common.order.salesorder.servicecenter_not_null','<@spring.message "type.com.lkkhpg.dsis.common.order.salesorder.servicecenter_not_null"/>');
+            $l('type.com.lkkhpg.dsis.common.order.salesline.item_not_null','<@spring.message "type.com.lkkhpg.dsis.common.order.salesline.item_not_null"/>');
+            $l('type.com.lkkhpg.dsis.common.order.salesorder.not_member','<@spring.message "type.com.lkkhpg.dsis.common.order.salesorder.not_member"/>');
+            $l('type.com.lkkhpg.dsis.common.member.dto.memberdetails.phoneno','<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phoneno"/>');
+
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.deliverypickrelease','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliverypickrelease"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.deliverypick','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliverypick"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.deliveryquery','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliveryquery"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.delivery','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.delivery"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.printinvoice','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.printinvoice"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.invalid','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.invalid"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.copytemplate','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.copytemplate"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.colse','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.colse"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.open','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.open"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.minimumorderamount','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.minimumorderamount"/>');
+            $l('msg.info.om.member_birthday_month','<@spring.message "msg.info.om.member_birthday_month"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.coupons','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.coupons"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.return','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.return"/>');
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.billaddress','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.billaddress"/>');
+            $l('msg.warn.order.actrualpayamtless','<@spring.message "msg.warn.order.actrualpayamtless"/>');
+
+            $l('msg.error.order.sales_point_insufficient','<@spring.message "msg.error.order.sales_point_insufficient"/>');
+            $l('msg.warn.order.om_sales_order.fullmembercode','<@spring.message "msg.warn.order.om_sales_order.fullmembercode"/>');
+            $l('msg.warn.order.om_sales_order.fullservicecentercode','<@spring.message "msg.warn.order.om_sales_order.fullservicecentercode"/>');
+            $l('msg.error.order.deliverycompany_null','<@spring.message "msg.error.order.deliverycompany_null"/>')
+            $l('msg.error.pdm.voucher.morethenorderamount','<@spring.message "msg.error.pdm.voucher.morethenorderamount"/>');
+            $l('msg.warn.pdm.voucher.notavalilablevoucher','<@spring.message "msg.warn.pdm.voucher.notavalilablevoucher"/>');
+            $l("msg.warn.pdm.voucher.unstackable",'<@spring.message "msg.warn.pdm.voucher.unstackable"/>')
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.orderinfo','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.orderinfo"/>')
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.memberinfo','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.memberinfo"/>')
+            $l('type.com.lkkhpg.dsis.common.order.dto.salesorder.remarkinfo','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.remarkinfo"/>')
+            $l('msg.info.order.new_order','<@spring.message "msg.info.order.new_order"/>')
+            $l('msg.error.om.billing_address_null','<@spring.message "msg.error.om.billing_address_null"/>')
+            $l('sys.hand.title.addressinfo','<@spring.message "sys.hand.title.addressinfo"/>');
+            $l('msg.warning.member.confirm_tip','<@spring.message "msg.warning.member.confirm_tip"/>');
+            $l('type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.shippingfee','<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.shippingfee"/>')
+            $l('type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.invamountto','<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.invamountto"/>')
+            $l('type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.invamountfrom','<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.invamountfrom"/>')
+            $l('type.com.lkkhpg.dsis.common.delivery.dto.shipping.shippingtier','<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shipping.shippingtier"/>')
+            $l('msg.error.payment_date_can_be_modified_to_last_months_one_to_the_current_date','<@spring.message "msg.error.payment_date_can_be_modified_to_last_months_one_to_the_current_date"/>')
+            $l("type.com.lkkhpg.dsis.common.order.dto.salesorder.internalremark",'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.internalremark"/>')
+            $l("type.com.lkkhpg.dsis.common.order.dto.salesorder.satffname",'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.satffname"/>')
+            $l("type.com.lkkhpg.dsis.common.order.dto.salesorder.satffnumber",'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.satffnumber"/>')
+            $l("type.com.lkkhpg.dsis.common.order.dto.salesorder.satffinfo",'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.satffinfo"/>')
+
+            var addressgrid,om_oc_form,linegrid,deliveryaddress,memberStatus,memberRole,defaultSaleOrg=${Session._salesOrgId},freePayMent,freeFreight;
+            var orderDetail,editform,amountsform,invOrgs,defaultInvOrg=${Session._invOrgId},defaultItemSalesType,ordertype="sales",allowBack=false,userType,addLineBtnDisabled,bonusDate,marketCode;
+            var summary={
+                pv:0,
+                tax:0,   //税
+                currency:0, //订单总额
+                taxRate:0,  //税率
+                shippingTier:0, //运费
+                discountAmt:0, //优惠金额
+                adjustMents:0, //
+                points:0,
+                exchange:0,
+                precision:0,
+                priceIncludeTax:false,
+                taxCode:"",
+                enableTax:false
+            };
+            var adjustTypeData=[ {
+                value : "add",
+                meaning : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.add"/>'
+            }, {
+                value : "subs",
+                meaning : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.subs"/>'
+            } ];
+            /*----------页面初始化 ----------*/
+            $.ajaxSettings.async = false;
+            $(function() {
+                addLineBtnDisabled = <#if accessService.access("EDITABLE") == false>true<#else> false </#if>;
+                $.getJSON(_basePath+"/spm/invOrganization/byorderid?orderId=" + ${RequestParameters.orderId} ,function(data) {
+                    invOrgs=data;
+                    for(var i in invOrgs){
+                        if(invOrgs[i].defaultFlag=="Y"){
+                            defaultInvOrg=invOrgs[i].invOrgId;
+                        }
+                    }
+                })
+                $.ajax({
+                    type : 'POST',
+                    url : _basePath + "/sys/um/getSingleUser?userId="+${Session.userId},
+                    async : false,
+                    contentType : "application/json; charset=utf-8",
+                    success : function(json) {
+                        if(json.success){
+                            userType =json.rows[0].userType;
+                        }
+                    }
+                });
+                marketCode = '${market}';
+                /* -------订单头表单---------- */
+                window['om_oc_form'] = $("#om_oc_form").ligerForm(o_omCreateFormOptions(true));
+                /*----------订单产品行信息----------*/
+                linegrid=$("#linegrid").ligerGrid(getshowLineGrid());
+                /* ---------配送地址------------- */
+                deliveryaddress=$('#deliveryaddress').ligerGrid(o_addressGridOptions(false));
+                $(document).on("click",".addArtificial",function(){
+                    var num=$("#payAdjust table tr").length-4;
+                    var str="<div style='float: left; margin-right: 5px'><input id='adjustType"+num+"' name='adjustType'/><input type='hidden' name='adjustid' id='adjustid'>";
+                    str+="</div> <input style='width: 60px' name='adjust' id='adjust' class='l-text' onBlur='f_payMentAdjust(this)' placeholder='00.00'/> ";
+                    var tr = $(this).parents('tr');
+                    var ntr = tr.clone();
+                    ntr.find(":input").val("");
+                    ntr.find("#adjustText").html("0");
+                    ntr.find('.addArtificial').hide();
+                    ntr.find('.subArtificial').show();
+                    ntr.find('td:eq(1)').html(str);
+                    tr.after(ntr);
+
+                    $("#adjustType"+num).ligerComboBox({
+                        width : 120,
+                        data : adjustTypeData,
+                        valueField : "value",
+                        textField : "meaning",
+                        focusWhenSetValue : false,
+                        cancelable:false
+                    });
+                    liger.get('adjustType'+num).setValue("add");
+                    for(var i in adjustTypeData){
+                        if(adjustTypeData[i].value=="add"){
+                            liger.get('adjustType'+num).setText(adjustTypeData[i].meaning);
+                        }
+                    }
+                });
+
+                $(document).on("click",".subArtificial",function(){
+                    var tr = $(this).parents('tr');
+                    if(tr.find("#adjustid").val()){
+                        var param={};
+                        param.adjustmentId=tr.find("#adjustid").val();
+                        $.getJSON("${base.contextPath}/om/order/adjust/remove",param,function(data) {
+                            if(data.success){
+                                tr.remove();
+                            }
+                        })
+                    }else{
+                        tr.remove()
+                    }
+
+                });
+
+                var param =  [{orgId : '${salesOrg}' ,orgType:'SALES',paramNames:['SPM.PAY_BY_RB','SPM.ADD_FEE_PAYMENT','SPM.ADD_FEE_FREIGHT','SPM.PRICE_INCLUDE_TAX','SPM.TAX_CODE','SPM.ENABLE_TAX','SPM.ALLOW_BACK_ORDER',"SPM.BONUS_MONTH_DATE"]}];
+                $.ajax({
+                    url : '${base.contextPath}/spm/orgParam/get',
+                    type : "POST",
+                    dataType : "json",
+                    contentType : "application/json",
+                    data : JSON2.stringify(param),
+                    success : function(json) {
+                        var data=json.rows;
+                        for(var i=0 ; i < data.length ; i++){
+                            if(data[i]["paramValues"]["SPM.PAY_BY_RB"]){
+                                if(!data[i]["paramValues"]["SPM.PAY_BY_RB"][0]||data[i]["paramValues"]["SPM.PAY_BY_RB"][0]=="N"){
+                                    $("#remainingBalanceUseid").parents('tr').hide();
+                                }else{
+                                    $("#remainingBalanceUseid").parents('tr').show();
+                                }
+                            }
+                            if(data[i]["paramValues"]["SPM.ADD_FEE_PAYMENT"]){
+                                freePayMent=data[i]["paramValues"]["SPM.ADD_FEE_PAYMENT"][0];
+                            }
+                            if(data[i]["paramValues"]["SPM.ADD_FEE_FREIGHT"]){
+                                freeFreight=data[i]["paramValues"]["SPM.ADD_FEE_FREIGHT"][0];
+                            }
+                            if(data[i]["paramValues"]["SPM.ENABLE_TAX"]){
+                                if(data[i]["paramValues"]["SPM.ENABLE_TAX"][0]=="Y"){
+                                    summary.enableTax=true;
+                                    $("#salesLineSummary tr:eq(1)").show();
+                                }else{
+                                    $("#salesLineSummary tr:eq(1)").hide();
+                                }
+                            }
+                            if(data[i]["paramValues"]["SPM.PRICE_INCLUDE_TAX"]&&data[i]["paramValues"]["SPM.PRICE_INCLUDE_TAX"][0]=="Y"){
+                                summary.priceIncludeTax=true;
+                            }
+                            if(data[i]["paramValues"]["SPM.TAX_CODE"]&&data[i]["paramValues"]["SPM.TAX_CODE"][0]){
+                                summary.taxCode=data[i]["paramValues"]["SPM.TAX_CODE"][0];
+                                var param = {taxCode : data[i]["paramValues"]["SPM.TAX_CODE"][0],isActive:'Y'};
+                                $.getJSON("${base.contextPath}/spm/tax/queryForOrder",param,function(taxData) {
+                                    if(taxData.success){
+                                        if(taxData.rows[0]){
+                                            summary.taxRate=taxData.rows[0].taxPercent/100;
+                                            f_calculateLinePrice();
+                                        }
+                                    }
+                                });
+                            }
+                            if(data[i]["paramValues"]["SPM.ALLOW_BACK_ORDER"]&&data[i]["paramValues"]["SPM.ALLOW_BACK_ORDER"][0]=="Y"){
+                                allowBack=true;
+                            }
+                            if(data[i]["paramValues"]["SPM.BONUS_MONTH_DATE"]){
+                                bonusDate=data[i]["paramValues"]["SPM.BONUS_MONTH_DATE"];
+                            }
+                        }
+                        linegrid.set({columns:o_getConfirmLineColumns()});
+                        linegrid.reRender();
+
+                    }
+                });
+
+            <#if RequestParameters.orderId ?exists>
+                    var param = {'orderId' : ${RequestParameters.orderId},"number" : Math.random()};
+                $.getJSON("${base.contextPath}/om/order/getDetailOrder",param,function(data) {
+                    $.getJSON(_basePath+"/spm/currency/query?currencyCode="+data.currency,function(data) {
+                        if(data.success&&data.rows[0]){
+                            summary.precision=data.rows[0].precision;
+                        }
+                    })
+                    orderDetail=data;
+                    initSalesOrder(true);
+                    /* ---------用户账单地址------------- */
+                    addressgrid=$("#addressgrid").ligerGrid(o_addressGridOptions(true));
+                    f_setOrderDetai(data,true);
+
+                    liger.get('memberId').set({readonly:true});
+                    liger.get('serviceCenterId').set({readonly:true});
+                    if(!orderDetail.memberId){
+                        liger.get('memberId').setPlaceholder("   ");
+                        f_changeMemberShow(false);
+                    }else{
+                        f_changeMemberShow(true);
+                    }
+                    if(data.orderType!="STDP"){
+                        $("#remainingBalanceUseid").parents('tr').hide();
+                        $("#exchangeBalanceUseid").parents('tr').hide();
+                    }
+                    liger.get("channel").set({readonly:true});
+                    getAllAvailableVouchers();
+                });
+            <#else>
+                initSalesOrder(true);
+                /* ---------用户账单地址------------- */
+                addressgrid=$("#addressgrid").ligerGrid(o_addressGridOptions(true));
+            </#if>
+                if(userType=="IPONT"){
+                    liger.get("deliveryType").set({readonly:true});
+                    liger.get("deliveryType").setValue("PCKUP");
+                    $("#billPannel").hide();
+                }
+            <#if isShowPeriod>
+                initUpdatePeriod();
+            </#if>
+                $.ajaxSettings.async = true;
+            });
+        </script>
+        <div id="topButtons" class="buttons">
+            <#-- 动态隐藏按钮 -->
+                <#if isShowPeriod>
+                    <div>
+                        <div id="periodBtn"></div>
+                        <!-- 奖金区间-->
+                    </div>
+                </#if>
+                <div>
+                    <div id="pickItem" style="display:none"></div>
+                    <!-- 挑库 -->
+                </div>
+                <div>
+                    <div id="deliveryPackage" style="display:none"></div>
+                    <!-- 发运 -->
+                </div>
+                <div>
+                    <div id="cancle" style="display:none"></div>
+                    <!-- 取消 -->
+                </div>
+                <div>
+                    <div id="invalid" style="display:none"></div>
+                    <!-- 失效 -->
+                </div>
+                <div>
+                    <div id="printInvoice" style="display:none"></div>
+                    <!-- 打印发票 -->
+                </div>
+                <div>
+                    <div id="copyBtn"></div>
+                    <!-- 复制模板 -->
+                </div>
+        </div>
+
+        <div id="topmenu" style="height: 30px;"></div>
+        <form id="om_oc_form" autocomplete="off"></form>
+        <div id="linegrid" style="margin-left: 10px;"></div>
+        <div id="linePrice" class="l-panel" style="width: 98%; text-align: center; margin-left: 10px;" ligeruiid="linePrice">
+            <table id="salesLineSummary" class="salesLineSummary">
+                <tr>
+                    <td>&nbsp;</td>
+                    <td><label class="l-label label1"><@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.pv"/> : </label><label id="totalPV" class="label2">0</label></td>
+                    <td><label class="l-label label1"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.orderamt"/> : </label><label id="TotalCurrency" class="label2">0</label>
+                    </td>
+                </tr>
+                <tr style="display:none">
+                    <td><label class="l-label label1"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.beforetax"/> : </label><label id="beforeTax" class="label2">0</label></td>
+                    <td><label class="l-label label1"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.taxamt"/> : </label><label id="tax" class="label2">0</label></td>
+                    <td><label class="l-label label1"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.aftertax"/> :</label><label id="afterTax" class="label2">0</label></td>
+                </tr>
+            </table>
+        </div>
+        <div class="interval"></div>
+        <!-- 优惠券 -->
+        <div id="couponsAdjust" style="margin: 10px; clear: both;">
+            <table>
+                <tr>
+                    <td><div class="l-icon l-icon-add addCoupon" style="float: left;"></div>
+                        <div class="l-icon l-icon-delete subCoupon" style="float: left"></div>
+                        <label><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.coupons"/></label></td>
+                    <td><input name="coupons" id="coupons" /><input type="hidden" id="couponsid"></td>
+                    <td width="120px"><label id="couponsText">0</label></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="interval"></div>
+        <div id="delivery" class="l-panel" ligeruiid="delivery">
+            <div class="l-panel-header">
+                <span><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliverytype"/></span>
+                <div class="icons"></div>
+            </div>
+            <div style="padding: 15px 0px 5px 25px;">
+                <label style="float: left; line-height: 20px"> <@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliverytype"/>: </label>
+                <div style="margin-left: 80px">
+                    <input name="deliveryType" id="deliveryType" />
+                </div>
+            </div>
+            <div id="addressPanel" class="l-panel">
+                <ul>
+                    <li><label><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliveryaddress"/></label>
+                        <div>
+                            <div id="deliveryaddress"></div>
+                        </div></li>
+
+                    <li><label><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.logistics"/></label>
+                        <div>
+                            <div style="float: left;">
+                                <input name="deliveryCompany" id="deliveryCompany" />
+                            </div>
+                            <div class="l-icon l-icon-greenwarn" style="float: left" onclick="showShippingTier()"></div>
+                            <div style="float: left;margin-left: 20%">
+                                <input type="checkbox" class="liger-checkbox" id="isCod"/><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.codflag"/>
+                            </div>
+                            <!-- 是否包邮 -->
+                            <div style="float: left;margin-left: 20%">
+                                <input type="checkbox" class="liger-checkbox"  id="freeShipping" ligerui="{
+                                onClick : f_resetShippingTier
+                            }"/><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.freeshipping"/>
+                            </div>
+                            <div style="float: right; margin-right: 10px;">
+                                <@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.shippingFee"/>:<label id="shippingTier">0</label>
+                            </div>
+                        </div></li>
+                </ul>
+            </div>
+        </div>
+        <div class="interval"></div>
+        <div id="billPannel" style="margin: 10px; clear: both;">
+            <div style="margin: 10px;">
+                <div id="addressgrid"></div>
+            </div>
+        </div>
+        <div class="interval"></div>
+        <!-- 支付调整 -->
+        <div id="payAdjust" style="margin: 10px; clear: both;">
+            <table class="payAdjust">
+                <tr>
+                    <td>
+                        <div class="l-icon l-icon-add addArtificial" style="float: left;"></div>
+                        <div class="l-icon l-icon-delete subArtificial" style="display: none; float: left"></div> <label><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesadjustment.adjust"/></label>
+                    </td>
+                    <td>
+                        <div style="float: left; margin-right: 5px">
+                            <input id='adjustType' /><input type="hidden" name="adjustid" id="adjustid">
+                        </div> <input style="width: 60px" name="adjust" id="adjust" class="l-text" onBlur="f_payMentAdjust(this)"  placeholder="00.00" />
+                    </td>
+                    <td><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.remark"/><input name="remarks" id="remarks" class="l-text" /></td>
+                    <td width="120px"><label id="adjustText">0</label></td>
+                </tr>
+                <!-- <tr>
+                     <td><@spring.message "type.com.lkkhpg.dsis.common.member.dto.accountingbalance.exchangebalance"/>:<label id="exchangeBalance">0</label>
+                     </td>
+                     <td><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.exchange"/>:<label id="exchange">0</label>
+                     </td>
+                     <td><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.use"/><input name="exchangeBalanceUse" id="exchangeBalanceUse" class="l-text" onBlur="f_payMentAdjust(this,true)"  placeholder="00.00" />
+                         <input type="hidden" id="exchangeBalanceUseid">
+                     </td>
+                     <td width="120px"><label id="exchangeBalanceUseText">0</label></td>
+                 </tr>
+                 <tr>
+                     <td><@spring.message "type.com.lkkhpg.dsis.common.member.dto.accountingbalance.remainingbalance"/>:<label id="remainingBalance">0</label></td>
+                     <td><input type="hidden" id="remainingBalanceUseid"></td>
+                     <td><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.use"/><input name="remainingBalanceUse" id="remainingBalanceUse" class="l-text" onBlur="f_payMentAdjust(this,true)"  placeholder="00.00" />
+                     </td>
+                     <td width="120px"><label id="remainingBalanceUseText">0</label></td>
+                 </tr> -->
+                <tr>
+                    <td><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesadjustment.adjustsum"/></td>
+                    <td></td>
+                    <td></td>
+                    <td width="120px"><label id="afterAdjust">0</label></td>
+                </tr>
+            </table>
+        </div>
+        <div class="interval"></div>
+        <div id="summary" class="l-panel" style="width: 98%; text-align: center; margin: 10px;" ligeruiid="summary">
+            <div class="l-panel-header">
+                <span><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.summary"/></span>
+                <div class="icons"></div>
+            </div>
+            <table class="summary">
+                <tr>
+                    <td><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.pvsummary"/>:<label id="summaryPV">0</label>
+                    </td>
+                    <td style="display:none"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.salesscore"/>:<label id="getsalespoint">0</label></td>
+                    <td><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.actrualpayamt"/>:<label class="currencysign"></label><label id="actrualPayAmt">0</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="footButtons" class="buttons">
+            <div>
+                <div id="delBtn"></div>
+            </div>
+            <div>
+                <div id="returnBtn"></div>
+            </div>
+            <div>
+                <div id="submitBtn"></div>
+            </div>
+        </div>
+        <div id="invalid1" style=" display:none">
+            <p id="invalid_lable"></p>
+            <p><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.remark"/></p>
+            <input id="invalid_text" type="text" size = "40"/>
+        </div>
+
+        <div id= "invalidFrame" style = "width:1000px;display:none">
+            <form id = "amountsform" style="width : 350px;margin:0 auto;font-weight : bold"></form>
+            <div id="invalid2" ></div>
+        </div>
+        <div id="invalid3" class="l-panel" style="text-align: center;margin: 8px;display:none;">
+            <form id="editform" method="post"></form>
+        </div>
+
+        <div id = "remarkText" style=" display:none">
+            <p style = "display : inline"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.remark"/></p>
+            <input type = "text"  size="40" />
+        </div>
+        <div id = "creditText" style=" display:none">
+            <div style="float:left;display : inline">
+                <p style="display : inline"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.creditCardType" /></p>
+                <input type = "text" readonly="readonly" size="10" />
+            </div>
+            <div style="float:right">
+                <p style="display : inline"><@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.tailnumber"/></p>
+                <input type = "text" readonly="readonly" size="20" />
+                <input type="button" style="align:right" value="<@spring.message 'sys.hand.btn.edit'/>" />
+            </div>
+        </div>
+        <div id = "debitText" style=" display:none">
+            <div style="float:left;display : inline">
+                <p style="display : inline"><@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.bank"/></p>
+                <input type = "text"  readonly="readonly" size="10"/>
+            </div>
+            <div style="float:right">
+                <p style="display : inline"><@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.tailnumber"/></p>
+                <input type = "text" readonly="readonly" size="20"/>
+                <input type="button" style="align:right" value="<@spring.message 'sys.hand.btn.edit'/>" />
+            </div>
+        </div>
+        <div id = "chequeText" style=" display:none">
+            <div style="float:left;display : inline">
+                <p style="display : inline"><@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.bank"/></p>
+                <input type = "text"  readonly="readonly" size="10"/>
+            </div>
+            <div style="float:right">
+                <p style="display : inline"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.transactionnumber"/></p>
+                <input type = "text" readonly="readonly" size="20"/>
+                <input type="button" style="align:right" value="<@spring.message 'sys.hand.btn.edit'/>" />
+            </div>
+        </div>
+        <div id="showShippingTier" style="margin: 3px; display: none;">
+            <div id="showShippingTierGrid"></div>
+        </div>
+        <#-- 动态隐藏DIV -->
+            <#if isShowPeriod>
+                <div id="updatePeriod" style=" display:none">
+                    <form id="updatePeriodFrom" autocomplete="off"></form>
+                </div>
+            </#if>
+        </body>
+        </html>

@@ -1,0 +1,573 @@
+<#--
+        * description: 会员查询界面
+        * version: 1.0
+        * author: mclin
+        * .
+        *
+        -->
+    <#include "../include/head.html">
+        <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+        <script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+        <script src="${base.contextPath}/common/code?memberStatus=MM.MEMBER_STATUS&memberRole=MM.MEMBER_ROLE&memberRank=MM.MEMBER_RANK" type="text/javascript"></script>
+        <body style="padding: 10px;">
+        <form id="member_query_form" ></form>
+        <div id="member_grid" style="margin: 0; padding: 0"></div>
+        <script type="text/javascript">
+            var data_year_from = [];
+            var start_year = '1900';
+            var mydate = new Date();
+            var selected_from_date = '';
+            var data_year_to = [];
+            var currency_year = mydate.getFullYear();
+
+            //I-point用户只能查看、更新今天创建的会员
+            var userType = '${userType?default('')}';
+            var isIpoint = '0';
+            if (userType == 'IPONT') {
+                isIpoint = '1';
+            }
+
+            for(var i = start_year;i<=currency_year;i++){
+                data_year_from.push(get_year(i));
+            }
+            if(selected_from_date==''){
+                data_year_to=data_year_from;
+            }
+
+            function get_year(year){
+                var o = {};
+                o.id = year;
+                o.text = year;
+                return o;
+            }
+
+            function get_memberStatus(statusList){
+                var datas = [];
+                for(var i = 0;i<statusList.length;i++){
+                    var o = {};
+                    o.id = statusList[i].value;
+                    o.text = statusList[i].meaning;
+                    datas.push(o);
+                }
+                return datas;
+            }
+
+            var memRoleTemp = [];
+            function newMemRole() {
+                for(var i = 0; i < memberRole.length;i++){
+                    memRoleTemp.push(memberRole[i])
+                }
+            }
+
+            function setToyear(value){
+                selected_from_date = $("input[ligeruiid='yearFrom']").val();
+                data_year_to = [];
+                for(var i = selected_from_date;i<=currency_year;i++){
+                    data_year_to.push(get_year(i));
+                }
+                liger.get('yearTo').clear();
+                liger.get('yearTo').set('data',data_year_to);
+
+            }
+
+            function compare(){
+                if(liger.get('yearFrom').selectedText==''){
+                    liger.get('yearTo').clear();
+                    data_year_to = [];
+                    for(var i = start_year;i<=currency_year;i++){
+                        data_year_to.push(get_year(i));
+                    }
+                    liger.get('yearTo').set('data',data_year_to);
+                    liger.get('yearTo').clear();
+                }
+            }
+
+            function create_member(){
+                window.top.f_removeTab('MEMBER_CREATE');
+                window.top.f_addTab('MEMBER_CREATE', '<@spring.message "type.com.lkkhpg.dsis.common.member.membercreate"/>',"mm/mm_member_edit.html");
+            }
+
+            function send_msg(){
+                var selected_datas = liger.get("member_grid").getSelectedRows();
+                var memberIds = [];
+                if(selected_datas.length==0){
+                    $.ligerDialog.error('<@spring.message "msg.error.member.no_member"/>');
+                    return null;
+                }
+                for(var i=0;i<selected_datas.length;i++){
+                    if(!(selected_datas[i].status=='NEW'||selected_datas[i].status=='ACTV'||selected_datas[i].status=='PEND')){
+                        $.ligerDialog.warn('<@spring.message "msg.warning.dto.member.member.status.issendmsg"/>');
+                        return null;
+                    }
+                    var memberId = selected_datas[i].memberId;
+                    memberIds.push(memberId);
+                }
+                $.ajax({
+                    url: '${base.contextPath}/mm/member/saveReceiver',
+                    type:"POST",
+                    dataType:"json",
+                    contentType : "application/json",
+                    data : JSON2.stringify(memberIds),
+                    success : function(json) {
+                        if(json.success){
+                            mem_params = "groupId="+json.rows[0];
+                            //self.location="sys/message_edit.html?"+mem_params
+                            window.top.f_removeTab('MESSAGE_EDIT');
+                            window.top.f_addTab('MESSAGE_EDIT','<@spring.message "type.com.lkkhpg.dsis.common.system.dto.edit.messageadd"/>',"sys/message_edit.html?"+mem_params);
+                        }
+                    },
+                    error : function() {
+                    }
+                })
+
+            }
+
+            function f_onCheckAllRow(checked)
+            {
+                for (var rowid in this.records)
+                {
+                    if(checked)
+                        addCheckedCustomer(this.records[rowid]['memberId']);
+                    else
+                        removeCheckedCustomer(this.records[rowid]['memberId']);
+                }
+            }
+
+            /*
+             该例子实现 表单分页多选
+             即利用onCheckRow将选中的行记忆下来，并利用isChecked将记忆下来的行初始化选中
+             */
+            var checkedCustomer = [];
+            function findCheckedCustomer(memberId)
+            {
+                for(var i =0;i<checkedCustomer.length;i++)
+                {
+                    if(checkedCustomer[i] == memberId) return i;
+                }
+                return -1;
+            }
+            function addCheckedCustomer(memberId)
+            {
+                if(findCheckedCustomer(memberId) == -1)
+                    checkedCustomer.push(memberId);
+            }
+            function removeCheckedCustomer(memberId)
+            {
+                var i = findCheckedCustomer(memberId);
+                if(i==-1) return;
+                checkedCustomer.splice(i,1);
+            }
+            function f_isChecked(rowdata)
+            {
+                if (findCheckedCustomer(rowdata.memberId) == -1)
+                    return false;
+                return true;
+            }
+            function f_onCheckRow(checked, data)
+            {
+                if (checked) addCheckedCustomer(data.memberId);
+                else removeCheckedCustomer(data.memberId);
+            }
+
+            function toDetailsHtml(data){
+                window.top.f_removeTab('MEMBER_DETAIL');
+                window.top.f_addTab('MEMBER_DETAIL', '<@spring.message "type.com.lkkhpg.dsis.common.member.memberdetail"/>',"mm/mm_member_edit.html?isedit=1&memberId="+data);
+            }
+
+            function createOrder(){
+                var selected_datas = liger.get("member_grid").getSelectedRows();
+                if(selected_datas.length == 0){
+                    $.ligerDialog.error('<@spring.message "msg.error.member.no_member"/>');
+                    return null;
+                }
+                if(selected_datas.length > 1){
+                    //$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.selectonerecord"/>');
+                    return null;
+                }
+                if(!(selected_datas[0].status=='NEW'||selected_datas[0].status=='ACTV'||selected_datas[0].status=='PEND')){
+                    $.ligerDialog.warn('<@spring.message "msg.warning.dto.member.member.status.isActive"/>');
+                    return null;
+                }
+                var memberId = 'memberId='+selected_datas[0].memberId;
+                var memberCode = '&memberCode='+selected_datas[0].memberCode;
+                var chineseName = '&chineseName='+selected_datas[0].chineseName;
+                var englishName = '&englishName='+selected_datas[0].englishName;
+                var currentPv = '&currentPv='+selected_datas[0].currentPv;
+                var remainingBalance = '&remainingBalance='+selected_datas[0].remainingBalance;
+                var exchangeBalance = '&exchangeBalance='+selected_datas[0].exchangeBalance;
+                var remark =  '&remark='+selected_datas[0].remark;
+                var mem_params = memberId + memberCode + chineseName + englishName + currentPv + remainingBalance + exchangeBalance +remark;
+                window.top.f_removeTab('ORDER_CREATE');
+                window.top.f_addTab('ORDER_CREATE','<@spring.message "type.com.lkkhpg.dsis.common.member.btn.member.createorder"/>',"om/om_order_create.html?"+mem_params);
+            }
+
+            var markets = [];
+            function queryMarkets(){
+                $.ajax({
+                    url: '${base.contextPath}/spm/market/queryMarketsByRole',
+                    type:"POST",
+                    dataType:"json",
+                    contentType : "application/json",
+                    data : '',
+                    async: false,
+                    success : function(json) {
+                        if(json.success){
+                            $(json.rows).each(function(i,o){
+                                markets.push({"id":o.marketId,"text":o.name})
+                            })
+                        }
+                    },
+                    error : function() {
+                    }
+                })
+
+            }
+            var openTime = 1;
+            <#assign marketId = (RequestParameters._marketId ! ) />
+            <#if marketId != ''>
+            currentMarket = ${RequestParameters._marketId};
+            </#if>
+            <#if marketId == ''>
+            currentMarket = _marketId;
+            </#if>
+
+            $(function(){
+                newMemRole();
+                queryMarkets();
+                window['member_query_form'] = $("#member_query_form").ligerForm({
+                    labelWidth: 130,
+                    fields: [
+
+                        { type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>', newline:false, name: 'marketId',valueField : 'text',
+                            options : {
+                                value: currentMarket,
+                                data:markets,
+                                onSelected:function(o){
+                                    if(openTime == 1){
+                                        $.ligerDialog.confirm('<@spring.message "dsis.lkkhpg.tip.refresh_page"/>',$l('sys.hand.tip.info'),
+                                            function(yes) {
+                                                if(yes){
+                                                    var tabid = window.top.tab.selectedTabId;
+                                                    var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                                    window.top.f_removeTab(tabid);
+                                                    window.top.f_addTab(tabid, tabname, "mm/mm_member_query.html?_marketId="+o);
+                                                }else{
+                                                    openTime = openTime + 1;
+                                                    liger.get('marketId').setValue(currentMarket);
+                                                }
+                                            });
+                                    }else{
+                                        openTime = 1;
+                                    }
+
+                                }
+                            },
+                            validate : {
+                                required: true
+                            }
+                        },
+                        /*      { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>', name: 'marketName',valueField : 'text',readonly:true
+
+                         }, */
+                        /* { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>', newline:false, name: 'memberCode'}, */
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+                            name: "memberCode",
+                            type: "popup",
+                            newline: false,
+                            validate: {
+                                digits: true,
+                                maxlength: 10
+                            },
+                            textField: 'memberCode',
+                            options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+                                onLoadData: function(){
+                                    this.setParm('marketId', liger.get('marketId').selectedValue)
+                                } ,
+                                onChangeValue: function(){
+                                    this.setParm('marketId', liger.get('marketId').selectedValue)
+                                }
+                            })
+                        },
+                        { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.membername"/>', newline:true, name: 'memberName'},
+                        { type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.status"/>', newline:false, name: 'status',valueField : 'text',rightToken : ' ',
+                            options : {
+                                data : get_memberStatus(memberStatus)
+                            }
+                        },
+                        { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.phonenumber"/>', newline:true, name: 'phoneNo',rightToken : ' ' },
+                        /*  { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.souponsname"/>', newline:false, name: 'souponsName' }, */
+                        { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.registercode"/>', newline:false, name: 'registerCode',rightToken : ' ' },
+
+                        { type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.birthmonth"/>', newline:true, name: 'month',valueField : 'text',rightToken : ' ',
+                            options : {
+                                data : [
+                                    {id : '01', text : '1'},{id : '02', text : '2'},{id : '03', text : '3'},
+                                    {id : '04', text : '4'},{id : '05', text : '5'},{id : '06', text : '6'},
+                                    {id : '07', text : '7'},{id : '08', text : '8'},{id : '09', text : '9'},
+                                    {id : '10', text : '10'},{id : '11', text : '11'},{id : '12', text : '12'}
+                                ]
+                            }
+                        },
+                        {
+                            type: 'combobox', name: 'yearFrom', label:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.birthfromyear"/>', newline:false, rightToken : ' ',id : 'yearFrom',
+                            options : {
+                                data : data_year_from,
+                                onSelected:setToyear
+                            }
+
+                        },{
+                            type: 'combobox', label:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.birthyearto"/>',name: 'yearTo',
+                            newline:true, rightToken : ' ',
+                            options : {
+                                data : data_year_to,
+                                onBeforeSelect:compare,
+                                onBeforeOpen:compare
+                            }
+
+                        },
+//                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.sponsorid"/>', newline:true, name: 'sponsorNo',rightToken : ' ' },
+//                    {
+//                        type: 'date',
+//                        label: '<@spring.message "type.com.lkkhpg.dsis.common.report.jointdatefrom"/>',
+//                        name: 'jointDateFrom',
+//                        format: 'yyyy-MM-dd',
+//                        newline: false
+//                    },
+//                    {
+//                        type: 'date',
+//                        label: '<@spring.message "type.com.lkkhpg.dsis.common.report.jointdateto"/>',
+//                        name: 'jointDateTo',
+//                        format: 'yyyy-MM-dd',
+//                        newline: false
+//                    },
+//                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.sponsorname"/>',
+//						newline: true,
+//						name: 'sponsorName'
+//					},
+                        {
+                            display:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberrole"/>',
+                            name : "memberRole",
+                            newline : false,
+                            type : "combobox",
+                            options : {
+                                valueField : 'value',
+                                textField : 'meaning',
+                                data : memRoleTemp,
+                                isShowCheckBox: true,
+                                isMultiSelect: true
+                            }
+                        }
+//					,
+//                    {
+//						display:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberlevel"/>',
+//						name : "rank",
+//						newline : false,
+//						type : "combobox",
+//						options : {
+//							valueField : 'value',
+//							textField : 'meaning',
+//							data : memberRank,
+//						}
+//					},
+//                    {
+//						display:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.idnumber"/>',
+//						name : "idNumber",
+//						newline : true
+//					},
+//                    {
+//						display:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.joinchannel"/>',
+//						name : "salesOrgId",
+//						newline : false,
+//						type: 'select',
+//						options: {
+//                    	  textField: 'name',
+//                    	  valueField: 'salesOrgId',
+//                    	  /*url : "${base.contextPath}/spm/allSalesOrganization/query", */
+//                    	  url : "${base.contextPath}/spm/salesOrganization/query",
+//                        }
+//					}
+                    ], buttons: [
+                        { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                            var datas = member_query_form.getData();
+                            if(datas.memberId!=""){
+                                delete member_query_form.getData().memberName;
+                            }
+                            var is_empty = false;
+                            for(var data in datas){
+                                if(datas[data] != '' && datas[data] != null){
+                                    is_empty = false;
+                                    break;
+                                }
+                            }
+                            if(is_empty){
+                                $.ligerDialog.warn('<@spring.message "msg.warning.sys.no_search_criteria"/>');
+                            }else{
+                                //I-point用户只能查看、更新今天创建的会员，添加加入日期查询条件
+                                /* if (isIpoint == '1') {
+                                 member_query_form.setData({"jointDate" : new Date(${.now?long})});
+                                 } */
+                                Hap.gridQuery({
+                                    form:member_query_form,
+                                    grid:member_grid
+                                })
+                            }
+                        }}
+                    ]
+                });
+                //liger.get('marketId').setValue(_marketId);
+                $.extend(liger.get('memberCode').options,{parms:{"marketId":liger.get('marketId').selectedValue}})
+
+                // I-point用户不能看到“加入渠道”查询条件
+                if(userType == 'IPONT'){
+                    member_query_form.setVisible("salesOrgId",false);
+                }
+
+
+                window['member_grid'] = $("#member_grid").ligerGrid({
+                    unSetValidateAttr:false,
+                    columns: [ {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+                        name: 'memberCode', align: 'middle', width: 150,
+                        isAllowHide: false,
+                        isSort : true,
+                        render: function (item)
+                        {
+                            var data = item.memberId;
+                            //var html = "<a href='mm_member_edit.html?isedit=1&memberId="+ data +"'>"+ data +"</a>";
+                            var html = '<a href="javascript:toDetailsHtml('+data+')">'+ item.memberCode +'</a>';
+                            return html;
+                        },
+                        editor : {
+                            type : 'int'
+                        }
+                    }, {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.membername"/>',
+                        name: 'memberName', align: 'left', isSort : true, width: 150
+                    },
+                        {
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberrole"/>',
+                            name : 'memberRole',
+                            isSort: false,
+                            width : 100,
+                            render : function(item) {
+                                for (var i = 0; i < memberRole.length; i++) {
+                                    if (memberRole[i].value == item.memberRole) {
+                                        return memberRole[i].meaning;
+                                    }
+                                }
+                            }
+                        },
+                        /* {
+                         display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+                         name: 'marketName', align: 'left', isSort : true, width: 150
+                         }, */ {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.email"/>',
+                            name: 'email', align: 'left', isSort : true, width: 150
+                        },{
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.phonenumber"/>',
+                            name: 'phoneNo', align: 'left', isSort : true, width: 150
+                        }, {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberstatus"/>',
+                            name: 'status', align: 'middle', isSort : true, width: 150,
+                            render:function(item){
+                                var data = item.status;
+                                for(var i = 0;i<memberStatus.length;i++){
+                                    if(data == memberStatus[i].value){
+                                        data =  memberStatus[i].meaning;
+                                        break;
+                                    }
+                                }
+                                return data;
+                            }
+                        },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.joindate"/>',
+                            name: 'jointDate', align: 'middle', isSort : true, width: 120
+                        },
+                        // I-point用户不能看到“加入渠道”查询结果列
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.joinchannel"/>',
+                            name: 'jointSiteName', align: 'middle', isSort : true, width: 120,
+                        <#if userType == 'IPONT'>
+                hide: true
+                </#if>
+            },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvaldate"/>',
+                        name: 'approvalDate', align: 'middle', isSort : true, width: 120
+                }
+//                  ,
+//                  {
+//                    display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.sponsorid"/>',
+//                    name: 'sponsorNo', align: 'middle', isSort : true, width: 120
+//                  },
+//                  {
+//                      display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.sponsorname"/>',
+//                      name: 'sponsorName', align: 'middle', isSort : true, width: 120
+//                  }
+                ],
+                url:'${base.contextPath}/mm/member/query',
+//                toolbar: { items: [
+//                                   /* { text: '<@spring.message "sys.hand.btn.create"/>', click: create_member, icon: 'add'},
+//                                   { line: true }, */
+//                                   { text: '<@spring.message "sys.hand.btn.sendmsg"/>', click: send_msg, icon: 'save',
+//                                	   <#if accessService.access("SEND_ENABLE") == false>
+//                                           disable:true,
+//                                       </#if>
+//                                   },
+//                                   { line: true },
+//                                   { text: '<@spring.message "sys.hand.btn.createorder"/>', click: createOrder, icon: 'add',
+//                                	   <#if accessService.access("CREATE_ORDER_ENABLE") == false>
+//                                           disable:true,
+//                                       </#if>
+//                                   },
+//
+//               					{ line: true },
+//
+//                                   {
+//                                       text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+//                                       menu:{ width: 120, items:
+//               	                            [
+//               		                 			{
+//               		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+//               		                 			    click:   function (){exportSelected("member_query_form","member_grid",{"memberRole":memberRole,'status':memberStatus},_basePath);}
+//               		                 			},
+//               		                 			{ line: true },
+//               		                 			{
+//               		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+//               		                 			    click: function (){exportDirectAll("member_query_form","member_grid",{"memberRole":memberRole,'status':memberStatus},_basePath);}
+//
+//               		                 			}
+//               	                          ]
+//                                    	}
+//                                   }
+//
+//                ] },
+                    enabledEdit: false,
+                    //usePager:true,
+                    delayLoad:true,
+                    width: '99%',
+                    height: '98%',
+                    checkbox: true,
+                    rownumbers: true,
+                    pageSizeOptions:[10,20,30,40,50],
+                    pageSize:'20' ,
+                    isChecked: f_isChecked, onCheckRow: f_onCheckRow, onCheckAllRow: f_onCheckAllRow
+            });
+
+                /* jQuery.validator.addMethod("compare_year", function(value, element, param) {
+                 selected_from_date = $("input[ligeruiid='yearFrom']").val();
+                 selected_to_date = $("input[ligeruiid='yearTo']").val();
+                 if(selected_from_date>selected_to_date){
+                 return {
+                 isError:true,
+                 errorInfo:"起始年份不能大于截止年份"
+                 }
+                 }
+                 }, $.validator.format("起始年份不能大于截止年份")); */
+            });//$function
+
+        </script>
+        </body>
+        </html>

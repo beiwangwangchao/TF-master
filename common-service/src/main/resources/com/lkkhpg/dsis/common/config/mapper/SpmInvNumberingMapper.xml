@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmInvNumberingMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.config.dto.SpmInvNumbering">
+        <id column="RULE_ID" property="ruleId" jdbcType="DECIMAL" />
+        <result column="NAME" property="name" jdbcType="VARCHAR" />
+        <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+        <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+        <result column="PREFIX" property="prefix" jdbcType="VARCHAR" />
+        <result column="INIT_NUMBER" property="initNumber" jdbcType="VARCHAR" />
+        <result column="MAX_NUMBER" property="maxNumber" jdbcType="VARCHAR" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+        <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+        <result column="SUFFIX" property="suffix" jdbcType="VARCHAR" />
+        <result column="STEP_LEN" property="stepLen" jdbcType="DECIMAL" />
+        <result column="CURRENT_NUMBER" property="currentNumber" jdbcType="VARCHAR" />
+        <result column="RULE_TYPE" jdbcType="VARCHAR" property="ruleType" />
+        <result column="MARKET_ID" jdbcType="DECIMAL" property="marketId" />
+        <result column="MARKET_NAME" jdbcType="VARCHAR" property="marketName" />
+        <result column="ZERO_FLAG" jdbcType="VARCHAR" property="zeroFlag" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        RULE_ID, NAME, START_ACTIVE_DATE, END_ACTIVE_DATE, PREFIX, INIT_NUMBER, MAX_NUMBER,
+        OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2,
+        ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,
+        DESCRIPTION,
+        ENABLED_FLAG, SUFFIX, STEP_LEN, CURRENT_NUMBER, RULE_TYPE, MARKET_ID,ZERO_FLAG
+    </sql>
+    <select id="selectNumberRule" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from SPM_INV_NUMBERING
+        where MARKET_ID = #{marketId,jdbcType=VARCHAR}
+         AND enabled_flag = 'Y'
+    <![CDATA[AND START_ACTIVE_DATE < CURRENT_TIMESTAMP]]>  
+    <![CDATA[AND END_ACTIVE_DATE >= CURRENT_TIMESTAMP]]>
+         for update
+    </select>
+    <insert id="insertNumbering" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvNumbering">
+        <selectKey resultType="java.lang.Long" keyProperty="ruleId" order="BEFORE">
+            select
+            SPM_INV_NUMBERING_S.nextval from dual
+        </selectKey>
+        insert into SPM_INV_NUMBERING
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            RULE_ID,
+            <if test="name != null">
+                NAME,
+            </if>
+            <if test="startActiveDate != null">
+                START_ACTIVE_DATE,
+            </if>
+            <if test="endActiveDate != null">
+                END_ACTIVE_DATE,
+            </if>
+            <if test="prefix != null">
+                PREFIX,
+            </if>
+            <if test="initNumber != null">
+                INIT_NUMBER,
+            </if>
+            <if test="maxNumber != null">
+                MAX_NUMBER,
+            </if>
+            OBJECT_VERSION_NUMBER,
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            CREATION_DATE,
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            LAST_UPDATE_DATE,
+
+
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY,
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1,
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2,
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3,
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4,
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5,
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6,
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7,
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8,
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9,
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10,
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11,
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12,
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13,
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14,
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15,
+            </if>
+            <if test="description != null">
+                DESCRIPTION,
+            </if>
+            <if test="enabledFlag != null">
+                ENABLED_FLAG,
+            </if>
+            <if test="suffix != null">
+                SUFFIX,
+            </if>
+            <if test="stepLen != null">
+                STEP_LEN,
+            </if>
+            <if test="currentNumber != null">
+                CURRENT_NUMBER,
+            </if>
+            <if test="ruleType != null">
+                RULE_TYPE,
+            </if>
+            <if test="marketId != null">
+                MARKET_ID,
+            </if>
+            <if test="zeroFlag != null">
+                ZERO_FLAG,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{ruleId,jdbcType=DECIMAL},
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="startActiveDate != null">
+                #{startActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endActiveDate != null">
+                #{endActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="prefix != null">
+                #{prefix,jdbcType=VARCHAR},
+            </if>
+            <if test="initNumber != null">
+                #{initNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="maxNumber != null">
+                #{maxNumber,jdbcType=VARCHAR},
+            </if>
+            1,
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            CURRENT_TIMESTAMP,
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            CURRENT_TIMESTAMP,
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                #{attribute15,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="enabledFlag != null">
+                #{enabledFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="suffix != null">
+                #{suffix,jdbcType=VARCHAR},
+            </if>
+            <if test="stepLen != null">
+                #{stepLen,jdbcType=DECIMAL},
+            </if>
+            <if test="currentNumber != null">
+                #{currentNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="ruleType != null">
+                #{ruleType,jdbcType=VARCHAR},
+            </if>
+            <if test="marketId != null">
+                #{marketId,jdbcType=DECIMAL},
+            </if>
+            <if test="zeroFlag != null">
+                #{zeroFlag,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="queryNumbering" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvNumbering">
+        select
+        <include refid="Base_Column_List" />
+        ,(select sm.name
+           from SPM_MARKET_TL sm
+          where sm.market_Id = sin.market_Id
+            and sm.lang = #{request.locale,jdbcType=VARCHAR}) market_name
+        from SPM_INV_NUMBERING sin
+        <where>
+            <if test="ruleId != null">
+                AND RULE_ID = #{ruleId,jdbcType=DECIMAL},
+            </if><if test="name != null">
+                AND NAME = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="startActiveDate != null">
+                AND START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endActiveDate != null">
+                AND END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="prefix != null">
+                AND PREFIX = #{prefix,jdbcType=VARCHAR},
+            </if>
+            <if test="initNumber != null">
+                AND INIT_NUMBER = #{initNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="maxNumber != null">
+                AND MAX_NUMBER = #{maxNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                AND DESCRIPTION = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="enabledFlag != null">
+                AND ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="suffix != null">
+                AND SUFFIX = #{suffix,jdbcType=VARCHAR},
+            </if>
+            <if test="stepLen != null">
+                AND STEP_LEN = #{stepLen,jdbcType=DECIMAL},
+            </if>
+            <if test="currentNumber != null">
+                AND CURRENT_NUMBER = #{currentNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="ruleType != null">
+                AND RULE_TYPE = #{ruleType,jdbcType=VARCHAR},
+            </if>
+            <if test="marketId != null">
+                AND MARKET_ID = #{marketId,jdbcType=DECIMAL},
+            </if>
+        </where>
+    </select>
+    <update id="updateNumbering" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvNumbering">
+        update SPM_INV_NUMBERING
+        <set>
+            <if test="name != null">
+                NAME = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="startActiveDate != null">
+                START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endActiveDate != null">
+                END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="prefix != null">
+                PREFIX = #{prefix,jdbcType=VARCHAR},
+            </if>
+            <if test="initNumber != null">
+                INIT_NUMBER = #{initNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="maxNumber != null">
+                MAX_NUMBER = #{maxNumber,jdbcType=VARCHAR},
+            </if>
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                DESCRIPTION = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="enabledFlag != null">
+                ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="suffix != null">
+                SUFFIX = #{suffix,jdbcType=VARCHAR},
+            </if>
+            <if test="stepLen != null">
+                STEP_LEN = #{stepLen,jdbcType=DECIMAL},
+            </if>
+            <if test="currentNumber != null">
+                CURRENT_NUMBER = #{currentNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="ruleType != null">
+                RULE_TYPE = #{ruleType,jdbcType=VARCHAR},
+            </if>
+            <if test="marketId != null">
+                MARKET_ID = #{marketId,jdbcType=DECIMAL},
+            </if>
+            <if test="zeroFlag != null">
+                ZERO_FLAG = #{zeroFlag,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where RULE_ID = #{ruleId,jdbcType=DECIMAL}
+    </update>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM SPM_INV_NUMBERING
+          WHERE RULE_ID = #{ruleId,jdbcType=DECIMAL}
+    </delete>
+    <resultMap type="java.util.Map" id="salesOrderMap">
+        <id column="header_id" property="orderId" jdbcType="DECIMAL" />
+        <result column="sales_org_id" property="salesOrgId" jdbcType="DECIMAL" />
+        <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
+        <result column="invoice_number" property="invoiceNumber" jdbcType="VARCHAR" />
+        <result column="order_status" property="orderStatus" jdbcType="VARCHAR" />
+        <result column="order_date" property="orderDate" jdbcType="DATE" />
+        <result column="order_type" property="orderType" jdbcType="VARCHAR" />
+        <result column="member_id" property="memberId" jdbcType="DECIMAL" />
+        <result column="channel" property="channel" jdbcType="VARCHAR" />
+        <result column="create_user_id" property="createUserId" jdbcType="DECIMAL" />
+        <result column="currency" property="currency" jdbcType="VARCHAR" />
+        <result column="order_amt" property="orderAmt" jdbcType="DECIMAL" />
+        <result column="discount_amt" property="discountAmt" jdbcType="DECIMAL" />
+        <result column="delivery_type" property="deliveryType" jdbcType="VARCHAR" />
+        <result column="delivery_location_id" property="deliveryLocationId" jdbcType="DECIMAL" />
+        <result column="delivery_to" property="deliveryTo" jdbcType="VARCHAR" />
+        <result column="billing_location_id" property="billingLocationId" jdbcType="DECIMAL" />
+        <result column="billing_to" property="billingTo" jdbcType="VARCHAR" />
+        <result column="source_type" property="sourceType" jdbcType="VARCHAR" />
+        <result column="source_key" property="sourceKey" jdbcType="VARCHAR" />
+        <result column="object_version_number" property="objectVersionNumber" jdbcType="VARCHAR" />
+        <result column="request_id" property="requestId" jdbcType="DECIMAL" />
+        <result column="program_id" property="programId" jdbcType="DECIMAL" />
+        <result column="market_id" property="marketId" jdbcType="DECIMAL" />
+        <result column="code" property="marketCode" jdbcType="VARCHAR" />
+        <result column="actrual_pay_amt" property="actrualPayAmt" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <select id="selectMarket" resultMap="salesOrderMap">
+        select
+        oso.header_id,oso.sales_org_id,oso.order_number,oso.invoice_number,
+        oso.order_status,oso.order_date,oso.order_type,oso.member_id,
+        oso.channel,oso.create_user_id,
+        oso.currency,oso.order_amt,oso.discount_amt,oso.delivery_type,
+        oso.delivery_location_id,oso.delivery_to,oso.billing_location_id,oso.billing_to,
+        oso.source_type,oso.source_key,oso.object_version_number,oso.request_id,
+        oso.program_id,sso.market_id,sm.code,oso.actrual_pay_amt
+        from om_sales_order oso,SPM_SALES_ORGANIZATION_B
+        sso,SPM_MARKET_B sm
+        where 1=1
+        and oso.header_id = #{orderId ,jdbcType = DECIMAL}
+        and oso.sales_org_id =
+        sso.sales_org_id
+        and sso.market_id = sm.market_id
+    </select>
+    
+    <select id="selectCountInDateRange" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.config.dto.SpmInvNumbering">
+    select count(1)
+  from spm_inv_numbering sin
+ where sin.market_id = #{marketId,jdbcType=DECIMAL}
+   and sin.enabled_flag = 'Y'
+   and (( sin.start_active_date &lt;  #{startActiveDate,jdbcType=TIMESTAMP} and sin.end_active_date &gt;  #{startActiveDate,jdbcType=TIMESTAMP})
+          or
+         ( sin.start_active_date &lt;  #{endActiveDate,jdbcType=TIMESTAMP} and sin.end_active_date &gt;  #{endActiveDate,jdbcType=TIMESTAMP})
+         or 
+         (sin.start_active_date &gt;=  #{startActiveDate,jdbcType=TIMESTAMP} and sin.end_active_date &lt;=  #{endActiveDate,jdbcType=TIMESTAMP})
+          )
+   <if test="ruleId != null">
+   and sin.rule_id != #{ruleId,jdbcType=DECIMAL}
+   </if>
+    </select>
+</mapper>

@@ -1,0 +1,33 @@
+<!--
+  ~
+  -->
+
+<configuration scan="true" scanPeriod="3 seconds">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{accountId}] [%X{requestId}] %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="IF-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${catalina.base}/logs/if/interface.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.base}/logs/if/interface-%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{listenerRequestId}] %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="IF-FILE"/>
+    </root>
+    <logger name="com.lkkhpg.dsis.platform.cache" level="INFO" additivity="false">
+        <appender-ref ref="IF-FILE"/>
+    </logger>
+    <logger name="org.mybatis.spring" level="INFO" additivity="false">
+        <appender-ref ref="IF-FILE"/>
+    </logger>
+    <logger name="com.lkkhpg.dsis.integration" level="INFO" additivity="false">
+        <appender-ref ref="IF-FILE"/>
+    </logger>
+</configuration>

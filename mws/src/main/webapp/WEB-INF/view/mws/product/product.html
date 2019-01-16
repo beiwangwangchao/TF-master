@@ -1,0 +1,258 @@
+<#include "/mws/include/header.html">
+<!-- ========== MENU END ========== -->
+
+<script src="${base.contextPath}/resources/js/spinner${resource_suffix!}.js"></script>
+
+<style>
+.summary>p{
+    margin-bottom:10px;
+    padding:0px;
+}
+.description{
+    padding:10px;
+    background-color:#E9E9E9;
+}
+.descriptionHeard{
+    color:#333;
+}
+</style>
+
+<!-- ========== CONTENT START ========== -->
+<section id="content">
+    <div class="container">
+
+        <ol class="breadcrumb">
+            <li><a href="../index.html"><@spring.message "mws.product.navigationbar.index"/></a></li>
+            <li><a href="${base.contextPath}/product/category.html?categoryId=${RequestParameters.categoryId}" name="categoryName"></a></li>
+            <li name="itemName"></li>
+        </ol>
+        
+        <div name="notpublish"></div>
+
+        <div class="row" name="row">
+            <div class="col-sm-5">
+                <div id="product-large" class="owl-carousel"></div>
+                <div id="product-thumb" class="owl-carousel"></div>
+            </div>
+          
+            <div class="col-sm-7 summary entry-summary">
+                <h1 class="product_title"></h1>               
+                <p class="price">
+                    <!--<h1><strong><sup name="currencySymbol" style="font-size: 22px"></sup><span class="amount"></span><sup name="cents"></sup></strong></h1>-->
+                    <h1><strong><span name="currencySymbol" style="font-size: 22px"></span>&nbsp;&nbsp;<span class="amount"></span><span name="cents"></span></strong></h1>
+                </p>
+                <#if isDisplay == "Y">
+                <p class="product-pv"><strong><@spring.message 'type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage'/></strong><span name="pv"></span></p>
+                <#else>
+                <p class="product-pv hide"><strong><@spring.message 'type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage'/></strong><span name="pv"></span></p>
+                </#if>
+                <p class="tax">
+                    <span name="tax"></span>%<@spring.message 'mws.product.tax'/>
+                </p>
+                <div class="description">
+                    <p><@spring.message 'mws.product.description'/>:<span name="description"></span></p>
+                    <p id="hideStandardParam"><@spring.message 'mws.product.specifications'/>:<span name="specifications"></span></p>
+                    <p id="hideDose"><@spring.message 'type.com.lkkhpg.dsis.platform.dto.inv.itemattr.name.dosage'/>:<span name="doseVal"></span></p>
+                    <p><@spring.message 'mws.product.attributes'/>:<span name="categoryName"></span></p>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <input type="text" class="qty text form-control" maxlength="5" title="Qty" name="qty" id="qty">
+                    </div>
+                    <div class="col-sm-9">
+                        <input style="border-radius:5px;" type="submit" class="btn btn-primary" id="addToCart" value="<@spring.message 'mws.product.addtocart'/>">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs product-tabs" name="nav-tabs">
+            <li class="active" id="hideSpecifications"><a href="#detailed" data-toggle="tab"><@spring.message 'mws.product.detailed'/></a></li>
+            <!-- <li><a href="#afterSaleService" data-toggle="tab"><@spring.message 'mws.product.aftersaleservice'/></a></li> -->
+            <li id="hideUseInstruction"><a href="#sysmContent" data-toggle="tab"><@spring.message 'mws.product.sysmcontent'/></a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content" name="tab-content">
+            <div class="tab-pane active" id="detailed"></div>
+            <div class="tab-pane" id="sysmContent"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+<script type="text/javascript">
+    $(function(){
+        //DOM Load完成时,请求数据初始化页面
+        initAjax();
+        
+        //只允许舒润0-99999的数字
+        $('#qty').spinner({
+            min:1,
+            step:1,
+            max:99999
+        }).change(function(){});
+        
+        //加入购物车
+        $("#addToCart").click(function(){
+            var data = new Object();
+            data.productId = ${RequestParameters.itemId};
+            data.quantity = $("input[name=qty]").val();
+            $.ajax({
+                type : "POST",
+                dataType : "json",
+                data : data,
+                url : "${base.contextPath}/product/addToCart",
+                success : function(data) {
+                    $("#shopCartNumber").text(data.rows[0]);
+                    $.dialog.success('<@spring.message "mws.dialog.success"/>','<@spring.message "mws.product.promptinfo"/>',function(){return true;});
+                }
+            });
+        });
+        
+        //DOM Load完成时,请求数据初始化页面
+        function initAjax() {
+            $.ajax({
+                type : "POST",
+                async : false,
+                dataType : "json",
+                url : "${base.contextPath}/product/queryDetailProductsByWhereClause?itemId=${RequestParameters.itemId}",
+                success : function(data) {
+                    if (data.rows == "" || ("message" in data)) {
+                        notproduct();
+                    }else {
+                        if (data.rows[0].publishStatus == 'Y') {
+                            //填充页面数据
+                            initData(data);
+                        } else {
+                            notproduct();
+                        }
+                    }
+                }
+            });
+        };
+        
+        //查询不到商品
+        function notproduct() {
+            $("div[name=row]").hide();
+            $("ul[name=nav-tabs]").hide();
+            $("div[name=tab-content]").hide();
+            $("div[name=notpublish]").html("<h3><@spring.message 'mws.product.notpublish'/></h3>");
+            $("a[name=categoryName]").text("<@spring.message 'mws.product.allproducts'/>");
+        }
+        
+        //填充页面数据
+        function initData(data) {
+        	// 当是否含税是N或者税码是null
+        	if("N" == data.rows[0].sign){
+        		$(".tax").hide();
+        	}
+            if ("${RequestParameters.categoryId}" == "" || "${RequestParameters.categoryId}" == null) {
+                $("a[name=categoryName]").text("<@spring.message 'mws.product.allproducts'/>");
+            } else {
+                $("a[name=categoryName]").text(data.rows[0].categoryName);
+            }
+            var itemName = data.rows[0].itemName == null ? " " : data.rows[0].itemName;
+            $("li[name=itemName]").text(itemName);
+            $("h1[class=product_title]").text(itemName);
+            $("span[name=currencySymbol]").text(data.rows[0].currencySymbol);
+            /*$("sup[name=currencySymbol]").text(data.rows[0].currencySymbol);*/
+            var array = data.rows[0].disAmt.toFixed(2).toString().split(".");
+            $("span[class=amount]").text(data.rows[0].disAmt.toFixed(2));
+            /*$("span[class=amount]").text(array[0]);*/
+            /*$("sup[name=cents]").text(array[1]);*/
+            /*$("span[name=cents]").text(array[1]);*/
+
+            $("span[name=pv]").text(data.rows[0].pvAmt+" "+data.rows[0].uomName);
+            if (data.rows[0].tax == -1) {
+                $(".tax").hide();
+            } else {
+                $("span[name=tax]").text(data.rows[0].tax);
+            } 
+            var desc = data.rows[0].description == null ? " " : data.rows[0].description
+            $("span[name=description]").text(desc);
+            var ggcs = data.rows[0].ggcsContent == null ? " " : data.rows[0].ggcsContent.replace(/<[^>]+>/g,'')
+            var dose = data.rows[0].bcfsContent == null ? " " : data.rows[0].bcfsContent.replace(/<[^>]+>/g,'')
+            $("span[name=specifications]").text(ggcs);
+            $("span[name=doseVal]").text(dose);
+            $("span[name=categoryName]").text(data.rows[0].categoryName);
+            $("#detailed").html(data.rows[0].spjjContent);
+            $("#sysmContent").html(data.rows[0].sysmContent);
+            if (("itemImg" in data.rows[0])) {
+                for (var i = 0; i < data.rows[0].itemImg.length; i++) {
+                    //console.log(data.rows[0].itemImg[i].filePath)
+                    var ImgH = "<div class='item'><img src='${base.contextPath}/resources/" + data.rows[0].itemImg[i].filePath + "${IMG_H}' onerror='javascript:this.src=\"${base.contextPath}/resources/img/480-480.png\";'></div>";
+                    var ImgL = "<div class='item'><img src='${base.contextPath}/resources/" + data.rows[0].itemImg[i].filePath + "${IMG_L}' onerror='javascript:this.src=\"${base.contextPath}/resources/img/78-78.png\";'></div>";
+                    $("#product-large").append(ImgH);
+                    $("#product-thumb").append(ImgL);
+                }
+            } else {
+                var Imgs = "<div class='item'><img src='${base.contextPath}/resources/img/NOT_IMAGE.png'></div>";
+                $("#product-large").append(Imgs);
+                $("#product-thumb").append(Imgs);
+            }
+        }
+        var hideSpecificationsCount=0;
+        var hideUseInstruction = 0;
+     // 隐藏或显示某字段
+        $.ajax({
+            type : "POST",
+            async : false,
+            data : {
+            	itemId : ${RequestParameters.itemId}
+            },
+            dataType : "json",
+            url : "${base.contextPath}/product/getWhetherHide",
+            success : function(data) {
+            	if(data.success){
+                    var data = data.rows;
+                    if(data.length > 0){
+                        for(var i=0;i<data.length;i++){
+                            if("SPJJ" == data[i].name && "Y" == data[i].hide){
+                            	hideSpecificationsCount = 1;
+                            	$("#hideSpecifications").hide();
+                            }
+                            if("SYSM" == data[i].name && "Y" == data[i].hide){
+                                //document.getElementById("hide_use_instruction").checked=true;
+                                //paramData.hideUseInstruction = "Y";
+                                hideUseInstruction = 1;
+                                $("#hideUseInstruction").hide();
+                            }
+                            if("GGCS" == data[i].name && "Y" == data[i].hide){
+                                //paramData.hideStandardParam = "Y";
+                                $("#hideStandardParam").hide();
+                            }
+                            if("DOSE" == data[i].name && "Y" == data[i].hide){
+                               // paramData.hideDose = "Y";
+                                $("#hideDose").hide();
+                            }
+                        }
+                        if(hideSpecificationsCount == 1 && hideUseInstruction == 1){
+                        	$("#detailed").hide();
+                        }
+                    }else {
+                        //没有维护数据时 默认隐藏规格，剂量
+                        $("#hideStandardParam").hide();
+                        $("#hideDose").hide();
+                    }
+                }
+            }
+        });
+    })
+function onlyNum() 
+{ 
+        if(!(event.keyCode==46)&&!(event.keyCode==8)&&!(event.keyCode==37)&&!(event.keyCode==39)) 
+            if(isNaN(String.fromCharCode(event.keyCode))) {
+                if(event.preventDefault){
+                    event.preventDefault();
+                }else{
+                    event.returnValue=false; 
+                }
+            } 
+} 
+</script>
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">
+<!-- ========== FOOTER END ========== -->

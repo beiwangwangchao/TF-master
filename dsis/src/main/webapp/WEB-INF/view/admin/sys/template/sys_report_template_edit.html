@@ -1,0 +1,236 @@
+<#-- 
+* description: 模板维护界面. 
+* version: 1.0 
+* author: hanrui.huang 
+* Copyright LKK Health Products Group Limited. 
+* 
+--> 
+<#include "../../include/head.html">
+<script src="${base.contextPath}/common/code?templateType=SYS_REPORT_TEMPLATE_CATEOGRY" type="text/javascript"></script>
+<body style="padding: 10px;">
+	<script type="text/javascript">
+	//保存按钮
+ 	var fal = true;
+	//文件ID全局变量
+	var fileId = null;
+	var f_id = null;
+	var f_token = null;
+	$(document).ready(function() {
+        $("#file_upload_sourceType").val("REPORT");
+        $("#file_upload_sourceKey").val("1");
+    });
+	function onUploadSuccess(file){
+        template_form.setData({'fileId':file.fileId});
+        fileId = file.fileId;
+        token = file._token;
+        fal = true;
+        $('#picker').css({'display':'none'});
+    }
+	function onRmSuccess(id,token){
+		f_id = id;
+		f_token = token;
+		fal = false;
+	}
+	<#assign isedit = (RequestParameters.isedit!'0')/>
+    var proData =[{id: 'Y', text: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.effective"/>'},{id: 'N', text: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.fail"/>'}];
+    $(function(){
+        window['template_form'] = $("#template_form").ligerForm({
+            fields: [
+                     {id:"__status",name : "__status",type : "hidden",attr:{value:"<#if isedit =='1'>update<#else>add</#if>"},newline : false},
+                     {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.messagetype.templatecode"/>',
+                         newline:false, 
+                         name: 'templateCode',
+                         type : "text",
+                         readonly:true
+                     },
+                     {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate"/>',
+                         newline:false, 
+                         name: 'templateName',
+                         type : "text",
+                         validate : {
+                             required : true
+                         }
+                     },
+                     {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.status"/>',
+                         newline:false, 
+                         readonly : true,
+                         name: 'enabledFlag',
+                         type : "select",
+                         options : {
+                             valueField : 'id',
+                             textField : 'text',
+                             data : proData,
+                             value : 'Y'
+                         }
+                     },
+                     {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.createdate"/>',
+                         newline:true, 
+                         name: 'startActiveDate',
+                         type : "date",
+                         options : {
+                             format : 'yyyy-MM-dd', showTime : true, readonly : true, value : new Date(${.now?long})
+                         }
+                     },
+                     {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.endActiveDate"/>',
+                         newline:false, 
+                         name: 'endActiveDate',
+                         type : "date",
+                         readonly : true
+                     },
+                     {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.categories"/>',
+                         newline:false, 
+                         name: 'templateCateogry',
+                         type:'select',
+                         options : {
+                             valueField : 'value',
+                             textField : 'meaning',
+                             type : 'select',
+                             data:templateType
+                         },
+                         style : 'display:none'
+                     },
+                     {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.eventmarket"/>',
+                         newline:true, 
+                         isSort : false,
+                         name: 'marketId',
+                         type:'select',
+                         textField:'name',
+                         options : {
+                             type : 'select',
+                             textField    : 'name',
+                             valueField   : 'marketId',
+                             url : "${base.contextPath}/spm/market/query"
+                         },
+                         style : 'display:none'
+                     },
+                     {
+                         display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.remarks"/>',
+                         name: 'remark',
+                         type : "textarea",
+                         width : 810
+                     },
+                     {
+                         label: 'ID',
+                         newline:false, 
+                         name: 'fileId',
+                         disabled :'none',
+                         type : "hidden"
+                     },
+                     {
+                         newline:false, 
+                         name: 'templateId',
+                         disabled :'none',
+                         type : "hidden"
+                     }
+                     ]
+        });
+
+      //保存按钮
+        window['template_btn'] = $('#template_btn').ligerForm({
+            buttons : [
+                       {
+                           text: '<@spring.message "sys.hand.btn.save"/>',
+                           id: 'save_btn',
+                           disabled: false,
+                           width: 80,
+                           click: function() {
+                        	   if(fal){
+                        		 //上传图片后才能保持
+                                   if(f_id != null){
+                                       var file = {
+                                               fileId : f_id,
+                                               token : f_token
+                                           };
+                                           $.ajax({
+                                               url : $("#contextPath").val() + "/sys/attach/remove",//路径 
+                                               data : file,
+                                               type : 'post',
+                                               cache : false,
+                                               dataType : 'json',
+                                               success : function(data) {
+                                                   if (data.message == "success") {
+                                                	   f_id = null;
+                                                   } 
+                                               },
+                                               error : function() {
+                                                   info.text('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.neterror"/>');
+                                                   info.css("display", "block");
+                                               }
+                                           });
+                                   }
+                        		   if(fileId != null){
+                                       if(Hap.validateForm(template_form)){
+                                           Hap.submitForm({
+                                               form:template_form,
+                                               url:'${base.contextPath}/sys/reportTemplate/save',
+                                               success:function(json,opt){
+                                                   Hap.showSuccess('<@spring.message "sys.hand.tip.success"/>');
+                                                   $.ligerui.get('templateCode').setValue(json.rows[0].templateCode);
+                                                   fileId = json.rows[0].fileId;
+                                                   template_form.setData({'__status':'update'});
+                                                   template_form.setData({'templateId':json.rows[0].templateId});
+                                                   $('#picker').css({'display':'none'});
+                                               }   
+                                           })
+                                       }
+                                   }else{
+                                       //还没有上传图片
+                                       Hap.showError('<@spring.message "type.please.upload.the.template.file"/>');
+                                   }
+                        	   }else{
+                        		 //还没有上传图片
+                                   Hap.showError('<@spring.message "type.please.upload.the.template.file"/>');
+                        	   }
+                           }
+                       }
+                       ],
+                       enabledEdit: false,
+                       width: '99%', 
+                       height: '98%'
+        });
+
+      <#if isedit == '1'>
+      Hap.loadForm({form:template_form,url:'${base.contextPath}/sys/reportTemplate/query',para:{templateCode:'${RequestParameters.templateCode}'},callback:function(data){
+          $('#picker').css({'display':'none'});
+          fileId = data.fileId;
+          if(data.enabledFlag == 'N'){
+        	  liger.get('save_btn').setDisabled(true);
+              liger.get('template_form').setEditable(false);
+          }
+          if (data.fileId) {
+              $.ajax({
+                  url : "${base.contextPath}/sys/attach/file/queryFiles",//路径 
+                  data:{fileId:data.fileId,page:1,pagesize:-1},
+                  type : 'post',
+                  cache : false,
+                  success : function(data) {
+                      if (data.success && data.rows.length > 0) {
+                          addFileToViewList(data.rows[0]);
+                      } else {
+                          template_form.setData({'fileId':null});
+                      }
+                  }
+              });
+          }
+      }});
+      </#if>
+    });
+    </script>
+    <!-- 保存按钮 -->
+    <div id="template_btn"></div>
+	<!-- 模板表单 -->
+	<form id="template_form"></form>
+	<!-- 上传图片 -->
+	<div id="uploader_content" style="height: 100px;margin-left: 50px">
+	   <input type="hidden" id="file_upload_sourceType" name="file_upload_sourceType" value="${sourceType!""}">
+	   <input type="hidden" id="file_upload_sourceKey" name="file_upload_sourceType" value="${sourceKey!""}">
+	   <#include "template_upload_include.html">
+	</div>
+</body>

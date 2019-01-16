@@ -1,0 +1,750 @@
+<#--
+ * description: 查询转出详细界面 
+ * version: 1.0 
+ * author:chuangsheng.zhang 
+ * .
+ * 
+-->
+<#include "../include/head.html">
+<body style="padding: 10px">
+	<form id="mainform" method="post"
+		enctype="application/json;charset=UTF-8">
+		<input type="hidden" name="transferTrxDetails" id="transferTrxDetails"
+			value="" />
+	</form>
+	<div id="codeValueGrid" style="margin-left: 2px; margin-top: 2px;"></div>
+	<script
+		src="${base.contextPath}/common/code?overallStatusData=INV.TRANSFER_OVERALL_STATUS&outStatusData=INV.TRANSFER_OUT_STATUS&yesno=SYS.YES_NO"
+		type="text/javascript"></script>
+    <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+	<script type="text/javascript">
+
+    jQuery.validator.addMethod("stringMaxLength", function(value, element, param) {  
+        var length = value.length;  
+        for(var i = 0; i < value.length; i++){  
+            if(value.charCodeAt(i) > 127){  
+                length = length + 2;  
+            }  
+        }  
+        return this.optional(element) || ( length <= param );  
+    }, "<@spring.message "sys.hand.btn.string240"/>");  
+	 <#--
+     * Description:
+     *   根据选择的商品重新渲染行
+     -->
+	function p_setItemLine(selected,data){		
+		var newData=selected;
+		newData.itemName=data.itemName;
+		newData.itemUomCode=data.uomCode;
+		newData.itemUomName =data.uomName;
+		newData.lotNumber=null;
+		newData.quantity=data.quantity;
+		newData.expiryDate=null;
+		newData.packingType=data.uomCode;
+		newData.name = data.uomName;
+		newData.numberOfIndCarton=null;
+		newData.numberOfCarton=null;
+		newData.trxQty=null;
+		codeValueGrid.updateRow(selected,newData);
+	}
+	
+	function p_clearItemLine(selected,data){
+        var newData=selected;
+        newData.itemName=null;
+        newData.itemUomCode=null;
+        newData.itemUomName =null;
+        newData.lotNumber=null;
+        newData.quantity=null;
+        newData.expiryDate=null;
+        newData.packingType=null;
+        newData.name = null;
+        newData.numberOfIndCarton=null;
+        newData.numberOfCarton=null;
+        newData.trxQty=null;
+        codeValueGrid.updateRow(selected,newData);
+    }
+	
+	function f_validate_org(){
+		 var organizationId=$("#organizationId").val();
+		 var transferOrgId=$("#transferOrgId").val();
+		 
+		 if(transferOrgId==organizationId){
+			 return true;
+		 } 
+		 else {
+			 return false;
+		 }
+	}
+	
+	
+	function f_delete() {
+        var curstatus=$("#status").val();
+        if(curstatus!='NEW'){
+        	 $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+        	 return;
+        };
+        if(curstatus=='NEW'){
+        	 $.ligerDialog.confirm('<@spring.message "msg.alert.pub.delete_or_not"/>', function (yes){
+        		 if(!yes){ return; }
+        		 Hap.submitForm({
+                     form:form,
+                     grid:codeValueGrid,
+                     gridName:'transferTrxDetails',
+                     url:'${base.contextPath}/im/transferOut/remove',
+                     success:function(json,opt){
+                         $.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>', '<@spring.message "sys.hand.tip.info"/>',function(yes){
+                        	 if(yes){
+                                 	//移除当前标签页
+                                 	var parent = top.tab;
+ 			                    	if(parent != undefined){
+ 			                    		parent.removeSelectedTabItem(this);
+ 			                    	} 
+                        	 }
+                         });
+                     }
+                 });
+        	});
+        }
+    }
+    
+	function f_save() {
+		if(f_validate_org()){
+			 $.ligerDialog.warn('<@spring.message "msg.error.inv_to_not_allowed_same_with_ti"/>');
+			 return;
+		}
+		
+		var curstatus=$("#status").val();
+        if(curstatus!='NEW'){
+        	 $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+        	return;
+        };
+	    	Hap.submitForm({
+	       	    form: form,
+	            grid: codeValueGrid,
+	            gridName: 'transferTrxDetails',
+	            url: '${base.contextPath}/im/transferOut/save',
+	            wrapArray: false,
+	            success: function(json, opt) {
+	                $.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>', '<@spring.message "sys.hand.tip.info"/>',
+	               function(yes) {
+	                 location.href = "${base.contextPath}/im/im_transfer_out_trx_create.html?isedit=1&trxId=" + json.message;
+	               });
+
+	        }
+	    });
+	}
+    
+    function f_submit() {
+    	if(f_validate_org()){
+			 $.ligerDialog.warn('<@spring.message "msg.error.inv_to_not_allowed_same_with_ti"/>');
+			 return;
+		}
+    	var curstatus=$("#status").val();
+    	if(curstatus!='NEW'){
+       	 $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+       	return;
+       };
+       $.ligerDialog.confirm('<@spring.message "msg.warning.system.commit_or_not"/>', function(yes) {
+    	   if(!yes)return;
+    	 Hap.submitForm({
+             form:form,
+             grid:codeValueGrid,
+             gridName:'transferTrxDetails',
+             url:'${base.contextPath}/im/transferOut/submit',
+             wrapArray:false,
+             success:function(json,opt){
+                 $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>',
+                function(yes) {
+ 	                location.href = "${base.contextPath}/im/im_transfer_out_trx_create.html?isedit=1&trxId=" + json.message;
+ 	            });
+             }
+         });
+       });
+    }
+	function f_generate() {
+		$.ligerDialog.open({
+            title: '<@spring.message "type.com.lkkhpg.dsis.report.type.choosing"/>',
+            width:400,
+            height:200,
+            slide: false,
+            url: "${base.contextPath}/sys/report/sys_report_type_dialog.html",
+            buttons: [{
+                text: '<@spring.message "sys.hand.btn.ok" />',
+                onclick: function(i, d) {
+                    if($('#trxId').val() == null || $('#trxId').val() == ""){
+                    	return;
+                    }else{
+                    	var form = d.frame.report_type_form;
+        				if (form.valid()) {
+        					d.close();
+        					window.open('${base.contextPath}/report/run?docType='+ form.getData().docType +'&reportProgramCode=RPT-00043&trxId='+$('#trxId').val());
+        				}
+                    }
+                }
+            },
+            {
+                text: '<@spring.message "sys.hand.btn.cancel" />',
+                onclick: function(i, d) {
+                    d.hide();
+                }
+            }]
+        });
+	}
+    var buttons = [];
+    buttons.push({
+    	id   : 'formdelbtn' ,
+    	<#if accessService.access("EDITABLE") == false>
+    	disabled : true,
+    	</#if>
+        text :  $l('sys.hand.btn.delete'),
+        onclick : f_delete
+    });
+ 	buttons.push({
+ 		id   : 'formsavebtn',
+ 		<#if accessService.access("EDITABLE") == false>
+        disabled : true,
+        </#if>
+      text :  $l('sys.hand.btn.save'),
+      onclick : f_save
+    });
+    buttons.push({
+    	id   : 'formsubbtn',
+    	<#if accessService.access("EDITABLE") == false>
+        disabled : true,
+        </#if>
+        text : $l('<@spring.message "sys.hand.btn.submit"/>'),
+        onclick : f_submit
+    });
+    <#if accessService.access("REPORT_EDITABLE") != false>
+    buttons.push({
+    	text :  $l('<@spring.message "sys.hand.btn.rpt.generate" />'),
+        onclick : f_generate
+    });
+    </#if>
+
+    <#assign isedit = (RequestParameters.isedit!'0')/> 
+    
+    Hap.addFormButtons(buttons);
+    var mainform = $("#mainform");  
+    var isDeleteRecord = false; //清除行记录的标记
+    var oldValue = null; //原值保存
+    var isResetOldValue = false; //重置标志
+    var form  = mainform.ligerForm({
+        fields : [{
+            name:'trxId',
+            type:'hidden'
+        },{
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.trxnumber"/>',
+            name : "trxNumber",
+            disabled:true,
+            type : "text",
+            readonly:true,
+            newline:false   
+        } , {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.status"/>',
+            name : "status",
+            type : "combobox",
+            options : 
+            	{
+            	value:'NEW',
+	  			valueField : 'value',
+	  		    textField: 'meaning',
+				data : outStatusData,
+				disabled:true
+				},
+            newline:false
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.overallstatus"/>',
+            name : "overallStatus",
+            type : "combobox",
+            options : 
+            	{
+            	value:'NEW',
+	  			valueField : 'value',
+	  		    textField: 'meaning',
+				data : overallStatusData,
+				disabled:true
+				},
+            newline:false
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.organizationid"/>',
+            name : "organizationId",
+            type : "select",
+            options : {
+                value : _invOrgId,
+                valueField : 'invOrgId',
+                textField : 'name',
+//                 data :[{ invOrgId:_invOrgId,invOrgName:_invOrgName}],
+//                 readonly : true ,
+                url : "${base.contextPath}/spm/invOrganization/queryInvOrgsByRole",
+                <#if isedit == '1' >
+                    disabled:true,
+                </#if>
+                cancelable : false ,
+                autocomplete:false,
+                onBeforeSelect : function(){ //该事件用于记录原值以及将重复标记置为true
+                	isResetOldValue = true;
+                    oldValue = liger.get('organizationId').getValue();
+                },
+                onSelected:function(e){
+                	if(isResetOldValue){
+                		if(!isDeleteRecord){
+                            var rows=codeValueGrid.getAdded();
+                            if(rows.length >0){
+                             $.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.change_confirm"/>', $l('sys.hand.tip.info'),function(yes) {
+                                  if (yes) {
+                                      var gridData={};
+                                      gridData.rows=new Array();
+                                      codeValueGrid.set({ data: gridData });
+                                      var transferOrgId = $.ligerui.get('transferOrgId').getValue();
+                                      if(e == transferOrgId) {
+                                          isDeleteRecord = true;
+                                          $.ligerui.get('transferOrgId').setText("");
+                                          $.ligerui.get('transferOrgId').setValue("");
+                                          isDeleteRecord = false;
+                                      }
+                                  } else {
+                                	  isResetOldValue = false;
+                                      liger.get('organizationId').setValue(oldValue);
+                                  }
+                              });
+                            } else {
+                            	var gridData={};
+                                gridData.rows=new Array();
+                                codeValueGrid.set({ data: gridData });
+                                var transferOrgId = $.ligerui.get('transferOrgId').getValue();
+                                if(e == transferOrgId) {
+                                    isDeleteRecord = true;
+                                    $.ligerui.get('transferOrgId').setText("");
+                                    $.ligerui.get('transferOrgId').setValue("");
+                                    isDeleteRecord = false;
+                                }
+                            }
+                        }
+                	}
+                	isResetOldValue = true;
+                }
+            },
+             validate : {
+                required : true
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.transferorgid"/>',
+            name : "transferOrgId",
+            type : "combobox",
+            options : {
+				 valueField:'invOrgId',
+				 textField:'name',
+				 url:'${base.contextPath}/spm/validOrg/get2' ,
+				 <#if isedit == '1' >
+		           disabled:true,
+			 <#else>
+             onBeforeSelect : function(){ //该事件用于记录原值以及将重复标记置为true
+                isResetOldValue = true;
+                oldValue = liger.get('transferOrgId').getValue();
+             },
+			 onSelected:function(e){
+				if(isResetOldValue){
+					if(!isDeleteRecord){
+	                     var rows=codeValueGrid.getAdded();
+	                      if(rows.length >0){
+	                       $.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.change_confirm"/>', $l('sys.hand.tip.info'),function(yes) {
+	                            if (yes) {
+	                                var gridData={};
+	                                gridData.rows=new Array();
+	                                codeValueGrid.set({ data: gridData });
+	                                var orgid= liger.get("organizationId").getValue();
+	                                var trfid= liger.get("transferOrgId").getValue();
+	                                if(orgid == trfid){
+	                                    isDeleteRecord = true;
+	                                    liger.get("organizationId").setText("");
+	                                    liger.get("organizationId").setValue("");
+	                                    isDeleteRecord = false;
+//	                                $.ligerDialog.warn('<@spring.message "msg.error.inv_to_not_allowed_same_with_ti"/>');
+	                                }
+	                            } else {
+	                                isResetOldValue = false;
+	                                liger.get('transferOrgId').setValue(oldValue);
+	                            }
+	                        });
+	                      } else {
+	                    	  var gridData={};
+                              gridData.rows=new Array();
+                              codeValueGrid.set({ data: gridData });
+                              var orgid= liger.get("organizationId").getValue();
+                              var trfid= liger.get("transferOrgId").getValue();
+                              if(orgid == trfid){
+                                  isDeleteRecord = true;
+                                  liger.get("organizationId").setText("");
+                                  liger.get("organizationId").setValue("");
+                                  isDeleteRecord = false;
+//                            $.ligerDialog.warn('<@spring.message "msg.error.inv_to_not_allowed_same_with_ti"/>');
+                              }
+                          }
+	                 }
+				}
+				isResetOldValue = true;
+			 }
+        </#if>
+			},
+			
+			newline:false,
+			 validate : {
+                required : true
+            }
+        },
+        {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.remark"/>',
+            name : "remark",
+            type : "text",
+            newline:false,
+            disabled:true,
+            validate: {
+            	 stringMaxLength : 240
+            }
+        },
+        {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.creationdate"/>',
+            name : "creationDate",
+            type : "date",
+            newline:true,
+            options : {
+                type : 'date',
+                showTime:true,
+           	    value:new Date(${.now?long}),
+                format:"yyyy-MM-dd hh:mm:ss",
+           	    disabled:true 
+            },
+			 validate : {
+	                required : true
+	           	}
+           
+        },
+        {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.trxdate"/>',
+            name : "trxDate",
+            type : "date",
+            newline:false ,
+            options : {
+                 value: new Date(${.now?long}),
+	             showTime:true,
+	             format : 'yyyy-MM-dd hh:mm:ss',
+                 onChangeDate : function(value) {
+                     var now = new Date(${.now?long});
+                     var trxDate = new Date(value);
+                     if (trxDate > now) {
+                         $.ligerDialog.warn('<@spring.message "msg.warning.inventory.trx_date_must_less_than_now_date"/>', null, function(){$.ligerui.get('trxDate').setValue(now);});
+                     }
+                 }
+	         },
+		    validate : {
+               required : true
+            } 
+        }],
+        readonly:false,
+    });
+    var codeValueGrid;
+    codeValueGrid=$("#codeValueGrid").ligerGrid({
+        columns : [{
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>',
+            name: 'itemId', align: 'left', width: 100,
+            textField : 'itemNumber',
+            valueField : 'itemId',
+            editor : 
+                $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_im_item_query")},{
+                        staticOptions : function(e){
+                            e.column.editor.parms = {
+                                 trxType : 'TRFOT',
+                                 transferOrgId : $("#transferOrgId").val(),
+                                 organizationId : $("#organizationId").val()
+                            }
+                        },
+                        onSelect : function(data){
+                            var selected = codeValueGrid.editor.editParm.record;
+                            if (!selected) { return; }
+                            p_setItemLine(selected,data.data[0]);
+                        },
+                        onChangeValue : function(data){
+                            var selected = codeValueGrid.editor.editParm.record;
+                            if (!selected) { return; }
+                            if (data == null || data == '') {
+                                p_clearItemLine(selected);
+                            }
+                        }
+                    }
+                ),
+            validate : {
+                required : true
+            }
+        }, {
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.product.dto.invitem.itemname"/>',
+            name : 'itemName',
+            align : 'left'
+        }, {
+        	display : '<@spring.message  "type.com.lkkhpg.dsis.common.inv.dto.transfertrxdetail.itemuomcode"/>',
+            name : 'itemUomCode',
+            textField:'itemUomName',
+            align : 'left'
+        },
+		/*   隐藏批次 20180207 by mingqing.wei
+		{
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.lotnumber"/>',
+            name : 'lotNumber',
+            align : 'left',
+            isMultiSelect:false,
+            editor : {
+            	 type : "popup",
+     		     valueField:'lotNumber',
+     			 textField:'lotNumber',
+     			 grid : {
+                	columns : [{
+	                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.lotnumber"/>',
+	                    name : "lotNumber",
+	                    width : 150,
+	                    type : "text",
+	                    align : "left"
+	                },{
+	                    display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage"/>',
+	                    name : "quantity",
+	                    width : 100,
+	                    type : "text",
+	                    align : "left"
+	                },{
+	                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.expirydate"/>',
+	                    name : "expiryDate",
+	                    width : 100,
+	                    type : "text",
+	                    align : "left"
+	                }],
+	                pageSize : 10,
+     		        url : '${base.contextPath}/im/itemLot/query',
+     		       onLoadData:function(){
+               	    var row = codeValueGrid.editor.editParm.record;
+               	     this.set('parms',null);
+           	         this.set('parms',{itemId:row.itemId,orgId:$("#organizationId").val()});
+                    },
+                     onSelectRow:function(data){
+                     var selected = codeValueGrid.editor.editParm.record;
+                     if (!selected) { return; }
+                     codeValueGrid.update(selected,{expiryDate:data.expiryDate,quantity:data.quantity});
+                   }
+     			}
+            }
+        },*/
+         {
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage"/>',
+            name : 'quantity',
+            align : 'left'
+        },
+		/*	隐藏按批次到期日查询条件 20180207 by mingqing.wei
+			{
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.expirydate"/>',
+            name : 'expiryDate',
+            align : 'left'
+        }, */
+        {
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.packingtype"/>',
+            name : 'packingType',
+            textField    : 'name',
+            valueField   : 'toUom',
+            align : 'left',
+            validate : {
+                required : true
+            },
+            editor : {
+            	type         : 'select',
+                textField    : 'name',
+                valueField   : 'toUom',
+                url          : "${base.contextPath}/pm/uom/query",
+                staticOptions: function (e) {
+
+                    e.column.editor.parms = {
+                        itemId : e.record.itemId == null ? 0 : e.record.itemId,
+                        uomCode: e.record.itemUomCode == null ? '' : e.record.itemUomCode
+                    }
+                },
+                onSelected   : function (v, t) {
+                    //选择时候自动带出箱子单位数量
+                    // debugger
+                    var rateDate = this.data;
+                    for(var i=0 ; i < rateDate.length;i++){
+                        var kk=rateDate[i].toUom;
+                        if(v == kk ){
+                            var rate = rateDate[i].convertRate;
+                            var selectedrow = codeValueGrid.editor.editParm.record;
+                            if (!selectedrow) { return; }
+                            var numberOfCarton = selectedrow.numberOfCarton;
+                            var trxQty = numberOfCarton;
+                            if(rate != null){
+                            	trxQty = numberOfCarton*rate ;
+                            }
+                            codeValueGrid.update(selectedrow,{numberOfIndCarton:rate,trxQty:trxQty});
+                            return;
+                        }
+                	}
+                }
+            }
+        }, {
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.numberofindcarton"/>',
+            name : 'numberOfIndCarton',
+            align : 'left'
+        }, {
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.numberofcarton"/>',
+            name : 'numberOfCarton',
+            align : 'left',
+            validate : {
+                required : true
+            },
+            editor : {
+                type : 'digits',
+                sign : false
+            }
+        }, {
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.trxqty"/>',
+            name : 'trxQty'
+        }, {
+        	display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.remark"/>',
+            name : 'remark',
+            align : 'left',
+            editor : {
+                type : 'text'
+            }
+        }],
+        showToggleColBtn : false,
+        width : '99%',
+        height : '98%',
+        rowHeight : 24,
+        columnWidth : 100,
+        usePager : false,
+        checkbox : true,
+        mouseoverRowCssClass : null,
+        enabledEdit:true,
+        onAfterEdit:function(editParam){
+	       
+	        if(editParam.column.name == 'numberOfCarton'){
+	        	var qty = 0;
+	        	var trxQty = editParam.record.trxQty;
+	        	var numberOfCarton = editParam.record.numberOfCarton;
+	        	var quantity = editParam.record.quantity;
+	        	var data = codeValueGrid.getData();
+	        	if (!trxQty) {
+            		trxQty = 0;
+            	}
+            	if (!numberOfCarton ) {
+            		numberOfCarton = 0;
+            	}
+            	if (!quantity) {
+            		quantity = 0;
+            	}
+            	if (editParam.record.lotNumber) {
+            		for (var current in data) { 
+            			if (data[current].itemNumber == editParam.record.itemNumber
+            					&& data[current].lotNumber == editParam.record.lotNumber) {
+            				qty += data[current].trxQty/1;
+            			} 
+            		}
+            	} else {
+            		for (var current in data) { 
+            			if (data[current].itemNumber == editParam.record.itemNumber) {
+            				qty += data[current].trxQty/1;
+            			}
+            		}
+            	}
+                if(!editParam.record.packingType){
+                	this.updateCell("trxQty",null,editParam.record);
+                	$.ligerDialog.warn('<@spring.message "msg.warn.must_select_packtype_fisrt"/>');	
+                }else{
+                	if(!editParam.record.numberOfIndCarton){
+                		if ((qty/1 - trxQty/1 + numberOfCarton)/1 > quantity/1) {
+                    		editParam.record.numberOfCarton = null;
+                    		$.ligerDialog.warn('<@spring.message "msg.error.transferred.quantity_must_less_than_storage"/>');
+                    		this.updateCell("numberOfCarton",editParam.record.numberOfCarton,editParam.record);
+                    		return;
+                    	}
+                		this.updateCell("trxQty",editParam.record.numberOfCarton,editParam.record);
+                	}else{
+                		if ((qty/1 - trxQty/1 + numberOfCarton)*editParam.record.numberOfCarton > quantity/1) {
+                    		editParam.record.numberOfCarton = null;
+                    		$.ligerDialog.warn('<@spring.message "msg.error.transferred.quantity_must_less_than_storage"/>');
+                    		this.updateCell("numberOfCarton",editParam.record.numberOfCarton,editParam.record);
+                    		return;
+                    	}
+                		this.updateCell("trxQty",editParam.record.numberOfIndCarton*editParam.record.numberOfCarton,editParam.record);
+                	}
+                }
+	        }
+        },
+        rownumbers:true,
+        <#if isedit == '1'>
+         url: '${base.contextPath}/im/transferOutDetail/query?trxId=${RequestParameters.trxId!}', 
+        </#if>
+        toolbar : {
+        	id: 'transfer_create_grid_tool_bar',
+            items : [ {
+            	id : 'newbtn',
+                text : '<@spring.message "sys.hand.btn.new"/>',
+                <#if accessService.access("EDITABLE") == false>
+                disable:true, 
+                </#if> 
+                //disable : false,
+                click : function() {
+                	  var curstatus=$("#status").val();
+                	  if(curstatus!='NEW'){
+                		  $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+                		  return;
+                     }
+                	 var transferOrg = liger.get("transferOrgId").getValue();
+                	 if(transferOrg == ""){
+                		 $.ligerDialog.warn('<@spring.message "msg.error.transferred.to.the.organization.has.no.choice"/>');
+                		 return ;
+                	 }
+                	codeValueGrid.addRow({})
+                },
+                icon : 'add'
+            }, {
+                line : true
+            }, {
+            	id : 'delbtn',
+                text : '<@spring.message "sys.hand.btn.delete"/>',
+                <#if accessService.access("EDITABLE") == false>
+                disable:true, 
+                </#if> 
+                click : function() {
+                	var curstatus=$("#status").val();
+              	    if(curstatus!='NEW'){
+              		  $.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+              		  return;
+                   }
+                    Hap.gridDelete({
+                        grid : codeValueGrid,
+                        url : '${base.contextPath}/im/transferOutDetail/remove'
+                    })
+                },
+                icon : 'delete'
+            } ]
+        }
+    });
+    <#if isedit == '1'>
+    Hap.loadForm({form:form,
+    	url:'${base.contextPath}/im/transferOutTrx/query',
+    	para:{trxId:${RequestParameters.trxId}},
+    	callback: function(data) {
+			/* 加载表格数据 */
+			
+			//如果状态为完成，表单和表格均不能编辑
+			if($.ligerui.get("status").getValue() == 'COMP'){
+				liger.get('mainform').setEditable(false);
+   			 	liger.get('transfer_create_grid_tool_bar').setDisabled('newbtn');
+    			liger.get('transfer_create_grid_tool_bar').setDisabled('delbtn');
+    			codeValueGrid.options.enabledEdit=false;
+			}
+		}
+	})
+   </#if>
+    
+    <#if accessService.access("EDITABLE") == false>
+    form.setEditable(false);
+    </#if>
+    </script>
+</body>
+</html>

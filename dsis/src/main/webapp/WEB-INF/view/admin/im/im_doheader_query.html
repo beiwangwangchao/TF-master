@@ -1,0 +1,147 @@
+<#--
+ * description: 提货单查询界面
+ * version: 1.0 
+ * author: liuxuan
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+
+<#include "../include/head.html">
+<body style="padding: 10px;">
+    <form id="d_stm_001_form"></form>
+    <div id="d_stm_001_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function() {
+        window['d_stm_001_form'] = $("#d_stm_001_form").ligerForm({
+            fields : [
+				{ name : 'doNumber', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.donumber"/>', newline : false ,type:'text'
+				},
+                { name : 'vendorName', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.vendorname"/>', newline : false},
+                { name : 'marketId',type:'select', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.marketid"/>', newline : false,
+                    options: {
+                        valueField: 'marketId',
+                        textField: 'name',
+                        url: '${base.contextPath}/spm/market/query'
+                    }
+                },
+	            {
+                	  name : 'startDate',
+  	                label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.startdate"/>',
+  	                type : 'date',
+  	                format: 'YYYY-MM-DD',
+  	                newline:true,
+  	                options:{
+  		                onChangeDate  :function(date){
+  		                	if($("input[name='startDate']").val()<date){
+  		                		if($("input[name='startDate']").val()!=""){
+  			                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+  			                		$.ligerui.get("overDate").setValue("");
+  		                		}
+  		                	}
+  		                }
+  	                }
+  	            },
+	            {
+  	            	 name : 'overDate',
+ 	                label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.overdate"/>',
+ 	                type : 'date',
+ 	                format: 'YYYY-MM-DD',
+ 	                newline:false,
+ 	                options:{
+ 		                onChangeDate : function(date){
+ 		                	if($("input[name='overDate']").val()>date){
+ 		                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+ 		                		$.ligerui.get("startDate").setValue("");
+ 		                	}
+ 		                }
+ 	                }
+ 	            }
+ 	        ],
+            buttons : [
+                {
+	                text : '<@spring.message "sys.hand.btn.query"/>',
+	                disabled : false,
+	                width : 60,
+	                click : function() {
+	                    Hap.gridQuery({
+	                        form : d_stm_001_form,
+	                        grid : d_stm_001_grid
+	                    })
+	                }
+	            },{
+                    text : '<@spring.message "sys.hand.btn.create"/>',
+                    disabled : false,
+                    width : 60,
+                    click: function(){  
+                    	   window.top.f_removeTab('IM_DO_HEADER');
+                           window.top.f_addTab('IM_DO_HEADER','<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.create"/>','${base.contextPath}/im/im_doheader_edit.html');
+                    }
+                }
+            ]
+        });
+         var d_stm_001_grid;
+         d_stm_001_grid = window['d_stm_001_grid'] = $("#d_stm_001_grid").ligerGrid({
+            columns : [
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.marketid"/>',
+	                name : 'name',
+	                align : 'left',
+	                width : 100
+                },
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.donumber"/>',
+	                name : 'doNumber',
+	                align : 'left',
+	                width : 200,
+                    type : 'text',
+                    render: function (row){
+                    	 return "<a href='javascript:void(0);' onclick='doheaderEdit(\""+row.doHeaderId+"\")'>" + row.doNumber + "</a> ";
+                    }
+	            },
+	            {
+	                name : 'doTo',
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.doto"/>',
+	                align : 'left',
+	                width : 200
+	            },
+                {
+                    name : 'vendorName',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.vendorname"/>',
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    name : 'deliveryTo',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.deliveryto"/>',
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    name : 'orderDate',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.orderdate"/>',
+                    align : 'left',
+                    width : 200,
+                    format: "YYYY-MM-DD",
+                    type : 'date'
+                },
+                {
+                    name : 'remark',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.remark"/>',
+                    align : 'left',
+                    width : 200
+                }
+            ],
+            url : '${base.contextPath}/im/header/query',
+            enabledEdit : false,
+            width : '99%',
+            height : '98%',
+            rownumbers : true
+        });
+    });
+    function doheaderEdit(doHeaderId){
+        window.top.f_removeTab('IM_DO_HEADER_ID');
+        window.top.f_addTab('IM_DO_HEADER_ID', '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.doheader.details"/>', 'im/im_doheader_edit.html?isedit=1&doHeaderId=' + doHeaderId);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<#-- 
+ * description: 订单类型维护页面
+ * version: 1.0 
+ * author: zhiwei.zhang@hand-china.com 
+ * [#PE20-4][ADD],2016-12-06 14:20:03.
+--> 
+<#include "../include/head.html">
+
+<body style="padding: 10px;">
+	<script src="${base.contextPath}/common/code?orderType=OM.ORDER_TYPE&priceType=SPM.PRICE_TYPE"
+		type="text/javascript">
+	</script>
+
+	<form id="om_order_type_form" ></form>
+    <div id="om_order_type_grid"></div>
+    
+    <script type="text/javascript">
+    	var isedit; //编辑还是新增标记
+    	var beforeEditValue; //记录编辑前的值
+    	
+    	//获取当前用户能访问的销售组织
+    	var salesOrgData;
+		$.ajax({
+			url : "${base.contextPath}/sys/salesOrg/queryOrg",
+			type : "POST",
+			dataType : "json",
+			async : false,
+			contentType : "application/json",
+			success : function(json) {
+				salesOrgData = json.rows;
+			}
+		});
+		
+		//订单类型JSON数据,用于前台验证
+		var orderTypeData_1;
+		function getValidData(){
+			$.ajax({
+				url : "${base.contextPath}/order/orderType/queryAll",
+				type : "POST",
+				dataType : "json",
+				async : false,
+				contentType : "application/json",
+				success : function(json) {
+					orderTypeData_1 = json.rows;
+				}
+			});
+		}
+		getValidData();
+		
+    	$(function(){
+    		window['om_order_type_form'] = $("#om_order_type_form").ligerForm({
+    			fields:[
+					{
+						label :'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.salesorg" />',
+						name : "salesOrgId",type : "select",newline : false,
+						textField: 'name',
+                        options : {
+                            valueField : 'salesOrgId',
+                            textField : 'name',
+                            url : '${base.contextPath}/sys/salesOrg/queryOrg'
+                        }
+					},
+					{
+						label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.ordertype" />',
+						name : "orderType",type : "select",newline : false,
+						options : {
+							valueField: "value",
+	                		textField: "meaning",
+	                		data: orderType
+						}
+					}
+				],
+				buttons:[
+					{ 
+						text: '<@spring.message "sys.hand.btn.query"/>',
+						disabled:false, 
+						width: 60, 
+						click: function(){
+							Hap.gridQuery({
+								form:om_order_type_form,
+								grid:om_order_type_grid
+							})
+						}
+					},
+					{
+		                text : '<@spring.message "sys.hand.btn.reset"/>',
+		                disabled : false,
+		                width : 60,
+		                click : function() {
+		                	om_order_type_form.reset();
+		                }
+		            }
+    			]
+    		});
+    		
+    		window['om_order_type_grid'] = $("#om_order_type_grid").ligerGrid({
+    			onBeforeEdit:function(e){
+    				beforeEditValue = e.value;
+    			},
+    			onBeforeSubmitEdit : function(e) {
+                    var rs = om_order_type_grid.rows;
+                    //销售组织和订单类型的组合必须唯一
+                    //e.value 刚刚新增的值
+                    //e.rowindex 新增值的行ID
+                    if(e.column.columnname == "salesOrgId"){
+                        if (e.value == null || (e.value == beforeEditValue && e.value != '')) {
+                            return true;
+                        }
+                        if(e.value == "" && (e.text == undefined || e.text == '')){
+                        	return true;
+                        }
+                        if(rs[e.rowindex].orderType == undefined || rs[e.rowindex].orderType == null || rs[e.rowindex].orderType == ''){
+                        	return true;
+                        }
+                        if(e.value == "" && e.text != undefined && e.text != ''){
+                        	for(var i = 0; i < salesOrgData.length; i++){
+								if(salesOrgData[i].name == e.text){
+									e.value = salesOrgData[i].salesOrgId;
+									break;
+								}
+							}
+                        }
+                        //若新增的记录(销售组织、订单类型组合),与已有记录相同,提示出错
+                        for(var i=0;i<orderTypeData_1.length;i++){
+                        	if(i != e.rowindex){
+                        		if(orderTypeData_1[i].salesOrgId == e.value){
+                               		if(orderTypeData_1[i].orderType == rs[e.rowindex].orderType){
+                               			Hap.showError('<@spring.message "type.ordertype.error"/>');
+                                           return false;
+                               		}
+                                }
+                        	}
+                        }
+                        //若页面上新增两个'销售组织、订单类型组合'相同的记录,提示出错
+                       	for(var i=0;i<rs.length;i++){
+                           	if(i != e.rowindex && rs[i].__status == 'add'){
+                           		if(rs[i].salesOrgId == e.value){
+                                   	if(rs[i].hasOwnProperty("orderType")){
+                                   		if(rs[i].orderType == rs[e.rowindex].orderType){
+                                   			Hap.showError('<@spring.message "type.ordertype.error"/>');
+                                               return false;
+                                   		}
+                                   	}
+								}
+                           	}
+						}
+                    }
+                    if(e.column.columnname == "orderType"){
+                        if (e.value == null || e.value == "" || e.value == beforeEditValue) {
+                            return true;
+                        }
+                        if(rs[e.rowindex].salesOrgId == undefined || rs[e.rowindex].salesOrgId == null || rs[e.rowindex].salesOrgId == ''){
+                        	return true;
+                        }
+                        //若新增的记录(销售组织、订单类型组合),与已有记录相同,提示出错
+                        for(var i=0;i<orderTypeData_1.length;i++){  
+                        	if(i != e.rowindex){
+                        		if(orderTypeData_1[i].orderType == e.value){
+                               		if(orderTypeData_1[i].salesOrgId == rs[e.rowindex].salesOrgId){
+                               			Hap.showError('<@spring.message "type.ordertype.error"/>');
+                                           return false;
+                               		}
+                                }
+							}
+                        }
+                        //若页面上新增两个'销售组织、订单类型组合'相同的记录,提示出错
+                        for(var i=0;i<rs.length;i++){  
+                        	if(i != e.rowindex && rs[i].__status == 'add'){
+                        		if(rs[i].orderType == e.value){
+                                	if(rs[i].hasOwnProperty("salesOrgId")){
+                                		if(rs[i].salesOrgId == rs[e.rowindex].salesOrgId){
+                                			Hap.showError('<@spring.message "type.ordertype.error"/>');
+                                            return false;
+                                		}
+                                	}
+                                }
+							}
+                        }
+                    }
+                },
+    			columns:[
+					{
+					    display: '',
+					    name   : 'orderTypeId', align: 'center', width: 135, hide: true
+					},
+					{
+					    display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.salesorg" />',
+					    name   : 'salesOrgId', textField: 'name', valueField: 'salesOrgId', align: 'center', width: 135,
+					    editor :  $.extend(
+							${lovService.getLov(base.contextPath,base.locale, "lov_salesOrg_ofUserHasPermission")}, 
+							{}
+					    ),
+					    render : function(item){
+					    	if(item.salesOrgId != '' && item.salesOrgId != null){
+					    		for(var i = 0; i < salesOrgData.length; i++){
+									if(salesOrgData[i].salesOrgId == item.salesOrgId){
+										return 	salesOrgData[i].name;
+									}
+								}
+								return item.salesOrgId;
+					    	}else{
+					    		for(var i = 0; i < salesOrgData.length; i++){
+									// 解决LOV无法复制设值问题
+									if(salesOrgData[i].name == item.name){
+										item.salesOrgId = salesOrgData[i].salesOrgId;
+										return 	salesOrgData[i].name;
+									}
+								}
+					    		item.name = null;
+								return null;
+					    	}
+						},
+					    validate: {
+					    	required: true
+					    }
+					},
+					{
+					    display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.ordertype" />',
+					    name   : 'orderType', align: 'center', width: 120,
+					    editor: {
+					    	type         : 'select',
+					        textField    : 'meaning',
+					        valueField   : 'value',
+					        data         : orderType
+					    },
+					    render : function(item){
+							for(var i = 0; i < orderType.length; i++){
+								if(orderType[i].value == item.orderType){
+									return 	orderType[i].meaning;
+								}
+							}
+							return item.orderType;
+						},
+					    validate: {
+					    	required: true
+					    }
+					},
+					{
+					    display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.ordertype.salesprice" />',
+					    name   : 'priceType', align: 'center', width: 120,
+					    editor: {
+					    	type         : 'select',
+					        textField    : 'meaning',
+					        valueField   : 'value',
+					        data         : priceType
+					    },
+					    render : function(item){
+							for(var i = 0; i < priceType.length; i++){
+								if(priceType[i].value == item.priceType){
+									return 	priceType[i].meaning;
+								}
+							}
+							return item.priceType;
+						},
+					    validate: {
+					    	required: true
+					    }
+					},
+					{ 
+	                    display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.itemsalestype" />',
+	                    width: 120,
+	                    render: function (rowdata) {
+	                    	if(rowdata.orderTypeId != null){
+	                    		isedit = '1';
+	                    	}else{
+	                    		isedit = '0';
+	                    	}
+	                    	if(rowdata.salesOrgId != null && rowdata.orderType != null && rowdata.priceType != null &&
+	                    			rowdata.salesOrgId != '' && rowdata.orderType != '' && rowdata.priceType != ''){
+	                    		var html = "<a href='#' onClick='a_click("+ rowdata.orderTypeId + "," + isedit + "," + rowdata.__index +")'><@spring.message 'type.com.lkkhpg.dsis.platform.dto.inv.item.btn.set'/></a>";
+			                    return html;
+	                		}
+	                    }
+	                }
+    			],
+    			url:'${base.contextPath}/order/orderType/query',
+                toolbar: {
+                    items: [
+						{
+                        	text : '<@spring.message "sys.hand.btn.new"/>',
+                        	disabled : true,
+                        	click : function() {
+                        		om_order_type_grid.addRow({
+                        		})
+                            },
+                            icon : 'add'
+						},
+						{ line: true },
+						{
+							text: '<@spring.message "sys.hand.btn.delete"/>',
+				        	click: function(){
+			                    Hap.gridDelete({
+			                       grid: om_order_type_grid,
+			                       url: '${base.contextPath}/order/orderType/delete',
+			                       success: function(e){
+			                    	   getValidData();
+			                       }
+			                   	});
+		               		},
+		               		icon: 'delete'
+		               	},
+				        { line: true },
+				        {
+				            text: '<@spring.message "sys.hand.btn.save"/>',
+				            click: function() {
+				            	// 必须设置一个销售类型行
+				            	var rs = om_order_type_grid.rows;
+				            	var isSet = false;
+				            	for(var i=0;i<rs.length;i++){
+				            		if(rs[i].orderTypeId == undefined || rs[i].orderTypeId == ''){
+				            			isSet = true;
+				            			//如果有必输字段未填,提示"N个字段验证不通过",isSet = false.
+				            			if(rs[i].salesOrgId == undefined || rs[i].orderType == undefined || rs[i].priceType == undefined
+				            					|| rs[i].salesOrgId == '' || rs[i].orderType == '' || rs[i].priceType == ''){
+				            				isSet = false;
+				            				break;
+				            			}
+				            		}
+				            	}
+				            	if(isSet){
+				            		Hap.showError('<@spring.message "type.atleastonesalestype.error"/>');
+	                                return false;
+				            	}
+				            	
+			            		Hap.gridSave({
+				                    grid: om_order_type_grid,
+				                    url: '${base.contextPath}/order/orderType/submit',
+				                    success: function(e){
+				                    	getValidData();
+				                    }
+				                })
+				            },
+				            icon: 'save'
+				        }
+					]
+                },
+                enabledEdit : true,
+                checkbox: true,
+                width : '99%',
+                height : '98%'
+    		});
+    	});
+    	
+    	function a_click(orderTypeId,isedit,index){
+    		var rs = om_order_type_grid.rows;
+    		var orderTypeData = rs[index];
+            $.ligerDialog.open({
+                height: 500,
+                width: 840,
+                title: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.itemsalestype" />',
+                url: '${base.contextPath}/om/om_sales_type_edit.html?orderTypeId=' + orderTypeId + '&index=' + index + '&isedit=' + isedit + '&orderTypeData=' + orderTypeData,
+                data: orderTypeData
+            });
+        }
+    </script>
+</body>

@@ -1,0 +1,236 @@
+<#include "/mws/include/header.html">
+<!-- ========== MENU END ========== -->
+
+<!-- ========== CONTENT START ========== -->
+<script src="${base.contextPath}/resources/js/navbar${resource_suffix!}.js"></script>
+<script type="text/javascript">
+$(function() { 
+	change(); //加载全部消息
+	$("#flagMessage").change(function(){
+	    var status = $("#flagMessage").val();
+		change(status);
+	});
+}); 
+    //选择已读、未读
+    var navbar;
+    function change(status){
+    	if(navbar){
+            navbar.query(1,{
+            	status:status
+            }); 
+        }else{
+            navbar = $('nav#pageMessage').navbar({
+            url:"${base.contextPath}/account/message",
+            pagesize:10,
+            parms:function(){
+                return {status:status};
+            },
+            onLoad:function(data){
+                    var html = [];
+                    var data = data.rows;
+                    if(data.length>0){
+                        for(var i=0;i<data.length;i++){
+                            var item = data[i];
+                            if(item.status == "Y"){
+                                html.push('<tr class="cart_item">\
+                                		<td class="hide">'+ item._token +'</td>\
+                                		<td style="text-align: center;display: none;" data-title=""><input type="text" value="'+ i +'" name="checkname"></td>\
+                                        <td style="text-align: center" data-title="<@spring.message "mws.myaccount.accountinfo.select"/>"><input type="checkbox" value="'+ item.readId +'" name="checkname"></td>\
+                                        <td style="text-align: center" data-title=""><img src="${base.contextPath}/resources/image/unreadEmail.png"/></td>\
+                                        <td style="text-align: center" data-title="<@spring.message "mws.myaccount.accountinfo.recipients"/>"><h5>'+ item.userName +'</h5></td>\
+                                        <td style="text-align: center ;width: 50%" data-title="<@spring.message "mws.myaccount.accountinfo.theme"/>" ><h5><a href="#" id="'+ item.readId +'" onclick="messageDetail('+ item.readId +')">'+ item.subject +'</a></h5></td>\
+                                        <td style="text-align: center" data-title="<@spring.message "mws.myaccount.accountinfo.time"/>"><h5>'+ item.publishDate +'</h5></td>\
+                                </tr>');
+                            }else{
+                                html.push('<tr class="cart_item">\
+                                		<td class="hide">'+ item._token +'</td>\
+                                		<td style="text-align: center;display: none;" data-title=""><input type="text" value="'+ i +'" name="checkname"></td>\
+                                        <td style="text-align: center" data-title="<@spring.message "mws.myaccount.accountinfo.select"/>"><input type="checkbox" value="'+ item.readId +'" name="checkname"></td>\
+                                        <td style="text-align: center" data-title=""><img src="${base.contextPath}/resources/image/readEmail.png"/></td>\
+                                        <td style="text-align: center" data-title="<@spring.message "mws.myaccount.accountinfo.recipients"/>"><h5>'+ item.userName +'</h5></td>\
+                                        <td style="text-align: center ;width: 50%" data-title="<@spring.message "mws.myaccount.accountinfo.theme"/>" ><h5><a href="#" id="'+ item.readId +'" onclick="messageDetail('+ item.readId +')">'+ item.subject +'</a></h5></td>\
+                                        <td style="text-align: center" data-title="<@spring.message "mws.myaccount.accountinfo.time"/>"><h5>'+ item.publishDate +'</h5></td>\
+                                </tr>');
+                            }
+                        }
+                        $("#messageTbody").html(html.join(''));
+                    }else{
+                    	$("#messageTbody").html(html.join(''));
+                    }
+            }
+        });
+        }
+    }
+    //点击消息内容查看详情
+    function messageDetail(readId, sort){
+    	$("#queryMessage").val(readId);
+    	$("#queryMessages").val(sort);
+    	$("#queryMessageForm").submit();
+    }
+    
+    //批量删除
+    function deleteMessage(){
+    	var array = [];
+    	$("input[name='checkname']:checked").each(function(){
+    		array.push({"readId":this.value,"__status":"del","_token":$(this).parent().parent().find(".hide").text()});
+    	});
+    	var json = JSON.stringify(array);
+    	$.ajax({
+            type:'post',
+            url:"${base.contextPath}/account/deleteMessage",
+            contentType: "application/json",
+            data:json,
+            dataTypee:'json',
+            success:function(data){
+            	if(data.success){
+            		window.location.href="${base.contextPath}/account/account-messagebox.html";
+            	}
+            }
+    	});
+    }
+	var flag = true;
+	function sortByTime(status){
+	    if(flag){
+	        $('#timeSort').removeClass().addClass("glyphicon glyphicon-arrow-up");
+	        flag = false;
+	        if(navbar){
+	            navbar.query(1,{
+	                status:status,sort:'desc'
+	            }); 
+	        }else{
+	        navbar = $('nav#pageMessage').navbar({
+	            url:"${base.contextPath}/account/message",
+	            pagesize:10,
+	            parms:function(){
+	                return {status:status,sort:'desc'};
+	            },
+	            onLoad:function(data){
+	                    var html = [];
+	                    var data = data.rows;
+	                    if(data.length>0){
+	                        for(var i=0;i<data.length;i++){
+	                            var item = data[i];
+	                            if(item.status == "Y"){
+	                                html.push("<tr class='cart_item'>\
+	                                		<td class='hide'>"+ item._token +"</td>\
+	                                        <td style='text-align: center' data-title='<@spring.message 'mws.myaccount.accountinfo.select'/>'><input type='checkbox' value='"+ item.readId +"' name='checkname'></td>\
+	                                        <td style='text-align: center' data-title=''><img src='${base.contextPath}/resources/image/unreadEmail.png'/></td>\
+	                                        <td style='text-align: center' data-title='<@spring.message 'mws.myaccount.accountinfo.recipients'/>'><h5>"+ item.userName +"</h5></td>\
+	                                        <td style='text-align: center ;width: 50%;' data-title='<@spring.message 'mws.myaccount.accountinfo.theme'/>' ><h5><a href='#' id='"+ item.readId +"' onclick='messageDetail("+ item.readId +",\"desc\")'>"+ item.subject +"</a></h5></td>\
+	                                        <td style='text-align: center' data-title='<@spring.message 'mws.myaccount.accountinfo.time'/>'><h5>"+ item.publishDate +"</h5></td>\
+	                                </tr>");
+	                            }else{
+	                                html.push("<tr class='cart_item'>\
+	                                		<td class='hide'>"+ item._token +"</td>\
+	                                		<td style='text-align: center' data-title='<@spring.message 'mws.myaccount.accountinfo.select'/>'><input type='checkbox' value='"+ item.readId +"' name='checkname'></td>\
+	                                        <td style='text-align: center' data-title=''><img src='${base.contextPath}/resources/image/readEmail.png'/></td>\
+	                                        <td style='text-align: center' data-title='<@spring.message 'mws.myaccount.accountinfo.recipients'/>'><h5>"+ item.userName +"</h5></td>\
+                                            <td style='text-align: center ;width: 50%;' data-title='<@spring.message 'mws.myaccount.accountinfo.theme'/>' ><h5><a href='#' id='"+ item.readId +"' onclick='messageDetail("+ item.readId +",\"desc\")'>"+ item.subject +"</a></h5></td>\
+                                            <td style='text-align: center' data-title='<@spring.message 'mws.myaccount.accountinfo.time'/>'><h5>"+ item.publishDate +"</h5></td>\
+                                    </tr>");
+	                            }
+	                        }
+	                        $("#messageTbody").html(html.join(''));
+	                    }else{
+	                        $("#messageTbody").html(html.join(''));
+	                    }
+	            }
+	        });
+	        }
+	    }else{
+	        $('#timeSort').removeClass().addClass("glyphicon glyphicon-arrow-down");
+	        flag = true;
+	        change(status);
+	    }
+	}
+	
+	//全选或全取消
+	function checkAll(val){
+		 $("input[name='checkname']").each(function() { 
+			 this.checked = val;
+			 //alert($(this).val());
+		 });
+	}
+</script>
+<section id="content">
+	<div class="container">
+
+		<ol class="breadcrumb">
+			<li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+			<li><@spring.message "mws.myaccount.accountinfo.message_center"/></li>
+		</ol>
+
+		<div class="row">
+			<!-- Sidebar Start -->
+	        <#include "../include/account-menu.html">
+			<!-- Sidebar End -->
+		
+		
+			<!-- Posts Start -->
+            <div class="col-sm-8 col-md-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><@spring.message "mws.myaccount.accountinfo.message_center"/></h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="portlet box light-grey">
+                            <div class="portlet-body no-more-tables">
+                                <table
+                                    class="shop_table table-bordered table-condensed table-striped cf" id="table_zzjs_net">
+                                    <thead class="cf">
+                                        <tr style="font-size: 10px">
+                                            <th class="product-price"><input type="checkbox" id="checkall" onclick="checkAll(this.checked)"></th>
+                                            <th class="product-price">
+                                                <select style="border:0px solid #FFFFFF;cursor: pointer;" id="flagMessage">
+                                                    <option selected="selected" value=""><@spring.message "mws.myaccount.accountinfo.message_all"/></option>
+                                                    <option value="Y"><@spring.message "mws.myaccount.accountinfo.message_read"/></option>
+                                                    <option value="N"><@spring.message "mws.myaccount.accountinfo.message_unread"/></option>
+                                                </select>
+                                            </th>
+                                            <th class="product-price"><@spring.message "mws.myaccount.accountinfo.recipients"/></th>
+                                            <th class="product-price"><@spring.message "mws.myaccount.accountinfo.theme"/></th>
+                                            <th class="product-price" style="cursor: pointer;" onclick="sortByTime($('#flagMessage').val())"><@spring.message "mws.myaccount.accountinfo.time"/><span class="glyphicon glyphicon-arrow-down" aria-hidden="true" id = "timeSort"></span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="messageTbody">
+                                    
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 col-sm-2">
+                                    <button class="btn btn-info" style="width: 100px;margin-top: 22px;margin-left: 10px;" onclick="deleteMessage()"><@spring.message "mws.myaccount.accountinfo.message_delete"/></button>
+                                </div>
+                                <div class="col-md-offset-6 col-md-4">
+                                    <nav id="pageMessage">
+                                    
+                                    </nav>
+                                        <!-- <ul class="pagination">
+                                            <li><a href="#" aria-label="Previous">&laquo;</a></li>
+                                            <li><a href="#">1</a></li>
+                                            <li><a href="#">2</a></li>
+                                            <li><a href="#">3</a></li>
+                                            <li><a href="#">4</a></li>
+                                            <li><a href="#">5</a></li>
+                                            <li><a href="#" aria-label="Next">&raquo;</a></li>
+                                        </ul> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+		<!-- Posts End -->
+
+            <form id="queryMessageForm" action="${base.contextPath}/account/message/detail" method="post">
+                <input type="hidden" name="readId" id="queryMessage" value=""/>
+                <input type="hidden" name="sort" id="queryMessages"/>
+            </form>
+
+	</div>
+	</div>
+</section>
+<!-- ========== CONTENT END ========== -->
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

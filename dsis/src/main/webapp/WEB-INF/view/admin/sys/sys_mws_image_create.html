@@ -1,0 +1,97 @@
+<#--
+ * description: 上传MWS图片
+ * version: 1.0 
+ * author:njq.niu@hand-china.com
+ * Copyright LKK Health Products Group Limited 
+ * 
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+    <iframe name='hidden_frame' id="hidden_frame" style="display: none;"></iframe>
+    <form id="uploadForm" action="${base.contextPath}/mws/images/upload" method="post" enctype="multipart/form-data" target="hidden_frame">
+        <input type="hidden" name="marketId" value="${Session._marketId!}"/>
+        <input type="hidden" name="sourceType" value="${RequestParameters.sourceType!}"/>
+        <#if RequestParameters.moduleType == 'MWS_SITE_CAROUSEL'><input type="hidden" name="moduleCode" value="${RequestParameters.moduleCode!}"/></#if>
+        <input type="hidden" name="moduleType" value="${RequestParameters.moduleType!}"/>
+    </form>
+    <script type="text/javascript">
+        window['uploadForm'] = $("#uploadForm").ligerForm({
+            labelWidth:80,
+            fields : [
+            <#if RequestParameters.moduleType == 'MWS_SITE_BANNER'>{ 
+                display:'<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.moduleCode"/>',
+                type:'text',
+                name:'moduleCode',
+                width:150,
+                newline : true,
+                typeCase:'uppercase', 
+                validate : {
+                    required : true
+                }
+            },
+            </#if>
+            { 
+                display:'<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.url"/>',
+                type:'text',
+                name:'url',
+                width:300,
+                newline : true,
+                validate : {
+                    required : true
+                }
+            }<#if RequestParameters.moduleType != 'MWS_SITE_BANNER'>
+            ,{ 
+                display:'<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.sort_number"/>',
+                type:'int',
+                name:'sortNumber',
+                newline : true,
+                options:{
+                    sign:false
+                },
+                validate : {
+                    required : true
+                }
+            }
+            </#if>,{
+                display : " ",
+                name : "file",
+                type : "html",
+                newline : true,
+                width:400,
+                render:function(v){  
+                    return '<input type="file" name="imageFile" />'
+                }
+            }]
+        });
+        /*给编码一个默认值*/
+        <#if RequestParameters.moduleType == 'MWS_SITE_BANNER'>
+        $.ligerui.get("moduleCode").setValue("CATEGORY");
+        </#if>
+        function closeUploadDialog(){
+            var dialog = frameElement.dialog;
+            dialog.close();
+        }
+        
+        Hap.setFormDefaultBtn(closeUploadDialog, function(){
+            if(Hap.validateForm(uploadForm)) {
+                window.uploadingDialog=$.ligerDialog.open({content: '<div style="padding:10px">Uploading....</div>', allowClose: false });
+                document.getElementById("uploadForm").submit();
+            }
+        });
+        
+        
+        function uploadCallback(code){
+            window.uploadingDialog.close();
+            if(code == 'UPLOAD_SUCCESS') {
+                $.ligerDialog.success('<@spring.message "type.com.lkkhpg.dsis.platform.dto.attachment.sysfile.upload_success"/>', '<@spring.message "sys.hand.tip.info"/>',  function(){
+                    parent.initData();
+                    closeUploadDialog();
+                });
+            }else{
+                //更多详细信息
+                $.ligerDialog.alert('Error', 'Unknown upload error!', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

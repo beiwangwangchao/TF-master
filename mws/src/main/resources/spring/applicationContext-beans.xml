@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+    
+    <bean id="cookieHttpSessionStrategy" class="org.springframework.session.web.http.CookieHttpSessionStrategy">
+        <property name="cookieName" value="SESSIONID_MWS"/>
+    </bean>
+    
+    <bean class="com.lkkhpg.dsis.platform.security.captcha.impl.DefaultCaptchaManager">
+        <property name="captchaKeyName" value="mws_captcha_key"></property>
+        <property name="validateFlag" value="true"></property>
+    </bean>
+    
+    <bean id="loginAdaptor" class="com.lkkhpg.dsis.mws.adaptor.LoginAdaptor" /> 
+         
+    <bean class="com.lkkhpg.dsis.platform.core.impl.RequestHelper">
+       <property name="requestListener">
+           <bean class="com.lkkhpg.dsis.mws.system.MwsRequestListener"></bean>
+       </property>
+    </bean>
+    
+    
+     <bean id="defaultPageManager" class="com.lkkhpg.dsis.platform.security.DefaultConfiguration">
+        <property name="pageLogin" value="/login.html"/>
+        <property name="page403" value="/403.html"/>
+        <property name="page404" value="/404.html"/>
+        <property name="page500" value="/500.html"/>
+        <property name="defaultViewPath" value="mws"/>
+    </bean>
+    
+     <!-- gds接口控制开关，默认true为启动，仅对主动调用接口生效 -->
+    <bean id="gdsSwitch" class="com.lkkhpg.dsis.integration.gds.service.impl.GdsSwitch">
+        <property name="switchFlag" value="true"></property>
+    </bean>
+</beans>

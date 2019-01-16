@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgDiffCheckMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgDiffCheck" >
+    <id column="INTERFACE_ID" property="interfaceId" jdbcType="DECIMAL" />
+    <result column="CHECK_DATE" property="checkDate" jdbcType="VARCHAR" />
+    <result column="CHECK_ORG_CODE" property="checkOrgCode" jdbcType="VARCHAR" />
+    <result column="CHECK_ENTITY_TYPE" property="checkEntityType" jdbcType="VARCHAR" />
+    <result column="CHECK_ENTITY_NO" property="checkEntityNo" jdbcType="VARCHAR" />
+    <result column="CHECK_ENTITY_REF_PERIOD" property="checkEntityRefPeriod" jdbcType="VARCHAR" />
+    <result column="CHECK_PHASE" property="checkPhase" jdbcType="VARCHAR" />
+    <result column="CHECK_RESULT_CODE" property="checkResultCode" jdbcType="VARCHAR" />
+    <result column="CHECK_RESULT_MEMO01" property="checkResultMemo01" jdbcType="VARCHAR" />
+    <result column="CHECK_RESULT_MEMO02" property="checkResultMemo02" jdbcType="VARCHAR" />
+    <result column="ORG_READ_FLAG" property="orgReadFlag" jdbcType="VARCHAR" />
+    <result column="ORG_READ_TIME" property="orgReadTime" jdbcType="VARCHAR" />
+    <result column="ORG_READ_BY" property="orgReadBy" jdbcType="VARCHAR" />
+    <result column="ORG_AMEND_FLAG" property="orgAmendFlag" jdbcType="VARCHAR" />
+    <result column="ORG_AMEND_MEMO" property="orgAmendMemo" jdbcType="VARCHAR" />
+    <result column="ORG_AMEND_TIME" property="orgAmendTime" jdbcType="VARCHAR" />
+    <result column="ORG_AMEND_BY" property="orgAmendBy" jdbcType="VARCHAR" />
+    <result column="ENABLED" property="enabled" jdbcType="VARCHAR" />
+    <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+    <result column="ORG_AUTO_SYN" property="orgAutoSyn" jdbcType="VARCHAR" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="PROCESS_STATUS" property="processStatus" jdbcType="VARCHAR" />
+    <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP" />
+    <result column="PROCESS_MESSAGE" property="processMessage" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="IS_EXCIT" property="isExist" jdbcType="VARCHAR" />
+    <result column="UPLOAD_FLAG" property="uploadFlag" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INTERFACE_ID, CHECK_DATE, CHECK_ORG_CODE, CHECK_ENTITY_TYPE, CHECK_ENTITY_NO, CHECK_ENTITY_REF_PERIOD, 
+    CHECK_PHASE, CHECK_RESULT_CODE, CHECK_RESULT_MEMO01, CHECK_RESULT_MEMO02, ORG_READ_FLAG, 
+    ORG_READ_TIME, ORG_READ_BY, ORG_AMEND_FLAG, ORG_AMEND_MEMO, ORG_AMEND_TIME, ORG_AMEND_BY, 
+    ENABLED, COMMENTS, ORG_AUTO_SYN, ADVISE_NO, PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+    REQUEST_ID, PROGRAM_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from ISG_DIFF_CHECK
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from ISG_DIFF_CHECK
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgDiffCheck" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      select Isg_Diff_Check_s.nextval from dual
+    </selectKey>
+    insert into ISG_DIFF_CHECK (INTERFACE_ID, CHECK_DATE, CHECK_ORG_CODE, 
+      CHECK_ENTITY_TYPE, CHECK_ENTITY_NO, CHECK_ENTITY_REF_PERIOD, 
+      CHECK_PHASE, CHECK_RESULT_CODE, CHECK_RESULT_MEMO01, 
+      CHECK_RESULT_MEMO02, ORG_READ_FLAG, ORG_READ_TIME, 
+      ORG_READ_BY, ORG_AMEND_FLAG, ORG_AMEND_MEMO, 
+      ORG_AMEND_TIME, ORG_AMEND_BY, ENABLED, 
+      COMMENTS, ORG_AUTO_SYN, ADVISE_NO, 
+      PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+      REQUEST_ID, PROGRAM_ID)
+    values (#{interfaceId,jdbcType=DECIMAL}, #{checkDate,jdbcType=VARCHAR}, #{checkOrgCode,jdbcType=VARCHAR}, 
+      #{checkEntityType,jdbcType=VARCHAR}, #{checkEntityNo,jdbcType=VARCHAR}, #{checkEntityRefPeriod,jdbcType=VARCHAR}, 
+      #{checkPhase,jdbcType=VARCHAR}, #{checkResultCode,jdbcType=VARCHAR}, #{checkResultMemo01,jdbcType=VARCHAR}, 
+      #{checkResultMemo02,jdbcType=VARCHAR}, #{orgReadFlag,jdbcType=VARCHAR}, #{orgReadTime,jdbcType=VARCHAR}, 
+      #{orgReadBy,jdbcType=VARCHAR}, #{orgAmendFlag,jdbcType=VARCHAR}, #{orgAmendMemo,jdbcType=VARCHAR}, 
+      #{orgAmendTime,jdbcType=VARCHAR}, #{orgAmendBy,jdbcType=VARCHAR}, #{enabled,jdbcType=VARCHAR}, 
+      #{comments,jdbcType=VARCHAR}, #{orgAutoSyn,jdbcType=VARCHAR}, #{adviseNo,jdbcType=VARCHAR}, 
+      #{processStatus,jdbcType=VARCHAR}, current_timestamp, #{processMessage,jdbcType=VARCHAR}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgDiffCheck" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      select Isg_Diff_Check_s.nextval from dual
+    </selectKey>
+    insert into ISG_DIFF_CHECK
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INTERFACE_ID,
+      <if test="checkDate != null" >
+        CHECK_DATE,
+      </if>
+      <if test="checkOrgCode != null" >
+        CHECK_ORG_CODE,
+      </if>
+      <if test="checkEntityType != null" >
+        CHECK_ENTITY_TYPE,
+      </if>
+      <if test="checkEntityNo != null" >
+        CHECK_ENTITY_NO,
+      </if>
+      <if test="checkEntityRefPeriod != null" >
+        CHECK_ENTITY_REF_PERIOD,
+      </if>
+      <if test="checkPhase != null" >
+        CHECK_PHASE,
+      </if>
+      <if test="checkResultCode != null" >
+        CHECK_RESULT_CODE,
+      </if>
+      <if test="checkResultMemo01 != null" >
+        CHECK_RESULT_MEMO01,
+      </if>
+      <if test="checkResultMemo02 != null" >
+        CHECK_RESULT_MEMO02,
+      </if>
+      <if test="orgReadFlag != null" >
+        ORG_READ_FLAG,
+      </if>
+      <if test="orgReadTime != null" >
+        ORG_READ_TIME,
+      </if>
+      <if test="orgReadBy != null" >
+        ORG_READ_BY,
+      </if>
+      <if test="orgAmendFlag != null" >
+        ORG_AMEND_FLAG,
+      </if>
+      <if test="orgAmendMemo != null" >
+        ORG_AMEND_MEMO,
+      </if>
+      <if test="orgAmendTime != null" >
+        ORG_AMEND_TIME,
+      </if>
+      <if test="orgAmendBy != null" >
+        ORG_AMEND_BY,
+      </if>
+      <if test="enabled != null" >
+        ENABLED,
+      </if>
+      <if test="comments != null" >
+        COMMENTS,
+      </if>
+      <if test="orgAutoSyn != null" >
+        ORG_AUTO_SYN,
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO,
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS,
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE,
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{interfaceId,jdbcType=DECIMAL},
+      <if test="checkDate != null" >
+        #{checkDate,jdbcType=VARCHAR},
+      </if>
+      <if test="checkOrgCode != null" >
+        #{checkOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="checkEntityType != null" >
+        #{checkEntityType,jdbcType=VARCHAR},
+      </if>
+      <if test="checkEntityNo != null" >
+        #{checkEntityNo,jdbcType=VARCHAR},
+      </if>
+      <if test="checkEntityRefPeriod != null" >
+        #{checkEntityRefPeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="checkPhase != null" >
+        #{checkPhase,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResultCode != null" >
+        #{checkResultCode,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResultMemo01 != null" >
+        #{checkResultMemo01,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResultMemo02 != null" >
+        #{checkResultMemo02,jdbcType=VARCHAR},
+      </if>
+      <if test="orgReadFlag != null" >
+        #{orgReadFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="orgReadTime != null" >
+        #{orgReadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="orgReadBy != null" >
+        #{orgReadBy,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAmendFlag != null" >
+        #{orgAmendFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAmendMemo != null" >
+        #{orgAmendMemo,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAmendTime != null" >
+        #{orgAmendTime,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAmendBy != null" >
+        #{orgAmendBy,jdbcType=VARCHAR},
+      </if>
+      <if test="enabled != null" >
+        #{enabled,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAutoSyn != null" >
+        #{orgAutoSyn,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgDiffCheck" >
+    update ISG_DIFF_CHECK
+    <set >
+      <if test="checkDate != null" >
+        CHECK_DATE = #{checkDate,jdbcType=VARCHAR},
+      </if>
+      <if test="checkOrgCode != null" >
+        CHECK_ORG_CODE = #{checkOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="checkEntityType != null" >
+        CHECK_ENTITY_TYPE = #{checkEntityType,jdbcType=VARCHAR},
+      </if>
+      <if test="checkEntityNo != null" >
+        CHECK_ENTITY_NO = #{checkEntityNo,jdbcType=VARCHAR},
+      </if>
+      <if test="checkEntityRefPeriod != null" >
+        CHECK_ENTITY_REF_PERIOD = #{checkEntityRefPeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="checkPhase != null" >
+        CHECK_PHASE = #{checkPhase,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResultCode != null" >
+        CHECK_RESULT_CODE = #{checkResultCode,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResultMemo01 != null" >
+        CHECK_RESULT_MEMO01 = #{checkResultMemo01,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResultMemo02 != null" >
+        CHECK_RESULT_MEMO02 = #{checkResultMemo02,jdbcType=VARCHAR},
+      </if>
+      <if test="orgReadFlag != null" >
+        ORG_READ_FLAG = #{orgReadFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="orgReadTime != null" >
+        ORG_READ_TIME = #{orgReadTime,jdbcType=VARCHAR},
+      </if>
+      <if test="orgReadBy != null" >
+        ORG_READ_BY = #{orgReadBy,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAmendFlag != null" >
+        ORG_AMEND_FLAG = #{orgAmendFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAmendMemo != null" >
+        ORG_AMEND_MEMO = #{orgAmendMemo,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAmendTime != null" >
+        ORG_AMEND_TIME = #{orgAmendTime,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAmendBy != null" >
+        ORG_AMEND_BY = #{orgAmendBy,jdbcType=VARCHAR},
+      </if>
+      <if test="enabled != null" >
+        ENABLED = #{enabled,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        COMMENTS = #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAutoSyn != null" >
+        ORG_AUTO_SYN = #{orgAutoSyn,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgDiffCheck" >
+    update ISG_DIFF_CHECK
+    set CHECK_DATE = #{checkDate,jdbcType=VARCHAR},
+      CHECK_ORG_CODE = #{checkOrgCode,jdbcType=VARCHAR},
+      CHECK_ENTITY_TYPE = #{checkEntityType,jdbcType=VARCHAR},
+      CHECK_ENTITY_NO = #{checkEntityNo,jdbcType=VARCHAR},
+      CHECK_ENTITY_REF_PERIOD = #{checkEntityRefPeriod,jdbcType=VARCHAR},
+      CHECK_PHASE = #{checkPhase,jdbcType=VARCHAR},
+      CHECK_RESULT_CODE = #{checkResultCode,jdbcType=VARCHAR},
+      CHECK_RESULT_MEMO01 = #{checkResultMemo01,jdbcType=VARCHAR},
+      CHECK_RESULT_MEMO02 = #{checkResultMemo02,jdbcType=VARCHAR},
+      ORG_READ_FLAG = #{orgReadFlag,jdbcType=VARCHAR},
+      ORG_READ_TIME = #{orgReadTime,jdbcType=VARCHAR},
+      ORG_READ_BY = #{orgReadBy,jdbcType=VARCHAR},
+      ORG_AMEND_FLAG = #{orgAmendFlag,jdbcType=VARCHAR},
+      ORG_AMEND_MEMO = #{orgAmendMemo,jdbcType=VARCHAR},
+      ORG_AMEND_TIME = #{orgAmendTime,jdbcType=VARCHAR},
+      ORG_AMEND_BY = #{orgAmendBy,jdbcType=VARCHAR},
+      ENABLED = #{enabled,jdbcType=VARCHAR},
+      COMMENTS = #{comments,jdbcType=VARCHAR},
+      ORG_AUTO_SYN = #{orgAutoSyn,jdbcType=VARCHAR},
+      ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL}
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </update>
+  
+  
+  <select id="selectByAdviseNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from ISG_DIFF_CHECK
+    where advise_no = #{adviseNo,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="updateUploadFlag" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    update ISG_DIFF_CHECK
+    set UPLOAD_FLAG = 'Y',
+        PROCESS_DATE = CURRENT_TIMESTAMP
+    where advise_no = #{adviseNo,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="queryDiffChecks" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgDiffCheck" >
+    select 
+    INTERFACE_ID, CHECK_DATE, CHECK_ORG_CODE, CHECK_ENTITY_TYPE, CHECK_ENTITY_NO, CHECK_ENTITY_REF_PERIOD, 
+    CHECK_PHASE, CHECK_RESULT_CODE, CHECK_RESULT_MEMO01, CHECK_RESULT_MEMO02, ORG_READ_FLAG, 
+    ORG_READ_TIME, ORG_READ_BY, ORG_AMEND_FLAG, ORG_AMEND_MEMO, ORG_AMEND_TIME, ORG_AMEND_BY, 
+    ENABLED, COMMENTS, ORG_AUTO_SYN, ADVISE_NO, PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+    idc.REQUEST_ID, idc.PROGRAM_ID, UPLOAD_FLAG, CASE check_entity_type
+         WHEN 'DLR' THEN
+          coalesce((SELECT 'Y'
+                     FROM mm_member mm
+                    WHERE mm.member_code = idc.check_entity_no),
+                   'N')
+         ELSE 'N' END AS IS_EXCIT
+    from ISG_DIFF_CHECK idc
+    <where>
+     <if test="uploadFlag != null" >
+        UPLOAD_FLAG = #{uploadFlag,jdbcType=VARCHAR}
+      </if>
+       <if test="checkOrgCode != null" >
+        and CHECK_ORG_CODE = #{checkOrgCode,jdbcType=VARCHAR}
+      </if>
+      <if test="checkEntityType != null" >
+        and CHECK_ENTITY_TYPE = #{checkEntityType,jdbcType=VARCHAR}
+      </if>
+      <if test="checkEntityNo != null" >
+        and CHECK_ENTITY_NO = #{checkEntityNo,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+  
+  <select id="updateByAdviseAndEntityNo" resultMap="BaseResultMap" parameterType="java.util.Map" >
+   update ISG_DIFF_CHECK
+    set UPLOAD_FLAG = #{uploadFlag,jdbcType=VARCHAR},
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+        PROCESS_DATE = CURRENT_TIMESTAMP
+    where advise_no = #{adviseNo,jdbcType=VARCHAR}
+    and CHECK_ENTITY_NO =  #{checkEntityNo,jdbcType=VARCHAR}
+    and CHECK_ENTITY_TYPE = #{checkEntityType,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select <include refid="Base_Column_List" />
+      from ISG_DIFF_CHECK
+    <where>
+        PROCESS_DATE &gt; #{processDateFrom,jdbcType=TIMESTAMP}
+        <if test="requestDateTo != null" >
+            AND PROCESS_DATE &lt; #{processDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="processStatus != null" >
+            AND PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="advoiseNo != null" >
+            AND ADVISE_NO = #{advoiseNo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by interface_id desc
+  </select>
+</mapper>

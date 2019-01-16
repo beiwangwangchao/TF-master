@@ -1,0 +1,326 @@
+<#--
+ * description: 发票编号发放界面
+ * version: 1.0
+ * author: chenjingxiong
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?ruleTypeData=OM.INVOICE_NO_RULE" type="text/javascript"></script>
+<body>
+    <div id="numberingGrid"></div>
+<script type="text/javascript">
+        jQuery.validator.addMethod("requiredWithRuleType",
+		    function(value, element) {
+		        var row = element.row;
+
+		        if (row.ruleType == 'SYSAS' && !value) {
+		        	  return false;
+			    }
+			    return true;
+			},'<@spring.message "msg.error.system.enter_required"/>.');
+
+		jQuery.validator.addMethod("notGreatThanEndDate",
+			function(value, element) {
+			    var row = element.row;
+	
+			    if (row.ruleType == 'SYSAS' && row.startActiveDate != null && row.endActiveDate != null) {
+			        var startActiveDate = row.startActiveDate,
+			        endActiveDate = row.endActiveDate;
+			        if (typeof row.startActiveDate == 'string') {
+			            startActiveDate = new Date(row.startActiveDate)
+			        }
+			        if (typeof row.endActiveDate == 'string') {
+			            endActiveDate = new Date(row.endActiveDate)
+			        }
+	
+			        if (endActiveDate < startActiveDate) {
+			            return false;
+			        }
+			    }
+			    return true;
+			},
+			'<@spring.message "msg.error.config.numbering.great_than_end_date"/>');
+		
+		jQuery.validator.addMethod("stringMaxLength", function(value, element, param) {  
+	        var length = value.length;  
+	        for(var i = 0; i < value.length; i++){  
+	            if(value.charCodeAt(i) > 127){  
+	                length = length + 2;  
+	            }  
+	        }  
+	        return this.optional(element) || ( length <= param );  
+	    }, "<@spring.message "sys.hand.validate.maxlength"/>");  
+
+		var rowindex ;
+		window['numberingGrid'] = $("#numberingGrid").ligerGrid({
+		    columns: [{
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.marketid"/>',
+		        name: "marketId",
+		        type: "popup",
+		        textField: 'marketName',
+		        editor: {
+		            staticOptions: ${lovService.getLov(base.contextPath, base.locale, "lov_market")},
+		            type: "popup"
+
+		        },
+		        validate: {
+		            required: true
+		        }
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.name"/>',
+		        name: 'name',
+		        type: 'text',
+		        width:200,
+		        align: 'center',
+		        editor: {
+		            type: 'text'
+		        },
+		        validate: {
+		            required: true,
+		            stringMaxLength : 40
+		        }
+
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.ruletype"/>',
+		        name: 'ruleType',
+		        type: 'select',
+		        align: 'center',
+		        valueField: 'ruleType',
+		        render: function(item) {
+		            for (var i = 0; i < ruleTypeData.length; i++) {
+		                if (ruleTypeData[i].value == item.ruleType) {
+		                    return ruleTypeData[i].meaning;
+		                }
+		            }
+		        },
+		        editor: {
+		            type: 'select',
+		            staticOptions: {
+		                valueField: 'value',
+		                textField: 'meaning',
+		                data: ruleTypeData
+		            }
+		        },
+		        validate: {
+		            required: true
+		        }
+
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.startactivedate"/>',
+		        name: 'startActiveDate',
+		        type: 'date',
+		        width:100,
+		        align: 'center',
+		        editor: {
+		            type: 'date'
+		        },
+		        validate: {
+					required: true,
+		            notGreatThanEndDate: true
+		        }
+
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.endactivedate"/>',
+		        name: 'endActiveDate',
+		        type: 'date',
+                width:100,
+		        align: 'center',
+		        editor: {
+		            type: 'date'
+		        },
+		        validate: {
+					required: true,
+		            notGreatThanEndDate: true
+		        }
+
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.prefix"/>',
+		        name: 'prefix',
+		        type: 'text',
+		        align: 'center',
+		        editor: {
+		            type: 'text'
+		        },
+		        validate : {
+		        	maxlength : 3
+		        }
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.initnumber"/>',
+		        name: 'initNumber',
+		        type: 'text',
+		        align: 'center',
+		        editor: {
+		            type: 'text'
+		        },
+		        validate: {
+		            requiredWithRuleType: true
+		        }
+
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.maxnumber"/>',
+		        name: 'maxNumber',
+		        type: 'text',
+		        align: 'center',
+		        editor: {
+		            type: 'text'
+		        },
+		        validate: {
+		            requiredWithRuleType: true
+		        }
+
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.currentnumber"/>',
+		        name: 'currentNumber',
+		        type: 'text',
+		        align: 'center'
+
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.suffix"/>',
+		        name: 'suffix',
+		        type: 'text',
+		        align: 'center',
+		        editor: {
+		            type: 'text'
+		        },
+                validate : {
+                    maxlength : 3
+                }
+
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.steplen"/>',
+		        name: 'stepLen',
+		        type: 'text',
+		        align: 'center',
+		        editor: {
+		            value: 1,
+		            type: 'int'
+		        },
+		        validate: {
+		            requiredWithRuleType: true
+		        }
+
+		    },
+		    {
+		        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.enabledflag"/>',
+		        name: 'enabledFlag',
+		        align: 'center',
+		        editor: {
+		            type: 'checkbox',
+		            align: 'center',
+		            staticOptions: {
+		                value: 'Y',
+		                checkValue: 'Y',
+		                uncheckValue: 'N'
+		            }
+		        }
+		    },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.zeroflag"/>',
+                name: 'zeroFlag',
+                align: 'center',
+                editor: {
+                    type: 'checkbox',
+                    align: 'center',
+                    staticOptions: {
+                        value: 'Y',
+                        checkValue: 'Y',
+                        uncheckValue: 'N'
+                    }
+                },
+                validate: {
+                    required: true
+                }
+            }],
+		    url: '${base.contextPath}/spm/numbering/query',
+		    toolbar: {
+		        items: [{
+		            text: '<@spring.message "sys.hand.btn.new"/>',
+		            click: function() {
+		                numberingGrid.addRow({
+		                    stepLen: 1,
+		                    enabledFlag: 'N',
+		                    zeroFlag: 'Y',
+		                    startActiveDate: new Date()
+		                });
+		            },
+		            icon: 'add'
+		        },
+		        {
+		            text: '<@spring.message "sys.hand.btn.save"/>',
+		            click: function() {
+		                Hap.gridSave({
+		                    grid: numberingGrid,
+		                    url: '${base.contextPath}/spm/numbering/save'
+		                })
+		            },
+		            icon: 'save'
+		        },
+		        { line: true },
+                { text: '<@spring.message "sys.hand.btn.delete"/>', click: function(){
+                	var row = numberingGrid.getSelectedRow();
+                	for(var i=0;i<numberingGrid.selected.length;i++){
+	                	if (row != null && numberingGrid.selected[i].enabledFlag == "Y") {
+	                		Hap.showError('<@spring.message "msg.error.config.numbering.can_not_delete"/>');
+	                		return false;
+	                	}
+                	}
+                    Hap.gridDelete({
+                       grid:numberingGrid,
+                       url: '${base.contextPath}/spm/numbering/delete'
+                   }) 
+                   
+               }, icon: 'delete'}]
+		    },
+		    enabledEdit: true,
+		    checkbox: true,
+		    onBeforeEdit:beforeEdit,
+		    onAfterEdit:afterEdit,
+		    width: '100%',
+		    height: '99%'
+		});
+
+		function beforeEdit(item) {
+            rowindex = item.rowindex;
+			var name = item.column.name,data = item.record;
+
+            if(name == 'initNumber' || name == 'maxNumber' || name == 'stepLen') {
+                if (data.ruleType == 'ORDER'){
+                    item.column.validate.required = false;
+                } else {
+                    item.column.validate.required = true;
+                }
+                return true;
+            } else if (name=="ruleType" && data.ruleId != null) {
+				return false;
+			} else if (data.ruleType == 'ORDER' && (name == "prefix"  || name == "suffix" || name == "stepLen"|| name == "initNumber"|| name == "maxNumber")) {
+				return false;
+			}
+		}
+		
+		function afterEdit(item) {
+			var name = item.column.name,lastEditRow = item.record;   
+			if(lastEditRow.ruleType == 'ORDER') {
+				var data = {};
+				data.prefix = '';
+				data.suffix = '';
+				data.stepLen = '';
+				data.initNumber = '';
+				data.maxNumber = '';
+	            numberingGrid.updateRow(lastEditRow, data);
+			}
+            numberingGrid.reRender();
+		}
+</script>
+</body>
+</html>

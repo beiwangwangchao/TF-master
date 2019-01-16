@@ -1,0 +1,119 @@
+<#--
+ * description: 角色界面
+ * version: 1.0 
+ * author:njq.niu@hand-china.com
+ * Copyright LKK Health Products Group Limited 
+ * 
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+    <form id="roleForm"></form>
+    <div id="roleGrid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function() {
+        window['roleForm'] = $("#roleForm").ligerForm({
+            fields : [ {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolecode"/>',
+                name : 'roleCode'
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolename"/>',
+                name : 'roleName',
+                newline : false
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.roledesc"/>',
+                name : 'roleDesc'
+            } ],
+            buttons : [ {
+                text : '<@spring.message "sys.hand.btn.query"/>',
+                disabled : false,
+                width : 60,
+                click : function() {
+                    Hap.gridQuery({
+                        form : roleForm,
+                        grid : roleGrid
+                    })
+                }
+            } ]
+        });
+
+        window['roleGrid'] = $("#roleGrid").ligerGrid({
+            unSetValidateAttr : false,
+            columns : [ {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolecode"/>',
+                name : 'roleCode',
+                align : 'left',
+                width : 120,
+                editor : {
+                    type : 'text'
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolename"/>',
+                name : 'roleName',
+                align : 'left',
+                width : 150,
+                editor : {
+                    type : 'text'
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.roledesc"/>',
+                name : 'roleDesc',
+                align : 'left',
+                width : 180,
+                editor : {
+                    type : 'text'
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.areaid"/>',
+                name : 'areaId',
+                align : 'left',
+                width : 100,
+                editor : {
+                    type : 'int'
+                }
+            } ],
+            url : '${base.contextPath}/sys/role/query',
+            toolbar : {
+                items : [ {
+                    text : '<@spring.message "sys.hand.btn.new"/>',
+                    disable : false,
+                    click : function() {
+                        roleGrid.addRow({})
+                    },
+                    icon : 'add'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click : function() {
+                        Hap.gridDelete({
+                            grid : roleGrid,
+                            url : '${base.contextPath}/sys/role/delete'
+                        })
+
+                    },
+                    icon : 'delete'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.save"/>',
+                    click : function() {
+                        Hap.gridSave({
+                            grid : roleGrid,
+                            url : '${base.contextPath}/sys/role/submit'
+                        })
+                    },
+                    icon : 'save'
+                } ]
+            },
+            enabledEdit : true,
+            width : '99%',
+            height : '98%',
+            checkbox : true
+        });
+    });
+    </script>
+</body>
+</html>

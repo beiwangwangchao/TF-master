@@ -1,0 +1,648 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmOrgDefinationMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.config.dto.SpmOrgDefination" >
+    <id column="DEFINATION_ID" property="definationId" jdbcType="DECIMAL" />
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="ORG_TYPE" property="orgType" jdbcType="VARCHAR" />
+    <result column="LOCATION_ID" property="locationId" jdbcType="DECIMAL" />
+    <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+    <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="INV_ORG_ID" property="invOrgId" jdbcType="DECIMAL" />
+    <result column="SALES_ORG_FLAG" property="salesOrgFlag" jdbcType="VARCHAR" />
+    <result column="INV_ORG_FLAG" property="invOrgFlag" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="COST_ORG_ID" property="costOrgId" jdbcType="DECIMAL" />
+    <result column="COST_ORG_NAME" property="costOrgName" jdbcType="VARCHAR" />
+    <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+    <result column="COMPANY_NAME" property="companyName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    DEFINATION_ID, CODE, NAME, DESCRIPTION, ORG_TYPE, LOCATION_ID, ENABLED_FLAG, START_ACTIVE_DATE, 
+    END_ACTIVE_DATE, SALES_ORG_ID, INV_ORG_ID, SALES_ORG_FLAG, INV_ORG_FLAG, OBJECT_VERSION_NUMBER, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, COST_ORG_ID,COMPANY_ID
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from SPM_ORG_DEFINATION_B
+    where DEFINATION_ID = #{definationId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SPM_ORG_DEFINATION_B
+    where DEFINATION_ID = #{definationId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmOrgDefination" >
+    <selectKey resultType="java.lang.Long" keyProperty="definationId" order="BEFORE" >
+      select SPM_ORG_DEFINATION_B_S.nextval from dual
+    </selectKey>
+    insert into SPM_ORG_DEFINATION_B (DEFINATION_ID, CODE, NAME, 
+      DESCRIPTION, ORG_TYPE, LOCATION_ID, 
+      ENABLED_FLAG, START_ACTIVE_DATE, END_ACTIVE_DATE, 
+      SALES_ORG_ID, INV_ORG_ID, SALES_ORG_FLAG, 
+      INV_ORG_FLAG, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+      PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+      ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+      ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, 
+      ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+      ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+      ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+      ATTRIBUTE15)
+    values (#{definationId,jdbcType=DECIMAL}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, #{orgType,jdbcType=VARCHAR}, #{locationId,jdbcType=DECIMAL}, 
+      #{enabledFlag,jdbcType=VARCHAR}, #{startActiveDate,jdbcType=TIMESTAMP}, #{endActiveDate,jdbcType=TIMESTAMP}, 
+      #{salesOrgId,jdbcType=DECIMAL}, #{invOrgId,jdbcType=DECIMAL}, #{salesOrgFlag,jdbcType=VARCHAR}, 
+      #{invOrgFlag,jdbcType=VARCHAR}, 1, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, 
+      #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, 
+      #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, 
+      #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, 
+      #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, 
+      #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, 
+      #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmOrgDefination" >
+    <selectKey resultType="java.lang.Long" keyProperty="definationId" order="BEFORE" >
+      select SPM_ORG_DEFINATION_B_S.nextval from dual
+    </selectKey>
+    insert into SPM_ORG_DEFINATION_B
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      DEFINATION_ID,
+      <if test="code != null" >
+        CODE,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="description != null" >
+        DESCRIPTION,
+      </if>
+      <if test="orgType != null" >
+        ORG_TYPE,
+      </if>
+      <if test="locationId != null" >
+        LOCATION_ID,
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG,
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE,
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE,
+      </if>
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID,
+      </if>
+      <if test="invOrgId != null" >
+        INV_ORG_ID,
+      </if>
+      <if test="salesOrgFlag != null" >
+        SALES_ORG_FLAG,
+      </if>
+      <if test="invOrgFlag != null" >
+        INV_ORG_FLAG,
+      </if>
+        OBJECT_VERSION_NUMBER,
+        
+        
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+        
+        
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+        
+        
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="costOrgId != null" >
+        COST_ORG_ID,
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{definationId,jdbcType=DECIMAL},
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="orgType != null" >
+        #{orgType,jdbcType=VARCHAR},
+      </if>
+      <if test="locationId != null" >
+        #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="enabledFlag != null" >
+        #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endActiveDate != null" >
+        #{endActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="salesOrgId != null" >
+        #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="invOrgId != null" >
+        #{invOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="salesOrgFlag != null" >
+        #{salesOrgFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="invOrgFlag != null" >
+        #{invOrgFlag,jdbcType=VARCHAR},
+      </if>
+        1,
+        
+        
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+        
+        
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+        
+        
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="costOrgId != null" >
+        #{costOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmOrgDefination" >
+    update SPM_ORG_DEFINATION_B
+    <set >
+      <if test="code != null" >
+        CODE = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="orgType != null" >
+        ORG_TYPE = #{orgType,jdbcType=VARCHAR},
+      </if>
+      <if test="locationId != null" >
+        LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="invOrgId != null" >
+        INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="salesOrgFlag != null" >
+        SALES_ORG_FLAG = #{salesOrgFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="invOrgFlag != null" >
+        INV_ORG_FLAG = #{invOrgFlag,jdbcType=VARCHAR},
+      </if>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+        
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+         LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+         
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="costOrgId != null" >
+        COST_ORG_ID = #{costOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID = #{companyId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where DEFINATION_ID = #{definationId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmOrgDefination" >
+    update SPM_ORG_DEFINATION_B
+    set CODE = #{code,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      DESCRIPTION = #{description,jdbcType=VARCHAR},
+      ORG_TYPE = #{orgType,jdbcType=VARCHAR},
+      LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+      ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+      SALES_ORG_FLAG = #{salesOrgFlag,jdbcType=VARCHAR},
+      INV_ORG_FLAG = #{invOrgFlag,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER +1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      COST_ORG_ID = #{costOrgId,jdbcType=DECIMAL},
+      COMPANY_ID = #{companyId,jdbcType=DECIMAL},
+    where DEFINATION_ID = #{definationId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="queryByOrganization" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmOrgDefination">
+  select 
+  b.defination_id, 
+  b.code, 
+  t.name, 
+  t.description, 
+  b.org_type, 
+  b.location_id, 
+  b.enabled_flag, 
+  b.start_active_date, 
+  b.end_active_date, 
+  b.sales_org_id, 
+  b.inv_org_id, 
+  b.sales_org_flag, 
+  b.inv_org_flag,
+  b.cost_org_id,
+  b.company_id,
+  cost_inv_ids.name cost_org_name,
+  sc.name as company_name
+  from spm_org_defination_b b
+  	left outer join (
+  		select cost_tl.name, cost_b.inv_org_id
+  		from spm_org_defination_b cost_b
+  			left outer join spm_org_defination_tl cost_tl 
+  				on (cost_b.defination_id = cost_tl.defination_id and cost_tl.lang = #{request.locale,jdbcType=VARCHAR})
+  	) cost_inv_ids on cost_inv_ids.inv_org_id = b.cost_org_id
+  	left join spm_org_defination_tl t
+  		on (b.defination_id = t.defination_id and t.lang = #{request.locale,jdbcType=VARCHAR})
+    left outer join SPM_COMPANY_B sc
+    on(b.COMPANY_ID=sc.COMPANY_ID)
+   <where>
+   (b.end_active_date > current_timestamp or b.end_active_date is null)
+    <if test="code != null">
+    AND Upper(b.code) like concat('%', concat(Upper(#{code,jdbcType=VARCHAR}), '%'))   
+    </if>
+    <if test="name != null">
+    AND Upper(t.name) like concat('%',concat(Upper(#{name,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="orgType != null">
+    AND b.org_type = #{orgType,jdbcType=VARCHAR}
+    </if>
+    <if test="salesOrgFlag != null">
+    AND b.sales_org_flag = #{salesOrgFlag,jdbcType=VARCHAR}
+    </if>
+    <if test="invOrgFlag != null">
+    AND b.inv_org_flag = #{invOrgFlag,jdbcType=VARCHAR}
+    </if>
+    </where>
+    <if test="sortname =='code'">
+                order by b.code ${sortorder}
+    </if>
+    <if test="sortname =='name'">
+                order by t.name ${sortorder}
+    </if>
+  </select>
+
+  <select id="queryByOrganization2" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmOrgDefination">
+    select
+    b.defination_id,
+    b.code,
+    t.name,
+    t.description,
+    b.org_type,
+    b.location_id,
+    b.enabled_flag,
+    b.start_active_date,
+    b.end_active_date,
+    b.sales_org_id,
+    b.inv_org_id,
+    b.sales_org_flag,
+    b.inv_org_flag,
+    b.cost_org_id,
+    b.company_id,
+    cost_inv_ids.name cost_org_name,
+    sc.name as company_name
+    from spm_org_defination_b b
+    left outer join (
+    select cost_tl.name, cost_b.inv_org_id
+    from spm_org_defination_b cost_b
+    left outer join spm_org_defination_tl cost_tl
+    on (cost_b.defination_id = cost_tl.defination_id and cost_tl.lang = #{request.locale,jdbcType=VARCHAR})
+    ) cost_inv_ids on cost_inv_ids.inv_org_id = b.cost_org_id
+    left join spm_org_defination_tl t
+    on (b.defination_id = t.defination_id and t.lang = #{request.locale,jdbcType=VARCHAR})
+    left outer join SPM_COMPANY_B sc
+    on(b.COMPANY_ID=sc.COMPANY_ID)
+    <where>
+      (b.end_active_date > current_timestamp or b.end_active_date is null)
+      AND (sc.COMPANY_ID = (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+           OR sc.GST_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL}))
+      <if test="code != null">
+        AND Upper(b.code) like concat('%', concat(Upper(#{code,jdbcType=VARCHAR}), '%'))
+      </if>
+      <if test="name != null">
+        AND Upper(t.name) like concat('%',concat(Upper(#{name,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="orgType != null">
+        AND b.org_type = #{orgType,jdbcType=VARCHAR}
+      </if>
+      <if test="salesOrgFlag != null">
+        AND b.sales_org_flag = #{salesOrgFlag,jdbcType=VARCHAR}
+      </if>
+      <if test="invOrgFlag != null">
+        AND b.inv_org_flag = #{invOrgFlag,jdbcType=VARCHAR}
+      </if>
+    </where>
+    <if test="sortname =='code'">
+      order by b.code ${sortorder}
+    </if>
+    <if test="sortname =='name'">
+      order by t.name ${sortorder}
+    </if>
+  </select>
+
+  <!-- 退货单 根据销售组织或库存组织获取对应地址 -->
+  <select id="queryLocationByInvOrSales" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmOrgDefination">
+  select 
+  b.defination_id, 
+  b.code, 
+  t.name, 
+  t.description, 
+  b.location_id, 
+  b.sales_org_id, 
+  b.inv_org_id, 
+  b.sales_org_flag, 
+  b.inv_org_flag
+  from spm_org_defination_b b
+  left join spm_org_defination_tl t
+  on (b.defination_id = t.defination_id and t.lang = #{request.locale,jdbcType=VARCHAR})
+   <where>
+   	b.SALES_ORG_FLAG = 'Y' AND b.ENABLED_FLAG = 'Y'
+    <if test="salesOrgId != null">
+    AND b.SALES_ORG_ID = #{salesOrgId, jdbcType=VARCHAR}
+    </if>
+    <if test="invOrgId != null">
+    AND b.SALES_ORG_FLAG = #{salesOrgFlag, jdbcType=VARCHAR}
+    </if>
+    </where>
+  </select>
+  
+  <select id="checkRepeatByCode" parameterType="java.lang.String" resultType="java.lang.Integer">
+    select count(0)
+    from spm_org_defination_b b 
+    where b.code = #{orgCode,jdbcType=VARCHAR}
+  </select>
+
+  <select id="querySameCompanySalesOrgId" parameterType="java.lang.Long" resultType="java.lang.Long">
+    SELECT b.SALES_ORG_ID
+    FROM SPM_ORG_DEFINATION_B b
+    where b.COMPANY_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b
+              WHERE b.MARKET_ID =#{request.marketId,jdbcType=VARCHAR})
+    INTERSECT
+    SELECT sura.ASSIGN_VALUE from SYS_USER_ROLE_ASSIGN sura
+    where sura.USER_ID = #{request.userId,jdbcType=VARCHAR}
+    AND sura.ROLE_ID = #{request.roleId,jdbcType=VARCHAR}
+    AND sura.ASSIGN_TYPE = 'SALES'
+  </select>
+  
+</mapper>

@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.common.inventory.mapper.InvLotMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.inventory.dto.InvLot">
+        <id column="ORGANIZATION_ID" property="organizationId" jdbcType="DECIMAL" />
+        <id column="ITEM_ID" property="itemId" jdbcType="DECIMAL" />
+        <id column="LOT_NUMBER" property="lotNumber" jdbcType="VARCHAR" />
+        <id column="QUANTITY" property="quantity" jdbcType="DECIMAL" />
+        <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR" />
+        <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+        <result column="EXPIRY_DATE" property="expiryDate" jdbcType="TIMESTAMP" />
+        <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+        <result column="ORGANIZATION_NAME" property="organizationName" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ORGANIZATION_ID,ITEM_ID,LOT_NUMBER,EXPIRY_DATE,ENABLED_FLAG,
+        OBJECT_VERSION_NUMBER, REQUEST_ID, 
+        PROGRAM_ID,
+        CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10,
+        ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14,
+        ATTRIBUTE15
+    </sql>
+
+    <insert id="insertInvLot" parameterType="com.lkkhpg.dsis.common.inventory.dto.InvLot">
+        insert into INV_LOT
+        (ORGANIZATION_ID,ITEM_ID,LOT_NUMBER,EXPIRY_DATE,ENABLED_FLAG,
+        REQUEST_ID,
+        PROGRAM_ID, CREATION_DATE,
+        CREATED_BY,
+        LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2,
+        ATTRIBUTE3,
+        ATTRIBUTE4,
+        ATTRIBUTE5,
+        ATTRIBUTE6, ATTRIBUTE7,
+        ATTRIBUTE8,
+        ATTRIBUTE9, ATTRIBUTE10,
+        ATTRIBUTE11,
+        ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14,
+        ATTRIBUTE15)
+        values
+        (#{organizationId,jdbcType=DECIMAL}, #{itemId,jdbcType=DECIMAL},
+        #{lotNumber,jdbcType=VARCHAR},
+        #{expiryDate,jdbcType=TIMESTAMP},
+        #{enabledFlag,jdbcType=VARCHAR},
+        #{requestId,jdbcType=DECIMAL},
+        #{programId,jdbcType=DECIMAL},
+        current_timestamp,
+        #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        current_timestamp,
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR},
+        #{attribute3,jdbcType=VARCHAR},
+        #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR},
+        #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR},
+        #{attribute9,jdbcType=VARCHAR},
+        #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR},
+        #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR},
+        #{attribute15,jdbcType=VARCHAR})
+    </insert>
+    
+    <!-- 插入批次 -->
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.inventory.dto.InvLot" >
+    insert into INV_LOT
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="organizationId != null" >
+        ORGANIZATION_ID,
+      </if>
+      <if test="itemId != null" >
+        ITEM_ID,
+      </if>
+      <if test="lotNumber != null" >
+        LOT_NUMBER,
+      </if>
+      <if test="expiryDate != null" >
+        EXPIRY_DATE,
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG,
+      </if>
+        OBJECT_VERSION_NUMBER,
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="organizationId != null" >
+        #{organizationId,jdbcType=DECIMAL},
+      </if>
+      <if test="itemId != null" >
+        #{itemId,jdbcType=DECIMAL},
+      </if>
+      <if test="lotNumber != null" >
+        #{lotNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="expiryDate != null" >
+        #{expiryDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="enabledFlag != null" >
+        #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+        1,
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+        current_timestamp,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        current_timestamp,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+    <delete id="deleteInvLot" parameterType="com.lkkhpg.dsis.common.inventory.dto.InvLot">
+        delete from INV_LOT
+        where ORGANIZATION_ID =
+        #{organizationId,jdbcType=DECIMAL}
+        and ITEM_ID
+        = #{itemId,jdbcType=DECIMAL}
+        and LOT_NUMBER =
+        #{lotNumber,jdbcType=VARCHAR}
+    </delete>
+
+    <update id="updateInvLot" parameterType="com.lkkhpg.dsis.common.inventory.dto.InvLot">
+        update INV_LOT
+        <set>
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="expiryDate != null">
+                EXPIRY_DATE = #{expiryDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enabledFlag != null">
+                ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL}
+        	and ITEM_ID = #{itemId,jdbcType=DECIMAL} 
+        	and LOT_NUMBER = #{lotNumber,jdbcType=VARCHAR}
+    </update>
+    <select id="selectInvLot" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.dto.InvLot">
+        <!-- select
+        iib.item_id,iib.item_number,iib.item_name
+        from INV_ITEM_B iib
+        
+        <where> -->
+            <!-- <if test="organizationId != null">
+                il.ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL}
+            </if> -->
+            <!-- <if test="itemNumber != null">
+                AND iib.item_number like concat('%', concat(#{itemNumber, jdbcType=VARCHAR}, '%'))
+            </if>
+            <if test="itemName != null">
+                AND iib.item_name like concat('%', concat(#{itemName, jdbcType=VARCHAR}, '%'))
+            </if>
+        </where> -->
+        select
+        <include refid="Base_Column_List" />
+        from inv_lot
+        <where>
+        	<if test="organizationId != null">
+        		organization_id = #{organizationId,jdbcType=DECIMAL}
+        	</if>
+        	<if test="lotNumber != null">
+                and lot_number = #{lotNumber,jdbcType=VARCHAR}
+            </if>
+            <if test="itemId != null">
+                and item_id = #{itemId,jdbcType=DECIMAL}
+            </if>
+        </where>
+        <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        
+    </select>
+
+    <select id="selectInvLotsByParas" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.dto.InvLot">
+        select iib.item_number,iit.item_name,il.organization_id,
+        il.item_id,org.name organization_name,
+        il.lot_number,
+        il.expiry_date,
+        il.enabled_flag,
+        il.object_version_number, il.request_id,
+        il.program_id,
+        il.creation_date,
+        il.created_by, il.last_updated_by,
+        il.last_update_daTe,
+        il.last_update_login, il.attribute_category,
+        il.attribute1, il.attribute2,
+        il.attribute3, il.attribute4,
+        il.attribute5, il.attribute6,
+        il.attribute7,
+        il.attribute8,
+        il.attribute9, il.attribute10,
+        il.attribute11, il.attribute12,
+        il.attribute13, il.attribute14,
+        il.attribute15
+        FROM inv_lot il
+        LEFT
+        OUTER JOIN inv_item_b iib
+        ON (il.item_id = iib.item_id)
+        LEFT OUTER JOIN
+        inv_item_tl iit
+        ON (il.item_id = iit.item_id AND iit.lang =
+        #{request.locale,jdbcType=VARCHAR})
+        LEFT OUTER JOIN
+        SPM_INV_ORGANIZATION_B org
+        ON (il.organization_id = org.INV_ORG_ID)
+        <where>
+        	<if test="organizationId == null">
+        		il.ORGANIZATION_ID = #{request.invOrgId,jdbcType=DECIMAL}
+        	</if>
+        	<if test="organizationId != null">
+                il.ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL}
+        	</if>
+            <if test="lotNumber != null">
+                AND il.LOT_NUMBER like concat('%',concat(#{lotNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="itemId != null">
+                AND il.item_id = #{itemId,jdbcType=DECIMAL}
+            </if>
+            <if test="itemName != null">
+                AND Upper(iit.ITEM_NAME) like concat('%',concat(Upper(#{itemName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="itemNumber != null">
+                AND Upper(iib.ITEM_NUMBER) like concat('%',concat(Upper(#{itemNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="expiryDateFrom != null">
+                AND il.EXPIRY_DATE >= #{expiryDateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="expiryDateTo != null">
+                AND il.EXPIRY_DATE &lt;= #{expiryDateTo,jdbcType=TIMESTAMP}
+            </if>
+            <if test="creationDateFrom != null">
+                AND il.CREATION_DATE >= #{creationDateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="creationDateToE != null">
+                AND il.CREATION_DATE &lt;= #{creationDateToE,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        <if test="sortname =='lotNumber'">
+            order by il.lot_number ${sortorder}
+        </if>
+        <if test="sortname =='itemId'">
+            order by il.item_id ${sortorder}
+        </if>
+        <if test="sortname =='expiryDate'">
+            order by il.expiry_date ${sortorder}
+        </if>
+        <if test="sortname =='creationDate'">
+            order by il.creation_date ${sortorder}
+        </if>
+        <if test="sortname =='organizationId'">
+            order by il.organization_id ${sortorder}
+        </if>
+    </select>
+
+    <select id="queryItemLots" resultMap="BaseResultMap">
+        SELECT 
+            lot.LOT_NUMBER,
+            lot.EXPIRY_DATE,
+            (SELECT SUM(ioqq.quantity-ioqq.pending_qty)
+               FROM inv_onhand_quantity_qry_v ioqq
+              WHERE lotv.item_id = ioqq.item_id
+		    	AND lotv.lot_number = ioqq.lot_number
+		    	AND ioqq.organization_id = lot.organization_id) QUANTITY
+        FROM
+            INV_ONHAND_QUANTITY_LOT_V lotv,
+            INV_LOT lot
+        WHERE
+            lotv.LOT_NUMBER = lot.LOT_NUMBER
+            AND lotv.ITEM_ID = lot.ITEM_ID
+            AND lotv.ORGANIZATION_ID = lot.ORGANIZATION_ID
+            AND lotv.ITEM_ID =#{itemId} 
+            AND LOT.ORGANIZATION_ID = #{orgId}
+    </select>
+    <select id="queryCount" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.inventory.dto.InvLot">
+        SELECT 
+            count(1)
+        FROM
+            INV_LOT il
+       <where>
+                il.ORGANIZATION_ID = #{request.invOrgId,jdbcType=DECIMAL}
+            <if test="itemId != null">
+                AND il.item_id = #{itemId,jdbcType=DECIMAL}
+            </if>
+            <if test="lotNumber != null">
+                AND il.LOT_NUMBER =#{lotNumber,jdbcType=VARCHAR}
+            </if>
+       </where>
+    </select>
+    <!-- 退货单-批次查询 -->
+    <select id="queryInvLotCount" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.inventory.dto.InvLot">
+        SELECT 
+            count(1)
+        FROM
+            INV_LOT il
+       <where>
+       		<if test = "organizationId != null">
+                il.ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL}
+       		</if>
+            <if test="itemId != null">
+                AND il.item_id = #{itemId,jdbcType=DECIMAL}
+            </if>
+            <if test="lotNumber != null">
+                AND il.LOT_NUMBER =#{lotNumber,jdbcType=VARCHAR}
+            </if>
+       </where>
+    </select>
+</mapper>

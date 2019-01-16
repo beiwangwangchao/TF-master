@@ -1,0 +1,602 @@
+<#include "/mws/include/header.html">
+
+<script src="${base.contextPath}/resources/js/spinner${resource_suffix!}.js"></script>
+<style>
+#footer{
+    display: none;
+}
+
+#content{
+    margin-bottom: 100px;
+}
+
+@media (max-width: 800px){
+    .QtyPanel>div{
+        width:100px;
+    }
+}
+
+@media screen and (max-width: 200px) {
+     .menu>ul>li{
+             display:block;
+             width:262.5px;
+             padding-top:1px;
+             margin-bottom:1px;
+             list-style:none;
+             overflow:visible;
+         }
+}
+
+.menu ul li ul{
+    display:none;
+    margin-top:2px;
+    margin-bottom:2px;
+}
+
+.menu ul li .active{background:url(${base.contextPath}/resources/image/on.png) top right no-repeat;}
+
+.menu ul li .inactive{background:url(${base.contextPath}/resources/image/off.png) top right no-repeat;}
+
+.menu ul li ul li ul li{
+    padding-left:13px;
+    margin-bottom:2px;
+    font-size:12px;
+    color:#8f9d4c;
+}
+
+.menu ul li ul li{
+    display:block;
+    background:none;
+    list-style:circle;
+    margin-bottom:0px;
+    margin-top:0px;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:5px;
+    margin-left:2px;
+    font: 700 small-caps normal 12px/100% Arial, Helvetica, sans-serif;
+}
+
+</style>
+
+<script>
+        $.fn.menu = function(b) {
+                var c,
+                    item,
+                    httpAdress;
+                b = jQuery.extend({
+                        Speed: 220,
+                        autostart: 1,
+                        autohide: 1
+                    },
+                    b);
+                c = $(this);
+                item = c.children("ul").parent("li").children("a");
+                httpAdress = window.location;
+                item.addClass("inactive");
+
+                function _item() {
+                    var a = $(this);
+                    if (b.autohide) {
+                        a.parent().parent().find(".active").parent("li").children("ul").slideUp(b.Speed / 1.2,
+                            function() {
+                                $(this).parent("li").children("a").removeAttr("class");
+                                $(this).parent("li").children("a").attr("class", "inactive")
+                            })
+                    }
+                    if (a.attr("class") == "inactive") {
+                        a.parent("li").children("ul").slideDown(b.Speed,
+                            function() {
+                                a.removeAttr("class");
+                                a.addClass("active")
+                            })
+                    }
+                    if (a.attr("class") == "active") {
+                        a.removeAttr("class");
+                        a.addClass("inactive");
+                        a.parent("li").children("ul").slideUp(b.Speed)
+                    }
+                }
+
+                item.unbind('click').click(_item);
+
+                if (b.autostart) {
+                    c.children("a").each(function() {
+                        if (this.href == httpAdress) {
+                            $(this).parent("li").parent("ul").slideDown(b.Speed,
+                                function() {
+                                    $(this).parent("li").children(".inactive").removeAttr("class");
+                                    $(this).parent("li").children("a").addClass("active")
+                                })
+                        }
+                    })
+                }
+            }
+
+    </script>
+
+<!-- 初始化 -->
+<script type="text/javascript">
+var memberRole = "";
+<#if memberRole??>
+    memberRole = "${memberRole}";
+</#if>
+/*add furong.tang*/
+var isDisplay = "";
+<#if isDisplay??>
+isDisplay = "${isDisplay}";
+</#if>
+/*add furong.tang*/
+
+//获取快速购物商品数据
+$(function(){
+    //创建变量
+    var categoryId = [],
+        categoryName = [],
+        currencySymbol,
+        titleColor,
+        titleColors = ["sandybrown","cornflowerblue"];//在此设置表title的背景颜色数组
+        
+    $.ajax({
+        type : "POST",
+        dataType : "json",
+        url : "${base.contextPath}/fastShopping/queryProductsInCategory",
+           success : function(data) {
+               if(data.success){
+                   if(data.total != 0){
+                       $(".settlementForm .token").val(data.rows[0]);
+                       initProductMenu(data.rows[1]);
+                       initProductTable(data.rows[1]);
+                       initBottomNavbar();
+                   }
+                   else{
+                       $("#productsMenu").html("<li><@spring.message 'mws.fastshopping.notype'/></li>");
+                       $("#productsTable").html("<div style='width: 100%; height: 300px; text-align: center; font-size: 50px; color: red;'><@spring.message 'mws.fastshopping.nocommodity'/></div>");
+                   }
+               }
+               else{
+                   $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'mws.menu.loadfail'/>", function(){
+                        return true; 
+                    })
+               }
+           }
+    });
+
+//初始化菜单
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "${base.contextPath}/fastShopping/queryCategory",
+        success: function (data) {
+            if (data.success) {
+                if (data.total != 0) {
+                    var htmlStr = [],cId='',yName='';
+                    $.each(data.rows[0],function(str,data){
+                        var temp = str.split("-");
+                        cId = str.substring(0,str.indexOf("-"));
+                        yName = str.substring(str.indexOf("-")+1,str.length);
+                        if(data!=null){
+                            var str=  Traversal(data);
+                            htmlStr.push("<li><a>" , yName , "</a>","<ul>",str,"</ul>","</li>");
+                        }else{
+                            htmlStr.push("<li><a href='#" , cId , "'>" , yName , "</a></li>");
+                        }
+                    });
+                    $("#productsMenu").html(htmlStr.join(''));
+                    $(".menu ul li ").menu();
+                }
+                else {
+                    $("#productsMenu").html("<li><@spring.message 'mws.fastshopping.notype'/></li>");
+                }
+            }
+        }
+    });
+
+//遍历菜单数组
+   function Traversal(data) {
+       var htmlStr = [],cId='',yName='';
+       for(var key in data){
+           var temp = key.split("-");
+           cId = key.substring(0,key.indexOf("-"));
+           yName = key.substring(key.indexOf("-")+1,key.length);
+           if(data[key] !=null){
+               var str=Traversal(data[key]);
+               if(str!=''){
+                   htmlStr.push("<li><a >" , yName , "</a>","<ul>",str,"</ul>","</li>");
+               }else{
+                   htmlStr.push("<li><a >" , yName , "</a>","</li>");
+               }
+           }else{
+               htmlStr.push("<li><a href='#" , cId , "'>" , yName , "</a></li>");
+           }
+       }
+       return htmlStr.join('');
+   }
+
+    //初始化数据
+    function initProductMenu(data){
+
+        var htmlStr = [],
+            i = 0;
+        $.each(data,function(str){
+                var temp = str.split("-");
+             categoryId[i] = str.substring(0,str.indexOf("-"));
+             categoryName[i] = str.substring(str.indexOf("-")+1,str.length);
+             //htmlStr.push("<li><a href='#" , categoryId[i] , "'>" , categoryName[i] , "</a></li>");
+             i++;
+        });
+        //$("#productsMenu").html(htmlStr.join(''));
+    }; 
+
+    //初始化商品表
+    function initProductTable(data){
+        var htmlStr = [];
+        $.each(categoryId,function(i,id){
+            //标题背景颜色切换
+            titleColor = selectTitleColor(titleColor, titleColors);
+            var name = categoryName[i];
+            htmlStr.push("<div class='productsTable_item portlet'>",
+                           "<div class='productsTable_item_title' style='font-size: 18px; text-align: center; width:166px;color: white; background-color: " ,titleColor, ";'>",
+                               "<span id='", id , "' style='color: white'>" , name , "</span>",
+                           "</div>",
+                           "<table class='productsTable_item_table table-condensed table-striped cf table-bordered table-hover'>",
+                           "<thead class='cf'>",
+                               "<tr style='background-color: darkgrey;font-size: 11px;'>",
+                                   "<th class='product-itemNumber visible-md visible-lg' style='text-align: center;'><@spring.message 'mws.fastshopping.itemNumber'/></th>",
+                                   "<th class='product-itemName' style='text-align: center; width:180px;'><@spring.message 'mws.fastshopping.itemName'/></th>",
+                                  /* "<th class='product-uomName' style='text-align: center;'><@spring.message 'mws.fastshopping.uomName'/></th>",*/
+                                   "<th class='product-disAmt' style='text-align: center; width: 85px;'><@spring.message 'mws.fastshopping.disAmt'/></th>",
+                                   "<th class='product-Qty' style='text-align: center; width: 130px;'><@spring.message 'mws.fastshopping.Qty'/></th>",
+                                   "<th class='product-total visible-md visible-lg' style='text-align: center; min-width: 110px;'><@spring.message 'mws.fastshopping.total'/></th>");
+                /*modified by furong.tang是否显示库存可用量*/
+                  if(isDisplay == "Y"){
+                  htmlStr.push("<th class='product-PV visible-md visible-lg' style='text-align: center; min-width: 80px;'><@spring.message 'type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage'/></th>");
+              }
+              /*add by furong.tang*/
+            htmlStr.push("<th class='product-uomName' style='text-align: center;'><@spring.message 'mws.fastshopping.uomName'/></th>");
+            htmlStr.push("<th class='product-kg visible-md visible-lg' style='text-align: center; min-width: 110px;'><@spring.message '重量小计'/></th>");
+              htmlStr.push("</tr>",
+                           "</thead>",
+                           "<tbody>");
+    
+                var goodsData = data[id+"-"+name];
+                $.each(data[id+"-"+name],function(key,data){
+                    //console.log(data.itemName+"--"+data.pvAmt);
+                    var itemId = data.itemId || "",
+                        itemNumber = data.itemNumber || "",
+                        itemName = data.itemName || "",
+                        uomCode = data.uomCode || "",
+                        uomName = data.uomName || "",
+                        disAmt = data.disAmt || "0",
+                        //modified by furong.tang
+                        //pvAmt = data.pvAmt || "0";
+                        pvAmt = data.pvAmt,
+                        disKg = data.dis_kg ||"0",
+                    currencySymbol = data.currencySymbol || "";
+                    var weight="kg";
+                    console.log(disKg);
+                    console.log(data.dis_kg );
+                    htmlStr.push( "<tr class='cart_item'>",
+                                  "<td class='visible-md visible-lg' style='text-align: center;' data-title='<@spring.message 'mws.fastshopping.itemNumber'/>'>",
+                                      "<a href='${base.contextPath}/product/product.html?categoryId="+ categoryId[i] +"&itemId="+ itemId +"'><h5 class='ProductNo'>" , itemNumber,"</h5></a>",
+                                  "</td>",
+                                  "<td style='text-align: center;' data-title='<@spring.message 'mws.fastshopping.itemName'/>'>",
+                                      "<a href='${base.contextPath}/product/product.html?categoryId="+ categoryId[i] +"&itemId="+ itemId +"'><h5 class='ProductName'>" , itemName,"</h5></a><input class='ProductId' type='hidden' value='" , itemId , "'>",
+                                  "</td>",
+                                  /*"<td style='text-align: center' data-title='<@spring.message 'mws.fastshopping.uomName'/>'>",
+                                      "<h5 class='Unit' name='" , uomCode , "'>" , uomName , "</h5>",
+                                  "</td>",*/
+                                  "<td style='text-align: center;' data-title='<@spring.message 'mws.fastshopping.disAmt'/>'>",
+                                      "<h5 class='Unit Price'>" , currencySymbol, " " , parseFloat(disAmt).toFixed(2) , "</h5>",
+                                  "</td>",
+                                  "<td class='QtyPanel' style='' data-title='<@spring.message 'mws.fastshopping.Qty'/>'>",
+                                       "<input type='text' class='Qty' maxlength='5' value='0'>",
+                                  "</td>",
+                                  "<td class='visible-md visible-lg' style='' data-title='<@spring.message 'mws.fastshopping.total'/>'>",
+                                      "<h5 style='text-align: center;'>" , currencySymbol, " "  , "<span class='singleTotal'>0.00</span></h5><input class='total' type='hidden' value='" , disAmt , "'>",
+                                  "</td>");
+                    /*modified by furong.tang 是否显示库存可用量（后台参数现在表示库存现有量）*/
+                    if(isDisplay == "Y"){
+                        htmlStr.push("<td class='visible-md visible-lg' style='' data-title='<@spring.message 'type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage'/>'>",
+                                "<h5 style='text-align: center;'><span class='pv'>" , pvAmt , "</span></h5>",
+                                "</td>");
+                    }
+                    htmlStr.push("<td style='text-align: center' data-title='<@spring.message 'mws.fastshopping.uomName'/>'>",
+                        "<h5 class='Unit' name='" , uomCode , "'>" , uomName , "</h5>",
+                        "</td>");
+                    htmlStr.push("<td class='visible-md visible-lg' style='' data-title='<@spring.message '重量小计'/>'>",
+                        "<h5 style='text-align: center;'>" , "<span class='singleTotalKg'>0.00</span>", " ",weight,"</h5><input class='totalkg' id='totalkg' type='hidden' value='" , disKg , "'>",
+                        "</td>");
+                    htmlStr.push("</tr>");
+                });
+        htmlStr.push("</tbody>",
+                "</table></div>");
+        });
+        
+        $("#productsTable").html(htmlStr.join(''));
+        //var iniCounts = 0;
+        //初始化数量编辑器
+        $(".Qty").spinner({
+                step : 1,
+                min : 0,
+                max : 99999
+            }).change(function(){
+            var thisQty = $(this),
+
+                totalwrap = thisQty.parents('.QtyPanel').next(),
+                counts = thisQty.parents('cart_item'),
+                //取重量的value，用jquery的下一个  9633
+                pvwrap = totalwrap.next().next().next(),
+                qty = thisQty.val();
+
+            sumGoodsNumber();
+            sumSingleTotal( totalwrap.find(".singleTotal"), qty, totalwrap.find(".total").val() );
+            sumSingleTotal( pvwrap.find(".singleTotalKg"), qty, pvwrap.find(".totalkg").val() );
+
+            /*modified by furong.tang*/
+            /*if(iniCounts == 0){
+                iniCounts = pvwrap.find(".pv").text();
+            }
+            var num = pvwrap.find(".pv").text();
+            pvwrap.find(".pv").text(iniCounts-qty);*/
+            //console.log(pvwrap.find(".pv").text());
+            //sumSinglePV( pvwrap.find(".singlePV"), qty, pvwrap.find(".PV").val() );
+            /*if(memberRole != "VIP"){
+                sumSinglePV( pvwrap.find(".singlePV"), qty, pvwrap.find(".PV").val() );
+                sumAllPV();
+            }*/
+            sumAllTotal();
+        });
+    }
+
+    //初始化底部菜单
+    function initBottomNavbar(){
+        $(".currencySymbol").text(currencySymbol);
+    }
+    
+    //自动切换表头颜色
+    function selectTitleColor(color, colors){
+        var index;
+        index = $.inArray(color,colors);
+        if(index == colors.length-1){
+            index = -1;
+        }
+        return colors[index+1];
+    }
+    //单个商品价格统计
+    function sumSingleTotal(total, count, price){
+        var sum = 0;
+        if(count != '') {
+            sum = parseInt(count) * parseFloat(price);
+        }
+        total.text(sum.toFixed(2));
+    }
+    
+    //单个商品库存PV
+    function sumSinglePV(pv, count, pvUnit){
+        var sum = 0;
+        if(count != '') {
+            sum = parseInt(count) * parseFloat(pvUnit);
+        }
+        pv.text(sum);
+    }
+    
+    //选择商品数量统计
+    function sumGoodsNumber(){
+        $(".goodsNumber").text($('.Qty').filter(function(){
+            return $(this).val() > 0;
+        }).length)
+    }
+    
+    //全部商品价格统计
+    function sumAllTotal(){
+        var sum = 0;
+        $('.singleTotal').each(function(){
+            sum += parseFloat($(this).text());
+        });
+        $(".allTotal").text(sum.toFixed(2));
+
+    }
+    
+    //全部商品PV统计
+    function sumAllPV(){
+        var sum = 0;
+        $('.singlePV').each(function(){
+            sum += parseFloat($(this).text());
+        });
+        $(".allPV").text(sum);
+    }
+    
+    //Empty按钮功能
+    $(".btn_empty").click(function(){
+    	$("#productsTable").find(".Qty").val(0).trigger($.Event('change'));
+        $("#productsTable").find(".singleTotal").text("0.00");
+       /* if(memberRole != "VIP"){
+            $("#productsTable").find(".singlePV").text("0");
+            $(".allPV").text("0");
+        }*/
+        $(".goodsNumber").text("0");
+        $(".allTotal").text("0.00");
+        
+    })
+    
+    //结算按钮功能
+    $(".btn_settlement").click(function(){
+        var productsArr = new Array();
+        var QtyArr = $("#productsTable").find(".Qty");
+        
+        for(var index = 0; index < QtyArr.length; index++){
+            var productId = QtyArr.eq(index).parent().parent().prev().prev().find(".ProductId").val();
+            var quantity = QtyArr.eq(index).val();
+            if(quantity != 0 ){
+                var args = {"productId" : productId, "quantity" : quantity};
+                productsArr.push(args);
+            }
+        }
+        //alert(JSON2.stringify(QtyArr));
+        var productsStr = JSON2.stringify(productsArr).toString();
+        $(".settlement").val(productsStr);
+        /*modified by fyurong.tang*/
+        if(productsStr == "[]"){
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'mws.fastshopping.dialog_noselect'/>", function(){
+                return true; 
+            })
+        }
+        else{
+        	$.ajax({
+                url: "${base.contextPath}/fastShopping/checkMinQuantity",
+                type:"POST",
+                dataType:"json",
+                contentType : "application/json; charset=UTF-8",
+                data : JSON2.stringify(productsArr),
+                success : function(data) {
+                    if(data.success){
+                        if ("success" == data.rows[0]){
+                        	$(".settlementForm").submit();
+                        } else {
+                            var errorStr = "";
+                            for (var i = 0; i < data.rows.length; i++) {
+                                var errorProduct = data.rows[i];
+                                var index = errorProduct.indexOf("_");
+                                var errorProductName = errorProduct.substring(0,index);
+                                var errorProductMin = errorProduct.substring(index - 0 +1);
+                                errorStr = errorStr + errorProductName + '<@spring.message "mws.shopcart.min.number"/>' + errorProductMin + ","; 
+                            }
+                            $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", errorStr.substring(0,errorStr.length-1));
+                        }
+                    }
+                },
+                error : function() {
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", 'error');
+                }
+            });
+        	
+            
+        }
+
+        
+    })
+
+
+    /*
+     //监听屏幕分辨率变化
+    $(window).resize(function(){
+        if(screen.width < 801) {
+            $("#productsTable").find(".QtyPanel").removeAttr("style");
+        }
+        else{
+            $("#productsTable").find(".QtyPanel").attr("style","width:100px;");
+        }
+        
+    }) */
+    
+});
+</script>
+
+
+<!-- ========== MENU END ========== -->
+
+<!-- ========== CONTENT START ========== -->
+
+<section id="content">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.menu.fastshopping"/></li>
+        </ol>
+        
+        <div class="row">
+        
+            <!-- Sidebar Start -->
+            <div class="col-sm-4 col-md-3 sidebar">
+                <aside class="widget widget_recent_posts">
+                    <h4 class="widget-title"><@spring.message "mws.menu.productsmenu"/></h4>
+                    <div class="menu">
+                        <ul id="productsMenu" class="productsMenu nav-pills nav-stacked" style="font-weight: bolder">
+                            <li><@spring.message 'mws.menu.loading'/></li>
+                            <!-- 动态插入一级菜单数据 -->
+
+                        </ul>
+                    </div>
+
+                </aside>
+            </div>
+            <!-- Sidebar End -->
+            
+            <!-- Posts Start -->
+            <div class="col-sm-8 col-md-9">
+                <article class="account-details-wrap">
+                    <div class="portlet-body no-more-tables">
+                    
+                            <div id="productsTable">
+                            
+                                <!-- 动态插入商品表数据 -->
+                                <div style='width: 100%; height: 300px; text-align: center; font-size: 50px;'><@spring.message 'mws.menu.loading'/></div>
+                            </div>
+                        
+                    </div>
+                </article>
+            </div>
+            <!-- Posts End -->
+        </div>
+       
+        <div class="row">
+            <nav class="navbar navbar-default navbar-fixed-bottom" style="width: 100%; margin: 0px;">
+            <!-- 大屏幕(大于768px)时显示 -->
+                <div id="navbar-bottom-large" class="navbar-collapse collapse" style="width: 100%;">
+                    <ul class="nav navbar-nav navbar-left" style="width: 100%;">
+                        <li class="col-md-2 col-sm-2 col-xs-2">
+                            <button class="btn_empty btn btn-default" style="font-size: 22px;color: darkgrey;float:right; margin-top: 15px; width: 100px;height: 40px; border-radius: 5px;"><@spring.message "mws.fastshopping.buttonNavbar.btn_Empty"/></button>
+                        </li>
+                        <li class="col-md-7 col-sm-7 col-xs-7">
+                            <div class="row" style="font-size: 18px;font-weight: bolder;margin-top: 20px">
+                                <div class="col-md-9 col-sm-8 col-xs-7 col-xs-offset-1" style="text-align: right"><@spring.message "mws.fastshopping.buttonNavbar.Description_selected"/><strong class="goodsNumber" style="color: #b82921">0</strong><@spring.message "mws.fastshopping.buttonNavbar.Description_items"/> <strong style="color: black"><@spring.message "mws.fastshopping.buttonNavbar.Description_total_excluding_freight"/></strong>：</div>
+                                <div class="col-md-1 col-sm-1 col-xs-1" style="text-align: left;padding-left: 0px;"><strong class="currencySymbol" style="color: #b82921"></strong>&nbsp;&nbsp;<strong class="allTotal" style="color: #b82921">0.00</strong></div>
+                            </div>
+                            <!--modified by furong.tang 删掉PV相关显示-->
+                           <!-- <#if memberRole != "VIP">
+                            <div class="row" style="font-size: 18px;font-weight: bolder">
+                                <div class="col-md-9 col-sm-8 col-xs-7  col-xs-offset-1" style="text-align: right"><strong  style="color: black"><@spring.message "mws.fastshopping.buttonnavbar.description_pv"/> ：</strong></div>
+                                <div class="col-md-1 col-sm-1 col-xs-1" style="text-align: left;padding-left: 0px;"><span class="allPV" style="color: #b82921">0</span></div>
+                            </div>
+                            </#if>-->
+                        </li>
+                        <li class="col-md-3 col-sm-3 col-xs-3">
+                            <button class="btn_settlement btn btn-danger" style="width: 140px;height: 70px;font-size: 26px;font-weight: bolder; "><@spring.message "mws.fastshopping.buttonNavbar.btn_settlement"/></button>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- 小屏幕(小于768px)时显示 -->
+                <div id="navbar-bottom-small" class="navbar-toggle" style="width: 100%; margin: 0px;">
+                    <div class="row" style="font-size: 14px;font-weight: bolder;">
+                        <div class="col-md-9 col-sm-9 col-xs-9" style="text-align: right"><@spring.message "mws.fastshopping.buttonNavbar.Description_selected"/><strong class="goodsNumber" style="color: #b82921">0</strong><@spring.message "mws.fastshopping.buttonNavbar.Description_items"/> <strong style="color: black"><@spring.message "mws.fastshopping.buttonNavbar.Description_total_excluding_freight"/></strong>：</div>
+                        <div class="col-md-2 col-sm-2 col-xs-2" style="text-align: left;padding-left: 0px;"><strong class="currencySymbol" style="color: #b82921"></strong><strong class="allTotal" style="color: #b82921">0.00</strong></div>
+                    </div>
+                    <!--modified by furong.tang 删除PV相关显示-->
+                    <!--<#if memberRole != "VIP">
+                    <div class="row" style="font-size: 14px;font-weight: bolder;">
+                        <div class="col-md-9 col-sm-9 col-xs-9" style="text-align: right"><strong  style="color: black"><@spring.message "mws.fastshopping.buttonnavbar.description_pv"/> ：</strong></div>
+                        <div class="col-md-2 col-sm-2 col-xs-2" style="text-align: left;padding-left: 0px;"><span class="allPV" style="color: #b82921">0</span></div>
+                    </div>
+                    </#if>-->
+                    <div class="row" style="height: 50px;">
+                        <button class="btn_empty btn btn-default col-md-2 col-sm-2 col-xs-2 col-xs-offset-1" style="color: darkgrey; min-width: 70px; border-radius: 5px;"><@spring.message "mws.fastshopping.buttonNavbar.btn_Empty"/></button>
+                        <button class="btn_settlement btn btn-danger col-md-2 col-sm-2 col-xs-2 col-xs-offset-5" style="font-weight: bolder; border-radius: 5px;"><@spring.message "mws.fastshopping.buttonNavbar.btn_settlement"/></button>
+
+                    </div>
+                </div>
+                <form class="settlementForm" method="post" action="${base.contextPath}/order/order-confirm">
+                    <input class="productId" name="productId" type="hidden" value="">
+                    <input class="settlement" name="settlement" type="hidden" value="">
+                    <input class="token" name="token" type="hidden" value="123">
+                </form>             
+            </nav>
+        </div>
+        
+    </div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<#include "/mws/include/footer.html">

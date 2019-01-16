@@ -1,0 +1,140 @@
+<#-- 
+ * description: 用户分配角色界面
+ * version: 1.0 
+ * author:xiawang.liu
+ *
+ * 
+-->
+
+<#include "../include/head.html">
+
+<body>
+	<div id="user_role_grid" style="margin: 5px;"></div>
+
+	<script type="text/javascript">
+		
+		/* 设定该页面为dialog */
+		var dialog = frameElement.dialog;
+	
+		/* user_role_grid对象 */
+		var user_role_grid = null;
+		
+		/* 数据库查询出所有角色显示的grid */
+		user_role_grid = window['user_role_grid'] = $("#user_role_grid").ligerGrid({
+            columns: [
+			  	{ 
+			  		display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.roleid"/>',
+			  		name: "roleId", 
+			  		align: 'left', 
+			  		width: 120
+			  	},
+              	{ 
+			  		display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolecode"/>',
+			  		name: "roleCode", 
+			  		align: 'left', 
+			  		width: 160
+              	},
+              	{ 
+              		display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolename"/>',
+              		name: "roleName", 
+              		align: 'left', 
+              		width: 180
+              	},
+              	{ 
+              		display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.roledesc"/>',
+              		name: "roleDesc", 
+              		align: 'left', 
+              		width: 290
+              	}
+            ],
+            checkbox : true,
+            url:'${base.contextPath}/sys/userrole/queryUserRoles?userId=' + ${RequestParameters.userId},
+            toolbar: { 
+            	items: [
+                	{ 
+                		text: '<@spring.message "sys.hand.btn.new"/>', 
+                		click: function(){
+                  			var manager = $("#user_role_grid").ligerGetGridManager();
+                       		$.ligerDialog.open({ 
+                       			url: 'sys_user_chooserole.html?userId=' + ${RequestParameters.userId}, 
+                       			height: 500, 
+                       			width: 700, 
+                       			buttons: [
+                       				{ 
+                       					cls:'l-dialog-btn-highlight',
+                                    	text: '<@spring.message "sys.hand.btn.ok"/>', 
+                                    	onclick: function (item, dialog) {
+                                    		var data = dialog.frame.$.ligerui.get("userchooserole_grid").getSelectedRows();
+                                      		for(var i = 0; i < data.length;i++ ){
+                                      			manager.addRow({
+                                            		roleId   : data[i].roleId,
+                                            		roleCode : data[i].roleCode,
+                                            		roleName : data[i].roleName,
+                                            		roleDesc : data[i].roleDesc
+                                            	});
+                                      		}
+                                      		dialog.close();
+                                    	} 
+                               		},
+                                	{ 
+                               			text: '<@spring.message "sys.hand.btn.cancel"/>', 
+                               			onclick: function (item, dialog) { dialog.close(); } 
+                               		}
+                            	], 
+                           		isResize: true
+                        	});
+						}, 
+						icon: 'add'
+					},
+					{ 
+						line: true 
+					},
+             		{ 
+						text: '<@spring.message "sys.hand.btn.delete"/>', 
+						click: function(){user_role_grid.deleteSelectedRow();}, 
+						icon: 'delete'
+					},
+					{ 
+						line: true 
+					},
+             		{ 
+						text: '<@spring.message "sys.hand.btn.save"/>', 
+						click: function(){save_click();}, 
+						icon: 'save'
+					}
+            	]
+        	},
+        	height: '96%', 
+		});
+		
+		/* 点击grid保存按钮，保存已勾选的数据到数据库 */
+		function save_click(){
+			var data=user_role_grid.getData();
+			var requestData = new Array();
+			if(data.length == 0){
+				var userRole = new Object();
+				userRole.userId = ${RequestParameters.userId};
+				requestData.push(userRole);
+			}else{
+				for (var i = 0; i < data.length; i++) {
+					var userRole = new Object();
+					userRole.roleId = data[i].roleId;
+					userRole.userId = ${RequestParameters.userId}; 
+					requestData.push(userRole);
+				}
+			}
+			$.ajax({
+				type: 'POST',
+				url:"${base.contextPath}/sys/userrole/submit",
+				data: JSON2.stringify(requestData),
+				contentType: "application/json; charset=utf-8",
+				success: function (json) {
+					if(json.success){
+						Hap.tip($l('sys.hand.tip.success'));
+					}
+			 	}
+			 });
+		}
+	</script>
+</body>
+</html>

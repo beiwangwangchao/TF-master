@@ -1,0 +1,491 @@
+<#include "/mws/include/header.html">
+<style>
+.align-right{
+    text-align : right;
+}
+.btn-return{
+    margin : -10px 5px 5px 5px;
+    font-size: 18px;
+    font-wight: bold;
+}
+</style>
+<!-- Header -->
+<!-- ========== MENU END ========== -->
+<!-- ========== CONTENT START ========== -->
+
+<section id="content">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.nav.myteam"/></li>
+            <li><@spring.message "mws.bonus.bonusdetail"/></li>
+        </ol>
+        
+        <div class="row">
+            <div class="col-md-2 col-md-offset-10">
+                <a class="btn-return pull-right" href="${base.contextPath}/account/account-myteam.html"><@spring.message 'sys.hand.btn.return'/></a>
+            </div>
+        </div>
+        
+        <!-- 奖金明细 -->
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><@spring.message "mws.bonus.bonusdetail"/></h3>
+                </div>
+                <div class="panel-body">
+                    <!-- 表格 -->
+                    <div class="col-sm-12 col-md-12">
+                        <div class="portlet-body no-more-tables">
+                            <table id="bonusDetailTable" class="table table-bordered table-condensed table-striped">
+                                <thead>
+                                    <tr style="font-size: 10px">
+                                        <th><@spring.message 'mws.bonus.item'/></th>
+                                        <th id="mk1"><@spring.message 'mws.bonus.mk1'/></th>
+                                        <th id="mk2"><@spring.message 'mws.bonus.mk2'/></th>
+                                        <th id="mk3"><@spring.message 'mws.bonus.mk3'/></th>
+                                        <th id="mk4"><@spring.message 'mws.bonus.mk4'/></th>
+                                        <th id="mk5"><@spring.message 'mws.bonus.mk5'/></th>
+                                        <th id="mk6"><@spring.message 'mws.bonus.mk6'/></th>
+                                        <th><@spring.message 'mws.bonus.total'/></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 奖金发放情况 -->
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><@spring.message "mws.bonus.bonuspaydetail"/></h3>
+                </div>
+                <div class="panel-body">
+                    <!-- 表格 -->
+                    <div class="col-sm-12 col-md-12">
+                        <div class="portlet-body no-more-tables">
+                            <table id="bonusPayDetailTable" class="table table-bordered table-condensed table-striped">
+                                <thead>
+                                    <tr style="font-size: 10px">
+                                        <th><@spring.message 'mws.bonus.item'/></th>
+                                        <th><@spring.message 'mws.bonus.localpay'/></th>
+                                        <th><@spring.message 'mws.bonus.interpay'/></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<!-- SCRIPT-初始化 -->
+<script type="text/javascript">
+    //全局变量-奖金明细字段映射
+    var bonusDetailFieldMap = {
+            orgGdcamt : "<@spring.message 'mws.bonus.orggdcamt'/>",//销售折让
+            orgLbamt : "<@spring.message 'mws.bonus.orglbamt'/>",//超额销售佣金
+            orgPbamt : "<@spring.message 'mws.bonus.orgpbamt'/>",//业绩红利
+            orgBbamt : "<@spring.message 'mws.bonus.orgbbamt'/>",//公司分红
+            orgEx450amt : "<@spring.message 'mws.bonus.orgex450amt'/>",//优秀奖
+            orgOut10amt : "<@spring.message 'mws.bonus.orgout10amt'/>",//卓越奖
+            orgAbamt : "<@spring.message 'mws.bonus.orgabamt'/>",//稳健奖
+            orgTopamt : "<@spring.message 'mws.bonus.orgtopamt'/>",//杰出成就奖
+            orgStdBonus : "<@spring.message 'mws.bonus.orgstdbonus'/>",//国际销售积分合计
+            orgStdBonusPvRate : "<@spring.message 'mws.bonus.orgstdbonuspvrate'/>",//国际销售积分转汇率
+            orgLclBonusOrigin : "<@spring.message 'mws.bonus.orglclbonusorigin'/>",//单一市场佣金合计
+            orgRebateAmt : "<@spring.message 'mws.bonus.orgrebateamt'/>",//优惠套装奖金
+            orgLclBonusAdjust : "<@spring.message 'mws.bonus.orglclbonusadjust'/>",//新市场特别奖励
+            orgPayExRate : "<@spring.message 'mws.bonus.orgpayexrate'/>",//国际市场货币兑换率
+            orgPreTaxAmtIncome : "<@spring.message 'mws.bonus.orgpretaxamtincome'/>",//税前应发金额
+            orgPreTaxAmtIncomeTotal : "<@spring.message 'mws.bonus.orgpretaxamtincometotal'/>"//税前应发合计
+    };
+    //全局变量-奖金支付明细字段映射
+    var bonusPayDetailFieldMap = {
+            preTaxAmtIncome : "<@spring.message 'mws.bonus.pretaxamtincome'/>",//税前应发佣金
+            preTaxAmtDiffer : "<@spring.message 'mws.bonus.pretaxamtdiffer'/>",//两次发放差异
+            preTaxAmtAdjust : "<@spring.message 'mws.bonus.pretaxamtadjust'/>",//税前调整
+            tax : "<@spring.message 'mws.bonus.tax'/>",//代扣税款
+            afterTaxAmt : "<@spring.message 'mws.bonus.aftertaxamt'/>",//税后收入
+            afterTaxAmtAdjust : "<@spring.message 'mws.bonus.aftertaxamtadjust'/>",//税后调整
+            remitNetAmt : "<@spring.message 'mws.bonus.remitnetamt'/>",//净收入
+            remitNetAccount : "<@spring.message 'mws.bonus.accountbank'/>"//实际发放银行账号
+    }
+    $(function(){//DOM Load完成时
+        //获取url参数
+        var period = "${RequestParameters.period!''}";
+        if(period == ""){//如果参数periodId是空，提示后跳转到我的团队界面
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.bonus.no.periodid'/>", function(){
+                window.location.href = "${base.contextPath}/account/account-myteam.html";
+            });
+            return;
+        }
+        //ajax请求填充BonusDetail
+        $.ajax({
+            type: "POST",
+            url: "${base.contextPath}/account/queryBonusDetail",
+            data : {period : period},
+            success: function(data){
+                if(data.rows){
+                    initBonusDetailTable(data.rows);
+                }else{
+                    initBonusDetailTable([]);
+                }
+            }
+        });
+        
+        //ajax请求填充BonusPayDetail
+        $.ajax({
+            type: "POST",
+            url: "${base.contextPath}/account/queryBonusPayDetail",
+            data : {period : period},
+            success: function(data){
+                initBonusPayDetailTable(data.rows);
+            }
+        });
+    });
+    
+    //初始化奖金明细table
+    function initBonusDetailTable(details){
+        var showNothing = false;
+        if(details){
+            //所属市场放到最前面
+            var marketId = ${_marketId};
+            for(var i=0; i<details.length; i++){
+                if(details[i].marketId == marketId){
+                    var temp = details[0];
+                    details[0] = details[i];
+                    details[i] = temp;
+                    //调整th位置
+                    $("#bonusDetailTable>thead>tr>th").eq(i+1).insertBefore($("#bonusDetailTable>thead>tr>th").eq(1));
+                    break;
+                }
+            }
+            //修正表头mk1-4
+            var tr = $("#bonusDetailTable").children().children();
+            for(var i=0; i<details.length; i++){
+                tr.children().eq(i+1).text(details[i].mkCode);
+            }
+            
+        }else{
+            showNothing = true;
+            details = [];
+        }
+        var record = {//小计对象
+                abamt : 0,
+                bbamt : 0,
+                ex450amt : 0,
+                gdcamt : 0,
+                lbamt : 0,
+                lclBonusAdjust : 0,
+                lclBonusOrigin : 0,
+                out10amt : 0,
+                payExRate : 0,
+                pbamt : 0,
+                preTaxAmtIncome : 0,
+                rebateAmt : 0,
+                stdBonus : 0,
+                stdBonusPvRate : 0,
+                topamt : 0
+        };
+        for(var i=0; i<details.length; i++){
+            record.abamt += details[i].orgAbamt;
+            record.bbamt += details[i].orgBbamt;
+            record.ex450amt += details[i].orgEx450amt;
+            record.gdcamt += details[i].orgGdcamt;
+            record.lbamt += details[i].orgLbamt;
+            record.lclBonusAdjust += details[i].orgLclBonusAdjust;
+            record.lclBonusOrigin += details[i].orgLclBonusOrigin;
+            record.out10amt += details[i].orgOut10amt;
+            record.payExRate += details[i].orgPayExRate;
+            record.pbamt += details[i].orgPbamt;
+            record.preTaxAmtIncome += details[i].orgPreTaxAmtIncome;
+            record.rebateAmt += details[i].orgRebateAmt;
+            record.stdBonus += details[i].orgStdBonus;
+            record.stdBonusPvRate += details[i].orgStdBonusPvRate;
+            record.topamt += details[i].orgTopamt;
+        }
+        for(var prop in record){
+            record[prop] = record[prop].toFixed(2);
+        }
+        var result = row2col(details);
+        for(var field in bonusDetailFieldMap){
+            var row = {
+                    title : bonusDetailFieldMap[field],
+                    arr : result[field]
+            };
+            //列小计字段处理
+            switch(field){
+            case "orgGdcamt":
+                row.colTotal = outputFormat(record.gdcamt);
+                break;
+            case "orgLbamt":
+                row.colTotal = outputFormat(record.lbamt);
+                break;
+            case "orgPbamt":
+                row.colTotal = outputFormat(record.pbamt);
+                break;
+            case "orgBbamt":
+                row.colTotal = outputFormat(record.bbamt);
+                break;
+            case "orgEx450amt":
+                row.colTotal = outputFormat(record.ex450amt);
+                break;
+            case "orgOut10amt":
+                row.colTotal = outputFormat(record.out10amt);
+                break;
+            case "orgAbamt":
+                row.colTotal = outputFormat(record.abamt);
+                break;
+            case "orgTopamt":
+                row.colTotal = outputFormat(record.topamt);
+                break;
+            case "orgStdBonus":
+                if(!showNothing){
+                    row.colTotal = plusFormat(record.gdcamt,record.lbamt,record.pbamt,record.bbamt,record.ex450amt,record.out10amt,record.abamt,record.topamt);
+                }else{
+                    row.colTotal = "";
+                }
+                break;
+            case "orgStdBonusPvRate":
+            case "orgLclBonusOrigin":
+            case "orgRebateAmt":
+            case "orgLclBonusAdjust":
+            case "orgPayExRate":
+                row.colTotal = "----";
+                break;
+            case "orgPreTaxAmtIncome":
+            case "orgPreTaxAmtIncomeTotal":
+                if(showNothing){
+                    row.colTotal = "";
+                }else{
+                    row.colTotal = plusFormat(row.arr[0],row.arr[1],row.arr[2],row.arr[3],row.arr[4],row.arr[5]);
+                }
+                break;
+            }
+            //行小计字段处理
+            if("orgPreTaxAmtIncomeTotal" == field){
+                if(showNothing){
+                    row.arr[1] = "";
+                }else{
+                    row.arr[1] = plusFormat(row.arr[1],row.arr[2],row.arr[3],row.arr[4],row.arr[5]);
+                }
+                detailTblAddRow(row, true);
+            }else{
+                detailTblAddRow(row, false);
+            }
+        }
+    }
+    
+    //json数据行转列
+    function row2col(rows){
+        var _LEN = 6;//保证返回值中数组有且仅有6个元素
+        //转换完成返回的数据
+        var result = {
+            orgGdcamt : [],
+            orgLbamt : [],
+            orgPbamt : [],
+            orgBbamt : [],
+            orgEx450amt : [],
+            orgOut10amt : [],
+            orgAbamt : [],
+            orgTopamt : [],
+            orgStdBonus : [],
+            orgStdBonusPvRate : [],
+            orgLclBonusOrigin : [],
+            orgRebateAmt : [],
+            orgLclBonusAdjust : [],
+            orgPayExRate : [],
+            orgPreTaxAmtIncome : [],
+            orgPreTaxAmtIncomeTotal : []
+        };
+        for(var i=0; i<_LEN; i++){
+            if(rows[i]){
+                result.orgGdcamt.push(outputFormat(rows[i]["orgGdcamt"]));
+                result.orgLbamt.push(outputFormat(rows[i]["orgLbamt"]));
+                result.orgPbamt.push(outputFormat(rows[i]["orgPbamt"]));
+                result.orgBbamt.push(outputFormat(rows[i]["orgBbamt"]));
+                result.orgEx450amt.push(outputFormat(rows[i]["orgEx450amt"]));
+                result.orgOut10amt.push(outputFormat(rows[i]["orgOut10amt"]));
+                result.orgAbamt.push(outputFormat(rows[i]["orgAbamt"]));
+                result.orgTopamt.push(outputFormat(rows[i]["orgTopamt"]));
+                result.orgStdBonus.push(outputFormat(rows[i]["orgStdBonus"]));
+                result.orgStdBonusPvRate.push(outputFormat(rows[i]["orgStdBonusPvRate"]));
+                result.orgLclBonusOrigin.push(outputFormat(rows[i]["orgLclBonusOrigin"]));
+                result.orgRebateAmt.push(outputFormat(rows[i]["orgRebateAmt"]));
+                result.orgLclBonusAdjust.push(outputFormat(rows[i]["orgLclBonusAdjust"]));
+                result.orgPayExRate.push(outputFormat(rows[i]["orgPayExRate"]));
+                result.orgPreTaxAmtIncome.push(outputFormat(rows[i]["orgPreTaxAmtIncome"]));
+                result.orgPreTaxAmtIncomeTotal.push(outputFormat(rows[i]["orgPreTaxAmtIncome"]));
+            }else{
+                result.orgGdcamt.push("");
+                result.orgLbamt.push("");
+                result.orgPbamt.push("");
+                result.orgBbamt.push("");
+                result.orgEx450amt.push("");
+                result.orgOut10amt.push("");
+                result.orgAbamt.push("");
+                result.orgTopamt.push("");
+                result.orgStdBonus.push("");
+                result.orgStdBonusPvRate.push("");
+                result.orgLclBonusOrigin.push("");
+                result.orgRebateAmt.push("");
+                result.orgLclBonusAdjust.push("");
+                result.orgPayExRate.push("");
+                result.orgPreTaxAmtIncome.push("");
+                result.orgPreTaxAmtIncomeTotal.push("");
+            }
+        }
+        return result;
+    }
+    
+    //奖金明细table添加新行
+    function detailTblAddRow(row, isLastRow){
+        var tbody = $("#bonusDetailTable tbody");
+        if(isLastRow){
+            var tr = "<tr>"+
+                    "<td data-title=\"<@spring.message 'mws.bonus.item'/>\">"+row.title+"</td>"+
+                    "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.mk1'/>\">"+row.arr[0]+"</td>"+
+                    "<td class='align-right' colspan='5' data-title=\"<@spring.message 'mws.bonus.mk2'/>\">"+row.arr[1]+"</td>"+
+                    "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.total'/>\">"+row.colTotal+"</td>"+
+                "</tr>";
+            tbody.append(tr);
+            return;
+        }
+        var tr = "<tr>"+
+                "<td data-title=\"<@spring.message 'mws.bonus.item'/>\">"+row.title+"</td>"+
+                "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.mk1'/>\">"+row.arr[0]+"</td>"+
+                "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.mk2'/>\">"+row.arr[1]+"</td>"+
+                "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.mk3'/>\">"+row.arr[2]+"</td>"+
+                "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.mk4'/>\">"+row.arr[3]+"</td>"+
+                "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.mk4'/>\">"+row.arr[4]+"</td>"+
+                "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.mk4'/>\">"+row.arr[5]+"</td>"+
+                "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.total'/>\">"+row.colTotal+"</td>"+
+            "</tr>";
+        tbody.append(tr);
+    }
+    
+    //初始化奖金支付明细table
+    function initBonusPayDetailTable(rows){
+        var result = {
+                preTaxAmtIncome : [],
+                preTaxAmtDiffer : [],
+                preTaxAmtAdjust : [],
+                tax : [],
+                afterTaxAmt : [],
+                afterTaxAmtAdjust : [],
+                remitNetAmt : [],
+                remitNetAccount : []
+        }
+        if(rows.length > 0){
+            if(rows.length == 1){
+                rows[1] = {};
+            }
+        }else{
+            rows[0] = {};
+            rows[1] = {};
+        }
+        //如果第一条是本地类型记录
+        if(rows[0].type && "LOCAL" == rows[0].type){
+            for(var i=0; i<2; i++){
+                result.preTaxAmtIncome.push(outputFormat(rows[i]["preTaxAmtIncome"]));
+                result.preTaxAmtDiffer.push(outputFormat(rows[i]["preTaxAmtDiffer"]));
+                result.preTaxAmtAdjust.push(outputFormat(rows[i]["preTaxAmtAdjust"]));
+                result.tax.push(outputFormat(rows[i]["tax"]));
+                result.afterTaxAmt.push(outputFormat(rows[i]["afterTaxAmt"]));
+                result.afterTaxAmtAdjust.push(outputFormat(rows[i]["afterTaxAmtAdjust"]));
+                result.remitNetAmt.push(outputFormat(rows[i]["remitNetAmt"]));
+                result.remitNetAccount.push(outputFormat(rows[i]["remitNetAccount"]));
+            }
+        }else{
+            for(var i=1; i>-1; i--){
+                result.preTaxAmtIncome.push(outputFormat(rows[i]["preTaxAmtIncome"]));
+                result.preTaxAmtDiffer.push(outputFormat(rows[i]["preTaxAmtDiffer"]));
+                result.preTaxAmtAdjust.push(outputFormat(rows[i]["preTaxAmtAdjust"]));
+                result.tax.push(outputFormat(rows[i]["tax"]));
+                result.afterTaxAmt.push(outputFormat(rows[i]["afterTaxAmt"]));
+                result.afterTaxAmtAdjust.push(outputFormat(rows[i]["afterTaxAmtAdjust"]));
+                result.remitNetAmt.push(outputFormat(rows[i]["remitNetAmt"]));
+                result.remitNetAccount.push(outputFormat(rows[i]["remitNetAccount"]));
+            }
+        }
+        //添加项目列
+        for(var field in bonusPayDetailFieldMap){
+            var row = {
+                    title : bonusPayDetailFieldMap[field],
+                    arr : result[field]
+            };
+            if("accountBank" == field){
+                payTblAddRow(row, true);
+            }else{
+                payTblAddRow(row, false);
+            }
+        }
+    }
+    
+    //奖金支付明细添加新行
+    function payTblAddRow(row, isLastCol){
+        if(isLastCol){
+            var tbody = $("#bonusPayDetailTable tbody");
+            var tr = "<tr>"+
+                    "<td data-title=\"<@spring.message 'mws.bonus.item'/>\">"+row.title+"</td>"+
+                    "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.accountbank'/>\">"+row.arr[0]+"</td>"+
+                    "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.accountbank'/>\">"+row.arr[1]+"</td>"+
+                "</tr>";
+            tbody.append(tr);
+            return;
+        }
+        var tbody = $("#bonusPayDetailTable tbody");
+        var tr = "<tr>"+
+                "<td data-title=\"<@spring.message 'mws.bonus.item'/>\">"+row.title+"</td>"+
+                "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.localpay'/>\">"+row.arr[0]+"</td>"+
+                "<td class='align-right' data-title=\"<@spring.message 'mws.bonus.interpay'/>\">"+row.arr[1]+"</td>"+
+            "</tr>";
+        tbody.append(tr);
+    }
+    
+    //格式化-加法
+    function plusFormat(){
+        var argsLength = arguments.length;
+        if(argsLength < 1){
+            return 0;
+        }
+        var result = 0;
+        for(var i=0; i<arguments.length; i++){
+            if(arguments[i] == null || arguments[i] == undefined || arguments[i] == ""){
+                result += 0;
+                continue;
+            }else{
+                result += Number(arguments[i]);
+                continue;
+            }
+        }
+        return result.toFixed(2);
+    }
+    
+    //格式化-输出
+    function outputFormat(obj){
+        if(obj == null || obj == undefined){
+            return "";
+        }else{
+            return obj;
+        }
+    }
+    
+</script>
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">
+

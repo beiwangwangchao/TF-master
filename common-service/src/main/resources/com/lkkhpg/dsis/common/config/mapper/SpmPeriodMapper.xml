@@ -1,0 +1,911 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmPeriodMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
+    <id column="PERIOD_ID" property="periodId" jdbcType="DECIMAL" />
+    <result column="PERIOD_TYPE" property="periodType" jdbcType="VARCHAR" />
+    <result column="PERIOD_NAME" property="periodName" jdbcType="VARCHAR" />
+    <result column="START_DATE" property="startDate" jdbcType="TIMESTAMP" />
+    <result column="END_DATE" property="endDate" jdbcType="TIMESTAMP" />
+    <result column="CLOSING_STATUS" property="closingStatus" jdbcType="VARCHAR" />
+    <result column="PERIOD_YEAR" property="periodYear" jdbcType="DECIMAL" />
+    <result column="PERIOD_MONTH" property="periodMonth" jdbcType="DECIMAL" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="ORG_TYPE" property="orgType" jdbcType="VARCHAR" />
+    <result column="ORG_ID" property="orgId" jdbcType="DECIMAL" />
+    
+    <!--关联字段 -->
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    PERIOD_ID, PERIOD_TYPE, PERIOD_NAME, START_DATE, END_DATE, CLOSING_STATUS, PERIOD_YEAR, PERIOD_MONTH,
+    OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,ORG_ID,ORG_TYPE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from SPM_PERIOD
+    where PERIOD_ID = #{periodId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SPM_PERIOD
+    where PERIOD_ID = #{periodId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
+    <selectKey resultType="java.lang.Long" keyProperty="periodId" order="BEFORE" >
+      select SPM_PERIOD_S.nextval from dual
+    </selectKey>
+    insert into SPM_PERIOD (PERIOD_ID, PERIOD_TYPE, PERIOD_NAME, 
+      START_DATE, END_DATE, CLOSING_STATUS, 
+      PERIOD_YEAR, PERIOD_MONTH,
+      OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,ORG_TYPE,ORG_ID)
+    values (#{periodId,jdbcType=DECIMAL}, #{periodType,jdbcType=VARCHAR}, #{periodName,jdbcType=VARCHAR}, 
+      #{startDate,jdbcType=TIMESTAMP}, #{endDate,jdbcType=TIMESTAMP}, #{closingStatus,jdbcType=VARCHAR}, 
+      #{periodYear,jdbcType=DECIMAL}, #{periodMonth,jdbcType=DECIMAL}, 1, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR},
+      #{orgType,jdbcType=VARCHAR}, #{orgId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertBonusPeriod" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
+      INSERT INTO spm_period
+          (period_id,
+           period_type,
+           period_name,
+           start_date,
+           end_date,
+           closing_status,
+           period_year,
+           period_month,
+           object_version_number,
+           request_id,
+           program_id,
+           creation_date,
+           created_by,
+           last_updated_by,
+           last_update_date,
+           last_update_login,
+           attribute_category,
+           attribute1,
+           attribute2,
+           attribute3,
+           attribute4,
+           attribute5,
+           attribute6,
+           attribute7,
+           attribute8,
+           attribute9,
+           attribute10,
+           attribute11,
+           attribute12,
+           attribute13,
+           attribute14,
+           attribute15,
+           org_type,
+           org_id)
+          (SELECT spm_period_s.nextval,
+                  #{periodType,jdbcType=VARCHAR} period_type,
+                  period.period_name period_name,
+                  to_date(period.period_name,
+                          'YYYYMM') start_date,
+                  #{endDate,jdbcType=VARCHAR} end_date,
+                  #{closingStatus,jdbcType=VARCHAR} closing_status,
+                  
+                  to_char(to_date(period.period_name,
+                                  'YYYYMM'),
+                          'YYYY') period_year,
+                  period.period_month period_month,
+                  1 object_version_number,
+                  #{requestId,jdbcType=DECIMAL} request_id,
+                  #{programId,jdbcType=DECIMAL} program_id,
+                  CURRENT_TIMESTAMP,
+                  #{createdBy,jdbcType=DECIMAL},
+                  #{lastUpdatedBy,jdbcType=DECIMAL},
+                  CURRENT_TIMESTAMP,
+                  #{lastUpdateLogin,jdbcType=DECIMAL},
+                  #{attributeCategory,jdbcType=VARCHAR} attribute_category,
+                  #{attribute1,jdbcType=VARCHAR} attribute1,
+                  #{attribute2,jdbcType=VARCHAR} attribute2,
+                  #{attribute3,jdbcType=VARCHAR} attribute3,
+                  #{attribute4,jdbcType=VARCHAR} attribute4,
+                  #{attribute5,jdbcType=VARCHAR} attribute5,
+                  #{attribute6,jdbcType=VARCHAR} attribute6,
+                  #{attribute7,jdbcType=VARCHAR} attribute7,
+                  #{attribute8,jdbcType=VARCHAR} attribute8,
+                  #{attribute9,jdbcType=VARCHAR} attribute9,
+                  #{attribute10,jdbcType=VARCHAR} attribute10,
+                  #{attribute11,jdbcType=VARCHAR} attribute11,
+                  #{attribute12,jdbcType=VARCHAR} attribute12,
+                  #{attribute13,jdbcType=VARCHAR} attribute13,
+                  #{attribute14,jdbcType=VARCHAR} attribute14,
+                  #{attribute15,jdbcType=VARCHAR} attribute15,
+                  #{orgType,jdbcType=VARCHAR} org_type,
+                  smb.market_id org_id
+             FROM spm_market_b smb,
+                  (SELECT #{periodYear,jdbcType=DECIMAL} || lpad(rownum - 0,
+                                         2,
+                                         0) period_name,
+                          rownum period_month
+                     FROM dual
+                   CONNECT BY rownum &lt; 13) period
+            WHERE 1 = 1
+              AND NOT EXISTS (SELECT 1
+                     FROM spm_period sp
+                    WHERE sp.period_type = #{periodType,jdbcType=VARCHAR}
+                      AND sp.org_id = smb.market_id
+                      AND period.period_name = sp.period_name))
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
+    <selectKey resultType="java.lang.Long" keyProperty="periodId" order="BEFORE" >
+      select SPM_PERIOD_S.nextval from dual
+    </selectKey>
+    insert into SPM_PERIOD
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      PERIOD_ID,
+      <if test="periodType != null" >
+        PERIOD_TYPE,
+      </if>
+      <if test="periodName != null" >
+        PERIOD_NAME,
+      </if>
+      <if test="startDate != null" >
+        START_DATE,
+      </if>
+      <if test="endDate != null" >
+        END_DATE,
+      </if>
+      <if test="closingStatus != null" >
+        CLOSING_STATUS,
+      </if>
+      <if test="periodYear != null" >
+        PERIOD_YEAR,
+      </if>
+      <if test="periodMonth != null" >
+        PERIOD_MONTH,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="orgId != null" >
+        ORG_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{periodId,jdbcType=DECIMAL},
+      <if test="periodType != null" >
+        #{periodType,jdbcType=VARCHAR},
+      </if>
+      <if test="periodName != null" >
+        #{periodName,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null" >
+        #{startDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endDate != null" >
+        #{endDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="closingStatus != null" >
+        #{closingStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="periodYear != null" >
+        #{periodYear,jdbcType=DECIMAL},
+      </if>
+      <if test="periodMonth != null" >
+        #{periodMonth,jdbcType=DECIMAL},
+      </if> 
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="orgId != null" >
+        #{orgId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
+    update SPM_PERIOD
+    <set >
+      <if test="periodType != null" >
+        PERIOD_TYPE = #{periodType,jdbcType=VARCHAR},
+      </if>
+      <if test="periodName != null" >
+        PERIOD_NAME = #{periodName,jdbcType=VARCHAR},
+      </if>
+      <if test="startDate != null" >
+        START_DATE = #{startDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endDate != null" >
+        END_DATE = #{endDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="closingStatus != null" >
+        CLOSING_STATUS = #{closingStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="periodYear != null" >
+        PERIOD_YEAR = #{periodYear,jdbcType=DECIMAL},
+      </if>
+      <if test="periodMonth != null" >
+        PERIOD_MONTH = #{periodMonth,jdbcType=DECIMAL},
+      </if> 
+       OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="orgType != null" >
+        ORG_TYPE = #{orgType,jdbcType=VARCHAR},
+      </if>
+      <if test="orgId != null" >
+        ORG_ID = #{orgId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where PERIOD_NAME = #{periodName,jdbcType=VARCHAR}
+          <if test="orgId != null">
+     and org_id = #{orgId,jdbcType=DECIMAL}
+      </if>
+  </update>
+  
+  
+  <update id="closeBonusPeriod" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
+    update SPM_PERIOD
+    <set >
+      <if test="startDate != null" >
+        START_DATE = #{startDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endDate != null" >
+        END_DATE = #{endDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="closingStatus != null" >
+        CLOSING_STATUS = #{closingStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="periodYear != null" >
+        PERIOD_YEAR = #{periodYear,jdbcType=DECIMAL},
+      </if>
+      <if test="periodMonth != null" >
+        PERIOD_MONTH = #{periodMonth,jdbcType=DECIMAL},
+      </if> 
+       OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where PERIOD_NAME = #{periodName,jdbcType=VARCHAR}
+    and CLOSING_STATUS = 'N'
+    and org_type='MKT'
+      <if test="orgId != null">
+     and org_id = #{orgId,jdbcType=VARCHAR}
+      </if>
+      <if test="periodType != null">
+     and period_type = #{periodType,jdbcType=VARCHAR}
+      </if>
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
+    update SPM_PERIOD
+    set PERIOD_TYPE = #{periodType,jdbcType=VARCHAR},
+      PERIOD_NAME = #{periodName,jdbcType=VARCHAR},
+      START_DATE = #{startDate,jdbcType=TIMESTAMP},
+      END_DATE = #{endDate,jdbcType=TIMESTAMP},
+      CLOSING_STATUS = #{closingStatus,jdbcType=VARCHAR},
+      PERIOD_YEAR = #{periodYear,jdbcType=DECIMAL},
+      PERIOD_MONTH = #{periodMonth,jdbcType=DECIMAL},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = CURRENT_TIMESTAMP,
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      ORG_ID = #{orgId,jdbcType=DECIMAL}
+    where PERIOD_ID = #{periodId,jdbcType=DECIMAL}
+  </update>
+  <!-- 根据订单日期查询是否在奖金期间且不是“已关闭”状态 -->
+  <select id="selectSpmPeriodByOrderDate" resultType="java.lang.String" >
+    select PERIOD_NAME
+    from SPM_PERIOD
+    where PERIOD_ID = #{periodId, jdbcType=DECIMAL}
+      and CLOSING_STATUS != #{closingStatus, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="querySpmPeriod" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod">
+     select 
+        sm.code, 
+        tl.name, 
+        sp.org_id,
+        sp.period_name,
+        sp.start_date, 
+        sp.end_date, 
+        sp.closing_status,
+        sp.period_year,
+        sp.creation_date
+     from spm_market_b sm left join spm_market_tl tl on sm.market_id=tl.market_id and tl.LANG = #{request.locale,jdbcType=VARCHAR},
+          spm_period sp
+     where sm.market_id = sp.org_id
+     <if test="orgId != null">
+        and sp.org_id = #{orgId,jdbcType=DECIMAL}
+     </if>
+     <if test="periodYear != null">
+        and sp.period_year = #{periodYear,jdbcType=DECIMAL}
+     </if>
+     order by sp.org_id ,to_char(sp.start_date,'yyyy') desc ,to_char(sp.start_date,'MM')
+  </select>
+  
+  <select id="selectSpmPeriod" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
+    select 
+    <include refid="Base_Column_List" />
+    from SPM_PERIOD
+    <trim prefix="WHERE" suffixOverrides="AND | OR">
+        1 = 1
+        <if test="periodId != null">
+            AND PERIOD_ID = #{periodId,jdbcType=DECIMAL}
+        </if>
+        <if test="periodType != null">
+            AND PERIOD_TYPE = #{periodType,jdbcType=VARCHAR}
+        </if>
+        <if test="orgId != null">
+            AND ORG_ID = #{orgId,jdbcType=DECIMAL}
+        </if>
+        <if test="periodName != null">
+            AND PERIOD_NAME = #{periodName,jdbcType=VARCHAR}
+        </if>
+        <if test="periodYear !=null">
+            AND PERIOD_YEAR=#{periodYear,jdbcType=DECIMAL}
+        </if>
+        <if test="periodMonth !=null">
+            AND PERIOD_MONTH=#{periodMonth,jdbcType=DECIMAL}
+        </if>
+        <if test="orgType != null">
+            AND ORG_TYPE = #{orgType,jdbcType=VARCHAR}
+        </if>
+        <if test="closingStatus != null">
+            AND CLOSING_STATUS = #{closingStatus, jdbcType=VARCHAR}
+        </if>    </trim>
+
+     AND START_DATE &lt;= CURRENT_TIMESTAMP
+    ORDER BY START_DATE DESC
+  </select>
+  
+  
+
+    <select id="isExistsOpenPeriod" resultType="Integer" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
+    select 
+    COUNT(1)
+    from SPM_PERIOD
+    <trim prefix="WHERE" suffixOverrides="AND | OR">
+        1 = 1
+        AND CLOSING_STATUS = 'N'
+        
+        <if test="periodType != null">
+            AND PERIOD_TYPE = #{periodType,jdbcType=VARCHAR}
+        </if>
+        <if test="orgId != null">
+            AND ORG_ID = #{orgId,jdbcType=DECIMAL}
+        </if>
+        <if test="periodName != null">
+            AND PERIOD_NAME = #{periodName,jdbcType=VARCHAR}
+        </if>
+        <if test="orgType != null">
+            AND ORG_TYPE = #{orgType,jdbcType=VARCHAR}
+        </if>
+
+    </trim>
+
+
+  </select>
+  
+   <select id="selectUsableSpmPeriod" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" >
+    select 
+    <include refid="Base_Column_List" />
+    from SPM_PERIOD
+    <trim prefix="WHERE" suffixOverrides="AND | OR">
+        1 = 1
+            AND PERIOD_TYPE = #{periodType,jdbcType=VARCHAR}
+            AND ORG_ID = #{orgId,jdbcType=DECIMAL}
+            AND ORG_TYPE = #{orgType,jdbcType=VARCHAR}
+            AND CLOSING_STATUS = #{closingStatus, jdbcType=VARCHAR}
+            AND START_DATE &lt;= SYSDATE
+            ORDER BY START_DATE DESC
+    </trim>
+  </select>
+    <select id="queryNextOpenPeriod" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod" resultMap="BaseResultMap">
+  SELECT
+  <include refid="Base_Column_List" />
+  FROM SPM_PERIOD SP 
+  WHERE SP.PERIOD_NAME =
+    (SELECT  MIN(PERIOD_NAME) from SPM_PERIOD t 
+    where t.PERIOD_TYPE = #{periodType, jdbcType=VARCHAR} 
+    and t.ORG_TYPE = #{orgType, jdbcType=VARCHAR} 
+    and t.ORG_ID = #{orgId, jdbcType=DECIMAL} 
+    and t.CLOSING_STATUS= 'N'
+    )
+  and SP.PERIOD_TYPE = #{periodType, jdbcType=VARCHAR} 
+  and SP.ORG_TYPE = #{orgType, jdbcType=VARCHAR} 
+  and SP.ORG_ID = #{orgId, jdbcType=DECIMAL} 
+  and SP.CLOSING_STATUS='N'
+  </select>
+
+    <select id="getCurentClosedPeroid" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod">
+        SELECT 
+        <include refid="Base_Column_List" />
+        FROM SPM_PERIOD SP WHERE SP.PERIOD_NAME=(SELECT MAX(PERIOD_NAME) from SPM_PERIOD t
+        where t.PERIOD_TYPE = #{periodType,jdbcType=VARCHAR}
+        and t.ORG_TYPE = #{orgType, jdbcType=VARCHAR}
+        and t.ORG_ID = #{orgId,jdbcType=DECIMAL}
+        and t.CLOSING_STATUS=#{closingStatus, jdbcType=VARCHAR}
+        )
+        AND SP.PERIOD_TYPE = #{periodType,jdbcType=VARCHAR}
+        and SP.ORG_TYPE = #{orgType, jdbcType=VARCHAR}
+        and SP.ORG_ID = #{orgId,jdbcType=DECIMAL}
+        and SP.CLOSING_STATUS=#{closingStatus, jdbcType=VARCHAR}
+    </select>
+    
+
+      <select id="getPreviousCloseSpmPeriod" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod">
+        SELECT 
+        <include refid="Base_Column_List" />
+        FROM SPM_PERIOD SP WHERE SP.PERIOD_NAME=(SELECT TO_CHAR(ADD_MONTHS(TO_DATE(MAX(PERIOD_NAME),'yyyyMM'),-1),'yyyyMM') from SPM_PERIOD t
+        where t.PERIOD_TYPE = #{periodType,jdbcType=VARCHAR}
+        and t.ORG_TYPE = #{orgType, jdbcType=VARCHAR}
+        and t.ORG_ID = #{orgId,jdbcType=DECIMAL}
+        and t.CLOSING_STATUS=#{closingStatus, jdbcType=VARCHAR}
+        )
+        AND SP.PERIOD_TYPE = #{periodType,jdbcType=VARCHAR}
+        and SP.ORG_TYPE = #{orgType, jdbcType=VARCHAR}
+        and SP.ORG_ID = #{orgId,jdbcType=DECIMAL}
+        and SP.CLOSING_STATUS=#{closingStatus, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="queryBonusDetail" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmPeriod">
+        <!-- SELECT 
+            sp.PERIOD_ID
+        FROM spm_period sp,
+             spm_market_b smb 
+        WHERE sp.org_id=smb.market_id
+        AND sp.org_id= #{orgId,jdbcType=DECIMAL}
+        AND sp.period_name=#{periodName,jdbcType=VARCHAR} -->
+        
+        SELECT
+            SP.PERIOD_ID
+        FROM
+            SPM_PERIOD SP
+        WHERE
+            SP.PERIOD_NAME = #{periodName,jdbcType=VARCHAR}
+        AND SP.ORG_TYPE = 'MKT'
+        AND SP.ORG_ID IN (
+            (
+                SELECT
+                    SMB.MARKET_ID
+                FROM
+                    SPM_MARKET_B SMB
+                WHERE
+                    SMB.CODE IN ('HK', 'CN', 'TW', 'MY')
+            )
+        )
+    </select>
+    
+    <select id="getSpmPeriodByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT <include refid="Base_Column_List"/> FROM SPM_PERIOD SP
+        WHERE SP.PERIOD_ID=(SELECT SO.PERIOD_ID FROM OM_SALES_ORDER SO WHERE SO.HEADER_ID= #{headerId,jdbcType=DECIMAL}
+         AND SO.ORDER_STATUS='COMP')
+    </select>
+    
+    <!-- Report-取用户当前登录的销售区域上的市场的所有已经关闭的奖金期间(包含当前月份) -->
+    <select id="getSpmPeriodNameBySalesOrgId" resultMap="BaseResultMap">
+    	SELECT REPLACE(to_char(SYSDATE, 'yyyy/MM'), '/', '') PERIOD_NAME
+		  FROM dual
+		UNION
+		SELECT SP.PERIOD_NAME
+		FROM SPM_PERIOD SP
+		WHERE SP.ORG_TYPE = 'MKT' AND SP.CLOSING_STATUS = 'Y'
+		       AND EXISTS (
+					     SELECT 'x'
+					     FROM SPM_SALES_ORGANIZATION_B SSOB
+						 WHERE SSOB.SALES_ORG_ID = #{request.salesOrgId,jdbcType=DECIMAL} 
+							AND SSOB.MARKET_ID = SP.ORG_ID
+					 )
+		ORDER BY PERIOD_NAME DESC
+    </select>
+    <select id="getSpmPeriodNameBySalesOrgIdNo" resultMap="BaseResultMap">
+SELECT sp.period_name
+  FROM spm_period sp
+ WHERE sp.org_type = 'MKT'
+   AND sp.closing_status = 'Y'
+   AND EXISTS (SELECT 'x'
+          FROM spm_sales_organization_b ssob
+         WHERE ssob.sales_org_id = #{request.salesOrgId,jdbcType=DECIMAL}
+           AND ssob.market_id = sp.org_id)
+
+ ORDER BY period_name DESC
+    </select>
+    
+        <!-- Report-取用户当前登录的销售区域上的市场的所有已经关闭的奖金期间(包含当前月份) -->
+    <select id="getSpmPeriodNameBySalesOrgIdA" resultMap="BaseResultMap">
+        SELECT REPLACE(to_char(SYSDATE, 'yyyy/MM'), '/', '') PERIOD_NAME
+          FROM dual
+        UNION
+        SELECT SP.PERIOD_NAME
+        FROM SPM_PERIOD SP
+        WHERE SP.ORG_TYPE = 'MKT' AND SP.CLOSING_STATUS = 'Y'
+               AND EXISTS (
+                         SELECT 'x'
+                         FROM SPM_SALES_ORGANIZATION_B SSOB
+                         WHERE SSOB.SALES_ORG_ID = #{request.salesOrgId,jdbcType=DECIMAL} 
+                            AND SSOB.MARKET_ID = SP.ORG_ID
+                     )
+                  AND sp.period_name &lt;= (SELECT MAX(oo.period)
+                            FROM omk.omk_me_salary_stat_01 oo)
+        ORDER BY PERIOD_NAME DESC
+    </select>
+    <select id="getSpmPeriodNameBySalesOrgIdNoA" resultMap="BaseResultMap">
+SELECT sp.period_name
+  FROM spm_period sp
+ WHERE sp.org_type = 'MKT'
+   AND sp.closing_status = 'Y'
+   AND EXISTS (SELECT 'x'
+          FROM spm_sales_organization_b ssob
+         WHERE ssob.sales_org_id = #{request.salesOrgId,jdbcType=DECIMAL}
+           AND ssob.market_id = sp.org_id)
+   AND sp.period_name &lt;= (SELECT MAX(oo.period)
+                            FROM omk.omk_me_salary_stat_01 oo)
+ ORDER BY period_name DESC
+    </select>
+    <!-- 奖金月份，不限制关闭 -->
+    <select id="getSpmPeriodNameBySalesOrgIdNoClose" resultMap="BaseResultMap">
+        SELECT SP.PERIOD_NAME
+        FROM SPM_PERIOD SP
+        WHERE SP.ORG_TYPE = 'MKT'
+               AND EXISTS (
+                         SELECT 'x'
+                         FROM SPM_SALES_ORGANIZATION_B SSOB
+                         WHERE SSOB.SALES_ORG_ID = #{request.salesOrgId,jdbcType=DECIMAL} 
+                            AND SSOB.MARKET_ID = SP.ORG_ID
+                     )
+        AND SP.PERIOD_NAME &lt;= to_char(sysdate,'yyyyMM')             
+        ORDER BY PERIOD_NAME DESC
+    </select>
+    
+    <!-- Mclin添加，查询台湾市场下的所有关闭的奖金区间 -->
+    <select id="queryClosingPeriodInTw" resultMap="BaseResultMap">
+	  select sp.period_id, sp.period_name
+	    from spm_period sp
+	   where exists (select '+'
+	            from spm_market_b mb
+	           where sp.org_id = mb.market_id
+	             and mb.code = 'TW')
+	     and sp.closing_status = 'Y'
+	   order by sp.period_name desc
+    </select>
+    <!--     根据市场ID和日期查询其所属期间 -->
+    <select id="selectPeriodByDateAndOrgId" resultMap="BaseResultMap" >
+        select period_name
+           from (select period_name
+                   from spm_period
+                 where org_id = #{orgId,jdbcType=DECIMAL}
+                   and to_date(to_char(#{betweenDate,jdbcType=TIMESTAMP},'yyyy-MM-dd'),'yyyy-MM-dd') between to_date(to_char(start_date,'yyyy-MM-dd'),'yyyy-MM-dd') and
+                       to_date(to_char(end_date,'yyyy-MM-dd'),'yyyy-MM-dd')
+                 union
+                 select period_name
+                   from spm_period
+                 where org_id = #{orgId,jdbcType=DECIMAL}
+                   and to_date(to_char(#{betweenDate,jdbcType=TIMESTAMP},'yyyy-MM-dd'),'yyyy-MM-dd') &gt;= to_date(to_char(start_date,'yyyy-MM-dd'),'yyyy-MM-dd')
+                   and closing_status != 'Y')
+        order by period_name asc
+    </select>
+</mapper>

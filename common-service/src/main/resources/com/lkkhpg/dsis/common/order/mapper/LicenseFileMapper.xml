@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.LicenseFileMapper">
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.LicenseFile" >
+    <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="ACTRUAL_PAY_AMT" property="actrualPayAmt" jdbcType="DECIMAL" />
+    <result column="CREDIT_CARD_NUM" property="creditCardNum" jdbcType="VARCHAR" />
+    <result column="VALID_YEAR" property="validYear" jdbcType="VARCHAR" />
+    <result column="VALID_MONTH" property="validMonth" jdbcType="VARCHAR" />
+    <result column="BATCH_NUMBER" property="batchNumber" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <select id="selectByBatchNumber" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.order.dto.LicenseFile">
+    SELECT oso.order_number,
+           oso.actrual_pay_amt,
+           occ.CARD_NUMBER credit_card_num,
+           to_char(occ.EXPIRY_DATE,'yyyy') valid_year,
+           to_char(occ.EXPIRY_DATE,'mm') valid_month
+      FROM mm_mem_card       occ,
+           om_autoship_order oao,
+           om_sales_order    oso
+     WHERE oso.source_type = 'AUTOS'
+       AND oso.source_key = oao.autoship_number
+       AND oao.credit_card_id = occ.card_id
+       and oso.batch_number = #{batchNumber,jdbcType=VARCHAR}
+     order by oso.order_number asc
+  </select>
+
+</mapper>

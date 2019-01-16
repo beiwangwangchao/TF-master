@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.dapp.mapper.GetAddressMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.dapp.dto.GetAddressData" >
+    <result column="COUNTRY_CODE" property="countryCode" jdbcType="DECIMAL" />
+    <result column="COUNTRY_NAME" property="countryName" jdbcType="DECIMAL" />
+    <result column="STATE_CODE" property="stateCode" jdbcType="VARCHAR" />
+    <result column="STATE_NAME" property="stateName" jdbcType="VARCHAR" />
+    <result column="CITY_CODE" property="cityCode" jdbcType="VARCHAR" />
+    <result column="CITY_NAME" property="cityName" jdbcType="VARCHAR" />
+  </resultMap>
+  <select id="queryCountryStateCityForDApp" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    SELECT sc.country_code,
+	       sct.name country_name,
+	       ss.state_code,
+	       sst.name state_name,
+	       sc.city_code,
+	       scit.name city_name
+	  FROM spm_country_tl sct, spm_country_b sc
+	  LEFT OUTER JOIN spm_state_b ss
+	    ON ss.country_code = sc.country_code
+	   AND ss.enabled_flag = 'Y'
+	  LEFT OUTER JOIN spm_state_tl sst
+	    ON ss.state_code = sst.state_code
+	   AND sst.lang = #{lang,jdbcType=VARCHAR}
+	  LEFT OUTER JOIN spm_city_b sc
+	    ON sc.state_code = ss.state_code
+	   AND sc.enabled_flag = 'Y'
+	  LEFT OUTER JOIN spm_city_tl scit
+	    ON sc.city_code = scit.city_code
+	   AND scit.lang = #{lang,jdbcType=VARCHAR}
+	 WHERE sc.country_code = sct.country_code
+	   AND sc.enabled_flag = 'Y'
+	   AND sct.lang = #{lang,jdbcType=VARCHAR}
+	 ORDER BY sc.country_code, sct.name, ss.state_code, sst.name, sc.city_code, scit.name
+  </select>
+</mapper>

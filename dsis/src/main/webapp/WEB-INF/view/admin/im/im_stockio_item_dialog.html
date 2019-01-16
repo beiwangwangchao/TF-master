@@ -1,0 +1,137 @@
+<#--
+ * description: 出入库创建商品查询对话框
+ * version: 1.0
+ * author: mclin
+ * .
+ *
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+	<script src="${base.contextPath}/common/code?isOrNotArray=SYS.YES_NO" type="text/javascript"></script>
+    <form id="stockio_create_item_query_form" method="post"></form>
+    <div id="stockio_create_item_query_grid"></div>
+    <script type="text/javascript">
+	    $(function(){
+	    	var trxType;
+	    	<#assign isedit = (RequestParameters.isedit!'0')/>
+	    	<#if isedit == '0'>
+	    		trxType = ${RequestParameters.trxType!'0'};
+          	</#if>
+	    	/* 生成商品类型下拉框 */
+	    	getItemTypes();
+		    window['stockio_create_item_query_form'] = $("#stockio_create_item_query_form").ligerForm({
+				inputWidth : 150,
+		    	labelWidth : 70,
+		    	fields : [ 
+				/* 出入库ID */
+				{ 
+					label: ' ', 
+					type: 'hidden', name: 'trxType',
+					options: {
+						value: trxType
+					}
+				}, 
+		    	/* 商品Code */
+		    	{
+					display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemnumber"/>',
+					name: 'itemNumber', type: 'text'
+				}, 
+				/* 商品名称 */
+				{
+					display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname"/>',
+					name : "itemName", newline : false, type : "text"
+				}, 
+				/* 商品类别 */
+				{
+					display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category"/>',
+					name : "itemType", newline : true, type : "select",
+					options: {
+						data: itemTypeSel,
+						valueField: 'categoryId',
+						textField: 'categoryName'
+					}
+				}, 
+				/* 可兑换性 */
+				{
+					display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.redeemflag"/>',
+					name : "redeemFlag", newline : false, type : "select",
+					options: {
+						data: isOrNotArray,
+						valueField: 'value',
+						textField: 'meaning'
+					}
+				}, 
+				/* 入会套餐 */
+				{
+					display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.starteraid"/>',
+					name : "starterAid", newline : false, type : "select",
+					options: {
+						data: isOrNotArray,
+						valueField: 'value',
+						textField: 'meaning'
+					}
+				} ],
+				buttons: [ 
+				/* 搜索按钮 */
+				{
+					text: '<@spring.message "sys.hand.btn.search"/>', 
+		        	disabled:false, width: 60,
+		        	id: 'searchCommBtn',
+		        	click: function(){
+		        		Hap.gridQuery({
+		        			form: stockio_create_item_query_form,
+		        			grid: stockio_create_item_query_grid
+		        		})
+		        	}
+				} ]
+			});
+			/* 自定义弹出对话框初始化，商品查询结果Grid */
+			window['stockio_create_item_query_grid'] = $("#stockio_create_item_query_grid").ligerGrid({
+				unSetValidateAttr:false,
+		    	columns : [ 
+		    	/* 商品代码 */
+		    	{
+					display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemnumber"/>',
+					name : "itemNumber", width : 180, type : "text", align : "left"
+				},
+				/* 商品名称 */
+				{
+					display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname"/>',
+					name : "itemName", width : 180, type : "text", align : "left"
+				},
+				/* 商品描述 */
+				{
+					display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.description"/>',
+					name : "description", width : 360, type : "text", align : "left"
+				} ],
+		    	url : '${base.contextPath}/inv/item/itemCodeQuery',
+		    	parms: {'trxType': trxType},
+		    	width: '99%',
+		    	height: '98%',
+				isSingleCheck: true,
+				onDblClickRow : function (data, rowindex, rowobj){
+					var dialog = frameElement.dialog;
+					dialog.options.buttons[0].onclick(rowobj, dialog);
+					dialog.close();
+				}
+			});
+			/* 查询商品类别(下拉框) */
+    		function getItemTypes(){
+    			$.ajax({
+                    url : '${base.contextPath}/pm/category/querySelection',
+                    async: false,
+                    type : 'POST',
+                    dataType : "json",
+                    contentType : "application/x-www-form-urlencoded; charset=UTF-8",
+                    success : function(json) {
+                    	window.itemTypeSel = json.rows;
+                    },
+                    error : function() {
+                        return;
+                    }
+                });
+    		}
+	    })
+    </script>
+</body>
+</html>

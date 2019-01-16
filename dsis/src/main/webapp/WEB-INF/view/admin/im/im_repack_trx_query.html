@@ -1,0 +1,305 @@
+<#-- 
+ * description: 创建分包记录-查询商品包界面 
+ * version: 1.0 
+ * author:hanrui.huang@hand-china.com
+ * .
+ * 
+--> 
+<#include "../include/head.html">
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?yesno=SYS.YES_NO&repackOperType=INV.REPACK_TYPE&repackStatus=INV.REPACK_STATUS" type="text/javascript"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+<body style="padding: 10px;zoom: 1;">
+<form id="query_form">
+</form>
+<div id="repack_trx_grid">
+</div>
+<script type="text/javascript">
+<#assign isedit = (RequestParameters.isedit!'0')/>
+    //商品包代码全局变量
+    var itemData = null;
+    $(function() {
+    	//当前库存组织
+        var salesOrgId = _invOrgId;
+        window['query_form'] = $("#query_form").ligerForm({
+            fields: [
+//             {
+//                 label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.organization"/>',
+//                 type : 'hidden', name : 'organizationId', newline : false, readonly : true, options : 
+//                 {
+//                     value : _invOrgId
+//                 }
+//             },
+            {
+                type : 'combobox',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.organization"/>',
+                name : 'organizationId',
+                newline : false,
+                options : {
+                    value : _invOrgId,
+                    valueField : 'invOrgId',
+                    textField : 'name',
+                    url : "${base.contextPath}/spm/invOrganization/queryInvOrgsByRole",
+                    cancelable : false ,
+                    autocomplete:false,
+                    onSelected : function(e){
+                        resetFormData();
+                        clearGrid();
+                    }
+                 },
+                 validate : {
+                     required : true
+                 }
+            }
+//             {
+//                 label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.organization"/>',
+//                 type : 'text', name : 'organizationName', newline : false, readonly : true, options : 
+//                 {
+//                 	value : _invOrgName
+//                 }
+//             }
+            ,{
+                type: 'text',
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.trxnumber"/>',
+                newline: false,
+                name: 'trxNumber'
+            },
+            {
+                type: 'select',
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.opertype"/>',
+                name: 'operType',
+                newline: false,
+                options: {
+                    valueField: 'value',
+                    textField: 'meaning',
+                    data: repackOperType,
+                    cancelable: true
+                }
+            },
+            {
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.trxdate"/><@spring.message "type.com.lkkhpg.dsis.common.dto.from" />',
+                type: 'date',
+                newline: true,
+                name: 'beforetrxDate',
+                options: {
+                    format: 'yyyy-MM-dd'
+                }
+            },
+            {
+                type: 'date',
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.createdate"/><@spring.message "type.com.lkkhpg.dsis.common.dto.from" />',
+                name: 'beforeCreationDate',
+                newline: false,
+                options: {
+                    format: 'yyyy-MM-dd'
+                }
+            },
+            {
+                type: 'select',
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.status"/>',
+                name: 'status',
+                newline: false,
+                
+                options: {
+                    valueField: "value",
+                    textField: "meaning",
+                    data: repackStatus,
+                    isMultiSelect: true,
+                    isShowCheckBox: true
+                }
+            },
+            {
+                type: 'date',
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.trxdate"/><@spring.message "type.com.lkkhpg.dsis.common.dto.to" />',
+                name: 'aftertrxDate',
+                newline: true,
+                options: {
+                    format: 'yyyy-MM-dd'
+                }
+            },
+            {
+                type: 'date',
+                label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.createdate"/><@spring.message "type.com.lkkhpg.dsis.common.dto.to" />',
+                name: 'afterCreationDate',
+                newline: false,
+                options: {
+                    format: 'yyyy-MM-dd'
+                }
+            },
+            {
+            	type : 'text', label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.packageitemid"/>',
+                name : 'itemNumber', newline : false, rightToken : ' ',  
+            }],
+            buttons: [{
+                text: '<@spring.message "sys.hand.btn.query"/>',
+                newline: false,
+                click: function() {
+                    Hap.gridQuery({
+                        form: query_form,
+                        grid: repack_trx_grid
+                    })
+                }
+            }],
+        });
+        var status = null; 
+        <!--产品包表格-->
+        window['repack_trx_grid'] = $("#repack_trx_grid").ligerGrid({
+            unSetValidateAttr: false,
+            columns: [{
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.trxnumber"/>',
+                name: 'trxNumber',isSort : true,
+                align: 'left',
+                render: function(repackTrx) {
+                    var html = "<a href='#' onClick=a_click('" + repackTrx.trxId + "')>" + repackTrx.trxNumber + "</a>";
+                    status = repackTrx.status;
+                    return html;
+                }
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.packageitemid"/>',
+                name: 'itemNumber',
+                align: 'left',
+                width: 200
+            },
+            {
+            	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.package.packagename"/>',
+                name : 'itemName',
+                align: 'left',
+                width: 200
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.status"/>',
+                name: 'status',
+                align: 'left',
+                width: 100,
+                isSort : false,
+                editor: {
+                    type: 'select',
+                    valueField: 'value',
+                    textField: 'meaning',
+                    data: repackStatus
+                },
+                render: function(item) {
+                    return getCodeDesc(repackStatus, item.status);
+                }
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.opertype"/>',
+                name: 'operType',
+                align: 'left',
+                width: 100,
+                isSort : false,
+                editor: {
+                    type: 'select',
+                    valueField: 'value',
+                    textField: 'meaning',
+                    data: repackOperType
+                },
+                render: function(item) {
+                    return getCodeDesc(repackOperType, item.operType);
+                }
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.createdate"/>',
+                name: 'creationDate',isSort : true,
+                align: 'left'
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.trxdate"/>',
+                name: 'trxDate',isSort : true,
+                align: 'left'
+            }],
+            url: '${base.contextPath}/im/repack/query',
+            toolbar: {
+                items: [{
+                    text: '<@spring.message "sys.hand.btn.new"/>',
+                    <#if accessService.access("NEW_EDITABLE") == false>
+                    disable:true, 
+                    </#if> 
+                    //disable: false,
+                    click: function() {
+                    	window.top.f_removeTab("im_repack_trx_create");
+                    	parent.f_addTab("im_repack_trx_create",'<@spring.message "sys.hand.btn.newsubpackage"/>',"${base.contextPath}/im/im_repack_trx_create.html?status=NEW");
+                    },
+                    icon: 'add'
+                },
+                {
+                    line: true
+                },
+                {
+                    text: '<@spring.message "sys.hand.btn.delete"/>',
+                    <#if accessService.access("DELETE_EDITABLE") == false>
+                    disable:true, 
+                    </#if> 
+                    click: function() {
+                        if (repack_trx_grid.getSelecteds().length == 0 && repack_trx_grid.getData().length != 0) {
+                            $.ligerDialog.alert('<@spring.message "msg.warn.system.no_row_choose"/>', $l('sys.hand.tip.info'), 'warn');
+                            return;
+                        }
+                        //进行判断，如果状态为完成时不可删除
+                        var rows = repack_trx_grid.getSelectedRows();
+                  if(rows!=null && rows.length > 0){
+                        	for(var i=0;i<rows.length;i++){
+                        	if(rows[i].status!='NEW'){
+                        		  $.ligerDialog.alert('<@spring.message "type.com.lkkhpg.dsis.common.inventory.stock.complete_not_allowd_delete"/>',
+                        				  	$l('sys.hand.tip.info'), 'warn');
+                        		  return;
+                        		}
+                        	}
+                        } 
+								                            Hap.gridDelete({
+								                                url: '${base.contextPath}/im/repack/remove',
+								                                grid: repack_trx_grid,
+								                            });
+                    },
+                    icon: 'delete'
+                },
+                {
+                	line:true
+                },
+                {                	
+                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                    menu:{ width: 120, items:
+                            [
+	                 			{                	
+	                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+	                 			    click:   function (){exportSelected("query_form","repack_trx_grid",{"status":repackStatus,"operType":repackOperType},_basePath);}
+	                 			},
+	                 			{ line: true },
+	                 			{                	
+	                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+	                 			    click: function (){exportAll("query_form","repack_trx_grid",{"status":repackStatus,"operType":repackOperType},_basePath);}
+	                 			}
+                          ]
+                 	}
+                } ]
+            },
+            enabledEdit: false,
+            width: '100%',
+            height: '99%',
+            checkbox: true
+        });
+    });
+    function a_click(data) {
+    	window.top.f_removeTab("im_repack_trx_create_1");
+        parent.f_addTab("im_repack_trx_create_1",'<@spring.message "sys.hand.btn.newsubpackage"/>',"${base.contextPath}/im/im_repack_trx_create.html?isedit=1&trxId=" + data);
+    }
+    function resetFormData(){
+    	query_form.setData({
+    	   trxNumber:'',
+    	   operType:'',
+    	   beforetrxDate:'',
+    	   beforeCreationDate:'',
+    	   status:'',
+    	   aftertrxDate:'',
+    	   afterCreationDate:'',
+    	   itemNumber:''
+        });
+    }
+    function clearGrid(){
+    	repack_trx_grid.currentData = {};
+    	repack_trx_grid.reRender();
+    }
+</script>
+</body>

@@ -1,0 +1,234 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>天府电商</title>
+<link href="${base.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css">
+<link href="${base.contextPath}/resources/css/style1${resource_suffix!}.css" rel="stylesheet" type="text/css">
+<link rel="shortcut icon" href="${base.contextPath}/resources/img/favicon.ico" />
+<!-- Bootstrap -->
+<link href="${base.contextPath}/resources/css/bootstrap${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.carousel${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.theme${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.transitions${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/style${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/config${resource_suffix!}.css" rel="stylesheet">
+
+<script src="${base.contextPath}/resources/js/jquery-1.11.3${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/lib/json2${resource_suffix!}.js"></script>
+<script type="text/javascript">var _basePath = "${base.contextPath}";</script>
+<!-- ========== MENU END ========== -->
+<!-- ========== CONTENT START ========== -->
+<script>
+	$(function() {
+		$.ajax({
+			type : 'POST',
+			url : "${base.contextPath}/salesorder/result",
+			dataType : "json",
+			data : {
+				status : "${model.status}",
+				respCode : "${model.respCode}",
+				orderStatus : "${model.orderStatus}",
+				payType : "${model.payType}",
+				lidm : "${model.lidm}",
+				authAmt : "${model.authAmt}",
+				errCode : "${model.errCode}",
+				xid : "${model.xid}",
+				authCode : "${model.authCode}",
+				<#if model.last4digitPAN?? >
+				last4digitPAN : "${model.last4digitPAN}",
+				</#if>
+				result : "${model.result}"
+				
+			},
+			success : function(data) {
+				$('#orderNumber').html(data.orderNumber);
+				$('#actrualPayAmt').html(data.actrualPayAmt);
+			}
+		});
+
+	});
+	
+	function closeWindows() {
+		open(location, '_self').close();
+   }
+	
+</script>
+</head>
+<body>
+ <header id="header">
+        <div>
+            <img src="${base.contextPath}/resources/img/top-line.jpg" style="width: 100%; height: 24px"/>
+        </div>
+        <!-- / #top-bar -->
+
+        <!-- ========== TOP BAR START ========== -->
+
+        <!-- ========== MENU START ========== -->
+
+        <nav id="main-nav">
+            <div class="navbar">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle"
+                            data-toggle="collapse"
+                            data-target=".main-nav">
+                            <span class="icon-bar"></span> <span
+                                class="icon-bar"></span> <span
+                                class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="${base.contextPath}/index.html"><img
+                            src="${base.contextPath}/resources/img/logo.png" alt="Infinitus"
+                            class="img-responsive"></a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+<style>
+    .span-css{
+        background-color: red;
+        color: white;
+    }
+    .market-li{
+        margin-top: 50px;
+        text-align: center;
+        color: #737373;
+    }
+    .market-td{
+        border: 2px solid #858585;
+        height: 35px;
+        width: 120px;
+        line-height: 35px;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .gradient-line-top{
+        background: -webkit-linear-gradient(#FFFFFF, #E4E4E4); /* Safari 5.1 - 6.0 */
+        background: -o-linear-gradient(#FFFFFF, #E4E4E4); /* Opera 11.1 - 12.0 */
+        background: -moz-linear-gradient(#FFFFFF, #E4E4E4); /* Firefox 3.6 - 15 */
+        background: linear-gradient(#FFFFFF, #E4E4E4);  /*标准的语法 */
+        height:150px;
+        width:2px;
+        margin-left:300px;
+        margin-top: 60px;
+    }
+    .gradient-line-bottom{
+        background: -webkit-linear-gradient(#E4E4E4, #FFFFFF); /* Safari 5.1 - 6.0 */
+        background: -o-linear-gradient(#E4E4E4, #FFFFFF); /* Opera 11.1 - 12.0 */
+        background: -moz-linear-gradient(#E4E4E4, #FFFFFF); /* Firefox 3.6 - 15 */
+        background: linear-gradient(#E4E4E4, #FFFFFF);  /*标准的语法 */
+        height:150px;
+        width:2px;
+        margin-left:300px;
+    }
+</style>
+</header>
+<section id="content">
+	<div class="container">
+		<#if model.status == 'SUCCESS'>
+		<div class="row" style="margin-top: 50px">
+			<div class="col-md-2 col-sm-2" style="margin-top: 30px">
+				<div class="col-md-offset-6">
+					<img src="${base.contextPath}/resources/img/u100.png">
+				</div>
+			</div>
+			<div class="col-md-6 col-sm-6" style="margin-top: 35px">
+				<div class="row">
+					<div class="col-sm-6 form-group" style="font-weight: bolder; font-size: 20px; color: black"><@spring.message "mws.payment.result.success"/></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>:</label> <span id="orderNumber"></span>
+					</div>
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.sum_actualpay"/>:</label> <span style="color: red;" id="actrualPayAmt"></span>
+					</div>
+				</div>
+
+<!-- 				<div class="row">
+					<div class="col-md-2 form-group">
+						<button class="btn btn-default btn-sm">关闭窗口</button>
+					</div>
+				</div> -->
+				<div style="margin-bottom: 160px; margin-top: 80px">
+					<p style="font-size: small">
+						<@spring.message "mws.payment.selector.relatecustomer"/>
+					</p>
+				</div>
+			</div>
+		</div>
+		<#elseif model.status == 'PAYING'>
+		<div class="row" style="margin-top: 50px">
+			<div class="col-md-2 col-sm-2" style="margin-top: 30px">
+				<div class="col-md-offset-6">
+					<img src="${base.contextPath}/resources/img/u100.png">
+				</div>
+			</div>
+			<div class="col-md-6 col-sm-6" style="margin-top: 35px">
+				<div class="row">
+					<div class="col-sm-6 form-group" style="font-weight: bolder; font-size: 20px; color: black"><@spring.message "mws.payment.result.processing"/></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>:</label> <span id="orderNumber"></span>
+					</div>
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.sum_actualpay"/>:</label> <span style="color: red;" id="actrualPayAmt"></span>
+					</div>
+				</div>
+<!-- 				<div class="row">
+					<div class="col-md-2 form-group">
+						<button class="btn btn-default btn-sm" onclick="closeWindows()">关闭窗口</button>
+					</div>
+				</div> -->
+				<div style="margin-bottom: 160px; margin-top: 80px">
+					<p style="font-size: small">
+						<@spring.message "mws.payment.selector.relatecustomer"/>
+					</p>
+				</div>
+			</div>
+		</div>
+		<#else>
+		<div class="row" style="margin-top: 50px">
+			<div class="col-md-2 col-sm-2" style="margin-top: 30px">
+				<div class="col-md-offset-6">
+					<img src="${base.contextPath}/resources/img/u100.png">
+				</div>
+			</div>
+			<div class="col-md-6 col-sm-6" style="margin-top: 35px">
+				<div class="row">
+					<div class="col-sm-6 form-group" style="font-weight: bolder; font-size: 20px; color: black"><@spring.message "mws.payment.result.fail"/></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>:</label> <span id="orderNumber"></span>
+					</div>
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.sum_actualpay"/>:</label> <span style="color: red;" id="actrualPayAmt"></span>
+					</div>
+				</div>
+<!-- 				<div class="row">
+					<div class="col-md-2 form-group">
+						<button class="btn btn-default btn-sm">关闭窗口</button>
+					</div>
+				</div> -->
+				<div style="margin-bottom: 160px; margin-top: 80px">
+					<p style="font-size: small">
+						<@spring.message "mws.payment.selector.relatecustomer"/>
+					</p>
+				</div>
+			</div>
+			
+
+		</div>
+		</#if>
+ 
+	</div>
+
+</section>
+
+<!-- ========== CONTENT END ========== -->
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

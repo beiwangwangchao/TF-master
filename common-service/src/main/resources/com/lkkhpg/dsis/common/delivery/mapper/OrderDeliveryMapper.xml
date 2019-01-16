@@ -1,0 +1,719 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.delivery.mapper.OrderDeliveryMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.delivery.dto.OrderDelivery" >
+    <id column="DELIVERY_ID" property="deliveryId" jdbcType="DECIMAL" />
+    <result column="INV_ORG_ID" property="invOrgId" jdbcType="DECIMAL" />
+    <result column="ORDER_HEADER_ID" property="orderHeaderId" jdbcType="DECIMAL" />
+    <result column="DELIVERY_NUMBER" property="deliveryNumber" jdbcType="VARCHAR" />
+    <result column="DELIVERY_TYPE" property="deliveryType" jdbcType="VARCHAR" />
+    <result column="DELIVERY_STATUS" property="deliveryStatus" jdbcType="VARCHAR" />
+    <result column="DELIVERY_DATE" property="deliveryDate" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    
+    <result column="contact_name" property="contactName" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />  
+    <result column="city_code" property="cityCode" jdbcType="VARCHAR" />
+     <result column="state_code" property="stateCode" jdbcType="VARCHAR" />  
+     <result column="country_code" property="countryCode" jdbcType="VARCHAR" />
+     <result column="address" property="address" jdbcType="VARCHAR" /> 
+     <result column="area_code" property="areaCode" jdbcType="VARCHAR" />
+     <result column="zip_code" property="zipCode" jdbcType="VARCHAR" />
+     <result column="address1" property="address1" jdbcType="VARCHAR" />
+     <result column="address2" property="address2" jdbcType="VARCHAR" />
+     <result column="address3" property="address3" jdbcType="VARCHAR" />
+
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="PICK_RELEASE_ID" property="pickReleaseId" jdbcType="DECIMAL" />
+    
+    <result column="INV_ORG_NAME" property="invOrgName" jdbcType="VARCHAR" />
+    <result column="OU_NAME" property="ouName" jdbcType="VARCHAR" />
+    <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="MEMBER_IDENTIFY" property="memberIdentify" jdbcType="VARCHAR" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+    <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR" />
+    <result column="RECEIPT_FLAG" property="receiptFlag" jdbcType="VARCHAR" />
+    
+    <result column="LOGISTICS_COMPANY" property="logisticsCompany" jdbcType="VARCHAR" />
+    <result column="TRACKER_NUMBER" property="trackerNumber" jdbcType="VARCHAR" />
+    <result column="INTERNAL_REMARK" property="internalRemark" jdbcType="VARCHAR" />
+    <result column="ORDER_INTERNAL_REMARK" property="orderInternalRemark" jdbcType="VARCHAR" />
+    <result column="ORDER_REMARK" property="orderRemark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    DELIVERY_ID, INV_ORG_ID, ORDER_HEADER_ID, DELIVERY_NUMBER, DELIVERY_TYPE, DELIVERY_STATUS, 
+    DELIVERY_DATE, REMARK, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15, PICK_RELEASE_ID, contact_name, phone  ,city_code ,state_code  ,country_code
+    ,address ,address1 ,address2 ,address3 ,area_code ,zip_code,RECEIPT_FLAG,INTERNAL_REMARK
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+      SELECT dod.delivery_id
+          ,dod.inv_org_id
+          ,dod.order_header_id
+          ,dod.delivery_number
+          ,dod.delivery_type
+          ,dod.delivery_status
+          ,dod.delivery_date
+          ,dod.remark
+          ,dod.object_version_number
+          ,dod.request_id
+          ,dod.program_id
+          ,dod.creation_date
+          ,dod.created_by
+          ,dod.last_updated_by
+          ,dod.last_update_date
+          ,dod.last_update_login
+          ,dod.attribute_category
+          ,dod.attribute1
+          ,dod.attribute2
+          ,dod.attribute3
+          ,dod.attribute4
+          ,dod.attribute5
+          ,dod.attribute6
+          ,dod.attribute7
+          ,dod.attribute8
+          ,dod.attribute9
+          ,dod.attribute10
+          ,dod.attribute11
+          ,dod.attribute12
+          ,dod.attribute13
+          ,dod.attribute14
+          ,dod.attribute15
+          ,dod.pick_release_id
+          ,dod.contact_name
+          ,dod.phone  
+          ,dod.city_code
+          ,dod.state_code  
+          ,dod.country_code
+          ,dod.address 
+          ,dod.address1
+          ,dod.address2
+          ,dod.address3 
+          ,dod.area_code
+          ,dod.zip_code
+          ,dod.internal_remark
+          ,(select orgtl.NAME from SPM_INV_ORGANIZATION_TL orgtl WHERE ORGTL.INV_ORG_ID = dod.inv_org_id  AND ORGTL.LANG =  #{localel,jdbcType=VARCHAR} )inv_org_name
+          ,sou.name ou_name
+          ,oso.order_number
+          ,mm.member_id member_identify
+          ,mm.member_name
+          ,mm.member_code
+          ,dod.receipt_flag
+          ,dod.logistics_company
+          ,dod.tracker_number
+          , (select code FROM spm_market_b where market_id = (SELECT so.market_id FROM SPM_SALES_ORGANIZATION_B so where so.sales_org_id = oso.sales_org_id) ) marketCode
+          ,oso.remark order_remark
+          ,oso.internal_remark  order_internal_remark
+          
+      FROM dm_order_delivery dod
+      LEFT JOIN SPM_INV_ORGANIZATION_B sio
+      ON sio.inv_org_id = dod.inv_org_id 
+      LEFT JOIN SPM_OPERATING_UNIT_B sou
+      ON sou.operating_unit_id = sio.operation_unit_id
+      LEFT JOIN om_sales_order oso
+      ON oso.header_id = dod.order_header_id
+      LEFT JOIN mm_member_v mm
+      ON oso.member_id = mm.member_id
+    WHERE dod.delivery_id = #{deliveryId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from DM_ORDER_DELIVERY
+    where DELIVERY_ID = #{deliveryId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDelivery" >
+    <selectKey resultType="java.lang.Long" keyProperty="deliveryId" order="BEFORE">
+            select DM_ORDER_DELIVERY_S.nextval from dual
+    </selectKey>
+    insert into DM_ORDER_DELIVERY (DELIVERY_ID, INV_ORG_ID, ORDER_HEADER_ID, 
+      DELIVERY_NUMBER, DELIVERY_TYPE, DELIVERY_STATUS, 
+      DELIVERY_DATE, REMARK
+      ,CONTACT_NAME,PHONE ,CITY_CODE
+      ,STATE_CODE ,COUNTRY_CODE ,ADDRESS,ADDRESS1,ADDRESS2,ADDRESS3 
+      ,AREA_CODE,ZIP_CODE 
+      ,REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15, PICK_RELEASE_ID,RECEIPT_FLAG,INTERNAL_REMARK
+      )
+    values (#{deliveryId,jdbcType=DECIMAL}, #{invOrgId,jdbcType=DECIMAL}, #{orderHeaderId,jdbcType=DECIMAL}, 
+      #{deliveryNumber,jdbcType=VARCHAR}, #{deliveryType,jdbcType=VARCHAR}, #{deliveryStatus,jdbcType=VARCHAR}, 
+      #{deliveryDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
+      
+      #{contactName,jdbcType=VARCHAR},
+      #{phone,jdbcType=VARCHAR}, 
+      #{cityCode,jdbcType=VARCHAR},
+      #{stateCode,jdbcType=VARCHAR},
+      #{countryCode,jdbcType=VARCHAR},
+      #{address,jdbcType=VARCHAR},
+      #{address1,jdbcType=VARCHAR},
+      #{address2,jdbcType=VARCHAR},
+      #{address3,jdbcType=VARCHAR},
+      #{areaCode,jdbcType=VARCHAR},
+      #{zipCode,jdbcType=VARCHAR},
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{pickReleaseId,jdbcType=DECIMAL},
+       'N',#{internalRemark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDelivery" >
+    <selectKey resultType="java.lang.Long" keyProperty="deliveryId" order="BEFORE">
+            select DM_ORDER_DELIVERY_S.nextval from dual
+    </selectKey>
+    insert into DM_ORDER_DELIVERY
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="deliveryId != null" >
+        DELIVERY_ID,
+      </if>
+      <if test="invOrgId != null" >
+        INV_ORG_ID,
+      </if>
+      <if test="orderHeaderId != null" >
+        ORDER_HEADER_ID,
+      </if>
+      <if test="deliveryNumber != null" >
+        DELIVERY_NUMBER,
+      </if>
+      <if test="deliveryType != null" >
+        DELIVERY_TYPE,
+      </if>
+      <if test="deliveryStatus != null" >
+        DELIVERY_STATUS,
+      </if>
+      <if test="deliveryDate != null" >
+        DELIVERY_DATE,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="contactName != null" >
+        contact_name,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="cityCode != null" >
+        city_code,
+      </if>
+      <if test="stateCode != null" >
+        state_code,
+      </if>
+      <if test="countryCode != null" >
+        country_code,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="address1 != null" >
+        address1,
+      </if>
+      <if test="address2 != null" >
+        address2,
+      </if>
+      <if test="address3 != null" >
+        address3,
+      </if>
+      <if test="areaCode != null" >
+        area_code,
+      </if>
+       <if test="zipCode != null" >
+        zip_code,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+       
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="pickReleaseId != null" >
+        PICK_RELEASE_ID,
+      </if>
+      <if test="receiptFlag">
+        RECEIPT_FLAG,
+      </if>
+      <if test="internalRemark">
+        INTERNAL_REMARK,
+      </if>
+      
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="deliveryId != null" >
+        #{deliveryId,jdbcType=DECIMAL},
+      </if>
+      <if test="invOrgId != null" >
+        #{invOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="orderHeaderId != null" >
+        #{orderHeaderId,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryNumber != null" >
+        #{deliveryNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryType != null" >
+        #{deliveryType,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryStatus != null" >
+        #{deliveryStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryDate != null" >
+        #{deliveryDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="contactName != null" >
+         #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+          #{phone,jdbcType=VARCHAR}, 
+      </if>
+      <if test="cityCode != null" >
+         #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateCode != null" >
+          #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="countryCode != null" >
+         #{countryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+          #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="address1 != null" >
+         #{address1,jdbcType=VARCHAR},
+      </if>
+      <if test="address2 != null" >
+          #{address2,jdbcType=VARCHAR},
+      </if>
+      <if test="address3 != null" >
+          #{address3,jdbcType=VARCHAR},
+      </if>
+      <if test="areaCode != null" > 
+          #{areaCode,jdbcType=VARCHAR},
+      </if>
+       <if test="zipCode != null" >
+          #{zipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="pickReleaseId != null" >
+        #{pickReleaseId,jdbcType=DECIMAL},
+      </if>
+      <if test="receiptFlag">
+        'N',
+      </if>
+      <if test="internalRemark">
+        #{internalRemark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDelivery" >
+    update DM_ORDER_DELIVERY
+    <set >
+      <if test="invOrgId != null" >
+        INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="orderHeaderId != null" >
+        ORDER_HEADER_ID = #{orderHeaderId,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryNumber != null" >
+        DELIVERY_NUMBER = #{deliveryNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryType != null" >
+        DELIVERY_TYPE = #{deliveryType,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryStatus != null" >
+        DELIVERY_STATUS = #{deliveryStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryDate != null" >
+        DELIVERY_DATE = #{deliveryDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+       
+      <if test="contactName != null" >
+         contact_name = #{contactName,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+          phone = #{phone,jdbcType=VARCHAR}, 
+      </if>
+      <if test="cityCode != null" >
+         city_code = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateCode != null" >
+          state_code = #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="countryCode != null" >
+         country_code = #{countryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+         address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="address1 != null" >
+          address1 = #{address1,jdbcType=VARCHAR},
+      </if>
+      <if test="address2 != null" >
+           address2 = #{address2,jdbcType=VARCHAR},
+      </if>
+      <if test="address3 != null" >
+           address3 = #{address3,jdbcType=VARCHAR},
+      </if>
+      <if test="areaCode != null" > 
+          area_code =  #{areaCode,jdbcType=VARCHAR},
+      </if>
+       <if test="zipCode != null" >
+          zip_code = #{zipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="pickReleaseId != null" >
+        PICK_RELEASE_ID = #{pickReleaseId,jdbcType=DECIMAL},
+      </if>
+       <if test="receiptFlag">
+        RECEIPT_FLAG = #{receiptFlag,jdbcType=VARCHAR},
+      </if>
+      
+      <if test="logisticsCompany != null" >
+        LOGISTICS_COMPANY = #{logisticsCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="trackerNumber != null" >
+        TRACKER_NUMBER = #{trackerNumber,jdbcType=VARCHAR},
+      </if>
+       <if test="internalRemark != null" >
+        INTERNAL_REMARK = #{internalRemark,jdbcType=VARCHAR},
+      </if>
+      
+    </set>
+    where DELIVERY_ID = #{deliveryId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.delivery.dto.OrderDelivery" >
+    update DM_ORDER_DELIVERY
+    set INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+      ORDER_HEADER_ID = #{orderHeaderId,jdbcType=DECIMAL},
+      DELIVERY_NUMBER = #{deliveryNumber,jdbcType=VARCHAR},
+      DELIVERY_TYPE = #{deliveryType,jdbcType=VARCHAR},
+      DELIVERY_STATUS = #{deliveryStatus,jdbcType=VARCHAR},
+      DELIVERY_DATE = #{deliveryDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      PICK_RELEASE_ID = #{pickReleaseId,jdbcType=DECIMAL},
+      RECEIPT_FLAG = #{receiptFlag,jdbcType=VARCHAR},
+      INTERNAL_REMARK = #{internalRemark,jdbcType=VARCHAR}
+    where DELIVERY_ID = #{deliveryId,jdbcType=DECIMAL}
+  </update>
+  
+  <update id="updateDeliveryStatus">
+    update DM_ORDER_DELIVERY d 
+    set d.delivery_status = #{newStatus,jdbcType=VARCHAR},
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP
+    where d.delivery_status in 
+        <foreach collection="status" open="(" separator="," close=")" item="state" index="index">
+            #{state,jdbcType=VARCHAR}
+        </foreach>
+    and d.ORDER_HEADER_ID = #{headerId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="checkDeliveryStatus"  resultType="java.lang.Long">
+    select count(*) 
+    from DM_ORDER_DELIVERY  
+    where ORDER_HEADER_ID = #{headerId,jdbcType=DECIMAL} 
+    and DELIVERY_STATUS not in 
+    <foreach collection="status" open="(" separator="," close=")" item="state" index="index">
+        #{state,jdbcType=VARCHAR}
+    </foreach>
+  </select>
+  
+  <select id="getShippedAmountByOrderLine" resultType="java.math.BigDecimal">
+    select sum(dodl.outstanding_qty)
+      from dm_order_delivery_line dodl ,
+      dm_order_delivery dod
+      where  dod.delivery_id = dodl.delivery_id
+      and dod.delivery_status in ('PCKUP','SHIPP')
+      and dodl.order_line_id = #{orderLineId,jdbcType=DECIMAL} 
+   </select>
+   <select id ="selectOrderDeliveryAll" resultMap="BaseResultMap">
+   		select 
+   		DELIVERY_ID, INV_ORG_ID, ORDER_HEADER_ID, DELIVERY_NUMBER, DELIVERY_TYPE, 
+   		(
+   		select coalesce(scvbct.meaning, scvb.meaning)
+		  from sys_code_b scb, sys_code_value_b scvb left join sys_code_value_tl scvbct 
+		  on (scvb.code_value_id = scvbct.code_value_id and scvbct.lang = #{request.locale,jdbcType=VARCHAR})
+		 where scb.code = 'DM.DELIVERY_STATUS'
+		   and scb.code_id = scvb.code_id
+		   and scvb.value = DELIVERY_STATUS) DELIVERY_STATUS, 
+	    DELIVERY_DATE, REMARK, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+	    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+	    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+	    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+	    ATTRIBUTE15, PICK_RELEASE_ID, contact_name, phone  ,city_code ,state_code  ,country_code
+	    ,address ,address1 ,address2 ,address3 ,area_code ,zip_code,RECEIPT_FLAG,INTERNAL_REMARK
+   		from DM_ORDER_DELIVERY
+   		<where> 
+   			INV_ORG_ID = #{request.invOrgId,jdbcType=DECIMAL}
+   		<if test="deliveryNumber !=null">
+   			AND DELIVERY_NUMBER like concat('%',concat(#{deliveryNumber,jdbcType=VARCHAR},'%'))
+   		</if>
+   		</where>
+        <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        
+   </select>
+   
+   <select id="queryByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    select
+        <include refid="Base_Column_List" />
+        from dm_order_delivery
+        where DELIVERY_ID = #{deliveryId,jdbcType=DECIMAL}
+        for update
+     </select>
+</mapper>

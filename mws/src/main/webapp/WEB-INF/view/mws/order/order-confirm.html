@@ -1,0 +1,2898 @@
+<#include "/mws/include/header.html">
+<style>
+    .vertical-middle {
+        vertical-align: middle;
+    }
+
+    .title {
+        margin-left: 15px;
+        color: black;
+        font-weight: bold;
+    }
+
+    .sites {
+        width: 92%;
+        margin: 0 auto;
+    }
+
+    .site {
+        text-align: center;
+        margin-bottom: 5px;
+    }
+
+    .site>div {
+        padding-top: 2px;
+    }
+
+    .site a {
+        visibility: hidden;
+    }
+
+    .row-hover {
+        background-color: #FEEAEB !important;
+    }
+
+    .row-hover a {
+        visibility: visible;
+    }
+
+    .checkSite {
+        background-color: #F5F5F5;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    .show {
+        display: block;
+    }
+
+    .a-link {
+        cursor: pointer;
+    }
+
+    .a-link:hover {
+        text-decoration: underline;
+    }
+
+    .default-border {
+        z-index: 100; /* 防止点击事件区域被遮住 */
+        cursor: pointer;
+        border: 2px solid red;
+        margin-left: -15px;
+        background-color: white !important;
+        padding-top: 0px !important; /* 屏蔽父级div带来的padding-top */
+    }
+
+    .default-no-border {
+        z-index: 100;
+        cursor: pointer;
+        border: 2px solid #EEEEEE;
+        margin-left: -15px;
+        background-color: white !important;
+        padding-top: 0px !important; /* 屏蔽父级div带来的padding-top */
+    }
+
+    .no-wrap {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .table>thead>tr>th, .thead>thead>tr>th, .table>tbody>tr>td, .table>tbody>tr>th
+    {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .pv {
+        background-color: green;
+        color: white;
+        line-height: 110%;
+    }
+
+    .small-select {
+        padding: 0 6px;
+        height: 26px;
+    }
+
+    .small-input {
+        height: 26px;
+    }
+
+    .col-small-margin {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    .align-right {
+        text-align: right;
+    }
+
+    .align-left {
+        text-align: left;
+    }
+
+    .settlement {
+        margin-top: 20px;
+        background-color: antiquewhite;
+    }
+
+    .deduct {
+        margin: 10px;
+        padding: 15px;
+        background-color: white;
+        min-height: 166px;
+    }
+
+    .deduct>.row {
+        padding-top: 15px;
+    }
+
+    .total {
+        margin-top: 20px;
+        margin-left: -10px; /* 屏蔽来自deduct形成边框引起的margin使得row长不超过12 */
+        margin-right: -10px; /* 屏蔽来自deduct形成边框引起的margin使得row长不超过12 */
+        padding: 10px;
+        font-weight: bold;
+        font-size: 12px;
+        text-align: center;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .ensureBtn {
+        margin-top: 10px;
+    }
+
+    .btn-yellow {
+        background-color: gold;
+        border-radius: 3px;
+        color: white !important;
+        width: 80px;
+        font-weight: bolder;
+        font-size: 16px;
+        padding: 2px 6px;
+    }
+
+    .btn-red {
+        background-color: #BD2426;
+        border-radius: 3px;
+        color: white !important;
+        font-weight: bolder;
+        font-size: 16px;
+        padding: 6px 6px;
+        width: 180px;
+        height: 40px;
+        margin-top: 5px;
+    }
+
+    .input-number {
+        width: 100px;
+        height: 27px;
+        padding: 1px 3px;
+        vertical-align: middle;
+    }
+
+    .total-price {
+        color: red;
+        font-size: 20px;
+    }
+
+    .total-price-title {
+        margin-top: 8px;
+    }
+
+    .setDefaultBtn {
+        padding-top: 1px !important;
+    }
+
+    .defaultText {
+        padding: 3px;
+        background-color: #999999;
+        color: white;
+        font-size: 13px;
+    }
+
+    .defaultBtn {
+        padding: 3px;
+        background-color: #BC2826;
+        color: white;
+        font-size: 13px;
+    }
+
+    .item-img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .btn-small {
+        height: 25px;
+        width: 30px;
+    }
+
+    .btn-small>span {
+        margin-top: -14px;
+        margin-left: -5px;
+    }
+
+    .coupon-row {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+</style>
+<!-- Header -->
+<!-- ========== MENU END ========== -->
+<!-- ========== CONTENT START ========== -->
+<!-- 修改地址模态框 -->
+
+<div class="modal fade" id="siteModal" tabindex="-1" aria-labelledby="siteModalLabel" data-backdrop="static"
+     data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button onclick="cancelEditSite()" type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="siteModalLabel"><@spring.message 'mws.addressbook.createdelivery'/></h4>
+            </div>
+            <div class="modal-body" class="col-sm-12">
+                <div class="row">
+                    <form id="editSite">
+                        <input type="hidden" name="_token">
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="name"><@spring.message "mws.addressbook.name"/></label> <input type="text" class="form-control"
+                                                                                                       name="name" placeholder="<@spring.message 'mws.addressbook.name'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="location"><@spring.message "mws.addressbook.location"/></label>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <select id="countryCode" name="countryCode" class="form-control" data-live-search="true" data-width="100%"
+                                            data-toggle="tooltip" title="国家">
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select id="stateCode" name="stateCode" class="form-control" data-live-search="true" data-width="100%"
+                                            data-toggle="tooltip" title="省">
+                                    </select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select id="cityCode" name="cityCode" class="form-control" data-live-search="true" data-width="100%"
+                                            data-toggle="tooltip" title="市">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="addressLine1"><@spring.message "mws.addressbook.address1"/></label> <input type="text"
+                                                                                                                   class="form-control" name="addressLine1" placeholder="<@spring.message 'mws.addressbook.address1'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="addressLine2"><@spring.message "mws.addressbook.address2"/></label> <input type="text"
+                                                                                                                   class="form-control" name="addressLine2" placeholder="<@spring.message 'mws.addressbook.address2'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="addressLine3"><@spring.message "mws.addressbook.address3"/></label> <input type="text"
+                                                                                                                   class="form-control" name="addressLine3" placeholder="<@spring.message 'mws.addressbook.address3'/>">
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="phone"><@spring.message "mws.addressbook.phone"/></label>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <select name="areaCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip"
+                                            title="areaCode">
+                                    </select>
+                                </div>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="phone" placeholder="<@spring.message 'mws.addressbook.phone'/>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-10 col-sm-offset-1 form-group">
+                            <label for="zipCode"><@spring.message "mws.addressbook.zipcode"/></label> <input type="text" class="form-control"
+                                                                                                             name="zipCode" placeholder="<@spring.message 'mws.addressbook.zipcode'/>">
+                        </div>
+                        <div id="defaultCheckBox" class="col-sm-10 col-sm-offset-2 form-group">
+                            <div class="checkbox">
+                                <label> <input name="defaultFlag" type="checkbox" checked="checked"> <span><@spring.message
+                                        "mws.addressbook.setdefault"/></span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="saveSite(event)" type="button" class="btn btn-primary" data-dismiss="modal"><@spring.message
+                    "sys.hand.btn.save"/></button>
+                <button onclick="cancelEditSite()" type="button" class="btn btn-default" data-dismiss="modal"><@spring.message
+                    "sys.hand.btn.cancel"/></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section id="content">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.orderconfirm.orderconfirm"/></li>
+        </ol>
+
+        <!-- 订单信息 -->
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><@spring.message 'mws.orderconfirm.orderinfo'/></h3>
+                </div>
+                <div class="panel-body">
+                    <!-- 表格 -->
+                    <div class="col-sm-12 col-md-12">
+                        <div class="portlet-body no-more-tables">
+                            <table id="billAddressTable" class="table table-condensed">
+                                <thead>
+                                <tr style="font-size: 10px">
+                                    <th></th>
+                                    <th><@spring.message 'mws.orderconfirm.productname'/></th>
+                                    <th><@spring.message 'mws.orderconfirm.price'/></th>
+                                    <th><@spring.message 'mws.orderconfirm.quantity'/></th>
+                                    <!--<th><@spring.message 'mws.orderconfirm.preferential'/></th>-->
+                                    <th><@spring.message 'mws.orderconfirm.costs'/></th>
+                                    <th><@spring.message '重量小计'/></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <#assign subtotal=0> <#assign pvtotal=0> <#assign kgtotal=0> <#if products??> <#if products?size lt 1><#assign big_error="order"></#if> <#list products as product> <#assign
+                                subtotal=subtotal+product.disAmt*product.itemAmount> <#assign pvtotal=pvtotal+product.pvAmt*product.itemAmount>  <#assign kgtotal=kgtotal+product.dis_kg*product.itemAmount>
+                                <tr id="item_${product.itemId}" class="cart_item">
+                                    <td data-title=""><#if product.itemImg??> <#if product.itemImg[0]??>
+                                        <div class="hidden-xs">
+                                            <img width="60px" height="60px"
+                                                 src="${base.contextPath}/sys/image/view?fileId=${product.itemImg[0].fileId}&compressLevel=L" onerror="javascript:this.src='${base.contextPath}/resources/img/60-60.png';">
+                                        </div> <#else>
+                                        <div class="hidden-xs">
+                                            <img width="60px" height="60px" src='${base.contextPath}/resources/img/NOT_IMAGE.png'>
+                                        </div> </#if> <#else>
+                                    <div class="hidden-xs">
+                                        <img width="60px" height="60px" src='${base.contextPath}/resources/img/NOT_IMAGE.png'>
+                                    </div> </#if>
+                                </td>
+                                <td data-title="Name"><a href="${base.contextPath}/product/product.html?categoryId=&itemId=${product.itemId}"><h4>${product.itemName}</h4></a>
+                                </td>
+                                <td data-title="Price">
+                                    <h5>${currencySymbol?html}${product.disAmt?string('0.00')}</h5>
+                                </td>
+                                <!--modified by furong.tang-->
+                                <!--<#if isDisplay != "Y">
+                                <td data-title="PV">
+                                    <h5>${product.pvAmt}</h5>
+                                </td>
+                            </#if>-->
+                            <td data-title="Quantity">
+                                <h5>${product.itemAmount}</h5>
+                            </td>
+                            <!--<td data-title="PreferentialWay">
+                                &lt;!&ndash; <select name="lineVoucher" class="form-control small-select"> &ndash;&gt; &lt;!&ndash; <option value="aa">满100立减10元</option> &ndash;&gt;
+                                &lt;!&ndash; <option value="bb">满200立减28元</option> &ndash;&gt; &lt;!&ndash; </select> &ndash;&gt;
+                            </td>-->
+                            <td data-title="Subtotal">
+                                <h5>${currencySymbol?html}${(product.disAmt*product.itemAmount)?string('0.00')}</h5>
+                                <!--modified by furong.tang-->
+                                <#if isDisplay == "Y">
+                                <span><strong class="pv">&nbsp;<@spring.message 'type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage'/>&nbsp;</strong>&nbsp;${product.pvAmt}&nbsp;&nbsp;${product.uomName}</span>
+                                <!--<span><strong class="pv">&nbsp;PV&nbsp;</strong>&nbsp;${product.pvAmt*product.itemAmount}</span>-->
+                            </#if>
+                            </td>
+                                    <td data-title="Kg">
+                                        <h5>${(product.dis_kg*product.itemAmount)?string('0.00')}kg</h5>
+                                    </td>
+                            </tr>
+                        </#list> </#if>
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 分割线 -->
+            <div class="row">
+                <hr width="95%" size=1 align=center noshade>
+            </div>
+            <div class="row">
+                <div class="col-sm-3 col-md-3 col-sm-offset-1 col-md-offset-1 col-xs-3 align-right">
+                    <label for="deliveryMethod"><@spring.message 'mws.orderconfirm.deliverymethod'/></label>
+                </div>
+                <div class="col-sm-2 col-md-2 col-xs-5">
+                    <select id="deliveryMethod" name="deliveryMethod" class="form-control small-select">
+                    </select>
+                </div>
+                <!-- 小计 -->
+                <div class="col-md-5 col-sm-5 align-right">
+                    <span><@spring.message 'mws.orderconfirm.subtotal'/>:<strong id="tempResult" style="color: red;">${currencySymbol?html}${subtotal?string('0.00')}</strong></span>
+                </div>
+                <!--重量小计 9633-->
+                <div class="col-md-11 col-sm-11 align-right">
+                    <span><@spring.message '重量总计'/>:<strong style="color: green;">${kgtotal?string('0.00')}kg</strong></span>
+                </div>
+                <!--modified by furong.tang-->
+                <!--<#if memberRole != "VIP">
+                <div class="col-md-11 col-sm-11 align-right">
+                    <span><@spring.message 'mws.orderconfirm.totalpv'/>:<strong style="color: green;">${pvtotal?html}</strong></span>
+                </div>
+                </#if>-->
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- 优惠券信息 -->
+    <div id="couponInfo" class="row hide" style="display: none;">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><@spring.message 'mws.orderconfirm.couponinfo'/></h3>
+            </div>
+            <div id="allCoupons" class="panel-body">
+                <div id="coupon1" name="coupons" class="row coupon-row">
+                    <div class="col-md-2 col-sm-2">
+                        <button id="addCoupon" type="button" class="pull-right btn btn-default btn-small" onclick="addCoupon(this)">
+                            <span class="vertical-middle glyphicon glyphicon-plus"></span>
+                        </button>
+                    </div>
+                    <div class="col-md-2 col-sm-2">
+                        <span class="pull-right"><@spring.message 'mws.orderconfirm.voucher'/></span>
+                    </div>
+                    <div class="col-sm-3 col-md-3 col-xs-3 col-small-margin">
+                        <select name="headVoucher" class="form-control small-select">
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <span class="pull-right"><@spring.message 'mws.orderconfirm.pref.amt'/>:</span>
+                    </div>
+                    <div name="subDiscountAmt" class="col-md-2 col-sm-2">
+                        <span>0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 账单信息 -->
+    <div id="billInfo" class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><@spring.message 'mws.orderconfirm.billinfo'/></h3>
+            </div>
+            <div class="panel-body">
+                <!-- 账单地址 -->
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h4 class="title"><@spring.message 'mws.addressbook.billingaddress'/></h4>
+                    </div>
+                    <div class="col-sm-3 col-sm-offset-4">
+                        <a class="pull-right a-link" onclick="addSite('BILL')"><@spring.message 'mws.addressbook.createbilling'/></a>
+                    </div>
+                </div>
+                <div class="row sites">
+                    <#if billSites??> <#if billSites?size lt 1><#assign big_error="bill"></#if> <#list billSites as billSite>
+                <div name="billSite"
+                     class="col-sm-12 site <#if billSite.defaultFlag=='Y'>checkSite show defaultSite<#else>hide</#if>"
+                     id="${billSite.siteId}" attr_location="${billSite.locationId}">
+                    <div
+                            class="col-sm-2 no-wrap col-small-margin <#if billSite.defaultFlag=='Y'>default-border<#else>default-no-border</#if>"
+                            onclick="chooseSite(this)">
+                                <span><#if billSite.defaultFlag=='Y'><@spring.message
+                                    'mws.addressbook.defaultaddress'/><#else><@spring.message 'mws.orderconfirm.check'/></#if></span>
+                    </div>
+                    <div class="col-sm-2 no-wrap col-small-margin">
+                        <span>${billSite.name?html}</span>
+                    </div>
+                    <div class="col-sm-2 no-wrap col-small-margin" title="${billSite.attribute1!?html}${billSite.attribute2!?html}${billSite.attribute3!?html}${billSite.spmLocation.addressLine1!?html}${billSite.spmLocation.addressLine2!?html}${billSite.spmLocation.addressLine3!?html}">
+                        <span>${billSite.attribute1!?html}${billSite.attribute2!?html}${billSite.attribute3!?html}${billSite.spmLocation.addressLine1!?html}${billSite.spmLocation.addressLine2!?html}${billSite.spmLocation.addressLine3!?html}</span>
+                    </div>
+                    <div class="col-sm-2 no-wrap col-small-margin" title="${billSite.phone?html}">
+                        <span>${billSite.phone?html}</span>
+                    </div>
+                    <div class="col-sm-2 setDefaultBtn col-small-margin no-wrap">
+                        <#if billSite.defaultFlag=='Y'> <span class="defaultText">&nbsp;<@spring.message
+                                    'mws.addressbook.defaultaddress'/>&nbsp;</span> <#else> <a class="a-link" onclick="setDefault(${billSite.siteId})"><span
+                            class="defaultBtn">&nbsp;<@spring.message 'mws.addressbook.setdefault'/>&nbsp;</span></a> </#if>
+                </div>
+                <div class="col-sm-2 col-small-margin just-no-wrap">
+                    <a class="a-link" onclick="editSite(${billSite.siteId},'BILL')"><@spring.message 'sys.hand.btn.edit'/></a>&nbsp;&nbsp; <a
+                        class="a-link" onclick="deleteSite(${billSite.siteId},'${billSite._token}')"><@spring.message 'sys.hand.btn.delete'/></a>
+                </div>
+            </div>
+        </#list> </#if>
+    <div id="billFoldSite" class="col-sm-12">
+        <a class="a-link" onclick="toggleSite(this,'bill')"><@spring.message 'mws.orderconfirm.more'/>&nbsp;<span
+                class="vertical-middle glyphicon glyphicon-chevron-down"></span>
+        </a>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    <!-- 配送信息 -->
+    <div id="shipInfo" class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><@spring.message 'mws.orderconfirm.shipinfo'/></h3>
+            </div>
+            <div class="panel-body">
+                <!-- 收货地址 -->
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h4 class="title"><@spring.message 'mws.addressbook.deliveryaddress'/></h4>
+                    </div>
+                    <div class="col-sm-3 col-sm-offset-4">
+                        <a class="pull-right a-link" onclick="addSite('SHIP')"><@spring.message 'mws.addressbook.createdelivery'/></a>
+                    </div>
+                </div>
+                <div class="row sites">
+                    <#if shipSites??> <#if shipSites?size lt 1><#assign big_error="ship"></#if> <#list shipSites as shipSite>
+                <div name="shipSite"
+                     class="col-sm-12 site <#if shipSite.defaultFlag=='Y'>checkSite show defaultSite<#else>hide</#if>"
+                     id="${shipSite.siteId}" attr_location="${shipSite.locationId}">
+                    <div
+                            class="col-sm-2 no-wrap col-small-margin <#if shipSite.defaultFlag=='Y'>default-border<#else>default-no-border</#if>"
+                            onclick="chooseSite(this)">
+                                <span><#if shipSite.defaultFlag=='Y'><@spring.message
+                                    'mws.addressbook.defaultaddress'/><#else><@spring.message 'mws.orderconfirm.check'/></#if></span>
+                    </div>
+                    <div class="col-sm-2 no-wrap col-small-margin">
+                        <span>${shipSite.name?html}</span>
+                    </div>
+                    <div class="col-sm-2 no-wrap col-small-margin" title="${shipSite.attribute1!?html}${shipSite.attribute2!?html}${shipSite.attribute3!?html}${shipSite.spmLocation.addressLine1!?html}${shipSite.spmLocation.addressLine2!?html}${shipSite.spmLocation.addressLine3!?html}">
+                        <span>${shipSite.attribute1!?html}${shipSite.attribute2!?html}${shipSite.attribute3!?html}${shipSite.spmLocation.addressLine1!?html}${shipSite.spmLocation.addressLine2!?html}${shipSite.spmLocation.addressLine3!?html}</span>
+                    </div>
+                    <div class="col-sm-2 no-wrap col-small-margin" title="${shipSite.phone?html}">
+                        <span>${shipSite.phone?html}</span>
+                    </div>
+                    <div class="col-sm-2 setDefaultBtn col-small-margin no-wrap">
+                        <#if shipSite.defaultFlag=='Y'> <span class="defaultText">&nbsp;<@spring.message
+                                    'mws.addressbook.defaultaddress'/>&nbsp;</span> <#else> <a class="a-link" onclick="setDefault(${shipSite.siteId})"><span
+                            class="defaultBtn">&nbsp;<@spring.message 'mws.addressbook.setdefault'/>&nbsp;</span></a> </#if>
+                </div>
+                <div class="col-sm-2 col-small-margin just-no-wrap">
+                    <a class="a-link" onclick="editSite(${shipSite.siteId},'SHIP')"><@spring.message 'sys.hand.btn.edit'/></a>&nbsp;&nbsp; <a
+                        class="a-link" onclick="deleteSite(${shipSite.siteId},'${shipSite._token}')"><@spring.message 'sys.hand.btn.delete'/></a>
+                </div>
+            </div>
+        </#list> </#if>
+    <div id="shipFoldSite" class="col-sm-12">
+        <a class="a-link" onclick="toggleSite(this,'ship')"><@spring.message 'mws.orderconfirm.more'/>&nbsp;<span
+                class="vertical-middle glyphicon glyphicon-chevron-down"></span>
+        </a>
+    </div>
+    </div>
+    </div>
+    <ul class="list-group">
+        <li id="express" class="list-group-item">
+            <!-- 选择物流公司 -->
+            <div class="row">
+                <div class="col-sm-2 col-md-2 col-sm-offset-1 col-md-offset-1 col-xs-4 col-xs-offset-1">
+                    <select id="expressCompany" name="expressCompany" class="form-control small-select">
+                    </select>
+                </div>
+                <div id="freight" class="col-sm-3 col-md-3 col-sm-offset-5 col-md-offset-5 col-xs-12 align-right">
+                    <span><@spring.message 'mws.orderconfirm.freight'/>:<strong style="color: red;"></strong></span>
+                </div>
+                <!--                             <div id="expressTotal" class="col-sm-3 col-md-3 col-sm-offset-8 col-md-offset-8 col-xs-12 align-right"> -->
+                <!--                                 <span><@spring.message 'mws.orderconfirm.total'/>:<strong style="color: red;"></strong></span> -->
+                <!--                             </div> -->
+            </div>
+        </li>
+    </ul>
+    </div>
+    </div>
+    <!-- Ecoupon -->
+    <div id="ecouponInfo" class="row hide" style="display: none">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Ecoupon</h3>
+            </div>
+            <div id="ecouponDiv" class="panel-body">
+                <div id="ecoupon1" name="ecoupons" class="row coupon-row">
+                    <div class="col-md-2 col-sm-2">
+                        <button id="addEcoupon" type="button" class="pull-right btn btn-default btn-small" onclick="addEcoupon(this)">
+                            <span class="vertical-middle glyphicon glyphicon-plus"></span>
+                        </button>
+                    </div>
+                    <div class="col-md-2 col-sm-2">
+                        <span class="pull-right">Ecoupon</span>
+                    </div>
+                    <div class="col-sm-3 col-md-3 col-xs-3 col-small-margin">
+                        <select id="selectEcoupon" name="selectEcoupon" class="form-control small-select">
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <span class="pull-right"><@spring.message 'mws.orderhistory.deductible_amount'/>:</span>
+                    </div>
+                    <div class="col-md-2 col-sm-2">
+                        <span name="discountAmt">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结算信息 -->
+    <div class="row settlement">
+        <!-- PV -->
+        <div class="col-md-8 col-sm-8 deduct">
+            <!--modified by furong.tang-->
+            <!--<#if memberRole != "VIP">
+            <div class="row">
+                <div class="col-sm-3 col-md-3 col-xs-4 col-small-margin">
+                    <span class="pull-right"><@spring.message 'mws.orderconfirm.totalpv'/>:</span>
+                </div>
+                <div class="col-sm-4 col-md-4 col-xs-4 col-small-margin">
+                    <span><strong style="color: green;">${pvtotal}</strong></span>
+                </div>
+            </div>
+            </#if>-->
+            <div class="row" style="margin-top: 20px">
+                <div class="col-sm-3 col-md-3 col-xs-4 col-small-margin">
+                    <span class="pull-right"><@spring.message 'mws.orderconfirm.remark'/> :</span>
+                </div>
+                <div class="col-sm-4 col-md-4 col-xs-4 col-small-margin">
+                    <input id="remark" type="text" class="form-control small-input" name="remark" placeholder="remark">
+                </div>
+            </div>
+            <div id="useRB" class="row ">
+                <div class="col-sm-3 col-md-3 col-xs-4 col-small-margin">
+                    <span class="pull-right"><@spring.message 'mws.orderconfirm.want.use.availablediscount'/> :</span>
+                </div>
+                <div id="outBal" class="col-md-7 col-sm-7 show">
+                        <span>
+                            <strong id="remainRemBal" style="color: red">${currencySymbol?html}
+                                <span id="remainBalance">${availableDiscount?string('0.00')}</span>
+                            </strong>&nbsp;&nbsp;&nbsp;&nbsp;<@spring.message 'mws.orderconfirm.want.use.remainbal'/>&nbsp;
+                        </span>
+                    <input id="outBalNum" type="number" min="0.00" value="0.00" class="input-number" step="0.01" required>
+                    <span>&nbsp;&nbsp;&nbsp;</span>
+                </div>
+            </div>
+        </div>
+        <!-- 总计 -->
+        <div class="col-md-4 col-sm-4 col-xs-12 total col-small-margin">
+            <!-- <div class="col-md-12 col-sm-12 col-small-margin">
+                <div class="col-md-6 col-sm-6 col-xs-6 align-right col-small-margin"><@spring.message
+                    'mws.orderconfirm.pricetotal'/>:</div>
+                <div id="settleSubTotal" class="col-md-6 col-sm-6 col-xs-6 align-left col-small-margin">${currencySymbol?html}${subtotal?string('0.00')}</div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-small-margin">
+                <div class="col-md-6 col-sm-6 col-xs-6 align-right col-small-margin"><@spring.message
+                    'mws.orderconfirm.freight'/>:</div>
+                <div id="settleFreight" class="col-md-6 col-sm-6 col-xs-6 align-left col-small-margin"></div>
+            </div> -->
+            <div class="col-md-12 col-sm-12 col-small-margin">
+                <div class="col-md-6 col-sm-6 col-xs-6 total-price-title align-right col-small-margin">*<@spring.message 'type.com.lkkhpg.dsis.common.order.dto.autoshiporder.autoshipamt'/>:</div>
+                <div id="settleTotal" class="col-md-6 col-sm-6 col-xs-6 total-price align-left col-small-margin"></div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-small-margin hide" id="hideEcouponTotal" style="display: none">
+                <div class="col-md-6 col-sm-6 col-xs-6 align-right col-small-margin"><@spring.message 'mws.orderhistory.ecoupon_discount'/>:</div>
+                <div class="col-md-6 col-sm-6 col-xs-6 align-left col-small-margin">${currencySymbol?html}<span id="ecouponTotal">0.00</span></div>
+            </div>
+            <div class="hide col-md-12 col-sm-12 col-small-margin" id="hideRemainingBal">
+                <div class="col-md-6 col-sm-6 col-xs-6 align-right col-small-margin"><@spring.message 'mws.orderconfirm.rembal'/>:</div>
+                <div class="col-md-6 col-sm-6 col-xs-6 align-left col-small-margin">${currencySymbol?html}<span id="rbTotal">0.00</span></div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-small-margin">
+                <div class="col-md-6 col-sm-6 col-xs-6 align-right col-small-margin"><@spring.message 'type.com.lkkhpg.dsis.common.order.dto.orderpayment.paymentamount'/>:</div>
+                <div class="col-md-6 col-sm-6 col-xs-6 align-left col-small-margin">${currencySymbol?html}<span id="settleSubTotal"></span></div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-small-margin ensureBtn">
+                <div class="col-md-12 col-sm-12">
+                    <button onclick="submitOrder()" class="btn btn-sm btn-red" style="border-radius:5px;"><@spring.message 'mws.orderconfirm.ensure'/></button>
+                </div>
+            </div>
+            <form id="orderPayment" class="hide" method="post" action="${base.contextPath}/order/order-select-payment">
+                <input id="headerId" name="headerId" type="hidden" value="">
+            </form>
+
+            <!--20180419-->
+            <form id="orderPayment1" class="hide" method="post" action="${base.contextPath}/order/payment_success">
+                <input id="headerId1" name="headerId1" type="hidden" value="">
+            </form>
+        </div>
+    </div>
+    <!-- 结算信息 end -->
+    </div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+<!-- SCRIPT-配送方式快码 -->
+<script src="${base.contextPath}/common/code?deliveryTypeData=DM.DELIVERY_TYPE" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?telAreaCode=SYS.TEL_COUNTRY_CODE&ecouponInvisible=SYS.MWS_ECOUPON_INVISIBLE"" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?cantPickUpData=MWS.CANT_SELECT_PICK_UP" type="text/javascript"></script>
+
+<!-- SCRIPT-初始化 -->
+<script type="text/javascript">
+    //全局变量
+
+    var conn = null;//为防止狂点确认而建立的ajax连接状态
+    var currencyCode = $.escapeHtml("${currencyCode?html}");
+    var currencySymbol = $.escapeHtml("${currencySymbol?html}");
+    var currencyPrecision = $.escapeHtml("${currencyPrecision}");
+    var salesOrgId = $.escapeHtml("${salesOrgId}");//销售区域
+    var sitesData = null;//所有地址详情！
+    var prodsData = null;//所有商品详情！
+    var isEditingSite = null;//正在编辑的地址详情
+    var createSiteType = null;//新建地址类型
+    var isRBUse = $.escapeHtml("${isRBUse?html}");//是否RB可用
+    var allowBackOrder = $.escapeHtml("${allowBackOrder?html}");//是否允许backOrder
+    // var RemBal = parseFloat("${RemainingBalance?string('0.00')}");//RemainingBalance
+    var RemBal = parseFloat("${availableDiscount?string('0.00')}");//RemainingBalance
+    var discount = parseFloat("${discount?string('0.00')}");//RemainingBalance
+    var shippingTier = new Array();//所有物流信息
+    var allowSubmit = true;//是否允许提交-物流时运费和地址为空时无法提交
+    var curLocationCode = null;//当前选中收货地location-为了在选中另外地址时如果location没变就不重新查物流
+    var phoneReg = /^[0-9]{1,14}$/;
+    var zipCodeReg = /^[0-9]{1,10}$/;
+    var numberReg = /^\d+(\.\d+)?$/;
+    var summary = function(){
+        var _subtotal = Math.round(parseFloat("${subtotal?string('0.00')}")*100)/100,
+            _kgtotal=Math.round(parseFloat("${kgtotal?string('0.00')}")*100)/100,
+            _tax = parseFloat("${tax}");
+        return { //结算信息
+            subtotal : _subtotal,//小计总额-税后
+            kgtotal :  _kgtotal,
+            tax : _tax,
+            pretax : Math.round(_subtotal/(1+_tax/100)*100)/100,//税前总额
+            useRemBal : 0,
+            freight : 0,
+            discountAmt : 0,
+            pv : 0
+        };
+    }();
+    var voucher={ //优惠券
+        version:"1.0",
+        vouchers:[],
+        memberId:${memberId},
+        salesOrgId:${salesOrgId},
+        discountAmt:"",
+        hasUnStackableVoucher:false,
+        appliedVouchers:[],
+        availableVouchers:[]
+    }
+    var code = $.escapeHtml("${Session._marketCode?html}"); // 当前市场code
+    var cantPickUpArr = [];
+
+
+    $(function(){//DOM Load完成时
+        /*******************************************************/
+        /* 重大异常处理-                                            /
+        /*******************************************************/
+
+        // 当前市场code等于快码code，就隐藏ecoupon。
+        for(var i=0;i<ecouponInvisible.length;i++){
+            if(ecouponInvisible[i].value == code){
+                $("#ecouponInfo").hide();
+                $("#hideEcouponTotal").hide();
+            }
+        }
+
+    <#if big_error??>
+        var bigError = "${big_error}";
+        switch(bigError){
+            case "order"://订单无记录
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.order.error'/>",
+                    function(){
+                        window.location.href="${base.contextPath}/index.html";
+                    });
+                break;
+            case "bill"://账单地址无记录-仅提示，允许本页新增
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.bill.error'/>");
+                break;
+            case "ship"://收货地址无记录-仅提示，允许本页新增
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.ship.error'/>");
+                break;
+        }
+        if(bigError == "order"){
+            return;
+        }
+    </#if>
+
+        //处理无法自提的市场信息
+        $.each(cantPickUpData, function(){
+            cantPickUpArr.push(this.meaning);
+        });
+
+        /*******************************************************/
+        /* 订单信息初始化-                                           /
+        /*******************************************************/
+        //取出订单信息全局化
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : "${base.contextPath}/order/getAllProds",
+            data : { prodsForQueryAll : '${prods}' },
+            success : function(data) {
+                if(data.rows){
+                    prodsData = data.rows;
+                }
+            }
+        });
+        /*******************************************************/
+        /* 地址信息初始化-                                           /
+        /*******************************************************/
+        //取出地址信息全局化
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : "${base.contextPath}/order/getAllSites",
+            data : {},
+            success : function(data) {
+                if(data.rows){
+                    sitesData = data.rows;
+                    $("#deliveryMethod").trigger("change");
+                }
+            }
+        });
+        //注册地址div的hover事件
+        $("div[name='shipSite']").hover(
+            function(){$(this).addClass('row-hover');},
+            function(){$(this).removeClass('row-hover');
+            });
+        $("div[name='billSite']").hover(
+            function(){$(this).addClass('row-hover');},
+            function(){$(this).removeClass('row-hover');
+            });
+        //初始化可使用的金额
+       /* $("#outBalNum").val(parseInt($("#remainBalance").text())> parseInt(parseFloat($("#tempResult").text().substr(3))*discount/100)?
+            parseInt(parseFloat($("#tempResult").text().substr(3))*discount/100):parseInt($("#remainBalance").text()));*/
+
+        $("#outBalNum").val((parseInt($("#remainBalance").text()*1000)/1000)> (parseInt(parseFloat($("#tempResult").text().substr(3))*discount*1000)/100000)?
+            ((parseInt(parseFloat($("#tempResult").text().substr(3))*discount*1000)/100000).toFixed(2)):((parseInt($("#remainBalance").text()*1000)/1000)).toFixed(2));
+
+        //console.log(parseInt(71.32*1000,10)/1000)
+       /* $("#rbTotal").text(parseFloat($("#outBalNum").val()).toFixed(2));*/
+
+       $("#rbTotal").text(parseFloat($("#outBalNum").val()).toFixed(2));
+        //注册配送方式下拉框的change事件
+        $("#deliveryMethod").change(function(e){
+            if($(this).val() == "PCKUP"){//自提类型
+                allowSubmit = true;
+                $("#shipInfo").removeClass("show");
+                $("#shipInfo").addClass("hide");
+                summary.freight = 0;
+                $("#settleFreight").text(currencySymbol+summary.freight.toFixed(2));
+                $("#settleTotal").text(currencySymbol+parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2));
+                //$("#settleSubTotal").text((summary.subtotal-summary.discountAmt).toFixed(2));
+                paymentAmount()
+            }else if($(this).val() == "SHIPP"){//配送类型
+                $("#shipInfo").removeClass("hide");
+                $("#shipInfo").addClass("show");
+                //取出物流公司信息并设置
+                queryShippingTier();
+            }
+        });
+        //注册物流公司下拉框的change事件
+        $("#expressCompany").change(function(e){
+            allowSubmit = true;
+            if($(this).find("option:selected").length == 0){
+                allowSubmit = false;
+                summary.freight = 0;
+            }else{
+                summary.freight = parseFloat($(this).find("option:selected").attr("fee"));
+            }
+            $("#freight > span > strong").text(currencySymbol+summary.freight.toFixed(2));
+            //$("#expressTotal > span > strong").text(currencySymbol+(summary.subtotal+summary.freight-summary.useRemBal-summary.discountAmt).toFixed(2));
+            $("#settleFreight").text(currencySymbol+summary.freight.toFixed(2));
+            $("#settleTotal").text(currencySymbol+parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2));
+        });
+        //初始化配送方式下拉框
+        initDeliveryMethod();//配送方式-物流信息-运费
+
+        //地址编辑器相关初始化
+        $("#countryCode").change(function(e){
+            //这样的逻辑保证了如果query失败,后面两个select都不会轻举妄动
+            if($("#countryCode").val()){
+                queryState(function(){$("#cityCode").empty();});
+            }else{
+                $("#stateCode").empty();
+                $("#cityCode").empty();
+            }
+        });
+        $("#stateCode").change(function(e){
+            if($("#stateCode").val()) queryCity();
+            else $("#cityCode").empty();
+        });
+        //为第一个下拉框求取值范围
+        queryCountry();
+        //为地区编号下拉框设取值范围
+        areaCodeSetData();
+        /*******************************************************/
+        /* 结算信息初始化-                                           /
+        /*******************************************************/
+        //如果启用RB支付
+        if("Y" == isRBUse){
+            $("#useRB").removeClass("hide");
+            $("#useRB").addClass("show");
+            $("#hideRemainingBal").removeClass("hide");
+            $("#hideRemainingBal").addClass("show");
+        }
+        //未清余额最大值
+        $("#outBalNum").attr("maxVal", RemBal);
+        //1.如果输入数字带有前置无意义的0,去掉.2.如果输入的值大于最大值,设置为最大值;...
+        $("#outBalNum").bind("blur", function(){
+            summary.useRemBal = 0.00;//每次改变之前,都先将值设为0
+           /* if(numberReg.test($(this).val()) == false){
+                $(this).val(0);
+                summary.useRemBal = 0;
+                $("#settleTotal").text(currencySymbol+parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2));
+                return;
+            }*/
+            //订单金额总计
+            var orderTotal = parseFloat($("#settleTotal").text().substr(3));
+
+            //校验值的有效性
+            var total = summary.subtotal+summary.freight-summary.discountAmt;
+            //var SubTotal = $("#settleSubTotal").text();
+            var ridDiscount = parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(2)-$("#ecouponTotal").text()).toFixed(2);
+
+            //20180517
+
+            var productTotal = parseFloat(((parseFloat($("#tempResult").text().substr(3))*1000)/1000).toFixed(2));
+
+
+            var max = parseFloat($("#outBalNum").attr("maxVal"));
+            //用户输入的值 保留两位小数
+            //var currentVal = parseInt(this.value*1000)/1000;
+            var currentVal = parseFloat(parseFloat(this.value).toFixed(2));
+
+
+            var maxVal = max>(ridDiscount*discount/100)?(ridDiscount*discount/100):max;//当前值最大值为max和total中小的一个
+            var minVal = parseFloat($(this).attr("min"));
+
+            //20180517
+            if (currentVal > productTotal && currentVal < orderTotal){
+
+                $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", "运费不能部分抵扣。只可运费全部抵扣或不抵扣运费。",
+                    function(){
+//                        location.reload(true);
+                        $("#outBal").find("#okMark").remove();
+                    }
+
+                );
+            }else {//end 20180517
+
+            if(currentVal <= maxVal && currentVal >= minVal){
+                $(this).val(currentVal);
+            }else if(currentVal > maxVal){
+                $(this).val(parseFloat(maxVal).toFixed(2));
+            }else if(currentVal < minVal){
+                $(this).val(parseFloat(minVal).toFixed(2));
+            }
+            //页面变化
+            summary.useRemBal = parseFloat($(this).val()?$(this).val():"0.00");
+            //$("#remainRemBal").html(currencySymbol+"<span id='remainBalance'></span>"+(max-summary.useRemBal).toFixed(2));
+            $("#remainBalance").text((max-summary.useRemBal).toFixed(2));
+            if(summary.useRemBal > 0){
+                if($("#outBal").find("#okMark").length == 0){
+                    $("#outBal").append("<span id='okMark' style='color:green;'><span class='vertical-middle glyphicon glyphicon-ok'></span></span>");
+                }
+            }else{
+                $("#outBal").find("#okMark").remove();
+            }
+            //$("#settleTotal").text(currencySymbol+parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2));
+            $("#rbTotal").text(parseFloat($("#outBalNum").val()).toFixed(2));
+            paymentAmount();
+
+            }
+        });
+        /*******************************************************/
+        /* 优惠券信息初始化-                                          /
+        /*******************************************************/
+        //事件监听
+        var previous = null;
+        $("#coupon1").find("select[name='headVoucher']").on('mousedown', function () {
+            beforeOpenVoucher(this);
+        }).on('keydown', function (e) {
+            if(e.keyCode == 13) beforeOpenVoucher(this);
+        }).on('focus', function () { // 为了change时拿到oldValue而监听
+            previous = $(this).val();// Store the current value on focus and on change
+        }).change(function() {
+            afterSelectVoucher(previous, this);// Do something with the previous value after the change
+            previous = $(this).val();// Make sure the previous value is updated
+        });
+        //所有该会员的优惠券
+        var allVouchers = null;
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : "${base.contextPath}/order/getAllVouchers",
+            data : {},
+            success : function(data) {
+                if(data.rows){
+                    allVouchers = data.rows;
+                    //所有可用优惠券
+                    for(var i in allVouchers){
+                        allVouchers[i].surplus = allVouchers[i].quantity;
+                        voucher.vouchers.push(allVouchers[i]);
+                        if(validateVoucher(allVouchers[i], prodsData)){//多传一个全部产品来检查是否购买的东西满足
+                            voucher.availableVouchers.push(allVouchers[i]);
+                        }
+                    }
+                    //初始化第一行优惠券选择下拉框
+                    setAvailableVouchers($("#coupon1"));
+                }
+            }
+        });
+
+
+        /***********************ECOUPON********************/
+
+
+        var previouss = null;
+        $("#ecoupon1").find("select[name='selectEcoupon']").on('mousedown', function () {
+            beforeOpenEcoupon(this);
+        }).on('keydown', function (e) {
+            if(e.keyCode == 13) beforeOpenEcoupon(this);
+        }).on('focus', function () { // 为了change时拿到oldValue而监听
+            previouss = $(this).val();// Store the current value on focus and on change
+        }).change(function() {
+            afterSelectEcoupon(previouss, this);// Do something with the previous value after the change
+            previouss = $(this).val();// Make sure the previous value is updated
+        });
+        initEcoupon($("#ecoupon1"));
+    });
+
+
+</script>
+
+<!-- SCRIPT-订单信息 -->
+<script type="text/javascript">
+    //提交订单
+    function submitOrder(){
+        //必输校验-start
+        if($("div[name='shipSite']").filter(".checkSite").length <= 0 && $("#deliveryMethod").val() == "SHIPP"){ //收货信息是否异常
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.have.no.shipinfo'/>");
+            return;
+        }
+        if(!allowSubmit){ //配送信息是否异常
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.have.no.logistic'/>");
+            return;
+        }
+        //自提允许账单为空
+        if($("div[name='billSite']").filter(".checkSite").length <= 0 && $("#deliveryMethod").val() != "PCKUP"){ //账单信息是否异常
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.have.no.billinfo'/>");
+            return;
+        }
+        //必输校验-end
+        var salesOrder = {
+            deliveryType:$("#deliveryMethod").val(),
+            remark:$("#remark").val()?$("#remark").val():"",
+            orderAmt:summary.subtotal,
+            // discountAmt:summary.discountAmt,
+            //discountAmt:summary.useRemBal,
+            discountAmt:$("#rbTotal").text(),
+            taxAmt:summary.subtotal-summary.pretax,
+            actrualPayAmt:summary.subtotal+summary.freight-summary.discountAmt-summary.useRemBal,
+            salesSites : []
+        };
+
+        var omMwsOrderPayment = {
+            payData : []
+        };
+        //订单信息
+        var prods = new Array();
+        for(var i=0; i<prodsData.length; i++){
+            var prod = {
+                productId:prodsData[i].itemId,
+                quantity:prodsData[i].itemAmount
+            };
+            prods.push(prod);
+        }
+        //配送信息
+        if($("#deliveryMethod").val() == "SHIPP"){//如果配送类型是物流配送
+            //老版配送地址-但是删了之后会创建失败-TODO
+            var checkShip = $("div[name='shipSite']").filter(".checkSite");
+            salesOrder.deliveryLocationId = checkShip.attr("attr_location");
+            salesOrder.deliveryTo = checkShip[0].id;
+            //配送地址
+            salesOrder.salesSites.push(getCheckShipSites());
+            //物流公司
+            salesOrder.logistics = {
+                shippingTierId:$("#expressCompany option:selected").val(),
+                shippingFee:summary.freight,
+                salesOrgId:salesOrgId,
+                codFlag:"N"
+            };
+        }
+        //账单信息
+        var checkBill = $("div[name='billSite']").filter(".checkSite");
+        if(checkBill.length > 0){
+            salesOrder.billingLocationId = checkBill.attr("attr_location");
+            salesOrder.billingTo = checkBill[0].id;
+            //账单地址
+            salesOrder.salesSites.push(getCheckBillSites());
+        }else{
+            salesOrder.billingLocationId = null;
+            salesOrder.billingTo = null;
+            //账单地址
+            //null
+        }
+
+
+        //Remaining Balance
+        /* memAccountingBalance = {
+            balance : $("#remainBalance").text()
+        } */
+
+        /* if(summary.useRemBal > 0){
+            var adjustMents = new Array();
+            adjustMents.push({
+                adjustmentType : 'RB',
+                adjustmentAmount : -summary.useRemBal
+            });
+            salesOrder.adjustMents = adjustMents;
+        } */
+        // 优惠券
+        salesOrder.vouchers = getUseVoucher();
+
+        /*******************支付数据**********************/
+        var ecouponTotal = parseFloat($("#ecouponTotal").text()).toFixed(2);
+        // ecounpon 数据
+        if(ecouponTotal > 0){
+            var paymentAmount = 0;
+            $("#ecouponDiv").find("select[name='selectEcoupon'] option:selected").each(function(i,discountAmt){
+                if("" != discountAmt.value){
+                    for(var i in ecoupon.availableEcoupons){
+                        if(discountAmt.value == ecoupon.availableEcoupons[i].voucherId){
+                            paymentAmount = ecoupon.availableEcoupons[i].discountValue;
+                        }
+                    }
+                    omMwsOrderPayment.payData.push({
+                        voucherId : discountAmt.value,
+                        paymentMethod : 'ECUP',
+                        paymentAmount : paymentAmount,
+                        status : 'NEW'
+                    });
+                }
+            });
+
+        }
+        var settleSubTotal = parseFloat($("#settleSubTotal").text()).toFixed(2);
+        if(settleSubTotal > 0){
+            omMwsOrderPayment.payData.push({
+                paymentMethod : 'ONLPA',
+                paymentAmount : settleSubTotal,
+                status : 'NEW'
+            });
+        }
+        var rbTotal = parseFloat($("#rbTotal").text()).toFixed(2);
+        if(rbTotal > 0 ){
+            omMwsOrderPayment.payData.push({
+                paymentMethod : 'RBPAY',
+                paymentAmount : rbTotal,
+                status : 'NEW'
+            });
+        }
+
+        //防止狂点发多次请求
+        if(conn && conn.readyState != 4) return;
+        conn = $.ajax({
+            type : 'POST',
+            url : "${base.contextPath}/account/submitOrder",
+            contentType : "application/json; charset=utf-8",
+            data : JSON2.stringify({
+                salesOrder : salesOrder,
+                omMwsOrderPayment : omMwsOrderPayment,
+                prods : prods
+            }),
+            success : function(data) {
+                if(data.success){
+                    if("N" == allowBackOrder){//这种情况下库存不足报错
+                        if(data.rows[0].attribute1&&data.rows[0].attribute1=="out"){
+                            $.dialog.error("<@spring.message 'mws.dialog.error'/>", data.rows[0].attribute2+"<@spring.message 'msg.error.mws.onhandqty.not.enough'/>"+"("+data.rows[0].attribute3+")",
+                                function(){
+                                    window.location.href="${base.contextPath}/order/shopping-cart.html";
+                                }
+                            );
+                            return;
+                        }
+                    }
+                    $("#headerId").val(data.rows[0].headerId);
+
+                    /*20180419*/
+                    $("#headerId1").val(data.rows[0].headerId);
+                    /*modify by mingqing.wei 2018.01.22 当订单状态为需要审核状态时，提示用户*/
+                    if(data.rows[0].orderStatus=='CHECK'){
+                        $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", "订单号为："+data.rows[0].orderNumber+"的订单已提交，请等待审核",
+                            function(){
+                                location.reload(true);
+                            }
+                        );
+                    }else{
+                        if (data.rows[1].attribute10=='N'){
+                            $("#orderPayment1").submit();
+                        }else {
+                            $("#orderPayment").submit();
+                        }
+                        //$("#orderPayment").submit();
+                    }
+
+                    // $("#orderPayment").submit();
+                }else{
+                    if(data.code){
+                        $.dialog.error("<@spring.message 'mws.dialog.error'/>", data.code,
+                            function(){
+                                location.reload(true);
+                            }
+                        );
+                    }else{
+                        $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", "<@spring.message 'msg.error.mws.failto.create.order'/>\n",
+                            function(){
+                                location.reload(true);
+                            }
+                        );
+                    }
+                }
+            }
+        });
+    }
+    //获取选中的配送地址
+    function getCheckShipSites(){
+        //var checkSites = new Array();
+        var shipSiteId = $("div[name='shipSite']").filter(".checkSite").attr("id");
+        var checkShip = null;
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == shipSiteId){
+                checkShip = sitesData[i];
+                break;
+            }
+        }
+        var salesShip = {
+            salesOrgId : salesOrgId,
+            siteType : "SHIP",
+            name : checkShip.name,
+            phone : checkShip.phone,
+            cityCode : checkShip.spmLocation.cityCode,
+            stateCode : checkShip.spmLocation.stateCode,
+            countryCode : checkShip.spmLocation.countryCode,
+            address : concatString(checkShip.spmLocation.addressLine1,checkShip.spmLocation.addressLine2,checkShip.spmLocation.addressLine3),
+            areaCode : checkShip.areaCode,
+            zipCode : checkShip.spmLocation.zipCode,
+            autoshipFlag : "N",
+            address1: checkShip.spmLocation.addressLine1,
+            address2: checkShip.spmLocation.addressLine2,
+            address3: checkShip.spmLocation.addressLine3
+        }
+//         checkSites.push(salesShip);
+//         return checkSites;
+        return salesShip;
+    }
+    //获取选中的账单地址
+    function getCheckBillSites(){
+        //var checkSites = new Array();
+        var billSiteId = $("div[name='billSite']").filter(".checkSite").attr("id");
+        var checkBill = null;
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == billSiteId){
+                checkBill = sitesData[i];
+                break;
+            }
+        }
+        var salesBill = {
+            salesOrgId : salesOrgId,
+            siteType : "BILL",
+            name : checkBill.name,
+            phone : checkBill.phone,
+            cityCode : checkBill.spmLocation.cityCode,
+            stateCode : checkBill.spmLocation.stateCode,
+            countryCode : checkBill.spmLocation.countryCode,
+            address : concatString(checkBill.spmLocation.addressLine1,checkBill.spmLocation.addressLine2,checkBill.spmLocation.addressLine3),
+            areaCode : checkBill.areaCode,
+            zipCode : checkBill.spmLocation.zipCode,
+            autoshipFlag : "N",
+            address1: checkBill.spmLocation.addressLine1,
+            address2: checkBill.spmLocation.addressLine2,
+            address3: checkBill.spmLocation.addressLine3
+        }
+//         checkSites.push(salesBill);
+//         return checkSites;
+        return salesBill;
+    }
+    //工具函数-连接多个字符串,如果有字符串为null转换成""再连接
+    function concatString(){
+        var argsLength = arguments.length;
+        if(argsLength < 1){
+            return "";
+        }
+        var str = "";
+        for(var i=0; i<arguments.length; i++){
+            if(arguments[i] != null){
+                str += arguments[i];
+            }
+        }
+        return str;
+    }
+</script>
+
+<!-- SCRIPT-地址信息 -->
+<script type="text/javascript">
+    //配送信息
+    //toggle地址列表
+    function toggleSite(link,type){
+        if($("div[name='"+type+"Site']").filter(".hide").length > 0){
+            $("div[name='"+type+"Site']").filter(".hide").addClass("show");
+            $("div[name='"+type+"Site']").filter(".hide").removeClass('hide');
+            $(link).html("<@spring.message 'mws.orderconfirm.fold'/>&nbsp;<span class='vertical-middle glyphicon glyphicon-chevron-up'></span>");
+        }else{
+            $("div[name='"+type+"Site']").filter(".show").not(".checkSite").addClass('hide');
+            $("div[name='"+type+"Site']").filter(".show").not(".checkSite").removeClass("show");
+            $(link).html("<@spring.message 'mws.orderconfirm.more'/>&nbsp;<span class='vertical-middle glyphicon glyphicon-chevron-down'></span>");
+        }
+    }
+    //open地址列表
+    function unfoldSite(type){
+        $("div[name='"+type+"Site']").filter(".hide").addClass("show");
+        $("div[name='"+type+"Site']").filter(".hide").removeClass('hide');
+        $("#"+type+"FoldSite>a").html("<@spring.message 'mws.orderconfirm.fold'/>&nbsp;<span class='vertical-middle glyphicon glyphicon-chevron-up'></span>");
+    }
+    // 更改选中地址
+    function chooseSite(div){
+        var parent = $(div).parent();
+        if(!parent.hasClass("checkSite")){
+            //更新页面
+            var oldCheck = parent.siblings(".checkSite");
+            oldCheck.removeClass("checkSite");
+            var oldCheckChild = oldCheck.children("div:first");
+            oldCheckChild.removeClass("default-border");
+            oldCheckChild.addClass("default-no-border");
+            parent.addClass("checkSite");
+            $(div).removeClass("default-no-border");
+            $(div).addClass("default-border");
+            if(parent.attr("name") == "shipSite"){//如果是收货地址变更
+                //查询新的物流公司-如果是第一次进入页面或者location有变化,就重新查询物流
+                var flag = checkLocationChange(oldCheck.length>0?oldCheck[0].id:null, parent[0].id);
+                if(flag) queryShippingTier();//重新查询物流
+            }
+        }
+    }
+    //检查选中地址后location是否变化
+    function checkLocationChange(oldSiteId, newSiteId){
+        if(oldSiteId == null){// 之前没有选择任何地址
+            return true;
+        }
+        var oldSite = null;
+        var newSite = null;
+        var count = 0;
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == oldSiteId){
+                oldSite = sitesData[i];
+                count++;
+                if(count > 1){
+                    break;
+                }
+            }else if(sitesData[i].siteId == newSiteId){
+                newSite = sitesData[i];
+                count++;
+                if(count > 1){
+                    break;
+                }
+            }
+        }
+        if(oldSite == null){// 删除选中地址时,会触发这个check方法,但全局的site信息已被splice
+            return true;
+        }
+        var oldLocationCode = oldSite.spmLocation.countryCode+oldSite.spmLocation.stateCode+oldSite.spmLocation.cityCode;
+        var newLocationCode = newSite.spmLocation.countryCode+newSite.spmLocation.stateCode+newSite.spmLocation.cityCode;
+        if(oldLocationCode != newLocationCode) return true;
+        return false;
+    }
+    /*******************************************************/
+    /* 增删改 -                                                /
+    /*******************************************************/
+    //保存地址
+    function saveSite(e){
+        var formData = mergeAndObjectify(
+            $("#editSite").serializeArray(),
+            [{name:"defaultFlag", value:$("input[name='defaultFlag']").prop("checked")==true?"Y":"N"}]
+        );
+        //必输校验-7个字段不能为空
+        if(!(formData.countryCode && formData.stateCode && formData.cityCode && formData.addressLine1 && formData.name && formData.areaCode && formData.phone)){
+            //处理报错信息
+            var errorMsg = "<@spring.message 'msg.error.mws.required_fields_is_empty'/>\n";
+            if(!formData.name){
+                errorMsg += "<@spring.message 'mws.addressbook.name'/>\n";
+            }
+            if(!formData.countryCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.country'/>\n";
+            }
+            if(!formData.stateCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.state'/>\n";
+            }
+            if(!formData.cityCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.city'/>\n";
+            }
+            if(!formData.addressLine1){
+                errorMsg += "<@spring.message 'mws.addressbook.address1'/>\n";
+            }
+            if(!formData.areaCode){
+                errorMsg += "<@spring.message 'mws.addressbook.areacode'/>\n";
+            }
+            if(!formData.phone){
+                errorMsg += "<@spring.message 'mws.addressbook.phone'/>\n";
+            }
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", errorMsg);
+            e = e||window.event;
+            if(e.stopPropagation){
+                e.stopPropagation();
+            }else{
+                e.cancelBubble = true;
+            }
+            return;
+        }
+        //格式校验
+        if (formData.zipCode) {
+            if (zipCodeReg.test(formData.zipCode) == false) {
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.zipcode.format.incorrect'/>");
+                e = e||window.event;
+                if(e.stopPropagation){
+                    e.stopPropagation();
+                }else{
+                    e.cancelBubble = true;
+                }
+                return;
+            }
+        }
+        if (phoneReg.test(formData.phone) == false) {
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.phone.format.incorrect'/>");
+            e = e||window.event;
+            if(e.stopPropagation){
+                e.stopPropagation();
+            }else{
+                e.cancelBubble = true;
+            }
+            return;
+        }
+        var memSite = {
+            siteUseCode:createSiteType,
+            spmLocation:{}
+        };
+        //如果是编辑已存在的地址,检查是否做过变更
+        if(isEditingSite != null){
+            memSite = isEditingSite;
+            var needSaveFlag = false;
+            if(formData.name != isEditingSite.name){
+                needSaveFlag = true;
+            }
+            if(formData.areaCode != isEditingSite.areaCode){
+                needSaveFlag = true;
+            }
+            if(formData.phone != isEditingSite.phone){
+                needSaveFlag = true;
+            }
+            if(formData.countryCode != isEditingSite.spmLocation.countryCode){
+                needSaveFlag = true;
+            }
+            if(formData.stateCode != isEditingSite.spmLocation.stateCode){
+                needSaveFlag = true;
+            }
+            if(formData.cityCode != isEditingSite.spmLocation.cityCode){
+                needSaveFlag = true;
+            }
+            if(formData.addressLine1 != isEditingSite.spmLocation.addressLine1){
+                needSaveFlag = true;
+            }
+            if(formData.addressLine2 != isEditingSite.spmLocation.addressLine2){
+                needSaveFlag = true;
+            }
+            if(formData.addressLine3 != isEditingSite.spmLocation.addressLine3){
+                needSaveFlag = true;
+            }
+            if(formData.zipCode != isEditingSite.spmLocation.zipCode){
+                needSaveFlag = true;
+            }
+            if(formData.defaultFlag != isEditingSite.defaultFlag){
+                needSaveFlag = true;
+            }
+            if(!needSaveFlag){
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.nothing_changed'/>");
+                e = e||window.event;
+                if(e.stopPropagation){
+                    e.stopPropagation();
+                }else{
+                    e.cancelBubble = true;
+                }
+                return;
+            }
+        }
+        //准备memSite传到后台
+        memSite._token = formData._token;
+        memSite.name = formData.name;
+        memSite.areaCode = formData.areaCode;
+        memSite.phone = formData.phone;
+        memSite.defaultFlag = formData.defaultFlag;
+        memSite.address = $("#countryCode>option[value='"+formData.countryCode+"']").text()+
+            $("#stateCode>option[value='"+formData.stateCode+"']").text()+
+            $("#cityCode>option[value='"+formData.cityCode+"']").text()+
+            (formData.addressLine1?formData.addressLine1:"")+
+            (formData.addressLine2?formData.addressLine2:"")+
+            (formData.addressLine3?formData.addressLine3:"");//保存后页面要用到
+        memSite.spmLocation.name = formData.name;
+        memSite.spmLocation.countryCode = formData.countryCode;
+        memSite.spmLocation.stateCode = formData.stateCode;
+        memSite.spmLocation.cityCode = formData.cityCode;
+        memSite.spmLocation.addressLine1 = formData.addressLine1;
+        memSite.spmLocation.addressLine2 = formData.addressLine2;
+        memSite.spmLocation.addressLine3 = formData.addressLine3;
+        memSite.spmLocation.zipCode = formData.zipCode;
+        //发送保存请求
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            contentType : "application/json",
+            url : "${base.contextPath}/account/saveAddress",
+            data : JSON2.stringify(memSite),
+            success : function(data) {
+                if(data.success){
+                    // 保存后更新界面
+                    pageAfterSave(data.rows[0]);
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", data.message, function(){location.reload(true);});
+                }
+            }
+        });
+    }
+    // 设为默认按钮
+    function setDefault(siteId){
+        // 发送ajax请求修改默认地址
+        var site = null;
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == siteId){
+                site = sitesData[i];
+                break;
+            }
+        }
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : "${base.contextPath}/account/changeDefaultFlag",
+            data : { siteId : site.siteId, defaultFlag : "Y", siteUseCode : site.siteUseCode, _token: site._token },
+            success : function(data) {
+                if(data.success){
+                    // 回调里执行修改界面
+                    pageSetDefault(siteId);
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", data.message, function(){location.reload(true);});
+                }
+            }
+        });
+    }
+    // 编辑按钮
+    function editSite(siteId,type){//此处多传个type是为了title更快展现给用户
+        if("SHIP" == type){
+            $("#siteModalLabel").text("<@spring.message 'mws.addressbook.editdelivery'/>");
+        }else if("BILL" == type){
+            $("#siteModalLabel").text("<@spring.message 'mws.addressbook.editbilling'/>");
+        }
+        //初始化模态框
+        initModel(siteId);
+        //打开模态框
+        $("#siteModal").modal("show");
+    }
+    //为下拉框areaCode设值
+    function areaCodeSetData(){
+        $("select[name='areaCode']").empty();
+        $("select[name='areaCode']").append("<option value='' selected></option>");
+        for(var i=0; i<telAreaCode.length; i++){
+            $("select[name='areaCode']").append("<option value='"+$.escapeHtml(telAreaCode[i].value)+"'>"+$.escapeHtml(telAreaCode[i].meaning)+"</option>");
+        }
+    }
+    // 删除按钮
+    function deleteSite(siteId,_token){
+        $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", "<@spring.message 'msg.warning.system.delete_or_not'/>",
+            function(){
+                $.ajax({
+                    type : "POST",
+                    dataType : "json",
+                    url : "${base.contextPath}/account/deleteAddress",
+                    data : { siteId : siteId, _token: _token },
+                    success : function(data) {
+                        if(data.success){//删除成功
+                            // 更新页面-如果非默认直接删除这条地址,如果默认,更新默认地址显示
+                            pageAfterDelete(siteId, data.rows[0].defaultSiteId);
+                        }else{//删除失败
+                            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                        }
+                    }
+                });
+            }
+        );
+    }
+    // 新增地址
+    function addSite(type){
+        createSiteType = type;
+        if("SHIP" == type){
+            $("#siteModalLabel").text("<@spring.message 'mws.addressbook.createdelivery'/>");
+        }else if("BILL" == type){
+            $("#siteModalLabel").text("<@spring.message 'mws.addressbook.createbilling'/>");
+        }
+        //显示defaultFlag的复选框
+        $("#defaultCheckBox").removeClass("hide");
+        $("#defaultCheckBox").addClass("show");
+        $("#siteModal").modal("show");
+    }
+
+    /*******************************************************/
+    /* 增删改- 子函数实现 -                                       /
+    /*******************************************************/
+    //编辑时-初始化模态框
+    function initModel(siteId){
+        //从全局匹配到地址详细信息
+        var site = null;
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == siteId){
+                site = sitesData[i];
+                break;
+            }
+        }
+        //编辑时,存一个全局,这样既可以区别新建和编辑状态,又可以不用传递而得到正在编辑的数据
+        isEditingSite = site;
+        //填入到模态框
+        $("input[name='name']").val(site.name);
+        queryCountry(function(){
+            $("#countryCode").val(site.spmLocation.countryCode);
+            queryState(function(){
+                $("#stateCode").val(site.spmLocation.stateCode);
+                queryCity(function(){
+                    $("#cityCode").val(site.spmLocation.cityCode);
+                });
+            });
+        });
+        $("#editSite input[name='_token']").val(site._token);
+        $("input[name='addressLine1']").val(site.spmLocation.addressLine1);
+        $("input[name='addressLine2']").val(site.spmLocation.addressLine2);
+        $("input[name='addressLine3']").val(site.spmLocation.addressLine3);
+        $("input[name='zipCode']").val(site.spmLocation.zipCode);
+        $("select[name='areaCode']").val(site.areaCode);
+        $("input[name='phone']").val(site.phone);
+        //隐藏defaultFlag的复选框
+        $("#defaultCheckBox").removeClass("show");
+        $("#defaultCheckBox").addClass("hide");
+    }
+    //取消编辑时,清空
+    function cancelEditSite(){
+        //清空数据
+        queryCountry(function(){
+            $("#stateCode").empty();
+            $("#cityCode").empty();
+        });
+        $("input[name='name']").val("");
+        $("input[name='addressLine1']").val("");
+        $("input[name='addressLine2']").val("");
+        $("input[name='addressLine3']").val("");
+        $("input[name='zipCode']").val("");
+        $("select[name='areaCode']").val("");
+        $("input[name='phone']").val("");
+        //默认标记默认是true
+        $("input[name='defaultFlag']").prop("checked", true);
+        //如果是编辑已存在的,更新相应全局的值
+        isEditingSite = null;
+        //如果是新增,同样更新相应全局的值
+        createSiteType = null;
+    }
+    /*******************************************************/
+    /* 增删改 - 之后页面更新-                                      /
+    /*******************************************************/
+    // 保存后更新界面
+    function pageAfterSave(newSite){
+        if(createSiteType){//如果是新增地址-重新查询物流
+            //新地址加到全局变量
+            sitesData.push(newSite);
+            //页面新增一个div-row -- 新增地址时，如果设为默认地址，选中并显示；如果不是默认地址，也选中并显示
+            if("SHIP" == newSite.siteUseCode){
+                pageAddRow(newSite);
+            }else if("BILL" == newSite.siteUseCode){
+                pageAddRow(newSite);
+            }
+        }else{//如果是编辑地址
+            //覆盖新地址到全局变量
+            for(var i=0; i<sitesData.length; i++){
+                if(sitesData[i].siteId == newSite.siteId){
+                    $.extend(true, sitesData[i], newSite);
+                    break;
+                }
+            }
+            //页面修改div-row
+            pageChangeRow(newSite);
+        }
+        // 更新全局变量
+        isEditingSite = null;
+        createSiteType = null;
+        // 清空模态框
+        cancelEditSite();
+        //查询新的物流公司
+        if("SHIP" == newSite.siteUseCode){
+            queryShippingTier();//重新查询物流
+        }
+    }
+    //新增地址时，页面新增行
+    function pageAddRow(newSite){
+        var siteName = null;
+        if(newSite.siteUseCode == "SHIP"){
+            siteName = "shipSite";
+        }else if(newSite.siteUseCode == "BILL"){
+            siteName = "billSite";
+        }
+        var html = ""+
+            "<div name='"+siteName+"' class='col-sm-12 site show' id='"+newSite.siteId+"' attr_location='"+newSite.locationId+"'>"+
+            "<div class='col-sm-2 no-wrap col-small-margin' onclick='chooseSite(this)'>"+
+            "<span><@spring.message 'mws.orderconfirm.check'/></span>"+
+            "</div>"+
+            "<div class='col-sm-2 no-wrap col-small-margin'>"+
+            "<span>"+$.escapeHtml(newSite.name)+"</span>"+
+            "</div>"+
+            "<div class='col-sm-2 no-wrap col-small-margin' title='"+$.escapeHtml(newSite.attribute1+newSite.attribute2+newSite.attribute3+newSite.spmLocation.addressLine1+newSite.spmLocation.addressLine2+newSite.spmLocation.addressLine3)+"'>"+
+            "<span>"+$.escapeHtml(newSite.attribute1+newSite.attribute2+newSite.attribute3+newSite.spmLocation.addressLine1+newSite.spmLocation.addressLine2+newSite.spmLocation.addressLine3)+"</span>"+
+            "</div>"+
+            "<div class='col-sm-2 no-wrap col-small-margin' title='"+$.escapeHtml(newSite.phone)+"'>"+
+            "<span>"+$.escapeHtml(newSite.phone)+"</span>"+
+            "</div>"+
+            "<div class='col-sm-2 setDefaultBtn col-small-margin no-wrap'>"+
+            "<a class='a-link' onclick='setDefault("+newSite.siteId+")'><span class='defaultBtn'>&nbsp;<@spring.message 'mws.addressbook.setdefault'/>&nbsp;</span></a>"+
+            "</div>"+
+            "<div class='col-sm-2 col-small-margin just-no-wrap'>"+
+            "<a class='a-link' onclick=\"editSite("+newSite.siteId+",'"+$.escapeHtml(newSite.siteUseCode)+"')\"><@spring.message 'sys.hand.btn.edit'/></a>&nbsp;&nbsp;"+
+            "<a class='a-link' onclick='deleteSite("+newSite.siteId+",\""+newSite._token+"\")'><@spring.message 'sys.hand.btn.delete'/></a>"+
+            "</div>"+
+            "</div>";
+        $(html).insertBefore($("div[name='"+siteName+"']:first"));
+        $("div[name='"+siteName+"']:first").hover(function(){
+            $(this).addClass('row-hover');
+        },function(){
+            $(this).removeClass('row-hover');
+        });
+        if(newSite.defaultFlag == 'Y'){
+            pageSetDefault(newSite.siteId);
+        }else{
+            chooseSite($("#"+newSite.siteId).children("div:first"));
+        }
+        //新增行后，展开地址列表
+        unfoldSite(newSite.siteUseCode.toLowerCase());
+    }
+    //编辑地址时，更新页面的行
+    function pageChangeRow(newSite){
+        var siteRow = $("#"+newSite.siteId);
+        //修改姓名-eq(index)从0开始
+        siteRow.children("div:eq(1)").find("span").html($.escapeHtml(newSite.name));
+        //修改地址
+        siteRow.children("div:eq(2)").attr("title", $.escapeHtml(newSite.attribute1+newSite.attribute2+newSite.attribute3+newSite.spmLocation.addressLine1+newSite.spmLocation.addressLine2+newSite.spmLocation.addressLine3));
+        siteRow.children("div:eq(2)").find("span").html($.escapeHtml(newSite.attribute1+newSite.attribute2+newSite.attribute3+newSite.spmLocation.addressLine1+newSite.spmLocation.addressLine2+newSite.spmLocation.addressLine3));
+        //修改电话
+        siteRow.children("div:eq(3)").find("span").html($.escapeHtml(newSite.phone));
+    }
+    //删除地址后更新页面
+    function pageAfterDelete(siteId, defaultSiteId){
+        $("#"+siteId).remove();
+        var flag = false;
+        var type = null;
+        //删除对应的全局变量
+        for(var i=0; i<sitesData.length; i++){
+            if(sitesData[i].siteId == siteId){
+                if(sitesData[i].defaultFlag == "Y"){//如果删除的是默认地址,需要更新页面
+                    flag = true;
+                }
+                sitesData.splice(i, 1);
+            }else if(sitesData[i].siteId == defaultSiteId){//没有直接break而是直接在这里提前更新defaultFlag是为了避免循环嵌套
+                sitesData[i].defaultFlag = "Y";
+                type = sitesData[i].siteUseCode;
+            }
+        }
+        //如果删除的是默认地址,更新最新的默认地址到界面
+        if(flag){
+            pageSetDefault(defaultSiteId);
+            unfoldSite(type.toLowerCase());
+        }
+    }
+    //设置默认后页面变更
+    function pageSetDefault(siteId){
+        var defaultSite = $("#"+siteId).siblings(".defaultSite");
+        if(defaultSite.length > 0){
+            defaultSite.children("div:first").children("span").text("<@spring.message 'mws.orderconfirm.check'/>");
+            defaultSite.removeClass("defaultSite");
+            defaultSite.find(".setDefaultBtn").html("<a class='a-link' onclick='setDefault("+$.escapeHtml(defaultSite[0].id)+")'><span class='defaultBtn'>&nbsp;<@spring.message 'mws.addressbook.setdefault'/>&nbsp;</span></a>");
+        }
+        var cur = $("#"+siteId).children("div:first");
+        cur.children("span").text("<@spring.message 'mws.addressbook.defaultaddress'/>");
+        $("#"+siteId).addClass("defaultSite");
+        $("#"+siteId).find(".setDefaultBtn").html("<span class='defaultText'>&nbsp;<@spring.message 'mws.addressbook.defaultaddress'/>&nbsp;</span>");
+        // 选中默认地址
+        chooseSite(cur);
+    }
+    /*******************************************************/
+    /* 下拉框联动实现 -                                          /
+    /*******************************************************/
+    //查询country下拉框
+    function queryCountry(callback){//callback就是函数套函数而已~
+        $.ajax({
+            url: '${base.contextPath}/account/queryCountry',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+            data : {},
+            success : function(data) {
+                if(data.success){
+                    countrySetData(data.rows);
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                }
+                if(callback){
+                    callback();
+                }
+            },
+            error : function() {
+                //alert("获取country下拉框失败");
+            }
+        })
+    }
+    //查询state下拉框
+    function queryState(callback){
+        $.ajax({
+            url: '${base.contextPath}/account/queryState',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+            data : {countryCode:$("#countryCode").val()},
+            success : function(data) {
+                if(data.success){
+                    stateSetData(data.rows);
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                }
+                if(callback){
+                    callback();
+                }
+            },
+            error : function() {
+                //alert("获取state下拉框失败");
+            }
+        })
+    }
+    //查询city下拉框
+    function queryCity(callback){
+        $.ajax({
+            url: '${base.contextPath}/account/queryCity',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+            data : {stateCode:$("#stateCode").val()},
+            success : function(data) {
+                if(data.success){
+                    citySetData(data.rows);
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                }
+                if(callback) callback();
+            },
+            error : function() {
+                //alert("获取state下拉框失败");
+            }
+        })
+    }
+    //为下拉框countryCode设值
+    function countrySetData(options){
+        $("#countryCode").empty();
+        $("#countryCode").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("#countryCode").append("<option value='"+$.escapeHtml(options[i].countryCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    //为下拉框stateCode设值
+    function stateSetData(options){
+        $("#stateCode").empty();
+        $("#stateCode").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("#stateCode").append("<option value='"+$.escapeHtml(options[i].stateCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    //为下拉框cityCode设值
+    function citySetData(options){
+        $("#cityCode").empty();
+        $("#cityCode").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("#cityCode").append("<option value='"+$.escapeHtml(options[i].cityCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+
+    //工具函数-合并多个serialize数组为一个对象(Map)
+    function mergeAndObjectify(){
+        var argsLength = arguments.length;
+        if(argsLength < 1){
+            return null;
+        }
+        var obj = {};
+        for(var i=0; i<argsLength; i++){
+            for(var j=0; j<arguments[i].length; j++){
+                obj[arguments[i][j].name] = arguments[i][j].value;
+            }
+        }
+        return obj;
+    }
+</script>
+
+<!-- SCRIPT-物流信息 -->
+<script type="text/javascript">
+    //初始化配送方式下拉框
+
+    function initDeliveryMethod(){
+        $("#deliveryMethod").empty();
+        for(var i=0; i<deliveryTypeData.length; i++){
+            // if(deliveryTypeData[i].value == "SHIPP"){
+            if(deliveryTypeData[i].value == "PICKUP"){
+                $("#deliveryMethod").append("<option value='"+$.escapeHtml(deliveryTypeData[i].value)+"' selected>"+$.escapeHtml(deliveryTypeData[i].meaning)+"</option>");
+            }else{
+                if(cantPickUpArr.indexOf(code) < 0){
+                    $("#deliveryMethod").append("<option value='"+$.escapeHtml(deliveryTypeData[i].value)+"'>"+$.escapeHtml(deliveryTypeData[i].meaning)+"</option>");
+                }
+            }
+        }
+    }
+    //动态获取物流公司信息
+    function queryShippingTier(){
+
+        //1.准备选中地址
+        var location = {};
+        var siteId = null;
+        if($("div[name='shipSite']").filter(".checkSite")[0]){
+            siteId = $("div[name='shipSite']").filter(".checkSite")[0].id;
+        }else{//未选中地址时也不允许提交
+            $("#expressCompany").empty();
+            allowSubmit = false;
+            return;
+        }
+        if(siteId){
+            for(var i=0; i<sitesData.length; i++){
+                if(sitesData[i].siteId == siteId){
+                    site = sitesData[i];
+                    location.countryCode = site.spmLocation.countryCode;
+                    location.stateCode = site.spmLocation.stateCode;
+                    location.cityCode = site.spmLocation.cityCode;
+                    break;
+                }
+            }
+            //2.发送ajax实时查询物流
+            $.ajax({
+                type : "POST",
+                dataType : "json",
+                url : "${base.contextPath}/account/queryShippingTier",
+                data : {
+                    countryCode : location.countryCode,
+                    stateCode : location.stateCode,
+                    cityCode : location.cityCode,
+                    currencyCode : currencyCode,
+                    apptype : 'WEB'
+                },
+                success : function(data) {
+                    if(data.success) reRenderExpressCompany(data.rows);// 更新界面
+                    else $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.failto.fetch.logistic'/>");
+                }
+            });
+        }else{
+            $("#expressCompany").empty();
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.none.shipsite.check'/>");
+        }
+    }
+    //重新渲染选择物流公司下拉框
+    function reRenderExpressCompany(opts){
+        shippingTier = new Array();
+        //计算运费-并排除无用选项（总额不在该区间）
+        var total = null;
+        for(var i=0; i<opts.length; i++){
+            if("PRTAX" == opts[i].calculationType && "N" == opts[i].privilegeFlag){//税前不含优惠-目前是税后
+                total = summary.subtotal;
+            }else if("PRTAX" == opts[i].calculationType && "Y" == opts[i].privilegeFlag){//税前含优惠-目前是税后
+                total = summary.subtotal - summary.discountAmt;
+            }else if("AFTAX" == opts[i].calculationType && "N" == opts[i].privilegeFlag){//税后不含优惠-目前是税前
+                total = summary.pretax;
+            }else if("AFTAX" == opts[i].calculationType && "Y" == opts[i].privilegeFlag){//税后含优惠-目前是税前
+                total = summary.pretax - summary.discountAmt;
+            }
+            var dtls = opts[i].shippingTierDtls;
+            for(var j=0; j<dtls.length; j++){
+
+                if(dtls[j].invAmountFrom <= summary.kgtotal && dtls[j].invAmountTo > summary.kgtotal){
+                    var obj = {
+                        shippingTierId:opts[i].shippingTierId,
+                        shippingTierName:opts[i].shippingTierName,
+                        shippingFee:dtls[j].shippingFee
+                    };
+                    shippingTier.push(obj);
+                    break;
+                }
+            }
+        }
+        //自动应用最低运费的项-采用冒泡方式对fee排序
+        for(var i=0; i<shippingTier.length; i++){
+            for(var j=0; j<shippingTier.length; j++){
+                if(shippingTier[i].shippingFee < shippingTier[j].shippingFee){
+                    var temp = shippingTier[i];
+                    shippingTier[i] = shippingTier[j];
+                    shippingTier[j] = temp;
+                }
+            }
+        }
+        $("#expressCompany").empty();
+        for(var i=0; i<shippingTier.length; i++){
+            $("#expressCompany").append("<option fee='"+$.escapeHtml(shippingTier[i].shippingFee)+"' value='"+$.escapeHtml(shippingTier[i].shippingTierId)+"'>"+$.escapeHtml(shippingTier[i].shippingTierName)+"</option>");
+        }
+        //触发物流公司改变事件
+        $("#expressCompany").trigger("change");
+        paymentAmount();
+
+    }
+</script>
+
+<!-- SCRIPT-优惠券信息 -->
+<script type="text/javascript">
+    // 添加新行以选择优惠券
+    function addCoupon(btn){
+        if(voucher.hasUnStackableVoucher){
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.already.use.unstack.voucher'/>");
+            return;
+        }
+        var canAdd = true;
+        $("#allCoupons").children().each(function(){
+            var value = $(this).find("select[name='headVoucher']").val();
+            if(value == null || value == ""){
+                canAdd = false;
+                return;
+            }
+        });
+        if(!canAdd){
+            return;
+        }
+        var num = $("#allCoupons").children().length+1;
+        var html = ""+
+            "<div id='coupon"+num+"' name='coupons' class='row coupon-row'>"+
+            "<div class='col-md-2 col-sm-2'>"+
+            "<button id='addCoupon' type='button' class='pull-right btn btn-default btn-small' onclick='delCoupon(\"coupon"+num+"\")'>"+
+            "<span class='vertical-middle glyphicon glyphicon-minus'></span>"+
+            "</button>"+
+            "</div>"+
+            "<div class='col-md-2 col-sm-2'>"+
+            "<span class='pull-right'><@spring.message 'mws.orderconfirm.voucher'/></span>"+
+            "</div>"+
+            "<div class='col-sm-3 col-md-3 col-xs-3 col-small-margin'>"+
+            "<select name='headVoucher' class='form-control small-select'></select>"+
+            "</div>"+
+            "<div class='col-md-3 col-sm-3'>"+
+            "<span class='pull-right'><@spring.message 'mws.orderconfirm.pref.amt'/>:</span>"+
+            "</div>"+
+            "<div name='subDiscountAmt' class='col-md-2 col-sm-2'>"+
+            "<span>0</span>"+
+            "</div>"+
+            "</div>";
+        // 添加新行以选优惠券
+        $("#allCoupons").append(html);
+        //事件监听
+        $("#coupon"+num).find("select[name='headVoucher']").on('mousedown', function () {
+            beforeOpenVoucher(this);
+        }).on('keydown', function (e) {
+            if(e.keyCode == 13) beforeOpenVoucher(this);
+        }).on('focus', function () { // 为了change时拿到oldValue而监听
+            previous = $(this).val();// Store the current value on focus and on change
+        }).change(function() {
+            afterSelectVoucher(previous, this);// Do something with the previous value after the change
+            previous = $(this).val();// Make sure the previous value is updated
+        });
+    }
+    // 删除一行优惠券
+    function delCoupon(row){
+        var removeId = $("#"+row).find("select[name='headVoucher']").val();
+        if(removeId){ //如果使用了优惠券
+            var vas = voucher.availableVouchers;
+            var removedVoucher = null;
+            for(var i=0; i<vas.length; i++){
+                if(removeId == vas[i].voucherId){
+                    removedVoucher = vas[i];
+                }
+            }
+            removeVoucher(removedVoucher,row);
+        }
+        $("#"+row).remove();
+    }
+    /**
+     * 判断该优惠券是否可用
+     * @param validateVoucher 优惠券
+     * @param lines 全部订单行
+     * @return true/false 可用为true，不可用为false
+     */
+    function validateVoucher(validateVoucher,lines){
+        //订单头金额
+        if(validateVoucher.applyCriteria=="INVOI"&&validateVoucher.type=="AM"){
+            var checkAmt;
+            if(validateVoucher.APP_TAX=="ECLD"){//不含税
+                checkAmt=summary.pretax-summary.discountAmt;
+            }else{//含税
+                checkAmt=summary.subtotal-summary.discountAmt;
+            }
+            if(validateVoucher.operation=="MT"&&checkAmt>validateVoucher.orderAmount){
+                return true;
+            }else if(validateVoucher.operation=="MOE"&&checkAmt>=validateVoucher.orderAmount){
+                return true;
+            }else if(validateVoucher.operation=="LT"&&checkAmt<validateVoucher.orderAmount){
+                return true;
+            }else if(validateVoucher.operation=="LOE"&&checkAmt<=validateVoucher.orderAmount){
+                return true;
+            }else if(validateVoucher.operation=="EQL"&&validateVoucher.orderAmount==checkAmt){
+                return true;
+            }else{
+                return false;
+            }
+        }else if(validateVoucher.applyCriteria=="INVOI"&&validateVoucher.type=="NM"){
+            //订单头数量处理对比
+            for(var i in validateVoucher.pdmVoucherItems){
+                var voucherItem=validateVoucher.pdmVoucherItems[i];
+                var temp=false;
+                for(var j in lines){
+                    if(lines[j].itemId==voucherItem.itemId&&lines[j].quantity>=voucherItem.quantity){
+                        temp=true;
+                        break;
+                    }
+                }
+                if(!temp){
+                    return false;
+                }
+            }
+            return true;
+        }else if(validateVoucher.applyCriteria=="PRODU"&&validateVoucher.type=="PD"){
+            //订单行处理对比
+            for(var i in validateVoucher.pdmVoucherItems){
+                var voucherItem=validateVoucher.pdmVoucherItems[i];
+                var temp=false;
+                for(var j in lines){
+                    if(lines[j].itemId==voucherItem.itemId&&lines[j].quantity>=voucherItem.quantity){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }else{
+            return false;
+        }
+    }
+    /**
+     * 设置当前下拉框可用的优惠券
+     * @param coupon 下拉框对象
+     * @param index 订单行的下标
+     */
+    function setAvailableVouchers(coupon,index){
+        var availableVouchers=[];
+        var couponRowLength = $("#allCoupons").children().length;
+        for(var i=0; i<voucher.availableVouchers.length; i++){
+            //优惠券的应用层级--头
+            if(!index){
+                //订单头
+                if(voucher.availableVouchers[i].applyCriteria=="PRODU"){
+                    continue;
+                }
+            }else{
+                //订单行
+                if(voucher.availableVouchers[i].applyCriteria=="INVOI"){
+                    continue;
+                }
+            }
+
+            //不可叠加类型的优惠券
+            if(voucher.availableVouchers[i].usageMode=="NSTAC"){
+                //如果已经用过优惠券，则不再提供不可叠加的优惠券
+                //TODO: 待修改为头与行情况
+                if(voucher.appliedVouchers.length>=1&&!voucher.hasUnStackableVoucher&&couponRowLength>1){
+                    continue;
+                }
+            }
+            var appliedIndex=-1;//使用过的下标
+            //遍历是否有使用过的记录
+            for(var j in voucher.appliedVouchers){
+                if(voucher.appliedVouchers[j].voucherId==voucher.availableVouchers[i].voucherId){
+                    appliedIndex=j;
+                    break;
+                }
+            }
+            //如果有使用过的，则校验数量是否有剩余
+            if(appliedIndex>=0){
+                var appliedVoucher=voucher.appliedVouchers[appliedIndex];
+                if(appliedVoucher.surplus>0){
+                    if(voucher.availableVouchers[i].applyCriteria=="INVOI"&&voucher.availableVouchers[i].type=="AM"){
+                        //已经有选择的，先暂时减少优惠金额
+                        var tempdiscountAmt=0;
+                        if(coupon.find("select[name='headVoucher']").val()){
+                            var voucherId = coupon.find("select[name='headVoucher']").val();
+                            var vouchers = voucher.vouchers;
+                            for(var j=0; j<vouchers.length; j++){
+                                if(voucherId == vouchers[j].voucherId){
+                                    tempdiscountAmt = vouchers[j].discountValue;
+                                    break;
+                                }
+                            }
+                            summary.discountAmt=summary.discountAmt-parseFloat(tempdiscountAmt);
+                        }
+                        if(validateVoucher(voucher.availableVouchers[i])){
+                            availableVouchers.push(voucher.availableVouchers[i]);
+                        }
+                        summary.discountAmt=summary.discountAmt+parseFloat(tempdiscountAmt);
+                    }else{
+                        availableVouchers.push(voucher.availableVouchers[i]);
+                    }
+                }
+            }else{
+                if(voucher.availableVouchers[i].applyCriteria=="INVOI"&&voucher.availableVouchers[i].type=="AM"){
+                    //已经有选择的，先暂时减少优惠金额
+                    var tempdiscountAmt=0;
+                    if(coupon.find("select[name='headVoucher']").val()){
+                        var voucherId = coupon.find("select[name='headVoucher']").val();
+                        var vouchers = voucher.vouchers;
+                        for(var j=0; j<vouchers.length; j++){
+                            if(voucherId == vouchers[j].voucherId){
+                                tempdiscountAmt = vouchers[j].discountValue;
+                                break;
+                            }
+                        }
+                        summary.discountAmt=summary.discountAmt-parseFloat(tempdiscountAmt);
+                    }
+                    if(validateVoucher(voucher.availableVouchers[i])){
+                        availableVouchers.push(voucher.availableVouchers[i]);
+                    }
+                    summary.discountAmt=summary.discountAmt+parseFloat(tempdiscountAmt);
+                }else{
+                    availableVouchers.push(voucher.availableVouchers[i]);
+                }
+            }
+        }
+        if(coupon.find("select[name='headVoucher']").val()){
+            var isInclude=false;
+            var selectVoucherId=coupon.find("select[name='headVoucher']").val();
+            for(var i in availableVouchers){
+                if(availableVouchers[i].voucherId==selectVoucherId){
+                    isInclude=true;
+                    break;
+                }
+            }
+            if(!isInclude){
+                var vvs = voucher.vouchers;
+                var selectVoucher = null;
+                for(var i=0; i<vvs.length; i++){
+                    if(vvs[i].voucherId == selectVoucherId){
+                        selectVoucher = vvs[i];
+                        break;
+                    }
+                }
+                selectVoucher.current = true;
+                availableVouchers.push(selectVoucher);
+            }
+        }
+        setCouponSelect(coupon, availableVouchers);
+        return availableVouchers;
+    }
+    //初始化配送方式下拉框
+    function setCouponSelect(coupon, availableVouchers){
+        var select = coupon.find("select[name='headVoucher']");
+        var current = select.val();
+        select.empty();
+        if(availableVouchers.length > 0){
+            select.append("<option value=''><@spring.message 'mws.orderconfirm.do.not.use.coupons'/></option>");
+        }else{
+            select.append("<option value=''><@spring.message 'mws.orderconfirm.do.not.have.coupons'/></option>");
+        }
+        for(var i=0; i<availableVouchers.length; i++){
+            if(current == availableVouchers[i].voucherId){
+                select.append("<option selected value='"+$.escapeHtml(availableVouchers[i].voucherId)+"'>"+$.escapeHtml(availableVouchers[i].name)+"</option>");
+            }else{
+                select.append("<option value='"+$.escapeHtml(availableVouchers[i].voucherId)+"'>"+$.escapeHtml(availableVouchers[i].name)+"</option>");
+            }
+        }
+    }
+    //打开优惠券下拉框时-初始化下拉框
+    function beforeOpenVoucher(select){
+        setAvailableVouchers($(select).parent().parent());
+    }
+    //选择优惠券后-根据选择的值做select/change/remove
+    function afterSelectVoucher(oldVal, select){
+        var selectId = $(select).parent().parent().attr("id");
+        var newVal = $(select).val();
+        if(!newVal){
+            var oldVoucher = null;
+            var vs = voucher.vouchers;
+            for(var i=0; i<vs.length; i++){
+                if(vs[i].voucherId == oldVal){
+                    oldVoucher = vs[i];
+                    break;
+                }
+            }
+            removeVoucher(oldVoucher,selectId);
+            return;
+        }
+        var oldVoucher = null;
+        var newVoucher = null;
+        var avs = voucher.availableVouchers;
+        var count = 0;
+        for(var i=0; i<avs.length; i++){
+            if(avs[i].voucherId == oldVal){
+                oldVoucher = avs[i];
+                count++;
+                if(count > 1){
+                    break;
+                }
+            }
+            if(avs[i].voucherId == newVal){
+                newVoucher = avs[i];
+                count++;
+                if(count > 1){
+                    break;
+                }
+            }
+        }
+        if(oldVal){
+            changeVoucher(oldVoucher, newVoucher, selectId);
+        }else{
+            selectVoucher(newVoucher, selectId);
+        }
+    }
+    /**
+     * 优惠券选中
+     * @param selectVoucher 选择的优惠券
+     * @param index 订单行的下标
+     */
+    function selectVoucher(selectVoucher,selectId){
+        if(selectVoucher.applyCriteria=="INVOI"){
+            //头类型的优惠券
+            //不可叠加类型的头优惠券处理
+            if(selectVoucher.usageMode=="NSTAC"){
+                voucher.hasUnStackableVoucher=true;
+                //删除之前使用过的所有可叠加优惠券-目前只有第一个优惠券行可以改用为使用不可叠加
+//                 $("#allCoupons").children().each(function(){
+//                     var index = $(this).attr("id");
+//                     if(Number(index.replace("coupon","")) > 1){//除第一个优惠券外
+//                         delCoupon(index);
+//                     }
+//                 });
+            }
+            var isUsed=false;//是否已经有使用过
+            for(var i in voucher.appliedVouchers){
+                if(voucher.appliedVouchers[i].voucherId==selectVoucher.voucherId){
+                    isUsed=true;
+                    //可用数量-1
+                    voucher.appliedVouchers[i].surplus=voucher.appliedVouchers[i].surplus-1;
+                    break;
+                }
+            }
+            if(!isUsed){
+                //可用数量-1
+                selectVoucher.surplus=selectVoucher.surplus-1;
+                voucher.appliedVouchers.push(selectVoucher);
+            }
+            //界面操作，金额扣减等.
+            if(selectVoucher.discountType=="FIX"){
+                summary.discountAmt = summary.discountAmt + selectVoucher.discountValue;
+                if(summary.discountAmt > summary.subtotal){
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.disamt.bigger.than.orderamt'/>");
+                    if(selectId == "coupon1"){
+                        $("#"+selectId).find("select[name='headVoucher']").empty();
+                    }else{
+                        $("#"+selectId).remove();
+                    }
+                    summary.discountAmt = summary.discountAmt - selectVoucher.discountValue;
+                    return;
+                }else{
+                    $("#"+selectId).find("div[name='subDiscountAmt']>span").text(selectVoucher.discountValue);
+                    $("#settleSubTotal").text(currencySymbol+(summary.subtotal-summary.discountAmt).toFixed(2));
+                    $("#settleTotal").text(currencySymbol+parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2));
+                }
+            }else if(selectVoucher.discountType=="PERCE"){
+                summary.discountAmt = summary.discountAmt+Number((summary.subtotal*(selectVoucher.discountValue/100)).toFixed(2));
+                if(summary.discountAmt > summary.subtotal){
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.disamt.bigger.than.orderamt'/>");
+                    if(selectId == "coupon1"){
+                        $("#"+selectId).find("select[name='headVoucher']").empty();
+                    }else{
+                        $("#"+selectId).remove();
+                    }
+                    summary.discountAmt = summary.discountAmt - selectVoucher.discountValue;
+                    return;
+                }else{
+                    $("#"+selectId).find("div[name='subDiscountAmt']>span").text((parseFloat(((summary.subtotal-summary.discountAmt)*(selectVoucher.discountValue/100))).toFixed(2)));
+                    $("#settleSubTotal").text(currencySymbol+(summary.subtotal-summary.discountAmt).toFixed(2));
+                    $("#settleTotal").text(currencySymbol+parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2));
+                }
+            }else if(selectVoucher.discountType=="GIFT"){
+                //TODO：礼物类型
+            }
+            //应用优惠券之后,重新查询物流
+            if($("#deliveryMethod").val() == "SHIPP"){
+                //取出物流公司信息并设置
+                queryShippingTier();
+            }
+            return;
+        }else{
+            //行类型的优惠券
+            var isUsed=false;//是否已经有使用过
+            for(var i in voucher.appliedVouchers){
+                if(voucher.appliedVouchers[i].voucherId==selectVoucher.voucherId){
+                    isUsed=true;
+                    //可用数量-1
+                    voucher.appliedVouchers[i].surplus=voucher.appliedVouchers[i].surplus-1;
+                    break;
+                }
+            }
+            if(!isUsed){
+                //可用数量-1
+                selectVoucher.surplus=selectVoucher.surplus-1;
+                voucher.appliedVouchers.push(selectVoucher);
+            }
+            //界面操作，金额扣减等.
+            //TODO:
+        }
+    }
+    /**
+     * 更改使用的优惠券
+     * @param oldVoucher 旧的优惠券
+     * @param newVoucher 新的优惠券
+     * @param index 订单行的下标
+     */
+    function changeVoucher(oldVoucher,newVoucher,selectId){
+        removeVoucher(oldVoucher,selectId);
+        selectVoucher(newVoucher,selectId);
+    }
+    /**
+     * 删除一张使用的优惠券
+     * @param removed 删除的优惠券
+     * @param index 订单行的下标
+     */
+    function removeVoucher(removed,selectId){
+        var isAddToAvailable=false;//是否添加回可用优惠券标记
+        if(removed.usageMode=="NSTAC"){
+            voucher.hasUnStackableVoucher=false;
+        }
+        for(var i in voucher.appliedVouchers){
+            if(voucher.appliedVouchers[i].voucherId==removed.voucherId){
+                //可用数量+1
+                voucher.appliedVouchers[i].surplus=voucher.appliedVouchers[i].surplus+1;
+                //最大可用量是优惠券数量时
+                if(voucher.appliedVouchers[i].surplus<=voucher.appliedVouchers[i].quantity){
+                    //当前可用量与优惠券的可用量相等时，说明该优惠券没有被使用，须从使用池删除.
+                    if(voucher.appliedVouchers[i].surplus==voucher.appliedVouchers[i].quantity){
+                        voucher.appliedVouchers.splice(i,1);
+                    }
+                    isAddToAvailable=true;
+                }
+                break;
+            }
+        }
+        //可用优惠券添加
+        if(isAddToAvailable){
+            var isInclude=false;
+            for(var i in voucher.availableVouchers){
+                if(voucher.availableVouchers[i].voucherId==removed.voucherId){
+                    isInclude=true;
+                    break;
+                }
+            }
+            if(!isInclude){
+                voucher.availableVouchers.push(removed);
+            }
+        }
+        if(removed.discountType=="FIX"){
+            $("#"+selectId).find("div[name='subDiscountAmt']>span").text(0);
+            summary.discountAmt = summary.discountAmt-removed.discountValue;
+            $("#settleSubTotal").text(currencySymbol+(summary.subtotal-summary.discountAmt).toFixed(2));
+            $("#settleTotal").text(currencySymbol+parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2));
+        }else if(removed.discountType=="PERCE"){
+            $("#"+selectId).find("div[name='subDiscountAmt']>span").text(0);
+            summary.discountAmt = summary.discountAmt-Number((summary.subtotal*(removed.discountValue/100)).toFixed(2));
+            $("#settleSubTotal").text(currencySymbol+(summary.subtotal-summary.discountAmt).toFixed(2));
+            $("#settleTotal").text(currencySymbol+parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2));
+        }else if(removed.discountType=="GIFT"){
+            //TODO：礼物类型
+        }
+        //删除优惠券之后,重新查询物流
+        if($("#deliveryMethod").val() == "SHIPP"){
+            //取出物流公司信息并设置
+            queryShippingTier();
+        }
+        return;
+    }
+    /**
+     * 获取使用的优惠券集合.
+     * @return array
+     */
+    function getUseVoucher(){
+        var results=[];
+        for(var i in voucher.appliedVouchers){
+            var appliedVoucher=voucher.appliedVouchers[i];
+            for(var index=appliedVoucher.surplus;index<appliedVoucher.quantity;index++){
+                results.push(appliedVoucher);
+            }
+        }
+        return results;
+    }
+</script>
+
+<!-- ECOUPON -->
+<script type="text/javascript">
+    /********************************************/
+    /*-----------Ecoupon function---------------*/
+    /********************************************/
+
+    //var ecouponArray=[];
+    var ecoupon = {
+        version:"1.0",
+        ecoupons:[],
+        memberId:${memberId},
+        salesOrgId:${salesOrgId},
+        discountAmt: 0,
+        hasUnStackableEcoupon:false,
+        appliedEcoupons:[], //已用
+        availableEcoupons:[] //可用
+    }
+
+    function initEcoupon(coupon){
+        $.ajax({
+            type:"post",
+            url:"${base.contextPath}/order/getMemberVouchersForVIP",
+            data:{},
+            dataType:"json",
+            success:function(data){
+                if(data.success){
+                    var html=[];
+                    ecoupon.ecoupons=data.rows;
+                    $.each(data.rows, function(index, item) {
+                        item.surplus=item.quantity;
+                        ecoupon.availableEcoupons.push(item)
+                    });
+                    //selectWhetherUse();
+                    setAvailableEcoupons(coupon);
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                }
+            }
+        });
+    }
+
+    // 添加一行Ecoupon
+    function addEcoupon(val){
+        var num = $("#ecouponDiv").children().length+1;
+        var html=[];
+        html.push("<div id='ecoupon"+num+"' name='ecoupons' class='row coupon-row'>\
+	                    <div class='col-md-2 col-sm-2'>\
+	                        <button id='addEcoupon' type='button' class='pull-right btn btn-default btn-small' onclick='delEcoupon(\"ecoupon"+num+"\")'>\
+	                            <span class='vertical-middle glyphicon glyphicon-minus'></span>\
+	                        </button>\
+	                    </div>\
+	                    <div class='col-md-2 col-sm-2'>\
+	                        <span class='pull-right'>Ecoupon</span>\
+	                    </div>\
+	                    <div class='col-sm-3 col-md-3 col-xs-3 col-small-margin'>\
+	                        <select id='selectEcoupon"+num+"' name='selectEcoupon' class='form-control small-select'></select>\
+	                    </div>\
+	                    <div class='col-md-3 col-sm-3'>\
+	                        <span class='pull-right'><@spring.message 'mws.orderhistory.deductible_amount'/>:</span>\
+	                    </div>\
+	                    <div class='col-md-2 col-sm-2'>\
+	                        <span name='discountAmt' id='discountAmt"+num+"'>0</span>\
+	                    </div>\
+	                </div>");
+        var canAdd = true;
+        $("#ecouponDiv").children().each(function(){
+            var value = $(this).find("select[name='selectEcoupon']").val();
+            if(value == null || value == ""){
+                canAdd = false;
+                return;
+            }
+        });
+        if(!canAdd){
+            return;
+        }else{
+            $("#ecouponDiv").append(html);
+        }
+
+        var previouss = null;
+        $("#ecoupon"+num).find("select[name='selectEcoupon']").on('mousedown', function () {
+            beforeOpenEcoupon(this);
+        }).on('keydown', function (e) {
+            if(e.keyCode == 13) beforeOpenEcoupon(this);
+        }).on('focus', function () { // 为了change时拿到oldValue而监听
+            previouss = $(this).val();// Store the current value on focus and on change
+        }).change(function() {
+            afterSelectEcoupon(previouss, this);// Do something with the previous value after the change
+            previouss = $(this).val();// Make sure the previous value is updated
+        });
+        //selectWhetherUse(num);
+    }
+
+
+    // 删除一行ecoupon
+    function delEcoupon(num){
+        var removeId = $("#"+num).find("select[name='selectEcoupon']").val();
+        if(removeId){ //如果使用了ecoupon
+            var vas = ecoupon.availableEcoupons;
+            var removedEcoupon = null;
+            for(var i=0; i<vas.length; i++){
+                if(removeId == vas[i].voucherId){
+                    removedEcoupon = vas[i];
+                }
+            }
+            removeEcoupon(removedEcoupon,num);
+        }
+        $("#"+num).remove();
+    }
+
+    var totalAmt = 0;
+    function paymentAmount(){
+        if($("#settleSubTotal").text() < 0){
+            $("#settleSubTotal").text(0);
+            $.dialog.warning("<@spring.message 'mws.dialog.confirm'/>", "<@spring.message 'mws.orderhistory.more_than_order_amt'/>");
+        }
+        $("#settleSubTotal").text(((parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2))
+            -parseFloat($("#ecouponTotal").text()).toFixed(2)
+            -parseFloat($("#rbTotal").text()).toFixed(2)).toFixed(2));
+    }
+
+
+
+    function beforeOpenEcoupon(select){
+        setAvailableEcoupons($(select).parent().parent());
+    }
+
+    /**
+     * 设置当前下拉框可用的Ecoupon
+     * @param coupon 下拉框对象
+     * @param index 订单行的下标
+     */
+    function setAvailableEcoupons(coupon, index){
+        var availableEcoupons=[];
+        var couponRowLength = $("#ecouponDiv").children().length;
+        for(var i in ecoupon.availableEcoupons){
+            var appliedIndex=-1;//使用过的下标
+            //遍历是否有使用过的记录
+            for(var j in ecoupon.appliedEcoupons){
+                if(ecoupon.appliedEcoupons[j].voucherId==ecoupon.availableEcoupons[i].voucherId){
+                    appliedIndex=j;
+                    break;
+                }
+            }
+            //如果有使用过的，则校验数量是否有剩余
+            if(appliedIndex>=0){
+                var appliedVoucher=ecoupon.appliedEcoupons[appliedIndex];
+                if(appliedVoucher.surplus>0){
+                    //已经有选择的，先暂时减少优惠金额
+                    var tempdiscountAmt=0;
+                    if(coupon.find("select[name='selectEcoupon']").val()){
+                        var voucherId = coupon.find("select[name='selectEcoupon']").val();
+                        var ecoupons = ecoupon.ecoupons;
+                        for(var j=0; j<ecoupons.length; j++){
+                            if(voucherId == ecoupons[j].voucherId){
+                                tempdiscountAmt = ecoupons[j].discountValue;
+                                break;
+                            }
+                        }
+                        summary.discountAmt=summary.discountAmt-parseFloat(tempdiscountAmt);
+                    }
+                    availableEcoupons.push(ecoupon.availableEcoupons[i]);
+                    summary.discountAmt=summary.discountAmt+parseFloat(tempdiscountAmt);
+                }
+            }else{
+                //已经有选择的，先暂时减少优惠金额
+                var tempdiscountAmt=0;
+                if(coupon.find("select[name='selectEcoupon']").val()){
+                    var voucherId = coupon.find("select[name='selectEcoupon']").val();
+                    var ecoupons = ecoupon.ecoupons;
+                    for(var j=0; j<ecoupons.length; j++){
+                        if(voucherId == ecoupons[j].voucherId){
+                            tempdiscountAmt = ecoupons[j].discountValue;
+                            break;
+                        }
+                    }
+                    summary.discountAmt=summary.discountAmt-parseFloat(tempdiscountAmt);
+                }
+                availableEcoupons.push(ecoupon.availableEcoupons[i]);
+                summary.discountAmt=summary.discountAmt+parseFloat(tempdiscountAmt);
+            }
+        }
+        if(coupon.find("select[name='selectEcoupon']").val()){
+            var isInclude=false;
+            var selectVoucherId=coupon.find("select[name='selectEcoupon']").val();
+            for(var i in availableEcoupons){
+                if(availableEcoupons[i].voucherId==selectVoucherId){
+                    isInclude=true;
+                    break;
+                }
+            }
+            if(!isInclude){
+                var vvs = ecoupon.ecoupons;
+                var selectVoucher = null;
+                for(var i=0; i<vvs.length; i++){
+                    if(vvs[i].voucherId == selectVoucherId){
+                        selectVoucher = vvs[i];
+                        break;
+                    }
+                }
+                //selectVoucher.current = true;
+                availableEcoupons.push(selectVoucher);
+            }
+        }
+        selectWhetherUse(coupon, availableEcoupons);
+        return availableEcoupons;
+    }
+
+    //选择Ecoupon后-根据选择的值做select/change/remove
+    function afterSelectEcoupon(oldVal, select){
+        var selectId = $(select).parent().parent().attr("id");
+        var newVal = $(select).val();
+        if(!newVal){
+            var oldEcoupon = null;
+            var vs = ecoupon.ecoupons;
+            for(var i=0; i<vs.length; i++){
+                if(vs[i].voucherId == oldVal){
+                    oldEcoupon = vs[i];
+                    break;
+                }
+            }
+            removeEcoupon(oldEcoupon,selectId);
+            return;
+        }
+        var oldEcoupon = null;
+        var newEcoupon = null;
+        var avs = ecoupon.availableEcoupons;
+        var count = 0;
+        for(var i=0; i<avs.length; i++){
+            if(avs[i].voucherId == oldVal){
+                oldEcoupon = avs[i];
+                count++;
+                if(count > 1){
+                    break;
+                }
+            }
+            if(avs[i].voucherId == newVal){
+                newEcoupon = avs[i];
+                count++;
+                if(count > 1){
+                    break;
+                }
+            }
+        }
+        if(oldVal){
+            changeEcoupon(oldEcoupon, newEcoupon, selectId);
+        }else{
+            selectEcoupon(newEcoupon, selectId);
+        }
+    }
+
+    /**
+     * Ecoupon选中
+     * @param selectVoucher 选择的Ecoupon
+     * @param index 订单行的下标
+     */
+    function selectEcoupon(selectEcoupon,selectId){
+        var isUsed=false;//是否已经有使用过
+        for(var i in ecoupon.appliedEcoupons){
+            if(ecoupon.appliedEcoupons[i].voucherId==selectEcoupon.voucherId){
+                isUsed=true;
+                //可用数量-1
+                voucher.appliedEcoupons[i].surplus=voucher.appliedEcoupons[i].surplus-1;
+                break;
+            }
+        }
+        if(!isUsed){
+            //可用数量-1
+            selectEcoupon.surplus=selectEcoupon.surplus-1;
+            ecoupon.appliedEcoupons.push(selectEcoupon);
+        }
+        //界面操作，金额扣减等.
+        $("#"+selectId).find("span[name='discountAmt']").text("-"+selectEcoupon.discountValue);
+        ecoupon.discountAmt = Number(ecoupon.discountAmt+selectEcoupon.discountValue);
+        var ordertotalAmt = parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2);
+        var disAtm = parseFloat(ecoupon.discountAmt).toFixed(2);
+        if(ecoupon.discountAmt > ordertotalAmt){
+            $.dialog.warning("<@spring.message 'mws.dialog.confirm'/>", "Ecoupon<@spring.message 'mws.orderhistory.more_than_order_amt'/>");
+            $("#ecouponTotal").text(ordertotalAmt);
+            return;
+        }else{
+            $("#ecouponTotal").text(disAtm);
+        }
+        $("#settleSubTotal").text(((parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2))
+            -parseFloat($("#ecouponTotal").text()).toFixed(2)
+            -parseFloat($("#rbTotal").text()).toFixed(2)).toFixed(2));
+        if($("#settleSubTotal").text() < 0){
+            $("#settleSubTotal").text(0);
+            $.dialog.warning("<@spring.message 'mws.dialog.confirm'/>", "<@spring.message 'mws.orderhistory.more_than_order_amt'/>");
+        }
+        return;
+    }
+
+    /**
+     * 更改使用的Ecoupon
+     * @param oldVoucher 旧的Ecoupon
+     * @param newVoucher 新的Ecoupon
+     * @param index 订单行的下标
+     */
+    function changeEcoupon(oldEcoupon, newEcoupon, selectId){
+        removeEcoupon(oldEcoupon,selectId);
+        selectEcoupon(newEcoupon,selectId);
+    }
+
+    /**
+     * 删除一张使用的Ecoupon
+     * @param removed 删除的Ecoupon
+     * @param index 订单行的下标
+     */
+    function removeEcoupon(removed,selectId){
+        var isAddToAvailable=false;//是否添加回可用Ecoupon标记
+        for(var i in ecoupon.appliedEcoupons){
+            if(ecoupon.appliedEcoupons[i].voucherId==removed.voucherId){
+                //可用数量+1
+                ecoupon.appliedEcoupons[i].surplus=ecoupon.appliedEcoupons[i].surplus+1;
+                //最大可用量是Ecoupon数量时
+                if(ecoupon.appliedEcoupons[i].surplus<=ecoupon.appliedEcoupons[i].quantity){
+                    //当前可用量与Ecoupon的可用量相等时，说明该Ecoupon没有被使用，须从使用池删除.
+                    if(ecoupon.appliedEcoupons[i].surplus==ecoupon.appliedEcoupons[i].quantity){
+                        ecoupon.appliedEcoupons.splice(i,1);
+                    }
+                    var isAddToAvailable=true;
+                }
+                break;
+            }
+        }
+        //可用Ecoupon添加
+        if(isAddToAvailable){
+            var isInclude=false;
+            for(var i in ecoupon.availableEcoupons){
+                if(ecoupon.availableEcoupons[i].voucherId==removed.voucherId){
+                    isInclude=true;
+                    break;
+                }
+            }
+            if(!isInclude){
+                ecoupon.availableEcoupons.push(removed);
+            }
+        }
+
+        $("#"+selectId).find("span[name='discountAmt']").text(0);
+        ecoupon.discountAmt = ecoupon.discountAmt -removed.discountValue;
+        $("#ecouponTotal").text(parseFloat(ecoupon.discountAmt).toFixed(2));
+        $("#settleSubTotal").text(((parseFloat((summary.subtotal+summary.freight-summary.discountAmt).toFixed(currencyPrecision)).toFixed(2))
+            -parseFloat($("#ecouponTotal").text()).toFixed(2)
+            -parseFloat($("#rbTotal").text()).toFixed(2)).toFixed(2));
+        return;
+    }
+    /**
+     * 获取使用的Ecoupon集合.
+     * @return array
+     */
+    /* function getUseVoucher(){
+        var results=[];
+        for(var i in ecoupon.appliedEcoupons){
+            var appliedEcoupon=ecoupon.appliedEcoupons[i];
+            for(var index=appliedEcoupon.surplus;index<appliedEcoupon.quantity;index++){
+                results.push(appliedEcoupon);
+            }
+        }
+        return results;
+    } */
+
+
+    //初始化配送方式下拉框
+    function selectWhetherUse(coupon, availableEcoupons){
+        var select = coupon.find("select[name='selectEcoupon']");
+        var current = select.val();
+        select.empty();
+        if(availableEcoupons.length > 0){
+            select.append("<option value=''><@spring.message 'mws.orderhistory.not_use_ecoupon'/></option>");
+        }else{
+            select.append("<option value=''><@spring.message 'mws.orderhistory.not_ecoupon_use'/>");
+        }
+        for(var i=0; i<availableEcoupons.length; i++){
+            if(current == availableEcoupons[i].voucherId){
+                select.append("<option selected value='"+availableEcoupons[i].voucherId+"'>"+availableEcoupons[i].name+"</option>");
+            }else{
+                select.append("<option value='"+availableEcoupons[i].voucherId+"'>"+availableEcoupons[i].name+"</option>");
+            }
+        }
+    }
+
+</script>
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">
+
+

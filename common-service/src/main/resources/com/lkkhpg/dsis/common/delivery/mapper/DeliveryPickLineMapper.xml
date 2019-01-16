@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.delivery.mapper.DeliveryPickLineMapper" >
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickLine" >
+        <id column="PICK_RELEASE_LINE_ID" property="pickReleaseLineId" jdbcType="DECIMAL" />
+        <result column="PICK_RELEASE_ID" property="pickReleaseId" jdbcType="DECIMAL" />
+        <result column="ORDER_LINE_ID" property="orderLineId" jdbcType="DECIMAL" />
+        <result column="INV_ORG_ID" property="invOrgId" jdbcType="DECIMAL" />
+        <result column="PICK_QUANTITY" property="pickQuantity" jdbcType="DECIMAL" />
+
+        <result column="LINE_ID" property="lineId" jdbcType="DECIMAL" />
+        <result column="parent_line_id" property="parentLineId" jdbcType="DECIMAL" />
+        <result column="item_type" property="itemType" jdbcType="VARCHAR" />
+
+        <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL" />
+        <result column="HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+        <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+        <result column="RETURN_QTY" property="returnQty" jdbcType="DECIMAL" />
+        <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR" />
+        <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+        <result column="UOM_CODE" property="uomCode" jdbcType="VARCHAR" />
+        <result column="UOM_NAME" property="uomName" jdbcType="VARCHAR" />
+        <result column="QUANTITY" property="quantity" jdbcType="DECIMAL" />
+        <!-- 销售区域名称 -->
+        <result column="NAME" property="name" jdbcType="VARCHAR" />
+        <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+        <result column="DELIVERY_TYPE" property="deliveryType" jdbcType="VARCHAR" />
+        <!-- 供货组织名称 -->
+        <result column="NAME" property="invOrgName" jdbcType="VARCHAR"/>
+        <result column="INVENTORY" property="inventory" jdbcType="DECIMAL" />
+        <result column="DELIVERY_STATUS" property="deliveryStatus" jdbcType="VARCHAR"/>
+        <result column="USER_NAME" property="userName" jdbcType="VARCHAR"/>
+        <result column="PHONE" property="phone" jdbcType="VARCHAR"/>
+        <result column="ADDRESS" property="address" jdbcType="VARCHAR"/>
+        <result column="CITY_CODE" property="cityCode" jdbcType="VARCHAR"/>
+        <result column="STATE_CODE" property="stateCode" jdbcType="VARCHAR"/>
+        <result column="COUNTRY_CODE" property="countryCode" jdbcType="VARCHAR"/>
+        <result column="DEFAULT_FLAG" property="defaultFlag" jdbcType="VARCHAR"/>
+        <result column="SUPPLY_TYPE" property="supplyType" jdbcType="VARCHAR"/>
+
+        <result column="PAY_DATE" property="payDate" jdbcType="TIMESTAMP"/>
+        <result column="ORDER_TYPE" property="orderType" jdbcType="VARCHAR"/>
+        <result column="MEMBER_NUMBER" property="memberNumber" jdbcType="VARCHAR"/>
+        <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR"/>
+        <result column="INVOICE_NUMBER" property="invoiceNumber" jdbcType="VARCHAR"/>
+        <result column="TRANSACTION_DOCUMENT" property="transactionDocument" jdbcType="VARCHAR"/>
+        <!--add to 2018.3.1 by furong.tang-->
+        <result column="ORDER_STATUS" property="orderStatus" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List" >
+    PICK_RELEASE_LINE_ID, PICK_RELEASE_ID, ORDER_LINE_ID, INV_ORG_ID, PICK_QUANTITY, 
+    OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+    LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+    ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+    ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+
+    <insert id="insertPickLine" parameterType="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickLine">
+        <selectKey resultType="java.lang.Long" keyProperty="pickReleaseLineId" order="BEFORE">
+            select dm_pick_release_line_s.nextval from dual
+        </selectKey>
+        insert into dm_pick_release_line(
+        pick_release_line_id,
+        pick_release_id,
+        order_line_id,
+        inv_org_id,
+        pick_quantity,
+        OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID,
+        CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3,
+        ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+        )
+        values(
+        #{pickReleaseLineId,jdbcType=DECIMAL},
+        #{pickReleaseId,jdbcType=DECIMAL},
+        #{orderLineId,jdbcType=DECIMAL},
+        #{invOrgId,jdbcType=DECIMAL},
+        #{pickQuantity,jdbcType=DECIMAL},
+        1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR},
+        #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR},
+        #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR},
+        #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR},
+        #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR},
+        #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <select id="selectOrder" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickLine">
+        SELECT DISTINCT sso.NAME,
+        oso.sales_org_id,
+        oso.order_number,
+        oso.order_status,       
+        oso.delivery_type,
+        oso.pay_date,
+        oso.order_type,
+        oso.invoice_number,
+        m.member_code MEMBER_NUMBER,
+        case when m.member_type = 'COMP' then m.ref_company_en else m.member_name end member_name,
+        <!-- oop.transaction_number TRANSACTION_DOCUMENT, -->
+        site.NAME AS username,
+        site.phone,
+        site.country_code,
+        site.state_code,
+        site.city_code,
+        site.ADDRESS
+        FROM om_sales_order oso
+        LEFT JOIN mm_member_v m on m.member_id = oso.member_id
+        LEFT JOIN OM_SALES_SITES site
+        ON oso.HEADER_ID = site.HEADER_ID
+        AND SITE.SITE_TYPE = 'SHIP'
+        AND SITE.AUTOSHIP_FLAG = 'N', spm_sales_organization_tl sso,
+        om_sales_line osl
+        <!-- , om_order_payment oop -->
+        WHERE oso.sales_org_id = sso.sales_org_id
+        and osl.header_id = oso.header_id
+        <!-- and oop.order_header_id = oso.header_id -->
+        and sso.lang = #{request.locale,jdbcType=VARCHAR}
+        <!--modified by furong.tang-->
+        <!--AND oso.order_status = 'COMP'-->
+        AND oso.order_status IN ('COMP','REFUN')
+        and coalesce(osl.unpick_quantity, 0) > 0
+        and oso.sales_org_id in (select sura.assign_value from sys_user_role_assign sura where sura.assign_type = 'SALES' and sura.role_id = #{request.roleId,jdbcType=DECIMAL} and sura.user_id = #{request.userId,jdbcType=DECIMAL})
+        <if test="orderNumber != null" >
+            AND Upper(oso.order_number) like concat('%',concat(Upper(#{orderNumber,jdbcType = VARCHAR}),'%'))
+        </if>
+        <if test="orderType != null" >
+            and oso.order_type = #{orderType,jdbcType = VARCHAR}
+        </if>
+        <if test="deliveryType != null" >
+            and oso.delivery_type = #{deliveryType,jdbcType = VARCHAR}
+        </if>
+        <if test="payDateFrom != null" >
+            and to_char(oso.pay_date,'yyyy-MM-dd') >= to_char(#{payDateFrom,jdbcType = TIMESTAMP},'yyyy-MM-dd')
+        </if>
+        <if test="payDateTo != null" >
+            and to_char(oso.pay_date,'yyyy-MM-dd') &lt;= to_char(#{payDateTo,jdbcType = TIMESTAMP},'yyyy-MM-dd')
+        </if>
+        <if test="memberNumber != null" >
+            AND Upper(m.member_code) like concat('%',concat(Upper(#{memberNumber,jdbcType = VARCHAR}),'%'))
+        </if>
+        <if test="memberName != null" >
+            AND Upper(m.member_name) like concat('%',concat(Upper(#{memberName,jdbcType = VARCHAR}),'%'))
+        </if>
+        <if test="invoiceNumber != null" >
+            AND Upper(oso.invoice_number) like concat('%',concat(Upper(#{invoiceNumber,jdbcType = VARCHAR}),'%'))
+        </if>
+        <!-- <if test="transactionDocument != null" >
+            AND Upper(oop.transaction_number) like concat('%',concat(Upper(#{transactionDocument,jdbcType = VARCHAR}),'%'))
+        </if> -->
+        order by oso.sales_org_id,oso.order_number desc
+    </select>
+
+    <select id="selectOrderLine" resultMap="BaseResultMap" >
+        SELECT DISTINCT oso.header_id
+        ,oso.order_number
+        ,coalesce(osl.quantity, 0) quantity
+        ,osl.parent_line_id
+        ,osl.line_id
+        ,osl.item_type
+        ,ipv.organization_id inv_org_id
+        ,(select iotl.NAME from SPM_INV_ORGANIZATION_TL iotl where iotl.INV_ORG_ID = ipv.organization_id and iotl.LANG = #{request.locale,jdbcType=VARCHAR} ) NAME
+        ,ib.item_id
+        ,ib.item_number
+        ,ib.item_name
+        ,ib.uom_code
+        ,(select uomtl.name from INV_UNIT_OF_MEASURE_TL uomtl where uomtl.uom_code= ib.uom_code and uomtl.LANG = #{request.locale,jdbcType=VARCHAR}) uom_name
+        ,coalesce(osl.unpick_quantity, 0) surplusqty
+        ,coalesce(oqv.quantity, 0) inventory
+        ,CASE
+        WHEN coalesce(osl.unpick_quantity, 0) &gt;
+        coalesce(oqv.quantity, 0) THEN
+        coalesce(oqv.quantity, 0)
+        ELSE
+        coalesce(osl.unpick_quantity, 0)
+        END pick_quantity
+        FROM om_sales_line osl
+        LEFT JOIN om_sales_order oso
+        ON oso.header_id = osl.header_id
+        LEFT JOIN inv_item_b ib
+        ON osl.item_id = ib.item_id
+        LEFT JOIN INV_ITEM_PROPERTY_V ipv
+        ON   ipv.item_id = ib.item_id and ipv.ORGANIZATION_ID= osl.default_inv_org_id and ipv.ENABLED_FLAG = 'Y'
+        <!--   #POS2SUPT-729 2016-12-26 17:06 BEGIN -->
+        <!--   LEFT JOIN INV_ONHAND_QUANTITY_V oqv -->
+        <!--     ON oqv.organization_id = ipv.ORGANIZATION_ID -->
+        <!--    AND oqv.item_id = ipv.COUNT_ITEM_ID -->
+        left outer join (SELECT ioq.organization_id,
+        ioq.subinventory_id,
+        ioq.location_id,
+        ioq.item_id,
+        ioq.uom_code,
+        SUM(ioq.quantity)<!-- - coalesce((SELECT SUM(coalesce(dodl.outstanding_qty,0))
+        FROM om_sales_line          osl
+        ,dm_order_delivery      dod
+        ,dm_order_delivery_line dodl
+        ,inv_item_property_v v
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND osl.item_id = v.item_id
+        and v.organization_id = dod.inv_org_id
+        and v.count_item_id = ioq.item_id
+        AND dod.delivery_status in ('PDDL','NEW'))
+        ,0)--> quantity
+        FROM inv_onhand_quantity ioq
+        LEFT OUTER JOIN INV_LOT il
+        on il.item_id = ioq.item_id and ioq.organization_id = il.organization_id and  ioq.lot_number = il.lot_number
+        LEFT OUTER JOIN inv_item_b iib
+        on iib.item_id = ioq.item_id
+        where ((iib.lot_ctrl_flag = 'Y' and il.deliver_enabled_flag = 'Y') or (iib.lot_ctrl_flag = 'N'))
+        GROUP BY ioq.organization_id,
+        ioq.subinventory_id,
+        ioq.location_id,
+        ioq.item_id,
+        <!--ioq.lot_number,-->
+        ioq.uom_code) oqv
+        on oqv.organization_id = ipv.ORGANIZATION_ID
+        and oqv.item_id = ipv.count_item_id
+        <!--   #POS2SUPT-729 2016-12-26 17:06 END -->
+        WHERE oso.order_number = #{orderNumber,jdbcType=VARCHAR}
+        AND oso.order_status in ('COMP','CONF','REFUN')
+        AND coalesce(osl.unpick_quantity, 0) > 0
+        ORDER BY  CONCAT(parent_line_id, line_id)
+    </select>
+
+    <select id="orderNumberLike" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickLine">
+        SELECT
+        SSOT.name,
+        oso.SALES_ORG_ID,
+        oso.order_number
+        FROM
+        om_sales_order oso
+        LEFT OUTER JOIN SPM_SALES_ORGANIZATION_TL SSOT on oso.SALES_ORG_ID = SSOT.SALES_ORG_ID AND SSOT.LANG=#{request.locale,jdbcType=VARCHAR}
+        WHERE oso.order_status in ('COMP','CONF')
+        AND oso.SALES_ORG_ID = #{request.salesOrgId,jdbcType=DECIMAL}
+        <if test="orderNumber != null">
+            AND Upper(oso.order_number) like concat('%',concat(Upper(#{orderNumber,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+            <bind name = '_sortorder' value='@com.lkkhpg.dsis.platform.util.CommonUtils@filterString(sortorder)'/>
+            ORDER BY ${_colName} ${_sortorder}
+        </if>
+
+    </select>
+
+    <select id="queryInventory" resultMap="BaseResultMap" >
+        select 
+            sum (qv.quantity) as inventory
+        from INV_ONHAND_QUANTITY_V  qv,
+             INV_ITEM_PROPERTY_V pv
+             
+        where pv.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+         and  pv.ORGANIZATION_ID = #{invOrgId,jdbcType=DECIMAL}
+         and  qv.ITEM_ID = pv.COUNT_ITEM_ID
+         and  qv.ORGANIZATION_ID = #{invOrgId,jdbcType=DECIMAL}
+    </select>
+
+    <select id="queryInvOrgs" resultType="java.util.Map" parameterType="java.lang.String">
+        SELECT
+            ss.INV_ORG_ID,
+            siot."NAME"
+        from 
+            SPM_INV_ORGANIZATION_B siob left outer join SPM_INV_ORGANIZATION_TL siot on siob.inv_org_id = siot.inv_org_id and siot.lang=#{request.locale,jdbcType=VARCHAR},
+            SPM_SUPPLY ss,
+            om_sales_order oso
+        WHERE
+            siob.INV_ORG_ID =  ss.INV_ORG_ID          
+            AND ss.SALES_ORG_ID =  oso.SALES_ORG_ID    
+            and ss.SUPPLY_TYPE = 'org'
+            and oso.order_number = #{orderNumber,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectInvOrgBySite" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickLine">
+        SELECT sup.inv_org_id
+              ,siot.name
+          FROM spm_supply sup
+          LEFT JOIN spm_inv_organization_tl siot ON siot.inv_org_id = sup.inv_org_id and siot.lang = #{request.locale,jdbcType=VARCHAR},
+             INV_ITEM_PROPERTY_V propertyv
+         WHERE sup.supply_type = 'SITE'
+           AND sup.country_code = #{countryCode,jdbcType=VARCHAR}
+           AND (sup.state_code = #{stateCode,jdbcType=VARCHAR} or sup.state_code IS NULL)
+           AND (sup.city_code = #{cityCode,jdbcType=VARCHAR} or sup.city_code IS NULL)
+           AND propertyv.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+           AND propertyv.ORGANIZATION_ID = sup.INV_ORG_ID
+     UNION
+       SELECT 
+          sup.INV_ORG_ID,
+          siot.name
+        FROM
+            SPM_SUPPLY sup
+            LEFT OUTER JOIN SPM_INV_ORGANIZATION_TL siot ON siot.inv_org_id = sup.inv_org_id AND siot.lang = #{request.locale,jdbcType=VARCHAR},
+            INV_ITEM_PROPERTY_V  propertyv
+        WHERE
+           sup.SUPPLY_TYPE = 'ORG'
+           AND sup.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+           AND  propertyv.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+           AND propertyv.ORGANIZATION_ID = sup.INV_ORG_ID 
+                
+    </select>
+
+    <select id="selectInvOrgByOrg" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickLine">
+        SELECT distinct
+          SS.INV_ORG_ID,
+          siot.name
+        FROM
+            SPM_SUPPLY SS
+            LEFT OUTER JOIN SPM_INV_ORGANIZATION_TL siot ON siot.inv_org_id = SS.inv_org_id AND siot.lang = #{request.locale,jdbcType=VARCHAR},
+            INV_ITEM_PROPERTY_V  propertyv
+        WHERE
+           SS.SUPPLY_TYPE = 'ORG'
+           AND SS.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+           AND  propertyv.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+           AND propertyv.ORGANIZATION_ID = SS.INV_ORG_ID 
+    </select>
+
+    <select id="getOrgByOrderNumber" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.delivery.dto.DeliveryPickLine">
+        SELECT
+            tbl.INV_ORG_ID,
+            tbl.NAME
+        FROM
+        (SELECT DISTINCT
+            CASE
+            WHEN SS.SUPPLY_TYPE = 'SITE' THEN 1
+            WHEN SS.SUPPLY_TYPE = 'ORG' THEN 2
+            END AS PRIORITY,
+            SS.INV_ORG_ID,
+            siot.NAME
+        FROM
+            OM_SALES_ORDER oso,
+            SPM_SUPPLY SS,
+            SPM_INV_ORGANIZATION_B siob
+        LEFT OUTER JOIN SPM_INV_ORGANIZATION_TL siot ON siob.inv_org_id = siot.inv_org_id
+        WHERE
+            oso.sales_org_id = ss.sales_org_id
+        AND ss.inv_org_id = siob.inv_org_id
+        AND oso.order_number = #{orderNumber,jdbcType=VARCHAR}
+        AND (
+            (SS.SUPPLY_TYPE = 'SITE' AND SS.DEFAULT_FLAG = 'Y')
+            OR (SS.SUPPLY_TYPE = 'ORG' AND SS.DEFAULT_FLAG = 'Y')
+        )
+        ORDER BY PRIORITY asc) tbl
+        WHERE ROWNUM &lt; 2
+    </select>
+</mapper>

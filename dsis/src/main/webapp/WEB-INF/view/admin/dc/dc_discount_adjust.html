@@ -1,0 +1,1292 @@
+<#--
+* description: 创建出入库单界面
+* version: 1.0
+* author: mclin
+* .
+*
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/common/code?
+        stockIoStatus=DC.ADJUSTMENT_STATUS&adjustType=DC.ADJUSTMENT_TYPE2&
+        stockOutReason=DC.ADJUSTMENT_REASON2&isOrNotArray=SYS.YES_NO"
+        type="text/javascript">
+</script>
+
+<form id="stockio_create_form" method="post"></form>
+<form id="stockio_create_btns"></form>
+<div id="stockio_create_grid" style="margin: 0; padding: 0"></div>
+<script type="text/javascript">
+    $(function () {
+    <#assign isedit = (RequestParameters.isedit !'0')/>
+
+        /* 下拉框选中事件标志，防止一聚焦下拉框就触发事件 */
+        var flag1 = 1; //包装类型下拉框
+        var flag4 = 1; //库存组织下拉框
+
+        var uomFlag = false; //标志
+
+        /* 调整类型入库代码 */
+        var stkin = 'DCIN';
+        var stadj = 'ADIN';
+        var stkot = 'ADDE';
+        var useot = 'USED';
+
+        /* 各个调整类型的出库原因  */
+        var stkinStockOutReason = new Array();
+        var stadjStockOutReason = new Array();
+        var stkotStockOutReason = new Array();
+        var useotStockOutReason = new Array();
+
+        /* 根据 调整类型 确定 出库原因 的范围 */
+        function getStockOutReason() {
+            for (i = 0; i < stockOutReason.length; i++) {
+                if (stockOutReason[i].description.indexOf(stkin) > -1) {
+                    stkinStockOutReason.push(stockOutReason[i]);
+                }
+                if (stockOutReason[i].description.indexOf(stadj) > -1) {
+                    stadjStockOutReason.push(stockOutReason[i]);
+                }
+                if (stockOutReason[i].description.indexOf(stkot) > -1) {
+                    stkotStockOutReason.push(stockOutReason[i]);
+                }
+                if (stockOutReason[i].description.indexOf(useot) > -1) {
+                    useotStockOutReason.push(stockOutReason[i]);
+                }
+            }
+        }
+
+        getStockOutReason();
+
+        /* 获取Cookie中的值 */
+        function getCookie(cookie_name) {
+            var allcookies = document.cookie;
+            var cookie_pos = allcookies.indexOf(cookie_name);//索引的长度
+
+            if (cookie_pos != -1) {
+                // 把cookie_pos放在值的开始，只要给值加1即可。
+                cookie_pos += cookie_name.length + 1;
+                var cookie_end = allcookies.indexOf(";", cookie_pos);
+                if (cookie_end == -1) {
+                    cookie_end = allcookies.length;
+                }
+                var value = unescape(allcookies.substring(cookie_pos, cookie_end));
+            }
+            return value;
+        }
+
+        /* 新建订单状态 */
+        var nw = 'NEW';
+        var cmp = 'COMP';
+        var count = 0;
+
+        /* 处理日起和创建日期默认值 */
+        var thisDate = new Date(${.now?long});
+
+        /* 表单数据暂存 */
+        var formExData = null;
+
+        /* 生成库存组织下拉框 */
+        makeOrgSelection();
+
+
+        /* 保存下拉框选中的 */
+        var tmpType = null;
+
+        /* 是否重置回原值*/
+        var isResetOldValue = true;
+        var oldValue = null;
+
+        /* 根据 salesOrgId 动态设置 code */
+        function getOperationUnitId(salesOrgId) {
+            var code;
+            for (var i = 0; i < window.orgSelLen; i++) {
+                if (orgSel[i].salesOrgId == salesOrgId) {
+                    if (orgSel[i].code == null) {
+                        code = '';
+                    } else {
+                        code = orgSel[i].code;
+                    }
+                    return code;
+                }
+            }
+        }
+
+        /* ----------------------------------------------------------------------------
+                                            页面表单
+           ---------------------------------------------------------------------------- */
+        window['stockio_create_form'] = $("#stockio_create_form").ligerForm({
+            inputWidth: 200,
+            space: 15,
+            fields: [
+                /* 出入库ID */
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.trxid"/>',
+                    type: 'text',
+                    name: 'discountTrxHeadId'
+                },
+                /* 单据编号 */
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.docno"/>',
+                    type: 'text', name: 'discountTrxNum', readonly: true
+                },
+                /* 业务实体ID */
+                {
+                    label: 'aaa ',
+                    type: 'text',
+                    name: 'code',
+                    newline: false,
+                    readonly: true,
+                    options: {
+                        value: getOperationUnitId(_salesOrgId)
+                    }
+                },
+                /* 库存组织 */
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition"/>',
+                    type: 'select', name: 'salesOrgId', newline: false,
+                    options: {
+                        data: orgSel,
+                        valueField: 'salesOrgId',
+                        textField: 'name',
+                        value: _salesOrgId,
+                        cancelable: false,
+                        onBeforeSelect: function () { //该事件用于记录原值以及将重复标记置为true
+                            isResetOldValue = true;
+                            oldValue = liger.get('salesOrgId').getValue();
+                        },
+                        onSelected: function (newKey, newValue) {
+
+                            // 根据 salesOrgId 动态设置 code
+                            liger.get('code').setValue(getOperationUnitId(newKey));
+                            // 清除行信息
+                            var createGrid = window['stockio_create_grid'];
+                            if (isResetOldValue) {
+                                if (createGrid != undefined && createGrid.getData().length > 0) {
+                                    $.ligerDialog.confirm('<@spring.message "dsis.lkkhpg.tip.change_confirm"/>', $l('sys.hand.tip.info'), function (yes) {
+                                        if (yes) {
+                                            //清空表格
+                                            createGrid.currentData = [];
+                                            createGrid.reRender();
+                                            isResetOldValue = true;
+                                        } else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+                                            isResetOldValue = false;
+                                            liger.get('salesOrgId').setValue(oldValue); //重置回原值
+                                        }
+                                    });
+                                }
+                            }
+                        },
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                /* 创建日期 */
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.creationdate"/>',
+                    type: 'date', newline: false, name: 'creationDate',
+                    options: {
+                        format: 'yyyy-MM-dd hh:mm:ss',
+                        showTime: true,
+                        readonly: true,
+                        value: thisDate
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                /* 处理日期 */
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.trxdate"/>',
+                    type: 'date', newline: true, name: 'processDate',
+                    options: {
+                        format: 'yyyy-MM-dd hh:mm:ss',
+                        showTime: true,
+                        value: thisDate,
+                        onChangeDate: function (value) {
+                            var now = new Date(${.now?long});
+                            var processDate = new Date(value).getTime();
+                            if (processDate > now) {
+                                $.ligerDialog.warn('<@spring.message "msg.warning.inventory.trx_date_must_less_than_now_date"/>', null, function () {
+                                    $.ligerui.get('processDate').setValue(now);
+                                });
+                            }
+                        }
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                /* 调整类型 */
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.trxtype"/>',
+                    type: 'select', newline: false, name: 'adjustType',
+                    options: {
+                        valueField: "value",
+                        textField: "meaning",
+                        data: adjustType,
+                        cancelable: false,
+                        onBeforeSelect: function () { //该事件用于记录原值以及将重复标记置为true
+                            isResetOldValue = true;
+                            oldValue = liger.get('adjustType').getValue();
+                        },
+                        onSelected: function (newKey, newValue) {
+                            if (isResetOldValue) {//如果重复标记为true
+                                var createGrid = window['stockio_create_grid'];
+                                if (createGrid != undefined && createGrid.getData().length > 0) {
+                                    $.ligerDialog.confirm('<@spring.message "dsis.lkkhpg.tip.change_confirm"/>', $l('sys.hand.tip.info'), function (yes) {
+                                        if (yes) {
+                                            //清空表格
+                                            createGrid.currentData = [];
+                                            createGrid.reRender();
+
+                                            var input = $('input[id$="_adjustReason"]');
+                                            var span = input.parents('li').next('li').eq(0).children('span');
+                                            var selection = $.ligerui.get("adjustReason");
+                                            if (newKey == stkin) {//入库
+                                                if (stkinStockOutReason.length == 0) {
+                                                    selection.set({
+                                                        'disabled': true,
+                                                        'cancelable': false,
+                                                        'data': stkinStockOutReason,
+                                                        'value': ''
+                                                    });
+                                                    $('#manualEnter').css("display", 'block');
+                                                } else {
+                                                    selection.set({
+                                                        //'disabled': true,
+                                                        'cancelable': false,
+                                                        'data': stkinStockOutReason,
+                                                        'value': stkinStockOutReason[0].value
+                                                    });
+                                                    $('#manualEnter').css("display", 'block');
+                                                }
+                                            } else if (newKey == stadj) {//盘盈
+                                                if (stadjStockOutReason.length == 0) {
+                                                    selection.set({
+                                                        'disabled': true,
+                                                        'cancelable': false,
+                                                        'data': stadjStockOutReason,
+                                                        'value': ''
+                                                    });
+                                                    $('#manualEnter').css("display", 'block');
+                                                } else {
+                                                    selection.set({
+                                                        //'disabled': true,
+                                                        'cancelable': false,
+                                                        'data': stadjStockOutReason,
+                                                        'value': stadjStockOutReason[0].value
+                                                    });
+                                                    $('#manualEnter').css("display", 'block');
+                                                }
+                                            }else  if (newKey == stkot) {//出库
+                                                if (stkotStockOutReason.length == 0) {
+                                                    selection.set({
+                                                        'disabled': false,
+                                                        'cancelable': false,
+                                                        'data': null,
+                                                        'value': ''
+                                                    });
+                                                    $('#lotNumberEnter').val(null);
+                                                    $('#manualEnter').css("display", 'none');
+                                                } else {
+                                                    selection.set({
+                                                        'disabled': false,
+                                                        'cancelable': false,
+                                                        'data': stkotStockOutReason,
+                                                        'value': stkotStockOutReason[0].value
+                                                    });
+                                                    $('#lotNumberEnter').val(null);
+                                                    $('#manualEnter').css("display", 'none');
+                                                }
+                                            } else  if (newKey == useot) {//出库
+                                                if (useotStockOutReason.length == 0) {
+                                                    selection.set({
+                                                        'disabled': false,
+                                                        'cancelable': false,
+                                                        'data': null,
+                                                        'value': ''
+                                                    });
+                                                    $('#lotNumberEnter').val(null);
+                                                    $('#manualEnter').css("display", 'none');
+                                                } else {
+                                                    selection.set({
+                                                        'disabled': false,
+                                                        'cancelable': false,
+                                                        'data': useotStockOutReason,
+                                                        'value': useotStockOutReason[0].value
+                                                    });
+                                                    $('#lotNumberEnter').val(null);
+                                                    $('#manualEnter').css("display", 'none');
+                                                }
+                                                stockio_create_form.setFieldValidate("adjustReason", {
+                                                    required: true
+                                                });
+                                            }
+                                            isResetOldValue = true;
+                                        } else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+                                            isResetOldValue = false;
+                                            liger.get('adjustType').setValue(oldValue); //重置回原值
+                                        }
+                                    })
+                                } else {
+                                    var input = $('input[id$="_adjustReason"]');
+                                    var span = input.parents('li').next('li').eq(0).children('span');
+                                    var selection = $.ligerui.get("adjustReason");
+                                    if (newKey == stkin) {//入库
+                                        if (stkinStockOutReason.length == 0) {
+                                            selection.set({
+                                                'disabled': false,
+                                                'cancelable': false,
+                                                'data': stkinStockOutReason,
+                                                'value': ''
+                                            });
+                                            $('#manualEnter').css("display", 'block');
+                                        } else {
+                                            selection.set({
+                                                'disabled': false,
+                                                'cancelable': false,
+                                                'data': stkinStockOutReason,
+                                                'value': stkinStockOutReason[0].value
+                                            });
+                                            $('#manualEnter').css("display", 'block');
+                                        }
+                                        stockio_create_form.setFieldValidate("adjustReason", {
+                                            required: true
+                                        });
+                                    } else if (newKey == stadj) {//盘盈
+                                        if (stadjStockOutReason.length == 0) {
+                                            selection.set({
+                                                'disabled': false,
+                                                'cancelable': false,
+                                                'data': stadjStockOutReason,
+                                                'value': ''
+                                            });
+                                            $('#manualEnter').css("display", 'block');
+                                        } else {
+                                            selection.set({
+                                                'disabled': false,
+                                                'cancelable': false,
+                                                'data': stadjStockOutReason,
+                                                'value': stadjStockOutReason[0].value
+                                            });
+                                            $('#manualEnter').css("display", 'block');
+                                        }
+                                        stockio_create_form.setFieldValidate("adjustReason", {
+                                            required: true
+                                        });
+                                    } else  if (newKey == stkot) {//出库STKOT
+                                        if (stkotStockOutReason.length == 0) {
+                                            selection.set({
+                                                'disabled': false,
+                                                'cancelable': false,
+                                                'data': stkotStockOutReason,
+                                                'value': ''
+                                            });
+                                            $('#lotNumberEnter').val(null);
+                                            $('#manualEnter').css("display", 'none');
+                                        } else {
+                                            selection.set({
+                                                'disabled': false,
+                                                'cancelable': false,
+                                                'data': stkotStockOutReason,
+                                                'value': stkotStockOutReason[0].value
+                                            });
+                                            $('#lotNumberEnter').val(null);
+                                            $('#manualEnter').css("display", 'none');
+                                        }
+                                        stockio_create_form.setFieldValidate("adjustReason", {
+                                            required: true
+                                        });
+                                    } else  if (newKey == useot) {//出库
+                                        if (useotStockOutReason.length == 0) {
+                                            selection.set({
+                                                'disabled': false,
+                                                'cancelable': false,
+                                                'data': null,
+                                                'value': ''
+                                            });
+                                            $('#lotNumberEnter').val(null);
+                                            $('#manualEnter').css("display", 'none');
+                                        } else {
+                                            selection.set({
+                                                'disabled': false,
+                                                'cancelable': false,
+                                                'data': useotStockOutReason,
+                                                'value': useotStockOutReason[0].value
+                                            });
+                                            $('#lotNumberEnter').val(null);
+                                            $('#manualEnter').css("display", 'none');
+                                        }
+                                        stockio_create_form.setFieldValidate("adjustReason", {
+                                            required: true
+                                        });
+                                    }
+                                    isResetOldValue = true;
+                                }
+                            }
+                        },
+                        value: adjustType[0].value
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                /* 出库原因 */
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.stockoutreason"/>',
+                    type: 'select', newline: false, name: 'adjustReason',
+                    options: {
+                        valueField: 'value',
+                        textField: 'meaning',
+                        data: stkinStockOutReason,
+                        value: stkinStockOutReason[0].value
+                    }
+                },
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.status"/>',
+                    type: 'select', newline: true, name: 'status',
+                    options: {
+                        valueField: "value",
+                        textField: "meaning",
+                        cancelable: false,
+                        data: stockIoStatus,
+                        value: stockIoStatus[0].value,
+                        readonly: true,
+                        onSelected: function (newKey, newValue) {
+                            /* ----------暂时存放---------- */
+                            var ioAddBtn = $("div[toolbarid=ioAddBtn]");
+                            var ioDelBtn = $("div[toolbarid=ioDelBtn]");
+//                            var tlDelBtn = $.ligerui.get("tlDelBtn");
+                            var tlSavBtn = $.ligerui.get("tlSavBtn");
+                            var tlSubBtn = $.ligerui.get("tlSubBtn");
+                            if (newKey != nw) {
+                                ioAddBtn.addClass('l-toolbar-item-disable');
+                                ioDelBtn.addClass('l-toolbar-item-disable');
+//                                tlDelBtn.set("disabled", true);
+                                tlSavBtn.set("disabled", true);
+                                tlSubBtn.set("disabled", true);
+                            } else {
+                                ioAddBtn.removeClass('l-toolbar-item-disable');
+                                ioDelBtn.removeClass('l-toolbar-item-disable');
+//                                tlDelBtn.set("disabled", false);
+                                tlSavBtn.set("disabled", false);
+                                tlSubBtn.set("disabled", false);
+                            }
+                        }
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                /* 创建人 */
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.creatorid"/>',
+                    type: 'text',
+                    name: 'creator',
+                    newline: false,
+                    readonly: true,
+                    options: {
+                        value: getCookie('loginName'),
+                    }
+                },
+                /* 备注 */
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.remarks"/>',
+                    type: 'textarea',
+                    newline: true,
+                    name: 'remark',
+                    editor: {
+                        height: 40
+                    }
+                }
+            ]
+        });
+        formExData = stockio_create_form.getData()
+        /* 默认出库原因必输 */
+        stockio_create_form.setFieldValidate("adjustReason", {
+            required: true
+        });
+
+        /* 隐藏业务实体ID, 用 type:hidden 将无法给业务实体ID动态赋值,所以采用 setVisible 方法 */
+        stockio_create_form.setVisible("code", false);
+        stockio_create_form.setVisible("discountTrxHeadId", false);
+
+        /* ----------------------------------------------------------------------------
+                                            页面表格
+        ---------------------------------------------------------------------------- */
+        window['stockio_create_grid'] = $("#stockio_create_grid").ligerGrid({
+            columns: [{
+                    name:'discountTrxLineId ',
+                    align:'left',
+                    width:160,
+                    hide:true
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.upstreamchange.memberid"/>',
+                    name: 'memberId', align: 'left', width: 160,
+                    textField: 'memberCode',
+                    valueField: 'memberId',
+                    editor:{
+                        type:'text'
+                    },validate: {
+                        required: true
+                    },
+                    editor:
+                        $.extend(
+                            ${lovService.getLov(base.contextPath,base.locale, "lov_memberdiscount")}, {
+                                onLoadData: function () {
+                                    this.setParm('salesOrgId', liger.get("salesOrgId").getValue());
+                                },
+                                onChangeValue: function (v) {
+                                    if (!v || v == null || v == "") {
+                                        var p = this.options;
+                                        var curRow = p.host_grid_row;
+                                        p.host_grid.updateRow(curRow, {
+                                            memberId: "",
+                                            memberCode: "",
+                                            memberName: "",
+                                            discountAmt:""
+                                        })
+                                    } else {
+                                        var p = this.options;
+                                        var curRow = p.host_grid_row;
+                                        p.host_grid.updateRow(curRow, {
+                                            memberId: "",
+                                            memberCode: "",
+                                            memberName: "",
+                                            discountAmt:""
+                                        })
+                                    }
+                                },
+                                onSelect: function (datas) {
+                                    var p = this.options;
+                                    var curRow = p.host_grid_row;
+                                    p.host_grid.updateRow(curRow, {
+                                        memberId: datas.data[0].memberId,
+                                        memberCode: datas.data[0].memberCode,
+                                        memberName: datas.data[0].chineseFirstName,
+                                        discountAmt: datas.data[0].discountAmt
+                                    });
+                                }
+                            }
+                        ),
+                    validate: {
+                        required: true
+                    }
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername"/>',
+                    name: 'memberName',
+                    align: 'left',
+                    readonly:true,
+                    width: 160,
+                    validate:{
+                        required:true
+                    }
+                },{
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.discountAmt"/>',
+                    name: 'discountAmt',
+                    align: 'left',
+                    width: 160,
+                    readonly:true,
+                    validate:{
+                        required:true
+                    }
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.totalprice"/>',
+                    name: 'discountAdjustAmt',
+                    align: 'left',
+                    width:160,
+                    editor:{
+                        type:'float'
+                    },
+                    validate:{
+                        required:true
+                    }
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.discount.prompt.attribute1"/>',
+                    name: 'attribute1',
+                    align: 'center',
+                    width: 160,
+                    editor:{
+                        type:'text'
+                    }
+                },
+                /* 单位 */
+                {
+                    display: '<@spring.message "sys.hand.common.comment"/>',
+                    name: 'remark',
+                    align: 'center',
+                    width: 260,
+                    editor:{
+                        type:'text'
+                    }
+                }
+            ],
+            toolbar: {
+                id: 'stockio_create_grid_tool_bar',
+                items: [
+                    {
+                        text: '<@spring.message "sys.hand.btn.new"/>',
+                        disable: false,
+                        id: 'ioAddBtn',
+                        click: function () {
+                            stockio_create_grid.addRow({});
+                            validateHasRows();
+                        },
+                        icon: 'add'
+                    },
+                    {line: true},
+                    {
+                        text: '<@spring.message "sys.hand.btn.delete"/>', disable: false, id: 'ioDelBtn',
+                        click: function () {
+                            gridDel({
+                                grid: stockio_create_grid,
+                                url: '${base.contextPath}/im/stocktrxdetails/delete',
+                                successTip: '<@spring.message "msg.info.system.delete_successful"/>'
+                            });
+                        }, icon: 'delete'
+                    }
+                ]
+            },
+            enabledEdit: true,
+            width: '99%',
+            height: '98%',
+            checkbox: true,
+            rownumbers: true,
+            usePager: false
+        });
+
+        /* ----------------------------------------------------------------------------
+                                            页面按钮
+        ---------------------------------------------------------------------------- */
+        window['stockio_create_btns'] = $("#stockio_create_btns").ligerForm({
+            buttons: [
+                /*{
+                text: '<@spring.message "sys.hand.btn.delete"/>',
+                disabled: false, width: 60,
+                id: 'tlDelBtn',
+                click: function () {
+                    if ($.ligerui.get("discountTrxNum").getValue() == null) {
+                        reSet();
+                        return;
+                    }
+                    /!* 删除整张出入单 *!/
+                    deleteFormAndGrid({
+                        form: stockio_create_form,
+                        grid: stockio_create_grid,
+                        gridName: 'discountTrxLineDto',
+                        url: "${base.contextPath}/im/stocktrx/allDelete"
+                    });
+                }
+            },*/ {
+                text: '<@spring.message "sys.hand.btn.save"/>',
+                disabled: false, width: 60,
+                id: 'tlSavBtn',
+                click: function () {
+                    saveForJust();
+                }
+            },
+                {
+                    text: '<@spring.message "sys.hand.btn.submit"/>',
+                    disabled: false, width: 60,
+                    id: 'tlSubBtn',
+                    click: function () {
+                        $.ligerDialog.confirm('<@spring.message "msg.warning.system.commit_or_not"/>', $l('sys.hand.tip.info'), function (yes) {
+                            if (yes) {
+
+                                submit();
+                            }
+                        })
+                    }
+                }
+            ]
+        });
+
+        /* ----------------------------------------------------------------------------
+                                    页面表格列逻辑设置
+        ---------------------------------------------------------------------------- */
+
+
+        /* 查询库存组织(下拉框) */
+        function makeOrgSelection() {
+            $.ajax({
+                url: '${base.contextPath}/spm/salesOrg/querySalesOrgByRole',
+                async: false,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                success: function (json) {
+                    window.orgSel = json.rows;
+                    if (orgSel != undefined) {
+                        window.orgSelLen = orgSel.length;
+                    } else {
+                        window.orgSelLen = 0;
+                    }
+                },
+                error: function () {
+                    return;
+                }
+            });
+        }
+
+
+        /* 重置页面上所有字段 */
+        function reSet() {
+            $.ligerui.get("discountTrxNum").set('value', '');
+            $.ligerui.get("processDate").set('value', null);
+            $.ligerui.get("creationDate").set('value', new Date(${.now?long}));
+            $.ligerui.get("adjustType").set('value', 'stock_out');
+            $.ligerui.get("status").set('value', nw);
+            var rowsCount = stockio_create_grid.getData().length;
+            if (rowsCount > 0) {
+                for (var i = 0; i < rowsCount; i++) {
+                    stockio_create_grid.select(i);
+                }
+                stockio_create_grid.deleteSelectedRow();
+            }
+            $('#remark').val(null);
+            //getLots();
+        }
+
+        /**
+         * 删除表单数据(头行数据可一起提交).
+         *
+         * <ul>
+         * <li>options.wrapArray: 是否包装成数组</li>
+         * <li>options.form: form对象</li>
+         * <li>options.grid: grid对象</li>
+         * <li>options.gridName: grid数据的name</li>
+         * <li>options.url: 提交的url</li>
+         * <li>options.success: success回调函数</li>
+         * <li>options.failure: failure回调函数</li>
+         * </ul>
+         * @param options
+         */
+        deleteFormAndGrid = function (options) {
+            $.ligerDialog.confirm(options.confirmTip || $l('sys.hand.tip.delete_confirm'), $l('sys.hand.tip.info'), function (yes) {
+                if (yes) {
+                    var form = options.form, grid = options.grid, url = options.url,
+                        wa = options.wrapArray || true;
+                    if (!form) return;
+                    if (!(form instanceof $.ligerui.controls.Form)) {
+                        form = $.ligerui.get(form);
+                    }
+                    var d = form.getData();
+                    for (var key in d) {
+                        if (!d[key]) {
+                            delete d[key]
+                        }
+                    }
+                    if (grid) {
+                        grid.endEdit();
+                        d[options.gridName || 'grid'] = grid.getData();
+                    }
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        dataType: "json",
+                        contentType: "application/json",
+                        data: JSON2.stringify(wa ? [d] : d),
+                        success: function (json) {
+                            options.json = json;
+                            Hap.defaultSuccessHandler(options)
+                            options = $.extend(options, {
+                                json: json,
+                                grid: grid,
+                                callback: function (json) {
+                                    window.top.f_removeCurrentTab();
+                                }
+                            })
+                            Hap.defaultSuccessHandler(options);
+                        },
+                        error: function () {
+                            $.ligerDialog.closeWaitting();
+                        }
+                    });
+                }
+            });
+        }
+
+        /**
+         * 提交出入库事务(头行数据可一起提交).
+         *
+         * <ul>
+         * <li>options.wrapArray: 是否包装成数组</li>
+         * <li>options.form: form对象</li>
+         * <li>options.grid: grid对象</li>
+         * <li>options.gridName: grid数据的name</li>
+         * <li>options.url: 提交的url</li>
+         * <li>options.success: success回调函数</li>
+         * <li>options.failure: failure回调函数</li>
+         * </ul>
+         * @param options
+         */
+        submit = function () {
+            if (!formExData) {
+                saveAndSubmit();
+            } else {
+                var changeLen = stockio_create_grid.getChanges().length;
+                var formCurData = stockio_create_form.getData();
+                /* 已保存但有修改过还未保存 */
+                console.log(validateEqua(formExData, formCurData, changeLen));
+                if (validateEqua(formExData, formCurData, changeLen)) {
+                    saveAndSubmit();
+                } else {
+                    submitFormDirect({
+                        form: stockio_create_form,
+                        grid: stockio_create_grid,
+                        gridName: 'discountTrxLineDto',
+                        url: "${base.contextPath}/dc/discount/submit?userId=${Session.userId}"
+                    });
+                }
+            }
+        };
+
+        saveAndSubmit = function () {
+            submitMyForm({
+                form: stockio_create_form,
+                grid: stockio_create_grid,
+                gridName: 'discountTrxLineDto',
+                url: "${base.contextPath}/dc/discount/submitTrx?userId=${Session.userId}",
+                callback: function (json) {
+
+                    console.log(json);
+                    var rs = $.isArray(json.rows) ? json.rows[0].discountTrxLineDto : [];
+                    if (rs.length > 0) {
+                        $.each(rs, function (i, n) {
+                            var r = stockio_create_grid.records[n['__id']];
+                            if (r) {
+                                r = $.extend(r, n, {
+                                    '__status': 'nochanged',
+                                    'discountTrxLineId': r.discountTrxLineId
+                                })
+                            }
+                        });
+                        stockio_create_grid.deletedRows = [];
+                        stockio_create_grid.reRender();
+                    }
+
+                    console.log("2018/03/09 1")
+
+                    // 保存后，调整类型和库存组织 不可编辑
+                    $.ligerui.get("salesOrgId").set("disabled", true);
+                    $.ligerui.get("adjustType").set("disabled", true);
+                    $.ligerui.get("adjustReason").set("disabled", true);
+                    $.ligerui.get('discountTrxNum').set({
+                        value: json.rows[0].discountTrxNum
+                    });
+                    $.ligerui.get('status').set({
+                        value: json.rows[0].status
+                    });
+                    $.ligerui.get('discountTrxHeadId').set({
+                        value: json.rows[0].discountTrxHeadId
+                    });
+                    //$('#discountTrxHeadId').attr('value',json.rows[0].discountTrxHeadId);
+                    formExData = stockio_create_form.getData();
+
+                    // 若有权限打印，设置打印清单按钮可用
+                }
+            })
+        };
+
+        //仅保存
+        saveForJust = function () {
+            submitForm({
+                form: stockio_create_form,
+                grid: stockio_create_grid,
+                gridName: 'discountTrxLineDto',
+                url: "${base.contextPath}/dc/discount/create?userId=${Session.userId}",
+                callback: function (json) {
+
+                    var rs = $.isArray(json.rows) ? json.rows[0].discountTrxLineDto : [];
+                    if (rs.length > 0) {
+                        $.each(rs, function (i, n) {
+                            var r = stockio_create_grid.records[n['__id']];
+                            if (r) {
+                                r = $.extend(r, n, {
+                                    '__status': 'nochanged',
+                                    'discountTrxLineId': r.discountTrxLineId
+                                })
+                            }
+                        });
+                        stockio_create_grid.deletedRows = [];
+                        stockio_create_grid.reRender();
+                    }
+
+                    // 保存后，调整类型和库存组织 不可编辑
+                    $.ligerui.get("salesOrgId").set("disabled", true);
+                    $.ligerui.get("adjustType").set("disabled", true);
+                    $.ligerui.get('discountTrxNum').set({
+                        value: json.rows[0].discountTrxNum
+                    });
+                    $.ligerui.get('status').set({
+                        value: json.rows[0].status
+                    });
+                    $.ligerui.get('discountTrxHeadId').set({
+                        value: json.rows[0].discountTrxHeadId
+                    });
+                    //$('#discountTrxHeadId').attr('value',json.rows[0].discountTrxHeadId);
+                    formExData = stockio_create_form.getData();
+
+                    // 若有权限打印，设置打印清单按钮可用
+                }
+            })
+        }
+
+        /* 只提交事务 */
+        submitFormDirect = function (options) {
+            var form = options.form, grid = options.grid, url = options.url, wa = options.wrapArray;
+            if (!form) return;
+            var d = form.getData();
+            for (var key in d) {
+                if (!d[key]) {
+                    delete d[key]
+                }
+            }
+            if (grid) {
+                grid.endEdit();
+                d[options.gridName || 'grid'] = grid.getData();
+            }
+            $.ligerDialog.waitting(options.waitingTip || $l('sys.hand.tip.processing'));
+            $.ajax({
+                url: url,
+                type: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON2.stringify(wa === false ? d : [d]),
+                success: function (json) {
+                    options.json = json;
+                    //options.successTip = '<@spring.message "msg.info.system.commit_successful"/>';
+                    if (json.success) {
+                        //修改出入库单状态
+                        $.ligerui.get("status").set({
+                            value: "COMP"
+                        });
+                        liger.get('stockio_create_form').setEditable(false);
+                        // liger.get('stockio_create_grid_tool_bar').setDisabled('ioAddBtn');
+                        // liger.get('stockio_create_grid_tool_bar').setDisabled('ioDelBtn');
+                        stockio_create_grid.options.enabledEdit = false;
+                    }
+                    Hap.defaultSuccessHandler(options);
+                },
+                error: function () {
+                    $.ligerDialog.closeWaitting();
+                }
+            });
+        }
+        gridDel = function (options) {
+            var grid = options.grid;
+            if (!grid) $.ligerDialog.alert('"grid" not found in options!', $l('sys.hand.tip.info'), 'error');
+            grid.endEdit();
+            var rows = grid.getSelectedRows(), dls = [];
+            //TODO:给个提示比较好
+            if (rows.length > 0)
+                $.ligerDialog.confirm(
+                    options.confirmTip || $l('sys.hand.tip.delete_confirm'),
+                    $l('sys.hand.tip.info'), function (yes) {
+                        if (yes) {
+                            if (options.url) {
+                                var adds = [];
+                                $.each(rows, function (i, d) {
+                                    if (d['__status'] == 'add') {
+                                        adds.push(d);
+                                        grid.remove(d);
+                                    }
+                                });
+
+                                dls = $.grep(rows, function (item) {
+                                    var isL = false;
+                                    $.each(adds, function (i, data) {
+                                        if (item['__id'] == data['__id']) {
+                                            isL = true;
+                                            return false;
+                                        }
+                                    })
+                                    return !isL;
+                                })
+
+                                if (dls.length == 0) {
+                                    validateHasRows();
+                                    return;
+                                }
+                                $.ligerDialog.waitting(options.waitingTip || $l('sys.hand.tip.processing'));
+                                $.ajax({
+                                    url: options.url || '',
+                                    type: "POST",
+                                    dataType: "json",
+                                    contentType: "application/json",
+                                    data: JSON2.stringify(dls),
+                                    success: function (json) {
+                                        options = $.extend(options, {
+                                            json: json,
+                                            grid: grid,
+                                            callback: function (json) {
+                                                $.each(dls, function (i, n) {
+                                                    grid.remove(grid.records[n['__id']]);
+                                                });
+                                                validateHasRows();
+                                            }
+                                        })
+                                        Hap.defaultSuccessHandler(options);
+                                    },
+                                    error: function () {
+                                        $.ligerDialog.closeWaitting();
+                                    }
+                                });
+                            } else {
+                                $.each(rows, function (i, d) {
+                                    if (d['__status'] == 'add') {
+                                        grid._removeData(grid.getRow(d));
+                                    }
+                                });
+                                grid.deleteSelectedRow();
+                                validateHasRows();
+                            }
+                        }
+                    });
+        }
+        /**
+         * 提交表单数据(头行数据可一起提交).
+         *
+         * <ul>
+         * <li>options.wrapArray: 是否包装成数组</li>
+         * <li>options.form: form对象</li>
+         * <li>options.grid: grid对象</li>
+         * <li>options.gridName: grid数据的name</li>
+         * <li>options.url: 提交的url</li>
+         * <li>options.success: success回调函数</li>
+         * <li>options.failure: failure回调函数</li>
+         * </ul>
+         * @param options
+         */
+        submitMyForm = function (options) {
+            var form = options.form, grids = options.grid ? [].concat(options.grid) : [],
+                gridNames = [].concat(options.gridName), url = options.url, wa = options.wrapArray,
+                su = options.success;
+
+            if (!form || form.con) return;
+            if (Hap.validateForm(form) && Hap.validateGrid(grids)) {
+                var d = form.getData();
+                for (var key in d) {
+                    if (!d[key]) {
+                        delete d[key]
+                    }
+                }
+                if (grids.length > 0) {
+                    $.each(grids, function (i, grid) {
+                        grid.endEdit();
+                        d[gridNames[i]] = grid.getData();
+                    })
+                }
+                form.con = $.ajax({
+                    url: url,
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON2.stringify(wa === false ? d : [d]),
+                    success: function (json) {
+                        options.json = json;
+                        Hap.defaultSuccessHandler(options);
+                        form.con = null;
+                        if(json.success) {
+                            $.ligerui.get("status").set({value: "COMP"});
+                            liger.get('stockio_create_grid_tool_bar').setDisabled('ioAddBtn');
+                            liger.get('stockio_create_grid_tool_bar').setDisabled('ioDelBtn');
+                            stockio_create_grid.options.enabledEdit = false;
+                        }
+                    },
+                    error: function () {
+                        $.ligerDialog.closeWaitting();
+                        form.con = null;
+                    }
+                });
+            }
+        };
+
+
+
+        /**
+         * 提交表单数据(头行数据可一起提交).
+         *
+         * <ul>
+         * <li>options.wrapArray: 是否包装成数组</li>
+         * <li>options.form: form对象</li>
+         * <li>options.grid: grid对象</li>
+         * <li>options.gridName: grid数据的name</li>
+         * <li>options.url: 提交的url</li>
+         * <li>options.success: success回调函数</li>
+         * <li>options.failure: failure回调函数</li>
+         * </ul>
+         * @param options
+         */
+        submitForm = function (options) {
+            var form = options.form, grids = options.grid ? [].concat(options.grid) : [],
+                gridNames = [].concat(options.gridName), url = options.url, wa = options.wrapArray,
+                su = options.success;
+
+            if (!form || form.con) return;
+            if (Hap.validateForm(form) && Hap.validateGrid(grids)) {
+                var d = form.getData();
+                for (var key in d) {
+                    if (!d[key]) {
+                        delete d[key]
+                    }
+                }
+                if (grids.length > 0) {
+                    $.each(grids, function (i, grid) {
+                        grid.endEdit();
+                        d[gridNames[i]] = grid.getData();
+                    })
+                }
+                form.con = $.ajax({
+                    url: url,
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON2.stringify(wa === false ? d : [d]),
+                    success: function (json) {
+                        options.json = json;
+                        Hap.defaultSuccessHandler(options);
+                        form.con = null;
+                        // liger.get('stockio_create_grid_tool_bar').setDisabled('ioAddBtn');
+                        // liger.get('stockio_create_grid_tool_bar').setDisabled('ioDelBtn');
+                    },
+                    error: function () {
+                        $.ligerDialog.closeWaitting();
+                        form.con = null;
+                    }
+                });
+            }
+        };
+
+        /* 移除表格头行的右键菜单 */
+        $("div[class='l-grid-popup']").remove();
+
+        /* 判断表格是否有行 */
+        function validateHasRows() {
+            var datas = stockio_create_grid.getData();
+            if (!datas || datas.length == 0) {
+                $.ligerui.get('tlSavBtn').set('disabled', true);
+                $.ligerui.get('tlSubBtn').set('disabled', true);
+            } else {
+                $.ligerui.get('tlSavBtn').set('disabled', false);
+                $.ligerui.get('tlSubBtn').set('disabled', false);
+            }
+        }
+
+        /* 判断表单某些字段是否有修改 */
+        function validateEqua(formExData, formCurData, changeLen) {
+            //trxData
+            if (formExData.processDate != null && $.trim(formExData.processDate).length <= 0) {
+                formExData['processDate'] = null;
+            }
+            if (formCurData.processDate != null && $.trim(formCurData.processDate).length <= 0) {
+                formCurData['processDate'] = null;
+            }
+            //adjustType
+            if (formExData.adjustType != null && $.trim(formExData.adjustType).length <= 0) {
+                formExData['adjustType'] = null;
+            }
+            if (formCurData.adjustType != null && $.trim(formCurData.adjustType).length <= 0) {
+                formCurData['adjustType'] = null;
+            }
+            //adjustReason
+            if (formExData.adjustReason != null && $.trim(formExData.adjustReason).length <= 0) {
+                formExData['adjustReason'] = null;
+            }
+            if (formCurData.adjustReason != null && $.trim(formCurData.adjustReason).length <= 0) {
+                formCurData['adjustReason'] = null;
+            }
+            //remark
+            if (formExData.remark != null && $.trim(formExData.remark).length <= 0) {
+                formExData['remark'] = null;
+            }
+            if (formCurData.remark != null && $.trim(formCurData.remark).length <= 0) {
+                formCurData['remark'] = null;
+            }
+            return (formExData.processDate != formCurData.processDate ||
+                formExData.adjustType != formCurData.adjustType ||
+                formExData.adjustReason != formCurData.adjustReason ||
+                formExData.remark != formCurData.remark || changeLen != 0);
+        }
+
+        /* 有传条件就新加载数据 */
+        var discountTrxHeadId;
+        var tempOrganizationId;
+    <#if isedit == '1' >
+        discountTrxHeadId = ${RequestParameters.discountTrxHeadId!'0'};
+    <#else>
+        $.ligerui.get('tlSavBtn').set('disabled', true);
+        $.ligerui.get('tlSubBtn').set('disabled', true);
+    </#if>
+        if (discountTrxHeadId != undefined && discountTrxHeadId != null &&
+            discountTrxHeadId != '0' && discountTrxHeadId != '' && $.trim(discountTrxHeadId).length > 0) {
+            /* 加载表单数据 */
+
+            // $.ligerui.get("discountAmt").set({enableEdit:fasle});
+
+            Hap.loadForm({
+                form: stockio_create_form,
+                url: '${base.contextPath}/dc/discounttrx/get',
+                para: {discountTrxHeadId: discountTrxHeadId},
+                callback: function (data) {
+                    //$.ligerui.get("discountTrxNum").setValue(data.discountTrxNum);
+                    /* 加载表格数据 */
+                    var jsonObj = {};
+                    var gridData = data.discountTrxLineDto;
+                    var arr = new Array();
+                    /* 修改 */
+                    for (var i in gridData) {
+                        var tmp = gridData[i];
+                        arr.push(tmp);
+                    }
+                    jsonObj.rows = arr;
+                    stockio_create_grid.set({data: jsonObj});
+                    stockio_create_grid.reRender();
+
+                    /* 默认出库原因必输 */
+                    stockio_create_form.setFieldValidate("adjustReason", {
+                        required: true
+                    });
+
+                    // 若有权限打印，设置打印清单按钮可用
+                <#if accessService.access("EDITABLE_PRINT") == true >
+                    $.ligerui.get('printlistBtn').set('disabled', false);
+                </#if>
+
+                    //如果状态为完成，表单和表格不能编辑
+                    if ($.ligerui.get("status").getValue() == cmp) {
+                        liger.get('stockio_create_form').setEditable(false);
+                        liger.get('stockio_create_grid_tool_bar').setDisabled('ioAddBtn');
+                        liger.get('stockio_create_grid_tool_bar').setDisabled('ioDelBtn');
+                        $.ligerui.get("memberName").set("disabled", true);
+                        $.ligerui.get("discountAdjustAmt").set("disabled", true);
+                        liger.get('stockio_create_grid').setEditable(false);
+                        stockio_create_grid.options.enabledEdit = false;
+
+                    } else if ($.ligerui.get("status").getValue() == nw) {
+                        // 如果状态为新建，调整类型和库存组织不可编辑
+                        $.ligerui.get("salesOrgId").set("disabled", true);
+                        $.ligerui.get("adjustType").set("disabled", true);
+                        liger.get('stockio_create_form').setEditable(false);
+                    }
+
+                    if (!data || data.discountTrxLineDto == null) {
+                        $.ligerui.get('tlSavBtn').set('disabled', true);
+                        $.ligerui.get('tlSubBtn').set('disabled', true);
+                    }
+                    formExData = data;
+                }
+            })
+        }
+
+    });
+</script>
+</body>
+</html>

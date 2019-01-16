@@ -1,0 +1,371 @@
+<#--
+ * description: 导入会员列表
+ * version: 1.0
+ * author: mclin
+ * .
+ *
+-->
+<#include "../include/import.html">
+<body style="padding: 10px;">
+	<script src="${base.contextPath}/common/code?reasonCode=MM.MEMBER_UPLOAD_FAIL&flagArray=SYS.YES_NO&memberStatus=MM.MEMBER_STATUS" type="text/javascript"></script>
+    <div id="uploader" class="wu-example">
+	    <!--用来存放文件信息-->
+	    <div id="filelist" class="uploader-list"></div>
+	    <div class="btns">
+	        <div id="picker" style="inline"><@spring.message "msg.hand.upload.btn.choose_file" /></div>
+	        <!-- <button id="ctlBtn" class="btn btn-default" style="inline">开始上传</button> -->
+	    </div>
+	</div>
+    <!-- <div id="member_import_grid" style="margin: 0; padding: 0"></div> -->
+    <div id="member_import_dialog_grid" style="margin: 0; padding: 0"></div>
+    <form id="member_import_btn"></form>
+    <script type="text/javascript">
+        var dialog = frameElement.dialog;
+	    function isExitsFunction(funcName) {
+			try {
+				if (typeof (eval(funcName)) == "function") {
+					return true;
+				}
+			} catch (e) {}
+			return false;
+		}
+		var BASE_URL = '/webuploader';
+		jQuery(function(){
+			var $ = jQuery,
+	        $list = $('#filelist'),
+	        $btn = $('#ctlBtn'),
+	        state = 'pending',
+	        preFile,
+	        uploader;
+		    uploader = WebUploader.create({
+		    	//选择文件后自动上传
+		    	auto: true,
+		        // 不压缩image
+		        resize: false,
+		        // swf文件路径
+		        swf: BASE_URL + '/js/Uploader.swf',
+		        // 文件接收服务端。
+		        server: '${base.contextPath}/mm/member/validate',
+		        //server: 'http://webuploader.duapp.com/server/fileupload.php',
+		        // 选择文件的按钮。可选。
+		        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+		        pick: '#picker',
+		        // 只允许选择Excel文件。
+                accept: {
+                	title: 'Excels',
+                    extensions: 'xls,xlsx,csv',
+                    mimeTypes: 'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                },
+                formData: {
+                	"idType": '${RequestParameters.idType}',
+                	"mentionId" : '${RequestParameters.mentionId}',
+                	"marketId" : '${RequestParameters.marketId}',
+                },
+                //一次只能上传一个文件
+                fileNumLimit: 1,
+                //不分块
+                chunked: false,
+                //文件大小限制为2M
+     		   	fileSingleSizeLimit: 2 * 1024 * 1024    // 2 M
+		    });
+		 	// 当有文件添加进来之前先删除原来的文件
+		    uploader.on('beforeFileQueued', function( file ) {
+		    	if(preFile){
+				    uploader.removeFile(preFile, true);
+			    	$preList = $list.find("div[id$='" + preFile+"']");
+			    	if($preList){
+			    		$preList.remove();
+			    	}
+		    	}
+			    preFile = file.id;
+		    }) 
+		    // 当有文件添加进来的时候
+		    uploader.on( 'fileQueued', function( file ) {
+		        $list.append( '<div id="' + file.id + '" class="item">' +
+		            '<h4 class="info" style="color: blue; font-size: 15px;">' + file.name + '</h4>' +
+		            '<p class="state" style="color: red; font-size: 11px;"><@spring.message "msg.info.member.import.waiting"/></p>' +
+		        '</div>' );
+		    });
+	
+		    // 文件上传过程中创建进度条实时显示。
+		    uploader.on( 'uploadProgress', function( file, percentage ) {
+		        var $li = $( '#'+file.id ),
+		        $percent = $li.find('.progress .progress-bar');
+		        // 避免重复创建
+		        if ( !$percent.length ) {
+		            $percent = $('<div class="progress progress-striped active" style="width: 200px; height: 10px;">' +
+		              '<div class="progress-bar" role="progressbar" style="width: 0%;">' +
+		              '</div>' +
+		            '</div>').appendTo( $li ).find('.progress-bar');
+		        }
+		        //$li.find('p.state').text('<@spring.message "msg.info.member.import.importing"/>');
+		        $li.find('p.state').text('');
+		        $percent.css( 'width', percentage * 100 + '%' );
+		    });
+	
+		    uploader.on( 'uploadSuccess', function( uploader,file,response ) {
+		    	$( '#'+file.id ).find('p.state').text('<@spring.message "msg.info.member.import.imported"/>');
+		    });
+	
+		    uploader.on( 'uploadError', function( file, code ) {
+		    	var obj = JSON.parse(code);
+		    	if(obj.message == 'MEMBERCODE_ERROR'){
+		    		$( '#'+file.id ).find('p.state').text('<@spring.message "msg.info.member.import.membercode.error"/>');
+		    	}else if(obj.message == 'FILE_ERROR'){
+		    		$( '#'+file.id ).find('p.state').text('<@spring.message "msg.info.member.import.file.error"/>');
+		    	}else{
+		    		$( '#'+file.id ).find('p.state').text(obj.message);
+		    	}
+		    });
+		    
+			uploader.on( 'error', function( code ) {
+				preFile = null;
+				if(code == 'F_EXCEED_SIZE'){
+					Hap.showError('<@spring.message "msg.info.member.import.exceed_size"/>');
+				}else if(code == 'Q_TYPE_DENIED'){
+					Hap.showError('<@spring.message "msg.info.member.import.type_denied"/>');
+				}else if(code == 'F_DUPLICATE'){
+					Hap.showError('<@spring.message "msg.info.member.import.file_duplicate"/>');
+				}
+		    });
+	
+		    uploader.on( 'uploadComplete', function( file ) {
+		        $( '#'+file.id ).find('.progress').fadeOut();
+		        window.tipField = $( '#'+file.id ).find('p.state');
+		        //window.tipField.text('<@spring.message "msg.info.member.import.successwait"/>');
+		    });
+		    
+		    uploader.on( 'uploadAccept', function ( object, ret) {
+		    	var file = uploader.getFiles()[uploader.getFiles().length - 1];
+		    	if(ret.success){
+		        	var groupId = ret.rows[0];
+		    		$.ajax({
+		    			type: "POST",
+                        dataType: "json",
+                        url: "${base.contextPath}/mm/member/queryImport",
+                        data: {
+                        	groupId : groupId
+                        },
+                        success: function(data){
+                        	if(data.success){
+                        		member_import_dialog_grid.loadData(data);
+                        		var rows = data.rows;
+                        		if(rows){
+            		    			for(var i in rows){
+            			    			var validateFlag = rows[i].validateFlag;
+            			    			if('N' == validateFlag){
+            			    				$.ligerui.get('btn_ok').setDisabled(true);
+            			    			}
+            			    		}
+            		    		}
+                        	}
+                        }
+		    		})
+		    	}else{
+		    		uploader.trigger('uploadError', file, JSON2.stringify(ret));
+		    	}
+		    });
+	
+		    uploader.on( 'all', function( type, json, result) {
+		    	if(type == 'uploadSuccess'){
+		    		if(!result.success){
+		    			if(result.message == 'MEMBERCODE_ERROR'){
+		    				$.ligerDialog.error('<@spring.message "msg.info.member.import.membercode.error"/>');
+		    			}else if(result.message == 'FILE_ERROR'){
+                            $.ligerDialog.error('<@spring.message "msg.info.member.import.file.error"/>');
+                        }else{
+		    				$.ligerDialog.error(result.message);
+		    			}
+	                }
+		    	}
+		        if ( type === 'startUpload' ) {
+		            state = 'uploading';
+		        } else if ( type === 'stopUpload' ) {
+		            state = 'paused';
+		        } else if ( type === 'uploadFinished' ) {
+		            state = 'done';
+		        }
+		        if ( state === 'uploading' ) {
+		            $btn.text('<%spring.message "msg.info.member.import.paused"/>');
+		        } else {
+		            $btn.text('<%spring.message "msg.info.member.import.started"/>');
+		        }
+		    });
+	
+		    $btn.on( 'click', function() {
+		        if ( state === 'uploading' ) {
+		            uploader.stop();
+		        } else {
+		            uploader.upload();
+		        }
+		    });
+		    
+		    window['member_import_dialog_grid'] = $("#member_import_dialog_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [ 
+					{ 
+						display: '', hide: true,
+						name: 'memberId', align: 'left', width: 100
+					},
+                   { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+                	name: 'memberCode', 
+                	align: 'center', 
+                	width: 140,
+                	render: function(rowData){
+                		if (rowData.enabled == "N") {
+                			return "<span style='color: red'>" +  rowData.memberCode +"</span>";
+                		} else {
+                			return rowData.memberCode;
+                		}
+                    }
+                  },
+                  { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.import.validate"/>',
+                	name: 'validateFlag', align: 'center', width: 100,
+                	editor: {
+                		type: 'select',
+                		data: flagArray,
+                		valueField: 'value',
+                		textField: 'meaning'
+                	},
+                	render: function(item){
+                		for (var i in flagArray) {
+                			if (flagArray[i].value == item.validateFlag) {
+                				return flagArray[i].meaning;
+                			}
+                		}
+                		return '';
+                	}
+                  },
+                  { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.import.failreason"/>',
+                	name: 'reasonCode', align: 'left', 
+                	editor: {
+                		type: 'select',
+                		data: reasonCode,
+                		valueField: 'value',
+                		textField: 'meaning'
+                	},
+                	render: function(item){
+                		for (var i in reasonCode) {
+                			if (reasonCode[i].value == item.reasonCode) {
+                				return reasonCode[i].meaning;
+                			}
+                			if('VOUCHER_EXIST' == item.reasonCode){
+                				return '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.member.error"/>';
+                			}
+                			if("MESSAGE_EXIST" == item.reasonCode){
+                                return '<@spring.message "msg.existing.the.same.member"/>';
+                            }
+                		}
+                		return '';
+                	}
+                  } 
+                ], 
+                enabledEdit: false,
+                width: '99%', 
+                height: '88%',
+                usePager : false
+            });
+		    
+		    window['member_import_btn'] = $('#member_import_btn').ligerForm({
+		    	buttons: [{
+		    		id: 'btn_ok',
+		    		text: '<@spring.message "sys.hand.btn.ok"/>',
+		    		click: function(){
+		    			var importData = member_import_dialog_grid.getData();
+		    			if(!importData || !importData[0]){
+		    				 $.ligerDialog.error('<@spring.message "msg.info.please.lead.into.the.file"/>');
+		    			}else{
+		    				var maxMember;
+		    			    if(${RequestParameters.maxMember}){
+		    			    	maxMember = ${RequestParameters.maxMember};
+		    			    }
+		    				var groupId = importData[0].groupId;
+			    			var groupType = importData[0].groupType;
+			    			$.ajax({
+			    				type: "POST",
+	                            dataType: "json",
+	                            url: "${base.contextPath}/mm/member/import",
+	                            data: {
+	                            	groupId : groupId,
+	                            	groupType : groupType,
+	                            	mentionId : ${RequestParameters.mentionId},
+	                            	maxMember : maxMember
+	                            },
+	                            success: function(data) {
+	                            	if(data.success){
+	                            		$.ligerDialog.success('');
+	                            		var groupId = data.rows[0];
+	                            		$.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+	                            			if('EVENT' == groupType){
+	                            				window.parent.location = '${base.contextPath}/sys/em/em_event_edit.html?isedit=1&eventId='+${RequestParameters.mentionId};
+	                            			}
+	                            			if('VOUCH' == groupType){
+	                            				//window.parent.location = '${base.contextPath}/promotion/pdm_voucher_edit.html?isedit=1&voucherId='+${RequestParameters.mentionId}+'&category=VIP';
+	                            			//}else{
+	                            				//window.parent.location = '${base.contextPath}/promotion/pdm_voucher_edit.html?isedit=2&memberId=' +importData[0].memberId+ '&category=VIP';
+	                            				pageSkip(importData);
+	                            			}
+	                            			if('MSG' == groupType){
+                                                window.parent.location = '${base.contextPath}/sys/message_edit.html?isedit=1&msMessageId='+${RequestParameters.mentionId};
+                                            }
+	                            			dialog.close();
+	                                    },{allowClose : false});
+	                            	}
+	                            }
+			    			})
+		    			}
+		    		}
+		    	},{
+		    		id: 'btn_cancel',
+		    		text: '<@spring.message "sys.hand.btn.cancel"/>',
+		    		click: function(){
+		    			//删除临时表
+		    			var importData = member_import_dialog_grid.getData();
+		    			if(!importData || !importData[0]){
+		    				 dialog.close();
+		    			}else{
+		    				var groupId = importData[0].groupId;
+			    			$.ajax({
+			    				type: "POST",
+	                            dataType: "json",
+	                            url: "${base.contextPath}/mm/member/deleteImport",
+	                            data: {
+	                            	groupId : groupId,
+	                            	mentionId : ${RequestParameters.mentionId},
+	                            },
+	                            success: function(data) {
+	                            	if(data.success){
+	                            	    dialog.close();
+	                            	}
+	                            }
+			    			})
+		    			}
+		    		}
+		    	}]
+		    });
+            
+    	});
+		
+		function pageSkip(data){
+			$.ajax({
+                type: "POST",
+                dataType: "json",
+                async : false,
+                contentType : "application/json; charset=utf-8",
+                url: "${base.contextPath}/admin/promotion/pdm_voucher_edit",
+                data: JSON2.stringify(data),
+                success: function(data) {
+                    if(data.success){
+                        //dialog.close();
+                    	window.parent.liger.get("member_grid").loadData(data);
+                    	//liger.get("member_grid").setData(data);
+                    }
+                }
+            })
+		}
+    </script>
+</body>
+</html>

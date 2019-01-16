@@ -1,0 +1,151 @@
+<#-- 
+* description: 供应商查询界面
+* version: 1.0 
+* author: liang.rao 
+* .
+* --> 
+<#include "../include/head.html">
+<body style="padding: 10px;">
+<script src="${base.contextPath}/common/code?vendorStatus=PO.VENDOR_STATUS" type="text/javascript"></script>
+    <form id="po_vendor_form"></form>
+    <div id="po_vendor_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function() {
+        window['po_vendor_form'] = $("#po_vendor_form").ligerForm({
+            fields : [ {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.code"/>',
+                name : 'code'
+            }, {
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.name"/>',
+                name : 'name',
+                newline : false,
+                type: 'text'
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.phone"/>',
+                name : 'phone',
+                newline : false
+            } ],
+            buttons : [ {
+                text : '<@spring.message "sys.hand.btn.query"/>',
+                disabled : false,
+                 width : 60,
+                click : function() {
+                    Hap.gridQuery({
+                        form : po_vendor_form,
+                        grid : po_vendor_grid
+                    })
+                }
+            }]
+        });
+        
+        window['po_vendor_grid'] = $("#po_vendor_grid").ligerGrid({
+            unSetValidateAttr : false,
+            columns : [ {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.code"/>',
+                name : 'code',
+                width : 100,
+                render: function (row){
+                    return "<a href='javascript:void(0);' onclick='vendordit(" + row.vendorId + ")'>" + row.code + "</a> "
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.name"/>',
+                name : 'name',
+                width : 200
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.contacts"/>',
+                name : 'contacts',
+                width : 100
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.phone"/>',
+                name : 'phone',
+                width : 200
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.status"/>',
+                name : 'enabledFlag',
+                width : 100,
+                options : {
+                    valueField: 'value',
+                    textField: 'meaning',
+                    data: vendorStatus
+                    },
+                render: function (item) {
+                        return getCodeDesc(vendorStatus, item.enabledFlag);
+                    }
+            } ],
+            url : '${base.contextPath}/po/vendor/query',
+            toolbar : {
+                items : [{
+                    text : '<@spring.message "sys.hand.btn.new"/>',
+                    disable : false,
+                    click : function(){create_vendor();},
+                    icon : 'add'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click : function() {
+                        deleteVendor();
+                    },
+                    icon : 'delete'
+                }, {
+                    line : true
+                } ]
+            },
+            width : '99%',
+            height : '98%',
+            delayLoad:true,
+            checkbox:true,
+            rownumbers: true
+        });
+    });
+    
+    /*转换供应商状态值、含义*/
+    function getCodeDesc(data, value){
+              for (var i in data) {
+                  if (data[i].value == value) {
+                  return data[i].meaning;
+              }
+          }
+          return '';
+      }
+    
+    /*点击新增跳转维护界面*/
+    function create_vendor(){
+    	window.top.f_removeTab('po_vendor_query_add');
+    	window.top.f_addTab('po_vendor_query_add', '<@spring.message "sys.hand.tab.vendor"/>', '${base.contextPath}/po/po_vendor_edit.html');
+    }
+    
+    /*点击编码跳转维护界面*/
+    function vendordit(id) {
+    	window.top.f_removeTab('po_vendor_query_edit');
+        window.top.f_addTab('po_vendor_query_edit', '<@spring.message "sys.hand.tab.vendoredit"/>', '${base.contextPath}/po/po_vendor_edit.html?vendorId=' + id);
+    }
+    
+    /*失效处理*/
+    function deleteVendor(){
+        var row = liger.get("po_vendor_grid").getSelected();
+        if (row.enabledFlag == "N") {
+            $.ligerDialog.warn('<@spring.message "msg.warn.po.can_not_delete"/>');
+            return ;
+        }
+        $.ligerDialog.confirm('<@spring.message "msg.warn.po.confirm_delete"/>',function (yes)
+                {if(yes){
+                    $.ajax({
+                        type: 'POST',
+                        url:"${base.contextPath}/po/vendor/remove",
+                        data: JSON2.stringify(row),
+                        contentType: "application/json; charset=utf-8",
+                        success: function (json) {
+                            if(json.success){
+                                po_vendor_grid.reload();
+                                Hap.showSuccess($l('sys.hand.tip.success'));
+                            }
+                         }
+                     });};
+            });
+    }
+    </script>
+</body>
+</html>

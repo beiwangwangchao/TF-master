@@ -1,0 +1,353 @@
+<#--
+ * description: 批次资料界面
+ * version: 1.0 
+ * author: runbai.chen
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?yesNoData=SYS.YES_NO" type="text/javascript"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<body style="padding: 10px;">
+    <form id="d_sc_002_form"></form>
+    <div id="inv_lov_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+        window['d_sc_002_form'] = $("#d_sc_002_form").ligerForm({
+            fields : [
+                { 
+                	name : 'organizationId', 
+                	label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.organizationname"/>', 
+                	newline : false ,
+                	type:'combobox',
+                	textValue : _invOrgName,
+                    options:{
+                    	value : _invOrgId,
+        				valueField : 'invOrgId',
+    					textField : 'name',
+    					url : _basePath + "/spm/assignOrg/get",
+    					isMultiSelect : false,
+    					isShowCheckBox : false,
+    					onSelected : function(value,text) {
+    						if (!value)
+    							return false;
+    						Hap.gridQuery({
+    				            form : d_sc_002_form,
+    				            grid : inv_lov_grid
+    				        })
+    					}
+                    },
+                    validate : {
+                    	required : true
+                    }
+                },
+                {
+                	name:'itemNumber',
+                	label:'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.itemid"/>',
+                	newline:false,
+                	type:'text'
+                },
+                { 
+                	name : 'itemName', 
+                	label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.itemname"/>', 
+                	newline : false ,
+                    type : 'text'
+                },      
+                
+                { 
+                	name : 'lotNumber', 
+                	type : 'text', 
+                	label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.lotnumber"/>', 
+                	newline : true 
+                },
+                {
+                    name : 'expiryDateFrom',
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.expirydate"/>',
+                    type : 'date',
+                    newline : false,
+                    format: 'yyyy-MM-dd',
+                    options:{
+                        onChangeDate : function(date){
+                            if($("input[name='expiryDateTo']").val()<date){
+                                if($("input[name='expiryDateTo']").val()!=""){
+                                    $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+                                    $.ligerui.get("expiryDateFrom").setValue("");
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    name : 'expiryDateTo',
+                    newline : false,
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.expirydateto"/>',
+                    type : 'date',
+                    format: 'yyyy-MM-dd',
+                    options:{
+                        onChangeDate : function(date){
+                            if($("input[name='expiryDateFrom']").val()>date){
+                                $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+                                $.ligerui.get("expiryDateTo").setValue("");
+                            }
+                        }
+                    }
+                },
+                {
+                    name : 'creationDateFrom',
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.creationdate"/>',
+                    type : 'date',
+                    newline : true,
+                    format: 'yyyy-MM-dd',
+                    options:{
+                        onChangeDate : function(date){
+                            if($("input[name='creationDateTo']").val()<date){
+                                if($("input[name='creationDateTo']").val()!=""){
+                                    $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+                                    $.ligerui.get("creationDateFrom").setValue("");
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    name : 'creationDateTo',
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.creationdateto"/>',
+                    type : 'date',
+                    format: 'yyyy-MM-dd',
+                    newline : false,
+                    options:{
+                        onChangeDate : function(date){
+                            if($("input[name='creationDateFrom']").val()>date){
+                                $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+                                $.ligerui.get("creationDateTo").setValue("");
+                            }
+                        }
+                    }
+                }
+            ],
+            buttons : [
+                {
+                    text : '<@spring.message "sys.hand.btn.query"/>',
+                    disabled : false,
+                    width : 60,
+                    click : function() {
+                    	if (Hap.validateForm(d_sc_002_form)) {
+	                        Hap.gridQuery({
+	                            form : d_sc_002_form,
+	                            grid : inv_lov_grid
+	                        })
+                    	}
+                    }
+                }
+            ]
+        });
+         var inv_lov_grid;
+        inv_lov_grid = window['inv_lov_grid'] = $("#inv_lov_grid").ligerGrid({
+            unSetValidateAttr : false,
+            columns : [
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.organizationname"/>',
+                    name : 'organizationId',
+                    hide:true,
+                    isSort : true,
+                    align : 'left',
+                    width : 150,
+                    options:{
+                    	value : _invOrgId
+                    },
+					validate : {
+                    	required : true
+                	}	
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.itemid"/>',
+                    name : 'itemId',
+                    textField:'itemNumber',
+                    align : 'left',
+                    width : 100,
+                    editor: $.extend(${lovService.getLov(base.contextPath, base.locale, "lov_item")},{
+                        staticOptions:function(e){
+                            e.column.editor.parms = {
+                                    organizationId : e.record.organizationId,
+                                    lotCtrlFlag : 'Y'
+                            }
+                        },
+                        onSelected:function(datas){
+                            var p = this.options;
+                            p.host_grid.updateCell('itemName',datas.data[0].itemName,p.host_grid_row);
+                        }
+                    }),
+                    validate : {
+                        required : true
+                    }   
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.itemname"/>',
+                    name : 'itemName',
+                    align : 'left',
+                    isSort : true,
+                    width : 200
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.lotnumber"/>',
+                    name : 'lotNumber',
+                    align : 'left',
+                    isSort : true,
+                    width : 150,
+                    editor : {
+                        type : 'text'
+                    },			
+                    validate : {
+                    	required : true
+                	}	
+                },
+                {
+                    name : 'expiryDate',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.expirydatedd"/>',
+                    align : 'left',
+                    width : 200,
+                    format: "yyyy-MM-dd",
+                    isSort : true,
+                    type : 'date',
+                    editor : {
+                        type : 'date'
+                    },
+					validate : {
+                    	required : true
+                	}	
+                },
+                {
+                    name : 'creationDate',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.creationdatedd"/>',
+                    align : 'left',
+                    width : 200,
+                    isSort : true,
+                    format: "yyyy-MM-dd",
+                    type : 'date'
+
+                },
+                {                   
+                    name : 'enabledFlag',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.enabledflag"/>',
+                    align : 'left',
+                    width : 200,
+                    editor : {                      
+                        type : 'select',
+                        data : yesNoData,
+                        valueField : 'value',
+                        textField : 'meaning'
+                    },
+                    render : function(item) {
+                        for (var i = 0; i < yesNoData.length; i++) {
+                            if (yesNoData[i]['value'] == item.enabledFlag)
+                                return yesNoData[i]['meaning']
+                        }
+                        return item.enabledFlag;
+                    },					
+                    validate : {
+                    	required : true
+                	}	
+                }
+            ],
+            url : '${base.contextPath}/im/lot/query',
+            toolbar : {
+                items: [
+                    {
+                        text: '<@spring.message "sys.hand.btn.new"/>',
+                        disable:false, 
+                        click: function(){
+                        	var invOrgId = liger.get("organizationId").getValue();
+                            inv_lov_grid.addRow({
+                            	organizationId : invOrgId
+                            })
+                        }, icon: 'add'
+                    },
+                    { line: true },
+                    { 
+                        text : '<@spring.message "sys.hand.btn.save"/>',
+                        click : submitForm, 
+                        icon : 'save'
+                    },
+                    { 
+                        text : '<@spring.message "sys.hand.btn.delete"/>',
+                        click : function() {
+                        
+                        	var data = inv_lov_grid.getSelectedRows();
+                        	if(data.length == 0){
+                        		return;
+                        	}
+                        	for(var i=0 ;i<data.length;i++){
+                        		if(data[i].__status != 'add'){
+                        			$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.inventory.stock.complete_not_allowd_delete"/>')
+                        			return;
+                        		}
+                        	}
+                            Hap.gridDelete({
+                                grid : inv_lov_grid
+                            })
+                        },
+                        icon : 'delete'
+                    },
+                    {line:true},
+                    {                   
+                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                        menu:{ width: 120, items:
+                                [
+                                    {                   
+                                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                        click:   function (){exportSelected("d_sc_002_form","inv_lov_grid",{"enabledFlag":yesNoData},_basePath);}
+                                    },
+                                    { line: true },
+                                    {                   
+                                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                        click: function (){exportDirectAll("d_sc_002_form","inv_lov_grid",{"enabledFlag":yesNoData},_basePath);}
+                                        
+                                    }
+                              ]
+                        }                        
+                    }
+                ]
+            },
+            enabledEdit : true,
+            checkbox: true,
+            width : '99%',
+            height : '98%',
+            rownumbers : true,
+            delayLoad : true,
+           /*  canSelect : function(item) {
+                if(item.itemId) {
+                    return false;
+                }else{
+                    return true;
+                }
+            }, */
+            onBeforeEdit: function(rowdata){
+                if(rowdata.record.__status == 'add'){           
+                    return true;
+                }else if(rowdata.column.name == 'enabledFlag'){
+                    return true;            
+                }else{
+                    return false;
+                }
+            }
+        });
+    
+    function submitForm(){
+        Hap.gridSave({
+            grid:inv_lov_grid,
+            url:'${base.contextPath}/im/lot/submit'
+        });
+    }
+    
+    $(function() {
+    	liger.get("organizationId").setText(_invOrgName);
+    	Hap.gridQuery({
+            form : d_sc_002_form,
+            grid : inv_lov_grid
+        })
+    })
+    
+</script>
+</body>
+</html>

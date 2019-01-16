@@ -1,0 +1,290 @@
+<#--
+* description: 物流资料查询界面
+* version: 1.0
+* author: 11816
+*
+-->
+
+<#include "../include/head.html">
+<body style="padding: 10px;">
+<form id="d_stm_001_form"></form>
+<div id="d_stm_001_grid" style="margin: 0; padding: 0"></div>
+<!--<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>-->
+<!--<script src="${base.contextPath}/common/code?bill_type=BILL.BILL_TYPE" type="text/javascript"></script>-->
+<script src="${base.contextPath}/common/code?bill_trade_state=BILL.TRADE_STATE" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?bill_trans_type=BILL.TRANS_TYPE" type="text/javascript"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161107" type="text/javascript"></script>
+<script type="text/javascript">
+    var return_data;
+    $(function () {
+        window['d_stm_001_form'] = $("#d_stm_001_form").ligerForm({
+            fields: [
+//                {
+//                    label: '<@spring.message "type.com.lkkhpg.dsis.info.order_type"/>',
+//                    newline: false,
+//                    name: 'salesOrgId',
+//                    type: "combobox",
+//                    options: {
+//                        valueField: "value",
+//                        textField: "meaning",
+//                        data: bill_type
+//                        // value: _salesOrgId,
+//                        // valueField: "salesOrgId",
+//                        // textField: "name"
+//                        // onSelected: function () {
+//                        //     Hap.gridQuery({
+//                        //         form: d_stm_001_form,
+//                        //         grid: d_stm_001_grid
+//                        //     })
+//                        // }
+//                    },
+//                    validate: {
+//                        required: true
+//                    }
+//                },
+                {
+                    label: '订单类型',
+                    newline: false,
+                    name: 'trans_type',
+                    type: "combobox",
+                    options: {
+                        valueField: "value",
+                        textField: "meaning",
+                        data: bill_trans_type,
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                {
+                    label: '订单状态',
+                    newline: false,
+                    name: 'trade_state',
+                    type: "combobox",
+                    options: {
+                        valueField: "value",
+                        textField: "meaning",
+                        data: bill_trade_state,
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                {
+                    name: 'order_date',
+                    label: '<@spring.message "type.com.lkkhpg.dsis.info.order_date"/>',
+                    type: 'date',
+                    format: 'YYYY-MM-DD',
+                    newline: true,
+                    options: {
+                        onChangeDate: function (date) {
+                            if ($("input[name='endActiveDate']").val() < date) {
+                                if ($("input[name='endActiveDate']").val() != "") {
+                                    $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+                                    $.ligerui.get("startActiveDate").setValue("");
+                                }
+                            }
+                        }
+                    }
+                },
+
+            ],
+            buttons: [
+                {
+                    text: '<@spring.message "sys.hand.btn.query"/>',
+                    disabled: false,
+                    width: 60,
+                    click: function () {
+
+//                        var param = {
+//                            "order_type": $("#salesOrgId").val(),
+//                            "order_date": $("input[name=order_date]").val()
+//                        }
+//
+//                        $.ajax({
+//                            type: "POST",
+//                            url: "${base.contextPath}/bill/get",
+//                            data: param,
+//                            success: function (data) {
+//                                return_data = data;
+//                            }
+//                        });
+                         Hap.gridQuery({
+                             form : d_stm_001_form,
+                             grid : d_stm_001_grid
+                         })
+
+                    }
+                }
+            ]
+        });
+        // liger.get('salesOrgId').setText(_salesOrgName);
+
+        var d_stm_001_grid;
+        d_stm_001_grid = window['d_stm_001_grid'] = $("#d_stm_001_grid").ligerGrid({
+            // unSetValidateAttr: false,
+            columns: [
+                {
+                    display: '平台交易流水号',
+                    name: 'plat_transno',
+                    align: 'left',
+                    width: 200
+                },
+                {
+                    display: '特约商户号',
+                    name: 'partnerNo',
+                    align: 'left',
+                    isSort: true,
+                    width: 100,
+                    isAllowHide: false
+                    // <!--to another address-->
+                    // render: function (row) {
+                    //     return "<a href='javascript:void(0);' onclick='shippingTierEdit(\"" + row.shippingTierId + "\")'>" + row.shippingTierCode + "</a> ";
+                    // }
+                },
+                {
+                    display: '二级商户号',
+                    name: 'subpartnerNo',
+                    align: 'left',
+                    isSort: true,
+                    width: 200,
+                    type: 'text'
+                },
+                {
+                    name: 'total_fee',
+                    display: '订单总金额',
+                    align: 'left',
+                    width: 200,
+                    isSort: true,
+                    type: 'text'
+                },
+                {
+                    name: 'out_trade_no',
+                    display: '商户订单号',
+                    align: 'left',
+                    width: 200,
+                    isSort: true,
+                    type: 'text'
+                },
+                {
+                    name: 'trade_state',
+                    display: '订单状态',
+                    align: 'left',
+                    width: 200,
+                    isSort: true,
+                    editor: {
+                        type: 'select',
+                        valueField: 'value',
+                        textField: 'meaning',
+                        data: bill_trade_state,
+                    },
+                    render: function(item) {
+                        for (var i = 0; i < bill_trade_state.length; i++) {
+                            if (bill_trade_state[i].value == item.trade_state) {
+                                return bill_trade_state[i].meaning;
+                            }
+                        }
+                    },
+                },
+                {
+                    name: 'trans_type',
+                    display: '订单类型',
+                    align: 'left',
+                    width: 200,
+                    isSort: true,
+                    editor: {
+                        type: 'select',
+                        valueField: 'value',
+                        textField: 'meaning',
+                        data: bill_trans_type,
+                    },
+                    render: function(item) {
+                        for (var i = 0; i < bill_trans_type.length; i++) {
+                            if (bill_trans_type[i].value == item.trans_type) {
+                                return bill_trans_type[i].meaning;
+                            }
+                        }
+                    },
+                },
+                {
+                    name: 'platCharge',
+                    display: '平台手续费',
+                    align: 'left',
+                    width: 200,
+                    isSort: true,
+                    type: 'text'
+                },
+                {
+                    name: 'subPlatCharge',
+                    display: '二级商户手续费',
+                    align: 'left',
+                    width: 200,
+                    isSort: true,
+                    type: 'text'
+                }
+            ],
+            url: '${base.contextPath}/bill/get',
+            toolbar: {
+                items: [
+                    {line: true},
+                    {
+                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                        menu: {
+                            width: 120, items:
+                                [
+                                    {
+                                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',
+                                        id: 'export',
+                                        icon: 'print',
+                                        name: "export",
+                                        click: function () {
+                                            exportSelected("d_stm_001_form", "d_stm_001_grid", {}, _basePath);
+                                        }
+                                    },
+                                    {line: true},
+                                    {
+                                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',
+                                        id: 'export',
+                                        icon: 'print',
+                                        name: "export",
+                                        click: function () {
+                                            //exportAll("d_stm_001_form", "d_stm_001_grid", {}, _basePath);
+                                            $.ajax({
+                                                type: 'POST',
+                                                url: "${base.contextPath}/bill/export",
+                                            });
+                                        }
+
+                                    }
+                                ]
+                        }
+                    }
+                ]
+            },
+            enabledEdit: false,
+            delayLoad: false,
+            width: '99%',
+            height: '98%',
+            rownumbers: true,
+            checkbox: true
+        });
+         Hap.gridQuery({
+             form: d_stm_001_form,
+             grid: d_stm_001_grid
+         })
+    });
+    //
+    // function submitForm() {
+    //     Hap.gridSave({
+    //         grid: d_stm_001_grid,
+    //         url: '${base.contextPath}/dm/shippingTier/query'
+    //     });
+    // }
+
+    function shippingTierEdit(shippingTierId) {
+        window.top.f_removeTab('shipping_tier_edit');
+        window.top.f_addTab('shipping_tier_edit', '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shipping.shippingtier"/>', '${base.contextPath}/dm/dm_shipping_tier.html?isedit=1&shippingTierId=' + shippingTierId + '&salesOrgId=' + liger.get('salesOrgId').getValue());
+    }
+</script>
+</body>
+</html>

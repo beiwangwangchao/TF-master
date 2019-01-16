@@ -1,0 +1,245 @@
+<#-- 
+ * description: 用户分配角色界面
+ * version: 1.0 
+ * author:liang.rao
+ *
+ * 
+-->
+
+<#include "../include/head.html">
+
+<body>
+    <div id="user_role_grid" style="margin: 5px;"></div>
+	<script src="${base.contextPath}/common/code?yes_no=SYS.YES_NO" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var deleterow = new Array;
+        /* 设定该页面为dialog */
+        var dialog = frameElement.dialog;
+
+        /*设定新增，删除，保存是否可用 默认不可用*/
+        var bDisable = false;
+
+        /* 获取Cookie中的值 */
+        function getCookie(cookie_name) {
+            var allcookies = document.cookie;
+            var cookie_pos = allcookies.indexOf(cookie_name);//索引的长度
+
+            if (cookie_pos != -1) {
+                // 把cookie_pos放在值的开始，只要给值加1即可。
+                cookie_pos += cookie_name.length + 1;
+                var cookie_end = allcookies.indexOf(";", cookie_pos);
+                if (cookie_end == -1) {
+                    cookie_end = allcookies.length;
+                }
+                var value = unescape(allcookies.substring(cookie_pos, cookie_end));
+            }
+            return value;
+        }
+
+       /* var userName=getCookie('loginName');
+        if(userName == "sysadmin"){
+            bDisable = false;
+        }*/
+        /* user_role_grid对象 */
+        var user_role_grid = null;
+        
+        /* 数据库查询出所有角色显示的grid */
+        user_role_grid = window['user_role_grid'] = $("#user_role_grid").ligerGrid({
+            columns: [{
+                      display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolecode"/>',
+                      name: "roleCode", 
+                      align: 'left'
+                  },
+                  { 
+                      display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.rolename"/>',
+                      name: "roleName", 
+                      align: 'left'
+                  },
+                  { 
+                      display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.roledesc"/>',
+                      name: "roleDesc", 
+                      align: 'left'
+                  },
+                  { 
+                      display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.defaultflag" />',
+                      name: "defaultFlag",
+                      align: 'left',
+                      editor : {
+                          type : 'select',
+                          data : yes_no,
+                          valueField : 'value',
+                          textField : 'meaning'
+                      },
+                      render : function(item) {
+      					for (var i in yes_no) {
+      						if (yes_no[i].value == item.defaultFlag) {
+      							return yes_no[i].meaning;
+      						}
+      					}
+      				  },
+                      validate : {
+                          required : true
+                      }
+                  },
+                  { 
+                      display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.role.assignorganization"/>',
+                      align: 'left',
+                      render : function(e) {
+                          if(e.__status != 'add'){
+                              var html = "<a href='#' onClick='editOrgTemplate(" + e.roleId + ")'><@spring.message 'type.com.lkkhpg.dsis.platform.dto.system.role.assignorganization'/></a>";
+                              return html; 
+                          }
+                      }  
+                  }
+            ],
+            checkbox : true,
+            height: '96%', 
+            url:'${base.contextPath}/sys/role/queryUserRoles?userId=' + ${RequestParameters.userId},
+            onAfterEdit : f_onAfterEdit,
+            enabledEdit : true,
+            toolbar: { 
+                items: [
+                    { 
+                        text: '<@spring.message "sys.hand.btn.new"/>', 
+                        click: function(){
+                              var manager = $("#user_role_grid").ligerGetGridManager();
+                               $.ligerDialog.open({ 
+                                   url: 'sys_user_chooserole.html?userId=' + ${RequestParameters.userId}, 
+                                   height: 500, 
+                                   width: 700,
+                                   buttons: [{
+                                        cls:'l-dialog-btn-highlight',
+                                        text: '<@spring.message "sys.hand.btn.ok"/>',
+                                        onclick: function (item, dialog) {
+		                                     var data = dialog.frame.$.ligerui.get("userchooserole_grid").getSelectedRows();
+	                                         for(var i = 0; i < data.length;i++ ){
+	                                             manager.addRow({
+	                                               roleId   : data[i].roleId,
+	                                               roleCode : data[i].roleCode,
+	                                               roleName : data[i].roleName,
+	                                               roleDesc : data[i].roleDesc,
+	                                               defaultFlag : 'N',
+	                                             });
+	                                         }
+		                                     dialog.close();
+                                         }
+                                       },
+                                    	{ 
+                                           text: '<@spring.message "sys.hand.btn.cancel"/>', 
+                                           onclick: function (item, dialog) { dialog.close(); } 
+                                      	}
+                                ], 
+                                isResize: true
+                            });
+                        }, 
+                        icon: 'add',
+                        disable: bDisable
+                    },
+                    { 
+                        line: true 
+                    },
+                     { 
+                        text: '<@spring.message "sys.hand.btn.delete"/>', 
+                        click: function() {
+                        	var data = user_role_grid.getSelectedRows();
+                        	for (var i = 0; i < data.length; i++) {
+                                 data[i].userId = ${RequestParameters.userId};
+                        	}
+                        	$.ligerDialog.confirm("<@spring.message 'msg.warning.sys.delete_or_not' />", function(yes) {
+                        		if (yes) {
+                        			$.ajax({
+                                        type: 'POST',
+                                        url:"${base.contextPath}/sys/userassign/delete",
+                                        data: JSON2.stringify(data),
+                                        contentType: "application/json; charset=utf-8",
+                                        success: function (json) {
+                                            if(json.success){
+                                                user_role_grid.reload();
+                                                Hap.showSuccess($l('sys.hand.tip.success'));
+                                            }
+                                         }
+                                     });
+                        		}
+                        	});
+                        },
+                        icon: 'delete',
+                        disable: bDisable
+                    },
+                    { 
+                        line: true 
+                    },
+                     { 
+                        text: '<@spring.message "sys.hand.btn.save"/>', 
+                        click: function() {
+                        	save_click();
+                       	}, 
+                        icon: 'save',
+                        disable: bDisable
+                    }
+                ]
+            },
+        });
+        
+    window.editOrgTemplate = function(roleId) {
+        window.popWin = $.ligerDialog.open({
+            load : false,
+            width : 600,
+            height : 550,
+            url : 'sys_assign_organization.html?isedit=1&userId=' + ${RequestParameters.userId}+'&roleId='
+                    + roleId
+        });
+    }
+        
+   /* 点击grid保存按钮，保存已勾选的数据到数据库 */
+   function save_click(){
+	   var num = 0;
+       var data = user_role_grid.getData();
+       if (data.length == 0) {
+           return;
+       }
+       for (var i = 0; i < data.length; i++) {
+           data[i].userId = ${RequestParameters.userId};
+           if (data[i].defaultFlag) {
+        	   if (data[i].defaultFlag == "Y") {
+        		   num ++;
+        	   }
+        	   continue;
+           } else {
+        	   $.ligerDialog.warn("<@spring.message 'msg.error.config.default_not_empty' />");
+        	   return false;
+           }
+       }
+       if (num != 1) {
+   	   		$.ligerDialog.warn("<@spring.message 'msg.error.config.user_has_one_default' />");
+   	   		return false;
+       }
+       $.ajax({
+           type: 'POST',
+           url:"${base.contextPath}/sys/userassign/submit",
+           data: JSON2.stringify(data),
+           contentType: "application/json; charset=utf-8",
+           success: function (json) {
+               if(json.success){
+                   user_role_grid.reload();
+                   Hap.showSuccess($l('sys.hand.tip.success'));
+               }
+            }
+        });
+   }
+   /*只能有一个默认值*/
+   function f_onAfterEdit(rowData){
+	   var gridData = user_role_grid.getData();
+	   if (rowData.value == 'Y') {
+		   for (var i=0; i<gridData.length; i++) {
+			   if (gridData[i].defaultFlag == 'Y' && rowData.rowindex != i) {
+				   user_role_grid.updateRow(user_role_grid.getRow(i), {
+					   defaultFlag : 'N'
+				   });
+			   }
+		   }
+	   }
+   }
+</script>
+</body>
+</html>

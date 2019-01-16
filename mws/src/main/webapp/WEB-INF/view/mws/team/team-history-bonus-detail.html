@@ -1,0 +1,362 @@
+<#include "/mws/include/header.html">
+<!-- <link href="${base.contextPath}/resources/css/metro${resource_suffix!}.css" rel="stylesheet"> -->
+<link href="${base.contextPath}/resources/css/date/bootstrap-datetimepicker${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/date/bootstrap-datetimepicker${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/awesomeStyle/awesome${resource_suffix!}.css" rel="stylesheet">
+<style>
+ul.base-info{
+    text-align: center;
+    padding-top: 20px;
+    font-size: 10px;
+}
+ul.base-info li {
+    float: left;
+    list-style: none;
+}
+    
+.ztree li span.button.pIcon01_ico_close{
+    margin-right:2px;
+     background: url(${base.contextPath}/resources/img/myteam/u04.jpg) no-repeat scroll 0 0 transparent; 
+     vertical-align:top;
+      *vertical-align:middle
+      }
+      
+.ztree li span.button.pIcon01_ico_open{
+    margin-right:2px;
+    background: url(${base.contextPath}/resources/img/myteam/04.png) no-repeat scroll 0 0 transparent;
+    vertical-align:top; 
+    *vertical-align:middle
+    }
+.top-name{
+    margin-top:20px;
+    font-weight: bold;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+}
+.table-td{
+    background-color: #CEE2FA;
+}
+.lable{
+    white-space:nowrap;
+    width: 60%;
+    text-align: right;
+    display:inline;
+}
+</style>
+
+<script src="${base.contextPath}/resources/js/jquery.ztree.core${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/jquery.ztree.all${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker.zh-CN${resource_suffix!}.js"></script>
+
+<script type="text/javascript">
+var appendBasicShow = "";
+var appendExtraShow = "";
+var appendPerformanceShow = "";
+var appendLeaderShow = "";
+var basicDealerNo = "";
+var extraDealerNo = "";
+var performanceDealerNo = "";
+var leaderDealerNo = "";
+$(function(){
+    
+    $.ajax({
+        type: "POST",
+        url: "${base.contextPath}/team/queryPeriod",
+        data: {param:'No'},
+        dataType: "json",
+        success: function(data){
+            if(data.success){
+                var html = [];
+                var data = data.rows;
+                if(data.length>0){
+                    for(var i=0;i<3;i++){
+                        var item = data[i];
+                        /* html.push("<li>"+ item.periodName +"</li>"); */
+                        html.push("<option value="+ item.periodName +">"+ item.periodName +"</option>");
+                    }
+                    $("#bonusPeriod").html(html.join(''));
+                }
+            }
+        }
+    });
+    
+
+
+
+          
+          
+//           f_button(${Session.memberCode});
+});
+
+function zTreeOnClick(event, treeId, treeNode) {
+    /* $.ajax({
+        type: "POST",
+        url: "${base.contextPath}/team/getHistoryTree",
+        data: {
+            memberId : treeNode.id,
+            memberCode : treeNode.memberCode
+        },
+        async:false,
+        dataType: "json",
+        success: function(data){
+            if(data.success){
+                
+            }
+        }
+    }); */
+}
+
+// basic 树型
+function getBasicTree(){
+    
+    var setting = {
+            data : {
+                simpleData : {
+                    enable : true
+                }
+            },
+            async : {
+                enable : true,
+                url : "${base.contextPath}/team/getBasicTree",
+                autoParam : [ "id=memberCode","bonusPeriod","level"],
+            //异步返回后经过Filter 
+            },
+            callback : {
+                onAsyncSuccess : zTreeOnAsyncSuccess,//异步加载成功的fun 
+                onAsyncError : zTreeOnAsyncError, //加载错误的fun 
+                onClick : zTreeOnClick
+            //捕获单击节点之前的事件回调函数 
+            }
+            
+    };
+    
+    var zNodes = [ 
+                  {level : 0, id:basicDealerNo, pId:0, name:appendBasicShow, bonusPeriod:$("#bonusPeriod").val(), open:true, isParent:true, icon:"${base.contextPath}/resources/img/ztree/diy/ccc.png"}
+              ];
+              
+              function zTreeOnAsyncError(event, treeId, treeNode) {
+                  alert("异步加载失败!");
+              }
+              function zTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+              }
+              
+              $.fn.zTree.init($("#basicTreeDemo"), setting, zNodes);
+}
+
+//extra 树型
+function getExtraTree(){
+    
+    var setting = {
+            data : {
+                simpleData : {
+                    enable : true
+                }
+            },
+            async : {
+                enable : true,
+                url : "${base.contextPath}/team/getExtraTree",
+                autoParam : [ "id=memberCode","bonusPeriod","level"],
+            //异步返回后经过Filter 
+            },
+            callback : {
+                onAsyncSuccess : zTreeOnAsyncSuccess,//异步加载成功的fun 
+                onAsyncError : zTreeOnAsyncError, //加载错误的fun 
+                onClick : zTreeOnClick
+            //捕获单击节点之前的事件回调函数 
+            }
+            
+    };
+    
+    var zNodes = [ 
+                  {level : 0, id:extraDealerNo, pId:0, name:appendExtraShow, bonusPeriod:$("#bonusPeriod").val(), open:true, isParent:true, icon:"${base.contextPath}/resources/img/ztree/diy/ccc.png"}
+              ];
+              
+              function zTreeOnAsyncError(event, treeId, treeNode) {
+                  alert("异步加载失败!");
+              }
+              function zTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+              }
+              
+              $.fn.zTree.init($("#extraTreeDemo"), setting, zNodes);
+}
+
+//Performance 树型
+function getPerformanceTree(){
+    
+    var setting = {
+            data : {
+                simpleData : {
+                    enable : true
+                }
+            },
+            async : {
+                enable : true,
+                url : "${base.contextPath}/team/getPerformanceTree",
+                autoParam : [ "id=memberCode","bonusPeriod","level"],
+            //异步返回后经过Filter 
+            },
+            callback : {
+                onAsyncSuccess : zTreeOnAsyncSuccess,//异步加载成功的fun 
+                onAsyncError : zTreeOnAsyncError, //加载错误的fun 
+                onClick : zTreeOnClick
+            //捕获单击节点之前的事件回调函数 
+            }
+            
+    };
+    
+    var zNodes = [ 
+                  {level : 0, id:performanceDealerNo, pId:0, name:appendPerformanceShow, bonusPeriod:$("#bonusPeriod").val(), open:true, isParent:true, icon:"${base.contextPath}/resources/img/ztree/diy/ccc.png"}
+              ];
+              
+              function zTreeOnAsyncError(event, treeId, treeNode) {
+                  alert("异步加载失败!");
+              }
+              function zTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+              }
+              
+              $.fn.zTree.init($("#performanceTreeDemo"), setting, zNodes);
+}
+
+//Leadership 树型
+function getLeadershipTree(){
+    
+    var setting = {
+            data : {
+                simpleData : {
+                    enable : true
+                }
+            },
+            async : {
+                enable : true,
+                url : "${base.contextPath}/team/getLeadershipTree",
+                autoParam : [ "id=memberCode","bonusPeriod","level"],
+            //异步返回后经过Filter 
+            },
+            callback : {
+                onAsyncSuccess : zTreeOnAsyncSuccess,//异步加载成功的fun 
+                onAsyncError : zTreeOnAsyncError, //加载错误的fun 
+                onClick : zTreeOnClick
+            //捕获单击节点之前的事件回调函数 
+            }
+            
+    };
+    
+    var zNodes = [ 
+                  {level : 0, id:leaderDealerNo, pId:0, name:appendLeaderShow, bonusPeriod:$("#bonusPeriod").val(), open:true, isParent:true, icon:"${base.contextPath}/resources/img/ztree/diy/ccc.png"}
+              ];
+              
+              function zTreeOnAsyncError(event, treeId, treeNode) {
+                  alert("异步加载失败!");
+              }
+              function zTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+              }
+              
+              $.fn.zTree.init($("#leaderTreeDemo"), setting, zNodes);
+}
+
+function query(){
+    var bonusPeriod = $("#bonusPeriod").val();
+    //alert(bonusPeriod);
+    $.ajax({
+        type: "POST",
+        url: "${base.contextPath}/team/initBonusDetail",
+        data: {bonusPeriod : bonusPeriod},
+        async:false,
+        dataType: "json",
+        success: function(data){
+            //if(data.success){
+                //var data = data.rows;
+                if(data.length > 0){
+                    for(var i in data){
+                        if(data[i].treeName == "tree1"){
+                            appendBasicShow = "<" + (0) + ">" + data[i].tree1[0].dealerNo + " / " + data[i].tree1[0].saleOrgCode + " / " + data[i].tree1[0].pv + " / " + data[i].tree1[0].gv + " / " + data[i].tree1[0].parsedTitlerate + " / " + data[i].tree1[0].gdcamt;
+                            basicDealerNo = data[i].tree1[0].dealerNo;
+                        }else if(data[i].treeName == "tree2"){
+                            appendExtraShow = "<" + (0) + ">" + data[i].tree2[0].dealerNo + " / " + data[i].tree2[0].saleOrgCode + " / " + data[i].tree2[0].pv + " / " + data[i].tree2[0].gv + " / " + data[i].tree2[0].lbcnt + " / " + data[i].tree2[0].lbgv + " / " + data[i].tree2[0].lbamt;
+                            extraDealerNo = data[i].tree2[0].dealerNo
+                        }else if(data[i].treeName == "tree3"){
+                            appendPerformanceShow = "<" + (0) + ">" + data[i].tree3[0].dealerNo + " / " + data[i].tree3[0].saleOrgCode + " / " + data[i].tree3[0].pv + " / " + data[i].tree3[0].gv + " / " + data[i].tree3[0].parsedPbrate + " / " + data[i].tree3[0].pbamt;
+                            performanceDealerNo  = data[i].tree3[0].dealerNo
+                        }else if(data[i].treeName == "tree4"){
+                            appendLeaderShow = "<" + (0) + ">" + data[i].tree4[0].dealerNo + " / " + data[i].tree4[0].saleOrgCode + " / " + data[i].tree4[0].pv + " / " + data[i].tree4[0].bbcnt + " / " + data[i].tree4[0].bbgv + " / " + data[i].tree4[0].bblevelno + " / " + data[i].tree4[0].bbamt;
+                            leaderDealerNo = data[i].tree4[0].dealerNo
+                        }
+                    }
+                    getBasicTree();
+                    getExtraTree();
+                    getPerformanceTree();
+                    getLeadershipTree();
+                    $(".ztree").show();
+                }else{
+                    $(".ztree").hide();
+                }
+            //}
+        }
+    });
+    
+}
+</script>
+
+<section id="content">
+<div class="container">
+    
+    <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.nav.myteam"/></li>
+            <li><@spring.message "mws.myteam.member.bonus.history.inquiry"/></li>
+    </ol>
+
+    <div class="row">
+                <#include "../include/myteam-menu.html">
+        <div class="col-sm-8 col-md-9" style="margin: 10px 0px 2px 0px; padding: 0;">
+            <div class="form-group" style="padding: 2px;margin-left: 5px;background-color: #CEE2FA;margin-right:0px;height: 10px;"></div>
+            <!-- <div><iframe src="http://www.baidu.com" width=1000px height=1000px frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes"/></div> -->
+                
+                <div>
+                    <div><@spring.message "type.com.lkkhpg.dsis.common.report.period"/> <select id="bonusPeriod" style="width: 100px;height: 30px;"></select>
+                    <span><input class="btn btn-default" type="button" value="<@spring.message 'sys.hand.btn.query'/>" onclick="query()"/></span>
+                    </div>
+                    
+                </div>
+            <div class="col-sm-12 col-md-12 sidebar" style="margin: 10px 0px 0px 0px; padding: 0;">
+                <div class="zTreeDemoBackground left" style="overflow: auto;">
+                    <p class="title-text">Basic Sales Bonus</p>
+                    <p class="title-text">(Pattern : CardNo / OrgCode / PV / GV / TitleRate / GDCAMT)</p>
+                    <!-- <p class="title-text">格式 : (經銷商編號 / 級別 / 姓名 / 個人銷售業績 / 無限代組織積分 / 入會年份及月份)</p> -->
+                    <ul id="basicTreeDemo" class="ztree"></ul>
+                </div>
+                <div style="background-color: #CEE2FA;;height: 1px;"></div>
+                <div class="zTreeDemoBackground left" style="overflow: auto;">
+                    <p class="title-text">Extra Sales Bonus</p>
+                    <p class="title-text">(Pattern : CardNo / OrgCode / PV / GV / LBCNT / LBGV / LBAMT)</p>
+                    <!-- <p class="title-text">格式 : (經銷商編號 / 級別 / 姓名 / 個人銷售業績 / 無限代組織積分 / 入會年份及月份)</p> -->
+                    <ul id="extraTreeDemo" class="ztree"></ul>
+                </div>
+                <div style="background-color: #CEE2FA;;height: 1px;"></div>
+                <div class="zTreeDemoBackground left" style="overflow: auto;">
+                    <p class="title-text">Performance Bonus</p>
+                    <p class="title-text">(Pattern : CardNo / OrgCode / PV / GV / PbRate / PBAMT)</p>
+                    <!-- <p class="title-text">格式 : (經銷商編號 / 級別 / 姓名 / 個人銷售業績 / 無限代組織積分 / 入會年份及月份)</p> -->
+                    <ul id="performanceTreeDemo" class="ztree"></ul>
+                </div>
+                <div style="background-color: #CEE2FA;;height: 1px;"></div>
+                <div class="zTreeDemoBackground left" style="overflow: auto;">
+                    <p class="title-text">Leadership Bonus</p>
+                    <p class="title-text">(Pattern : CardNo / OrgCode / PV / BBCNT / BBGV / BBLEVELNO / BBAMT)</p>
+                    <!-- <p class="title-text">格式 : (經銷商編號 / 級別 / 姓名 / 個人銷售業績 / 無限代組織積分 / 入會年份及月份)</p> -->
+                    <ul id="leaderTreeDemo" class="ztree"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="height: 150px" class="hidden-lg hidden-md hidden-sm"></div><!--拉开底边距-->
+</div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<#include "/mws/include/footer.html">

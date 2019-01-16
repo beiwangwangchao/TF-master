@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.integration.payment.mapper.PaymentConfigMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.integration.payment.dto.PaymentConfig" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD">
+        <id column="CONFIG_ID" property="configID" jdbcType="VARCHAR" />
+        <result column="PAYMENT_TYPE" property="paymentType" jdbcType="VARCHAR" />
+        <result column="KEY" property="key" jdbcType="VARCHAR" />
+        <result column="VALUE" property="value" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        PAYMENT_TYPE, KEY, VALUE, CONFIG_ID
+    </sql>
+
+   <insert id="insertUnit" parameterType="com.lkkhpg.dsis.integration.payment.dto.PaymentConfig">
+       <selectKey resultType="java.lang.String" keyProperty="configID" order="BEFORE" >
+           select SYS_PAYMENT_CONFIG_S.nextval from dual
+       </selectKey>
+       insert into SYS_PAYMENT_CONFIG (CONFIG_ID,PAYMENT_TYPE,KEY,VALUE)
+       values (#{configID, jdbcType=VARCHAR},#{paymentType, jdbcType=VARCHAR},
+       #{key, jdbcType=VARCHAR},#{value, jdbcType=VARCHAR})
+   </insert>
+
+    <select id="selectByType" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        t.PAYMENT_TYPE, t.KEY, t.VALUE, t.CONFIG_ID
+        from sys_payment_config t
+
+        <if test="value != null">
+            where t.PAYMENT_TYPE = #{value, jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <update id="updateValueByPrimaryKey" parameterType="com.lkkhpg.dsis.integration.payment.dto.PaymentConfig">
+        update
+        sys_payment_config cfg
+        set cfg.VALUE = #{value,
+        jdbcType=VARCHAR},
+        cfg.object_version_number = cfg.object_version_number + 1,
+        cfg.request_id = #{requestId,jdbcType=DECIMAL},
+        cfg.program_id = #{programId,jdbcType=DECIMAL},
+        cfg.last_updated_by = #{lastUpdatedBy,jdbcType=DECIMAL},
+        cfg.last_update_date = CURRENT_TIMESTAMP,
+        cfg.last_update_login = #{lastUpdateLogin,jdbcType=DECIMAL}
+        where
+        cfg.CONFIG_ID = #{configID, jdbcType=DECIMAL}
+    </update>
+
+</mapper>

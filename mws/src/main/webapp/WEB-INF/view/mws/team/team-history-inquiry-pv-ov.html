@@ -1,0 +1,127 @@
+<#include "/mws/include/header.html">
+<!-- <link href="${base.contextPath}/resources/css/metro${resource_suffix!}.css" rel="stylesheet"> -->
+<link href="${base.contextPath}/resources/css/date/bootstrap-datetimepicker${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/date/bootstrap-datetimepicker${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/awesomeStyle/awesome${resource_suffix!}.css" rel="stylesheet">
+<style>
+ul.base-info{
+    text-align: center;
+    padding-top: 20px;
+    font-size: 10px;
+}
+ul.base-info li {
+    float: left;
+    list-style: none;
+}
+    
+.ztree li span.button.pIcon01_ico_close{
+    margin-right:2px;
+     background: url(${base.contextPath}/resources/img/myteam/u04.jpg) no-repeat scroll 0 0 transparent; 
+     vertical-align:top;
+      *vertical-align:middle
+      }
+      
+.ztree li span.button.pIcon01_ico_open{
+    margin-right:2px;
+    background: url(${base.contextPath}/resources/img/myteam/04.png) no-repeat scroll 0 0 transparent;
+    vertical-align:top; 
+    *vertical-align:middle
+    }
+.top-name{
+    margin-top:20px;
+    font-weight: bold;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+}
+.table-td{
+    background-color: #CEE2FA;
+}
+.lable{
+    white-space:nowrap;
+    width: 60%;
+    text-align: right;
+    display:inline;
+}
+</style>
+
+<script src="${base.contextPath}/resources/js/jquery.ztree.core${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/jquery.ztree.all${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker.zh-CN${resource_suffix!}.js"></script>
+<script type="text/javascript">
+$(function(){
+	
+	var nowDate = new Date();
+    var year = nowDate.getFullYear();
+    var month = nowDate.getMonth()+1;
+    for(i=12;i>0;i--){
+    month = month < 10 ? '0'+month : month;
+    //var date = year + month;
+        if(month!="01"){
+        $('#beforeBonusPeriod').append("<option value='"+year+month+"'>"+ year + month +"</option");
+        $('#afterBonusPeriod').append("<option value='"+year+month+"'>"+ year + month +"</option");
+        month--;
+        }else{
+        $('#beforeBonusPeriod').append("<option value='"+year+month+"'>"+ year + month +"</option");  
+        $('#afterBonusPeriod').append("<option value='"+year+month+"'>"+ year + month +"</option"); 
+        year--;
+        month=12;
+        }
+    }
+    /* $.ajax({
+        type: "POST",
+        url: "${base.contextPath}/team/queryPeriod",
+        data: {},
+        dataType: "json",
+        success: function(data){
+            if(data.success){
+                var html = [];
+                var data = data.rows;
+                if(data.length>0){
+                    for(var i=0;i<10;i++){
+                        var item = data[i];
+                        html.push("<option value="+ item.periodName +">"+ item.periodName +"</option>");
+                    }
+                    $("#beforeBonusPeriod").html(html.join(''));
+                    $("#afterBonusPeriod").html(html.join(''));
+                }
+            }
+        }
+    }); */
+});
+</script>
+<section id="content">
+<div class="container">
+    
+    <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.nav.myteam"/></li>
+            <li><@spring.message "mws.myteam.pv.ov.history.inquiry"/></li>
+    </ol>
+    <div class="row">
+                <#include "../include/myteam-menu.html">
+	    <form action="${base.contextPath}/report/run" target="pv_ov_historyInquiry">
+		    <div class="col-sm-8 col-md-9" style="margin: 10px 0px 2px 0px; padding: 0;">
+	            <div class="form-group" style="padding: 2px;margin-left: 5px;background-color: #CEE2FA;margin-right:0px;height: 10px;"></div>
+	                <div>
+	                    <div><@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.periodfrom"/> <select id="beforeBonusPeriod" name="periodFrom" style="width: 100px;height: 30px;"></select>
+	                                <@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.periodto"/> <select id="afterBonusPeriod" name="periodTo" style="width: 100px;height: 30px;"></select>
+	                                <input type="hidden" name="reportProgramCode" value="PV_OV(History)_Inquiry"/>
+	                                <input type="hidden" name="docType" value="HTML"/>
+	                                <!-- <input type="hidden" name="memberCode" value=""/> -->
+	                        <span><input class="btn btn-default" type="submit" value="<@spring.message 'sys.hand.btn.query'/>" /></span>
+	                    </div>
+	                </div>
+	        </div>
+	    </form>
+	    <iframe name="pv_ov_historyInquiry" style="width: 870px;height: 500px;"></iframe>
+    </div>
+    <div style="height: 150px" class="hidden-lg hidden-md hidden-sm"></div><!--拉开底边距-->
+</div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<#include "/mws/include/footer.html">

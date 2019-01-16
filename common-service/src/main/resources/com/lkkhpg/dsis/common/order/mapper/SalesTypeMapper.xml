@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.SalesTypeMapper">
+	<resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.SalesType">
+		<id column="SALES_TYPE_ID" property="salesTypeId" jdbcType="DECIMAL" />
+		<result column="ORDER_TYPE_ID" property="orderTypeId" jdbcType="DECIMAL" />
+		<result column="SALES_TYPE" property="salesType" jdbcType="VARCHAR" />
+        <result column="SALES_TYPE" property="itemSalesType" jdbcType="VARCHAR" />
+        <result column="SALES_TYPE_NAME" property="itemSalesTypeName" jdbcType="VARCHAR" />
+		<result column="FREE_FLAG" property="freeFlag" jdbcType="VARCHAR" />
+		<result column="CAL_PV_FLAG" property="calPvFlag" jdbcType="VARCHAR" />
+		<result column="TAX_PRICE" property="taxPrice" jdbcType="VARCHAR" />
+		<result column="DEFAULT_FLAG" property="defaultFlag" jdbcType="VARCHAR" />
+		
+		<result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		SALES_TYPE_ID, ORDER_TYPE_ID, SALES_TYPE, FREE_FLAG, CAL_PV_FLAG, TAX_PRICE, DEFAULT_FLAG,
+		ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+		ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+	</sql>
+	
+	<insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.SalesType" >
+    <selectKey resultType="java.lang.Long" keyProperty="salesTypeId" order="BEFORE" >
+		select OM_SALES_TYPE_s.nextval from dual
+    </selectKey>
+    	INSERT INTO OM_SALES_TYPE (
+			SALES_TYPE_ID, ORDER_TYPE_ID, SALES_TYPE, FREE_FLAG, CAL_PV_FLAG, TAX_PRICE, DEFAULT_FLAG
+		)
+		VALUES (#{salesTypeId,jdbcType=DECIMAL}, #{orderTypeId,jdbcType=DECIMAL}, #{salesType,jdbcType=VARCHAR},
+			#{freeFlag,jdbcType=VARCHAR}, #{calPvFlag,jdbcType=VARCHAR}, #{taxPrice,jdbcType=VARCHAR},
+			#{defaultFlag,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.lkkhpg.dsis.common.order.dto.SalesType" >
+		update OM_SALES_TYPE
+		set
+		  SALES_TYPE = #{salesType,jdbcType=VARCHAR},
+		  FREE_FLAG = #{freeFlag,jdbcType=VARCHAR},
+		  CAL_PV_FLAG = #{calPvFlag,jdbcType=VARCHAR},
+		  TAX_PRICE = #{taxPrice,jdbcType=VARCHAR},
+		  DEFAULT_FLAG = #{defaultFlag,jdbcType=VARCHAR}
+		where SALES_TYPE_ID = #{salesTypeId,jdbcType=DECIMAL}
+	</update>
+	
+	<select id="queryByOrderTypeId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+	    select 
+	    	<include refid="Base_Column_List" />
+	    from
+			OM_SALES_TYPE
+	    where
+			ORDER_TYPE_ID = #{orderTypeId,jdbcType=DECIMAL}
+	</select>
+	
+	<!-- //#POS2SUPT-1158 2017-07-18 BEGIN  -->
+	<select id="queryByOrderTypeIdAndSalesType" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.order.dto.SalesType" >
+	    select 
+	    	<include refid="Base_Column_List" />
+	    from
+			OM_SALES_TYPE
+	    where
+			ORDER_TYPE_ID = #{orderTypeId,jdbcType=DECIMAL}
+			and SALES_TYPE = #{salesType,jdbcType=VARCHAR}
+	</select>
+	<!-- //#POS2SUPT-1158 2017-07-18 END  -->
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    	delete from OM_SALES_TYPE
+		where SALES_TYPE_ID = #{salesTypeId,jdbcType=DECIMAL}
+	</delete>
+	
+	<delete id="deleteByOrderTypeId" parameterType="java.lang.Long" >
+    	delete from OM_SALES_TYPE
+		where ORDER_TYPE_ID = #{orderTypeId,jdbcType=DECIMAL}
+	</delete>
+    
+     <select id="querySalesTypeForOrder" parameterType="com.lkkhpg.dsis.common.order.dto.SalesType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />,
+        SALES_TYPE itemSalesType,
+        (
+            SELECT
+                tl.MEANING
+            FROM
+                SYS_CODE_VALUE_TL tl,
+                SYS_CODE_VALUE_B cvb,
+                SYS_CODE_B scb
+            WHERE
+                scb.CODE_ID = cvb.CODE_ID
+            AND scb.CODE = 'OM.PRODUCT_SALES_TYPE'
+            AND TL.CODE_VALUE_ID = cvb.CODE_VALUE_ID 
+            AND tl.LANG = #{request.locale,jdbcType=VARCHAR}
+            AND cvb.VALUE = SALES_TYPE
+        ) itemSalesTypeName
+        from
+        OM_SALES_TYPE
+        <where>
+            ORDER_TYPE_ID = (select ORDER_TYPE_ID from OM_ORDER_TYPE where sales_org_id = #{salesOrgId,jdbcType=DECIMAL}
+            and order_type = #{orderType,jdbcType=VARCHAR})
+            <if test="salesType != null">
+                and SALES_TYPE = #{salesType,jdbcType=VARCHAR}
+            </if>
+        </where>
+        ORDER BY DEFAULT_FLAG DESC
+    </select>
+    
+    <!-- // POS2SUPT-1171 2017-09-04 BEGIN  -->
+	<select id="selectBySalesType" resultMap="BaseResultMap" >
+	    select ost.SALES_TYPE_ID,ost.ORDER_TYPE_ID,ost.SALES_TYPE,ost.FREE_FLAG,ost.CAL_PV_FLAG,
+	    	   ost.TAX_PRICE,ost.DEFAULT_FLAG
+	    from
+			OM_SALES_TYPE ost
+		left join OM_ORDER_TYPE oot
+		on ost.ORDER_TYPE_ID=oot.ORDER_TYPE_ID
+	    where oot.SALES_ORG_ID=#{salesOrgId,jdbcType=DECIMAL}
+	     and oot.order_type='STDP'
+	     <if test="salesType!=null">
+	     	and ost.SALES_TYPE=#{salesType,jdbcType=VARCHAR}
+	     </if>
+	</select>
+	<!-- // POS2SUPT-1171 2017-09-04 END  -->
+</mapper>

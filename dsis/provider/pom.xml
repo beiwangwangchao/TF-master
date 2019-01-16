@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+		<groupId>com.infinitus</groupId>
+		<artifactId>dsis</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../pom-dubbo.xml</relativePath>
+  </parent>
+  <groupId>com.hand</groupId>
+  <artifactId>provider</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>provider</name>
+  <packaging>war</packaging>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <build>
+    <finalName>provider</finalName>
+  	<sourceDirectory>../src/main</sourceDirectory>
+    <testSourceDirectory>../test</testSourceDirectory>
+    <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+          <configuration>
+             <source>1.8</source> <!-- 源代码使用的开发版本 -->
+             <target>1.8</target> <!-- 需要生成的目标class文件的编译版本 -->
+             <!-- <excludes>
+                 <exclude>**/controller/*.java</exclude>
+                 <exclude>**/interceptor/*.java</exclude>
+             </excludes>  -->
+          </configuration>
+         </plugin>
+      	 <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <overlays>
+                        <overlay>
+                            <groupId>com.hand</groupId>
+							<artifactId>hap</artifactId>
+                        </overlay>
+                    </overlays>
+                     <webResources>  
+                     <resource>  
+                        <directory>src/main/webapp/WEB-INF</directory>  
+                        <!-- <filtering>true</filtering>  --> 
+                        <targetPath>WEB-INF</targetPath>  
+                     </resource>  
+                     <resource>
+                     	 <directory>../src/main/resources</directory>  
+                        <!-- <filtering>true</filtering>   -->
+                        <targetPath>WEB-INF/classes</targetPath>  
+                     </resource>
+                </webResources>  
+                </configuration>
+            </plugin>
+      
+      </plugins>
+      
+  </build>
+	<dependencies>
+		<dependency>
+			<groupId>com.hand</groupId>
+			<artifactId>hap</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<type>war</type>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+  	
+</project>

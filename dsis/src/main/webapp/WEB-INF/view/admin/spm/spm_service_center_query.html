@@ -1,0 +1,217 @@
+<#--
+ * description: 服务中心查询界面.
+ * version: 1.0
+ * author: hanrui.huang
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?serviceStatus=SC.SERVICE_CENTER_STATUS" type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+<body style="padding: 10px;">
+    <form id="spm_service_center_form" ></form>
+    <div id="spm_service_center_grid" ></div>
+    <script type="text/javascript">
+    $(function() {
+        initForm();
+        initGrid();
+        liger.get('salesOrgId').setText(_salesOrgName); // 赋初始值
+        Hap.gridQuery({
+            form: spm_service_center_form,
+            grid: spm_service_center_grid
+        })
+    });
+    function initForm() {
+        window['spm_service_center_form'] = $("#spm_service_center_form").ligerForm({
+            fields: [
+                     {
+                         label:'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.salesmarket"/>',
+                         name:'marketName',
+                         type : 'text',
+                         readonly:true,
+                         options:{
+                             value:_marketName
+                         }
+                     },
+                     /* {
+                         label:'<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition" />',
+                         name:'salesOrgName',
+                         type : 'text',
+                         readonly:true,
+                         newline : false,
+                         options:{
+                             value: _salesOrgName
+                         }
+                     }, */
+                     {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition"/>',
+                         newline:false, 
+                         id : 'salesOrgId',
+                         name: 'salesOrgId',
+                         type : "combobox",
+                         options : {
+                             url: '${base.contextPath}/sys/salesOrg/queryOrg',
+                             valueField: "salesOrgId",
+                             textField: "name",
+                             onChangeValue : function() {
+                                 $.ajax({
+                                     type : 'POST',
+                                     dataType : 'json' ,
+                                     url : '${base.contextPath}/spm/serviceCenter/selectMarketByOrg',
+                                     data : {
+                                         salesOrgId : $("#salesOrgId").val()
+                                     },
+                                     success : function(data){
+                                        var data = data.rows;
+                                        if(data.length>0){
+                                            for(var i=0;i<data.length;i++){
+                                                liger.get('marketName').setValue(data[i].name);
+                                                //liger.get('marketName').setText(data[i].name);
+                                            }
+                                        }
+                                     }
+                                 });
+                                 Hap.gridQuery({
+                                     form:spm_service_center_form,
+                                     grid:spm_service_center_grid
+                                 })
+                             }
+                         },
+                         validate : {
+                             required : true
+                         }
+                     },
+                     {
+                         label:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.code"/>',
+                         name:'code',
+                         type:'text',
+                         newline : false
+                     },
+                     {
+                         label:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.name"/>',
+                         name:'name',
+                         type:'text',
+                         newline : true
+                     },
+                     {
+                         label:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.member"/>',
+                         name:'chargeMemberCode',
+                         type:'text',
+                         newline : false
+                     },
+                     {
+                         label:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.status"/>',
+                         name:'status',
+                         type:'select',
+                         newline : false,
+                         options : {
+                             valueField : 'value',
+                             textField : 'meaning',
+                             value:'ALING',
+                             data : serviceStatus,
+                             isShowCheckBox: true,
+             			     isMultiSelect: true
+                         }
+                     },
+                     {
+                         label: 'marketId',
+                         newline:false, 
+                         name: 'marketId',
+                         type : "hidden",
+                         options:{
+                             value:_marketId
+                         }
+                     },
+                     {
+                         label: 'salesOrgId',
+                         newline:false, 
+                         name: 'salesOrgId',
+                         type : "hidden",
+                         options:{
+                             value:_salesOrgId
+                         }
+                     }
+                     ], 
+                     buttons: [
+                               {
+                                   text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                                       if(Hap.validateForm(spm_service_center_form) == false){ // 未通过校验
+                                    	   return;
+                                       }
+                                       Hap.gridQuery({
+                                           form:spm_service_center_form,
+                                           grid:spm_service_center_grid
+                                       })
+                                   }
+                               }
+                               ]
+                               
+        });
+    }
+    
+    function initGrid() {
+        window['spm_service_center_grid'] = $("#spm_service_center_grid").ligerGrid({
+            delayLoad:true,
+            columns: [
+                      {
+                          display:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.code"/>',
+                          name: 'code', align: 'left', width: '150',isSort : true,
+                          render : function (data) 
+                          {
+                              var html = "<a href='#' onClick='cityClick(\"" + data.serviceCenterId + "\")'>" + data.code + "</a>";
+                              return html;
+                          }
+                      },
+                      {
+                          display:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.name"/>',
+                          name: 'name', align: 'left', width: '150'
+                      },
+                      {
+                          display:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.status"/>',
+                          name: 'status', align: 'left', width: '150',
+                          isSort : false,
+                          editor: {
+                              type: 'select',
+                              valueField: 'value',
+                              textField: 'meaning',
+                              data: serviceStatus
+                          },
+                          render: function(item) {
+                              return getCodeDesc(serviceStatus, item.status);
+                          }
+                      },
+                      {
+                          display:'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.member"/>',
+                          name: 'chargeMemberCode', align: 'left', width: '150'
+                      }
+                      ],
+                      url:'${base.contextPath}/spm/serviceCenter/query',
+                      toolbar: {
+                          items:[
+                                 {
+                                     text: '<@spring.message "sys.hand.btn.new"/>',
+                                     <#if accessService.access("CREATE_EDITABLE") == false>
+                                     disable:true,
+                                     </#if>
+                                     click: function(){
+                                         window.top.f_removeTab('spm_service_center_edit');
+                                         parent.f_addTab("spm_service_edit","<@spring.message 'type.type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.details'/>","${base.contextPath}/spm/spm_service_center_edit.html?isedit=0");
+                                     }, 
+                                     icon: 'add'
+                                 }
+                                 ],
+                      },
+                      enabledEdit: false,
+                      width: '99%', 
+                      height: '98%', 
+                      rownumbers: true
+        });
+    }
+    function cityClick(data) 
+    {
+        window.top.f_removeTab("spm_service_edit_"+data);
+        parent.f_addTab("spm_service_edit_"+data,"<@spring.message 'type.type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.details'/>","${base.contextPath}/spm/spm_service_center_edit.html?isedit=1&serviceCenterId="+data+'&salesOrgId='+liger.get('salesOrgId').getValue());
+    };
+    </script>
+</body>

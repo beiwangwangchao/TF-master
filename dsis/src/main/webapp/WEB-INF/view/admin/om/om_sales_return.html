@@ -1,0 +1,315 @@
+<#-- 
+ * description: 退货单查询界面.
+ * version: 1.0 
+ * author:liuxuan
+ * .
+ * 
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?state=RM.RETURN_STATUS&Typedefs=RM.RETURN_TYPE"
+	type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.min.js?v=20161026" type="text/javascript"></script>
+<body style="padding: 10px; overflow: hidden;">
+    <form id="d_sc_002_form"></form>
+    <div id="d_sc_002_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function() {
+    	var salesOrgMarket;
+    	var marketId = null;
+    	initForm();
+    	initGrid();
+        query_return(true);
+    	
+    	function initForm() {
+    		window['d_sc_002_form'] = $("#d_sc_002_form").ligerForm({
+                fields : [ {
+    	            type : 'combobox',
+    	            display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.salesorgid"/>',
+    	            name: 'salesOrgId',
+    	            textField : 'name',
+    	            newline : false,
+    	            options : {
+    	            	value : _salesOrgId,
+    					valueField : 'salesOrgId',
+    					textField : 'name',
+    					url : _basePath + "/sys/salesOrg/queryOrg",
+    					isMultiSelect : false,
+    					isShowCheckBox : false,
+    					onSuccess : function(data) {
+    						salesOrgMarket = data.rows;
+    						this.setValue(_salesOrgId);
+    					},
+    					onBeforeSelect : function(value,text) {
+    						if (value != this.getValue()) {
+	    						f_clearForm();
+    						}
+    					},
+    					onSelected : function(value,text) {
+    						if (!value)
+    							return false;
+    						for (var i=0;i<salesOrgMarket.length;i++) {
+    							if (value == salesOrgMarket[i].salesOrgId) {
+		    						marketId = salesOrgMarket[i].market.marketId;
+		    						break;
+    							}
+    						}
+    						query_return(false);
+    					}
+                    },
+                    validate : {
+                    	required : true
+                    }
+                },{
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.orderheaderid"/>',
+                    name : 'orderNumber',
+                    type: "text",
+                    newline : false
+                }, 
+                {
+                    type : 'text',
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returnid"/>',
+                    name : 'returnNumber',
+                    newline : false
+                }, {
+                    type : 'date',
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returndatefrom"/>',
+                    name : 'returnDateFrom',
+                    format : "yyyy-MM-dd"
+                }, {
+                    type : 'date',
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returndateto"/>',
+                    name : 'returnDateTo',
+                    format : "yyyy-MM-dd",
+                    newline : false
+                }, {
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returnstatus"/>',
+     	            name: "returnStatus",
+     	            newline: false,
+     	            type: "combobox",
+     	            editor: {
+     	            	value : 'NEW',
+     	                valueField: 'value',
+     	                textField: 'meaning',
+     	                isMultiSelect: true,
+     	                data: state
+     	            }
+                },{
+                    type : 'combobox',
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returntype"/>',
+                    name : 'returnType',
+                    typeCase:'uppercase',
+                    options: {
+    	                data: Typedefs,
+    	                valueField: "value",
+    	                textField: "meaning"
+    	            }
+                },{
+                	type : 'popup',
+                	label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.memberid"/>',
+                	name : 'memberId',
+                	newline: false,
+                	options : $.extend(${lovService.getLov(base.contextPath,base.locale,"lov_member")},{
+    					onLoadData : function() {
+    						this.setParm('marketId', marketId);
+                        },
+    				}),
+                },{
+                	type : 'text',
+                	label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername" />',
+                	name : 'memberName',
+                	newline : false
+                },{
+                	type : 'text',
+                	label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.invoicenumber" />',
+                	name : 'invoiceNumber',
+                	newline : true
+                }],
+                buttons : [ {
+                    text : '<@spring.message "sys.hand.btn.query"/>',
+                    disabled : false,
+                     width : 60,
+                    click : function() {
+                    	query_return(false);
+                    }
+                }]
+            });
+    	}
+    	
+    	function initGrid() {
+    		window['d_sc_002_grid'] = $("#d_sc_002_grid").ligerGrid({
+                unSetValidateAttr : false,
+                columns : [ {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returnid"/>',
+                    name : 'returnNumber',
+                    align : 'center',
+                    isSort : true,
+                    render: function (row){
+                        var html = '<a href="javascript:edit_return('+row.returnId+');">'+row.returnNumber+'</a>';
+                        return html;
+                    }
+                }, {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.orderheaderid"/>',
+                    name : 'orderNumber',
+                    isSort : true,
+                    align : 'center'
+                } ,{
+                	display:'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returntype"/>',
+                	name:'returnType',
+                	align:'center',
+                	render : function(item) {
+    					for (var i = 0; i < Typedefs.length; i++) {
+    						if (Typedefs[i].value == item.returnType) {
+    							return Typedefs[i].meaning;
+    						}
+    					}
+    				}
+                },{
+                	display:'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returnstatus"/>',
+                	name:'returnStatus',
+                	align:'center',
+                	render : function(item) {
+    					for (var i = 0; i < state.length; i++) {
+    						if (state[i].value == item.returnStatus) {
+    							return state[i].meaning;
+    						}
+    					}
+    				}
+                },{
+                	display:'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returndate"/>',
+                	name:'returnDate',
+                	isSort : true,
+                	align:'center'
+                },{
+                	display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.memberid" />',
+                	name : 'memberCode',
+                	isSort : true,
+                	align : 'center'
+                },{
+                	display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername" />',
+                	name : 'memberName',
+                	isSort : true,
+                	align : 'center'
+                },{
+                	display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.invoicenumber" />',
+                	name : 'invoiceNumber',
+                	isSort : true,
+                	align : 'center'
+                }],
+                toolbar : {
+                    items : [{
+                    	text: '<@spring.message "sys.hand.btn.create"/>',
+                        <#if accessService.access("CREATE_EDITABLE") == false>
+    	            	disable: true,
+                        </#if>	 
+                    	click: function() {
+                    		create_return();
+                    	}, 
+                    	icon: 'add' 
+                    }, {
+                        line : true
+                    },{
+                        text : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.delorder"/>',
+                        <#if accessService.access("DELETE_EDITABLE") == false>
+    	            	disable: true,
+                        </#if>	 
+                        click : function() {
+                        	if(!deleteValidator()) {
+                        		return false;
+                        	}
+                            Hap.gridDelete({
+                                grid : d_sc_002_grid,
+                                url : '${base.contextPath}/om/return/deleteSalesReturn'
+                            })
+                        },
+                        icon : 'delete'
+                    }, {
+                    	line : true
+                    }, {                	
+                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                        menu:{ width: 120, items:
+	                            [
+		                 			{
+		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+		                 			    click:   function (){exportSelected("d_sc_002_form","d_sc_002_grid",{"returnType":Typedefs, "returnStatus":state},_basePath);}
+		                 			},
+		                 			{ line: true },
+		                 			{                	
+		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+		                 			    click: function (){exportDirectAll("d_sc_002_form","d_sc_002_grid",{"returnType":Typedefs,"returnStatus":state},_basePath);}
+		                 			}
+	                          ]
+                     	}
+                    }]
+                },
+                width : '99%',
+                height : '98%',
+                url : '${base.contextPath}/om/sales/return',
+                delayLoad: true,
+                enabledEdit : true,
+                checkbox : true,
+            });
+    	}
+        
+    });
+    /*清空Form*/
+    function f_clearForm() {
+    	liger.get("orderNumber").setValue('');
+    	liger.get("returnNumber").setValue('');
+    	liger.get("returnStatus").setValue('NEW');
+    	liger.get("returnType").setValue('');
+    	liger.get("memberId").setValue('');
+    	liger.get("memberName").setValue('');
+    	liger.get("invoiceNumber").setValue('');
+    	
+    }
+    
+    /*查询 flag-true 表示页面初始化加载*/
+    function query_return(flag) {
+    	if (!flag) {
+	    	if(!Hap.validateForm(d_sc_002_form)) {
+	    		return false;
+	    	}
+    	}
+    	Hap.gridQuery({
+            form : d_sc_002_form,
+            grid : d_sc_002_grid
+        })
+    }
+    
+    /*删除校验，只能是新建状态才能删除*/
+    function deleteValidator() {
+    	var gridData = d_sc_002_grid.getSelectedRows();
+    	for (var i=0; i<gridData.length; i++) {
+    		if (gridData[i].returnStatus != "NEW") {
+    			Hap.showError('<@spring.message "msg.warning.dto.salesreturn.returnstatus.not_allow_delete" />');
+    			return false;
+    		}
+    	}
+    	return true;
+    }
+    
+    /*新建退货单*/
+    function create_return(){
+        var path = "${base.contextPath}/om/om_salesreturn_create.html";
+        if (window.parent.f_addTab != undefined) {
+        	window.parent.f_removeTab("UPDATE_RETURN");
+            window.parent.f_addTab("CREATE_RETURN", '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.new"/>',path);
+        }else{
+            window.open(path)
+        }
+    }
+    /*编辑退货单*/
+    function edit_return(returnId){
+        var path = "${base.contextPath}/om/om_salesreturn_create.html?returnId=" + returnId;
+        if (window.parent.f_addTab != undefined) {
+        	window.parent.f_removeTab("CREATE_RETURN");
+            window.parent.f_removeTab("UPDATE_RETURN");
+            window.parent.f_addTab("UPDATE_RETURN", '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.update"/>',path);
+        }else{
+            window.open(path)  
+        }
+    }
+    </script>
+</body>
+</html>

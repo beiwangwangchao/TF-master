@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.InvoiceMapper">
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.Invoice" >
+    <id column="INVOICE_ID" property="invoiceId" jdbcType="DECIMAL" />
+    <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+    <result column="INVOICE_NUMBER" property="invoiceNumber" jdbcType="VARCHAR" />
+    <result column="INVOICE_AMOUNT" property="invoiceAmount" jdbcType="DECIMAL" />
+    <result column="ORDER_ID" property="orderId" jdbcType="DECIMAL" />
+    <result column="PRINTED_FLAG" property="printedFlag" jdbcType="VARCHAR" />
+    <result column="ATTACHMENT_ID" property="attachmentId" jdbcType="DECIMAL" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="PROGRAM_CODE" property="programCode" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INVOICE_ID, MARKET_ID, INVOICE_NUMBER, INVOICE_AMOUNT, ORDER_ID, PRINTED_FLAG, ATTACHMENT_ID, 
+    OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+    LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+    ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+    ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+    <select id="selectInvoice" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.order.dto.Invoice" >
+    select 
+    <include refid="Base_Column_List" />
+    from OM_INVOICES
+    where 1=1
+    <if test="orderId!=null">
+    and ORDER_ID = #{orderId,jdbcType=DECIMAL}
+    </if>
+  </select>
+    <insert id="insertInvoice" parameterType="com.lkkhpg.dsis.common.order.dto.Invoice" >
+    <selectKey resultType="java.lang.Long" keyProperty="invoiceId" order="BEFORE" >
+      select om_invoices_s.nextval from dual
+    </selectKey>
+    insert into OM_INVOICES
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INVOICE_ID,
+      <if test="marketId != null" >
+        MARKET_ID,
+      </if>
+      <if test="invoiceNumber != null" >
+        INVOICE_NUMBER,
+      </if>
+      <if test="invoiceAmount != null" >
+        INVOICE_AMOUNT,
+      </if>
+      <if test="orderId != null" >
+        ORDER_ID,
+      </if>
+      <if test="printedFlag != null" >
+        PRINTED_FLAG,
+      </if>
+      <if test="attachmentId != null" >
+        ATTACHMENT_ID,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{invoiceId,jdbcType=DECIMAL},
+      <if test="marketId != null" >
+        #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="invoiceNumber != null" >
+        #{invoiceNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="invoiceAmount != null" >
+        #{invoiceAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=DECIMAL},
+      </if>
+      <if test="printedFlag != null" >
+        #{printedFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="attachmentId != null" >
+        #{attachmentId,jdbcType=DECIMAL},
+      </if> 
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+       CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <select id="selectInvoiceCount" resultType="java.lang.Integer"  parameterType="com.lkkhpg.dsis.common.order.dto.Invoice">
+        select count(INVOICE_ID) from OM_INVOICES where 1=1
+        <if test="orderId!=null">
+            and ORDER_ID = #{orderId,jdbcType=DECIMAL}
+        </if>
+    </select>
+    
+   <select id="selectByInvoice" parameterType="com.lkkhpg.dsis.common.order.dto.Invoice" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from OM_INVOICES
+    where 1=1
+    <if test="marketId!=null">
+    and MARKET_ID = #{marketId,jdbcType=DECIMAL}
+    </if>
+    <if test="invoiceNumber!=null">
+    and INVOICE_NUMBER = #{invoiceNumber,jdbcType=VARCHAR}
+    </if>
+   </select>
+
+  <select id="selectInvoiceReport" parameterType="java.lang.Long" resultType="java.util.Map">
+    SELECT sf.file_path
+          ,srp.data_service_name
+      FROM sys_report_program srp
+      LEFT JOIN sys_report_template srt
+        ON srp.template_code = srt.template_code
+      LEFT JOIN sys_file sf
+        ON sf.file_id = srt.file_id
+     WHERE srp.entity_code = 'INV'
+       AND srp.entity_key = #{marketId,jdbcType=DECIMAL}
+  </select>
+  
+ <select id="selectInvoiceByOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+ 
+  SELECT
+     i.INVOICE_ID, i.MARKET_ID, i.INVOICE_NUMBER, i.INVOICE_AMOUNT, i.ORDER_ID, i.PRINTED_FLAG, i.ATTACHMENT_ID,SRP.PROGRAM_CODE
+  FROM
+      OM_INVOICES i,
+      SYS_REPORT_PROGRAM srp
+  WHERE
+      i.order_id  = #{orderId,jdbcType=DECIMAL}
+      AND srp.ENTITY_KEY = i.MARKET_ID
+    AND srp.ENTITY_CODE = 'INV'
+  </select>
+
+  <update id="updateInvoice" parameterType="com.lkkhpg.dsis.common.order.dto.Invoice">
+    update
+    OM_INVOICES i
+    set  i.ATTACHMENT_ID =  #{attachmentId,jdbcType=DECIMAL}
+   where i.invoice_id = #{invoiceId,jdbcType=DECIMAL}
+  </update>
+</mapper>

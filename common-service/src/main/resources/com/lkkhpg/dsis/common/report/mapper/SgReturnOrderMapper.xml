@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.report.mapper.SgReturnOrderMapper">
+	<resultMap id="salesReturnMap" type="com.lkkhpg.dsis.common.order.dto.SalesReturn">
+		<result column="ORDER_HEADER_ID" property="orderHeaderId" jdbcType="DECIMAL"/>
+		<result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL"/>
+		<result column="RETURN_NUMBER" property="returnNumber" jdbcType="VARCHAR"/>
+		<result column="RETURN_DATE" property="returnDate" jdbcType="TIMESTAMP"/>
+		<result column="RETURN_TYPE" property="returnType" jdbcType="VARCHAR"/>
+		<result column="RETURN_REASON" property="returnReason" jdbcType="VARCHAR"/>
+		<result column="RETURN_PROMOTION" property="returnPromotion" jdbcType="DECIMAL"/>
+		<result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+		<result column="AMOUNT" property="amount" jdbcType="DECIMAL"/>
+		<result column="TAX_AMOUNT" property="taxAmount" jdbcType="DECIMAL"/>
+		<result column="ACTUAL_PAY_AMOUNT" property="actualPayAmount" jdbcType="DECIMAL"/>
+		<result column="RETURN_STATUS" property="returnStatus" jdbcType="VARCHAR"/>
+		<result column="RETURN_ADJUST_FLAG" property="returnAdjustFlag" jdbcType="VARCHAR"/>
+		<result column="SHIPPING_FEE_FLAG" property="shippingFeeFlag" jdbcType="VARCHAR"/>
+		<result column="CREDIT_NOTE" property="creditNote" jdbcType="VARCHAR"/>
+	</resultMap>
+	<resultMap id="salesReturnLineMap" type="com.lkkhpg.dsis.common.report.dto.SgReturnOrderLine">
+		<result column="ROWNUM" property="rowNum" jdbcType="DECIMAL"/>
+		<result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR"/>
+		<result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR"/>
+		<result column="QUANTITY" property="quantity" jdbcType="DECIMAL"/>
+		<result column="PV" property="pv" jdbcType="DECIMAL"/>
+		<result column="UNIT_SELLING_PRICE" property="unitSellingPrice" jdbcType="DECIMAL"/>
+		<result column="UNIT_ORIG_PRICE" property="unitOrigPrice" jdbcType="DECIMAL"/>
+	</resultMap>
+<select id="queryRetrunSales" resultMap="salesReturnMap" parameterType="java.lang.String">
+	SELECT OSR.ORDER_HEADER_ID,
+	   OSR.SALES_ORG_ID,
+       OSR.RETURN_NUMBER,
+       OSR.RETURN_DATE,
+       OSR.RETURN_TYPE,
+       OSR.RETURN_REASON,
+       OSR.RETURN_PROMOTION,
+       OSR.REMARK,
+       OSR.AMOUNT,
+       OSR.TAX_AMOUNT,
+       OSR.ACTUAL_PAY_AMOUNT,
+       OSR.RETURN_STATUS,
+       OSR.RETURN_ADJUST_FLAG,
+       OSR.SHIPPING_FEE_FLAG,
+       OSR.CREDIT_NOTE
+  FROM OM_SALES_RETURN OSR
+  WHERE OSR.RETURN_NUMBER = #{returnNumber,jdbcType=VARCHAR,javaType=java.lang.String}
+</select>
+<select id="queryReturnOrderLine" resultMap="salesReturnLineMap" parameterType="java.lang.String">
+	SELECT ROWNUM,
+       IIB.ITEM_NUMBER,
+       IIT.ITEM_NAME,
+       OSRL.QUANTITY,
+       OSL.PV PV,
+       OSL.UNIT_SELLING_PRICE,
+       OSL.UNIT_ORIG_PRICE
+  FROM INV_ITEM_B IIB,INV_ITEM_TL IIT,OM_SALES_RETURN OSR,OM_SALES_LINE OSL,OM_SALES_RTN_LINE OSRL     
+ WHERE IIB.ITEM_ID = OSRL.ITEM_ID
+   AND OSRL.RETURN_ID = OSR.RETURN_ID
+   AND IIB.ITEM_ID = IIT.ITEM_ID 
+   AND OSRL.ORDER_LINE_ID = OSL.LINE_ID(+)
+   AND IIT.LANG = #{request.locale, jdbcType=VARCHAR}
+   AND OSR.RETURN_NUMBER = #{returnNumber,jdbcType=VARCHAR,javaType=java.lang.String}
+</select>
+
+</mapper>

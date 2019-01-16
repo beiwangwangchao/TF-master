@@ -1,0 +1,32 @@
+<#--
+ * description: 报表输出类型选择界面(用于弹出对话框)
+ * version: 1.0 
+ * author: wangc
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../../include/head.html">
+<body style="padding: 0px;">
+	<script
+		src="${base.contextPath}/common/code?exportTypeData=SYS.REPORT_EXPORT_TYPE"></script>
+	<form id="report_type_form" name="report_type_form"></form>
+	<script type="text/javascript">
+		window['report_type_form'] = $("#report_type_form").ligerForm({
+			fields : [{
+				name : 'docType',
+				newline: true,
+				type : 'select',
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.exporttype"/>',
+				options: {
+					valueField: 'value',
+			        textField: 'meaning',
+			        data: exportTypeData
+				},
+				validate: {
+					required: true
+				}
+			}]
+		})
+	</script>
+</body>
+</html>

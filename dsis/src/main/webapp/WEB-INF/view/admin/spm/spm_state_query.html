@@ -1,0 +1,82 @@
+<#--
+ * description: 省州查询界面
+ * version: 1.0
+ * author: huangjiajing
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+
+<body style="padding: 10px;">
+    <form id="spm_state_form" ></form>
+
+    <div id="spm_state_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function(){
+        window['spm_state_form'] = $("#spm_state_form").ligerForm({
+                fields: [
+                    {label : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmstate.statecode"/>',name : "stateCode",type : "text",newline : false,group:'<@spring.message "type.com.lkkhpg.dsis.common.config.spmstate.statequery"/>'},
+                    {  label: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmstate.statename"/>', newline:false, name: 'name',
+                    	type: 'text'
+                    }
+                ], 
+                buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>',
+                        disabled:false, width: 60, click: function(){
+                            var datas = spm_state_form.getData();
+                            var is_empty = true;
+
+                        Hap.gridQuery({
+                            form:spm_state_form,
+                            grid:spm_state_grid
+                        })
+                       
+                    }}
+                ]
+            });
+        
+            window['spm_state_grid'] = $("#spm_state_grid").ligerGrid({
+                columns: [ { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmstate.statecode"/>',
+                	name: 'stateCode', align: 'left', width: '150',
+                	render: function (row){
+                		return "<a href='javascript:void(0);' onclick='stateEdit(\""+row.stateCode+"\")'>" + row.stateCode + "</a> ";
+                    }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmstate.statename"/>',
+                	name: 'name', align: 'left', width: '150', 
+                	editor: {
+               			type: 'tl',
+               			idField: 'stateCode',
+               			dto: 'com.lkkhpg.dsis.common.config.dto.SpmState'
+                	}
+                  }
+                ], 
+                url:'${base.contextPath}/spm/state/query',
+                toolbar: { items: [
+                                   { 
+                                	   text: '<@spring.message "sys.hand.btn.new"/>',
+                                	   disable:false,
+                                	   click: function(){
+                                		   window.top.f_removeTab('spm_state_edit');
+                                		   window.top.f_addTab('spm_state_edit', '<@spring.message "type.com.lkkhpg.dsis.common.config.spmstate.stateedit"/>', 'spm/spm_state_edit.html');
+                                	   },
+                                		   icon: 'add' 
+                                	}
+                     ]
+                },
+                enabledEdit: false,
+                width: '99%', 
+                height: '98%', 
+                rownumbers: true
+            }); 
+           
+    	});//$function
+    	function stateEdit(stateCode){
+    		window.top.f_removeTab('spm_state_edit'+stateCode);
+            window.top.f_addTab('spm_state_edit'+stateCode, '<@spring.message "type.com.lkkhpg.dsis.common.config.spmstate.stateedit"/>', 'spm/spm_state_edit.html?isedit=1&stateCode=' + stateCode);
+    	}
+    		
+    </script>
+</body>
+</html>

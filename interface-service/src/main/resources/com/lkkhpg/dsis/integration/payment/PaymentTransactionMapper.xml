@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.integration.payment.mapper.PaymentTransactionMapper">
+
+
+    <insert id="insert" parameterType="com.lkkhpg.dsis.integration.payment.dto.PaymentTransactionModel">
+        <selectKey resultType="java.lang.Long" keyProperty="transactionId" order="BEFORE">
+        select
+        om_payment_transaction_s.nextval from dual
+       </selectKey>
+        insert into OM_PAYMENT_TRANSACTION (TRANSACTION_ID, SOURCE_TYPE, SOURCE_KEY1,
+        SOURCE_KEY2,SOURCE_KEY3,SOURCE_KEY4,SOURCE_KEY5,
+        STATUS, MESSAGE, REQUEST_DATE,
+        REQUEST_URL, PHASE,
+        TRANSACTION_TYPE
+        )
+        values (#{transactionId,jdbcType=DECIMAL},
+        #{sourceType,jdbcType=VARCHAR},#{sourceKey1,jdbcType=VARCHAR},#{sourceKey2,jdbcType=VARCHAR},#{sourceKey3,jdbcType=VARCHAR},
+        #{sourceKey4,jdbcType=VARCHAR},#{sourceKey5,jdbcType=VARCHAR},#{tStatus,jdbcType=VARCHAR},#{tMessage,jdbcType=VARCHAR},#{tRequestDate,jdbcType=VARCHAR},
+        #{tRequestUrl,jdbcType=VARCHAR},#{tPhase,jdbcType=VARCHAR},#{transactionType,jdbcType=VARCHAR}
+        )
+    </insert>
+
+</mapper>

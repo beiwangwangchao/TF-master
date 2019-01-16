@@ -1,0 +1,118 @@
+<#--
+ * description: 会员地址相关审计
+ * version: 1.0
+ * author: xiawang.liu
+ * .
+ *
+-->
+
+<#include "../../include/head.html">
+
+<body style="padding: 10px; overflow: hidden;">
+<style>
+    .audit_update {
+        height: 30px;
+        width: 100%;
+        background: yellow;
+        text-align: center;
+    }
+
+    .audit_insert {
+        color: green;
+    }
+
+    .audit_delete {
+        color: grey;
+        text-decoration: line-through;
+    }
+</style>
+<div id="site_audit_grid">
+</div>
+<script>
+
+    function markRender(item, index, value, col) {
+	    // TODO: 针对文本的效果,无法体现在空字符串上
+        value = value == undefined ? "" : value;
+        if (item.auditTransactionType == 'INSERT') {
+            return "<span class='audit_insert'>" + value + "</span>"
+        } else if (item.auditTransactionType == 'DELETE') {
+            return "<span class='audit_delete'>" + value + "</span>"
+        }
+        if (!item.__changes || item.__changes.indexOf(col.columnname) < 0)
+            return value;
+        return "<div class='audit_update'>" + value + "</div>";
+    }
+
+    window['site_audit_grid'] = $("#site_audit_grid").ligerGrid({
+        columns   : [
+            {
+                display: '<@spring.message "sys.hand.common.audittimestamp"/>',
+                name   : 'auditTimestamp',
+                width  : 120,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "sys.hand.common.auditby"/>',
+                name   : 'auditBy',
+                width  : 60,
+                frozen : true
+            },
+            {
+                display: 'Id(test)',
+                name   : 'auditSessionId',
+                width  : 60,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "sys.hand.common.audittype"/>',
+                name   : 'auditTransactionType',
+                width  : 60,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.billinginfo"/>',
+                name   : 'siteUseCode_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.payername"/>',
+                name   : 'name',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phoneno"/>',
+                name   : 'phone',
+                width  : 80,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.defaultaddress"/>',
+                name   : 'defaultFlag_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.areacode"/>',
+                name   : 'areaCode',
+                width  : 70,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.paymentaddress"/>',
+                name   : 'site_',
+                width  : 60,
+                render : markRender
+            }
+        ],
+        url       : '${base.contextPath}/mm/member/site/audit?auditSessionId=${RequestParameters.auditSessionId!0}',
+        delayLoad : false,
+        width     : '99%',
+        usePager  : false,
+        height    : '98%',
+        rownumbers: true
+    });
+</script>
+</body>
+</html>

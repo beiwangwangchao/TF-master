@@ -1,0 +1,150 @@
+<#include "/mws/include/header.html">
+    <style>
+/*        #ul {
+            top: 226px;
+            position: fixed;
+        }*/
+        .remove-border td{
+            border: none !important;
+        }
+    </style>
+<!-- Header -->
+<!-- ========== MENU END ========== -->
+
+<!-- ========== CONTENT START ========== -->
+<script src="${base.contextPath}/resources/js/navbar${resource_suffix!}.js"></script>
+<script type="text/javascript" lang="javascript">
+    $(function(){
+    	//加载菜单
+    	$.ajax({
+    		type:"post",
+    		url:"${base.contextPath}/account/queryCategory",
+    		data:{},
+    		dataType:"json",
+    		success:function(data){
+    			if(data.success){
+                    var html = [];
+                    var data = data.rows;
+                    if(data.length>0){
+    				    $("#top").text(data[0].categoryName); //默认加载第一个菜单的信息
+                        for(var i=0;i<data.length;i++){
+                            var item = data[i];
+                            var str="<li style='color:#616161;border-bottom: 1px solid #EFEFEF;'>";
+                            str=str+"<a style='margin-left: -15px;text-decoration:none;' href='#' id='"+ item.categoryId +"' onclick='getDownloadMessage("+item.categoryId+",\""+item.categoryName+"\")'>";
+                            str=str+"<img src='${base.contextPath}/resources/img/jiantu.png' style='width: 20%;'>&nbsp;&nbsp;&nbsp;"+ item.categoryName +"</a></li>"
+                            html.push(str)
+                            /* html.push('<li style="color:#616161;border-bottom: 1px solid #EFEFEF;">\
+                                <a style="margin-left: -15px;text-decoration:none;" href="#" id="'+ item.categoryId +'" onclick="getDownloadMessage('+ item.categoryId +')">\
+                                <img src="${base.contextPath}/resources/img/jiantu.png">&nbsp;&nbsp;&nbsp;'+ item.categoryName +'</a>\
+                            </li>'); */
+                               
+                          
+                        }
+                        $("#sidebarUl").html(html.join(''));
+    			        getDownloadMessage(data[0].categoryId,data[0].categoryName);
+                    }
+                }
+    		}
+    	});
+    	
+    	
+    });
+    var navbar;
+    //根据菜单显示附件消息
+    function getDownloadMessage(valId, valName){
+	    $("#top").text(valName); // 根据点击的菜单名字显示
+    	if(navbar){
+    		navbar.query(1,{
+    			categoryId:valId
+    		}); 
+    	}else{
+	    	navbar = $('nav#pageDownload').navbar({
+	            url:"${base.contextPath}/account/selectDownloadMessage",
+	            pagesize:5,
+	            parms:function(){
+	            	return {categoryId:valId};
+	            },
+	            onLoad:function(data){
+	                var html = [];
+	                var data = data.rows;
+	                if(data.length>0){
+	                for(var i=0;i<data.length;i++){
+	                var item = data[i];
+	                    html.push('<tr class="cart_item remove-border">\
+	                         <td style="width: 20px;text-align: center;vertical-align: middle;" data-title="标记"><span class="glyphicon glyphicon-play-circle" style="color:red;"></span></td>\
+	                         <td style="width: 85%;vertical-align: middle;" data-title="内容"><span class="phone" style="color:#000;">'+ item.fileName +'</span></td>\
+	                         <td style="width: 100px;text-align: center;vertical-align: middle;" data-title="下载">\
+	                         <button class="phone btn btn-default" type="button" style="color:#727071;border: 1px solid #7FCBB4;font-weight: 600;" onclick="download('+ item.fileId +')"><span class="glyphicon glyphicon-save" style="color: #7FCBB4"></span>&nbsp;&nbsp;<@spring.message "mws.nav.download_dom"/></button>\
+	                               </td>\
+	                         </tr>');
+	                        }
+	                    }else{
+	                    	html.push('');
+	                    }
+	                    $("#messageTbody").html(html.join(''));
+	            }
+	        });
+            
+        }
+    }
+    
+    function download(val){
+    	window.open("${base.contextPath}/sys/attach/file/view?fileId="+val,"_blank");
+    }
+</script>
+<section id="content">
+    <div class="container">
+
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.myaccount.accountinfo.download_center"/></li>
+        </ol>
+
+        <div class="row" style="margin-bottom: 50px">
+        <!-- Sidebar Start -->
+        <div class="col-sm-4 col-md-3 sidebar">
+            <aside class="widget widget_recent_posts">
+                <ul class="submenu nav-pills nav-stacked" style="font-weight: bolder" id="sidebarUl">
+                </ul>
+            </aside>
+        </div>
+        <!-- Sidebar End -->
+
+
+          <!-- Posts Start -->
+          <div class="col-sm-8 col-md-9">
+          <article class="account-details-wrap">
+              <h4 style="font-weight: 600;color: #000000;border-bottom: 2px dashed #EEEEEE;"><span id="top"></span></h4>
+              <div style="margin-top: 20px;">
+              <table class="table shop_table table-hover" frame=void>
+                <tbody id="messageTbody">
+                </tbody>
+              </table>
+              </div>
+              <div class="row">
+                   <div class="col-md-8 col-md-offset-8">
+                       <nav id="pageDownload">
+                           <!-- <ul class="pagination pagination-sm">
+                               <li class="disabled"><a href="#" aria-label="Previous">上一页</a></li>
+                               <li class="active"><a href="#">1</a></li>
+                               <li><a href="#">2</a></li>
+                               <li><a href="#">3</a></li>
+                               <li><a href="#">4</a></li>
+                               <li><a href="#">5</a></li>
+                               <li><a href="#" aria-label="Next">下一页</a></li>
+                           </ul> -->
+                      </nav>
+                   </div>
+             </div>
+          </article>
+          </div>
+          <!-- Posts End -->
+        </div>
+
+        <div style="height: 150px" class="hidden-lg hidden-md hidden-sm"></div><!--拉开底边距-->
+    </div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<#include "/mws/include/footer.html">

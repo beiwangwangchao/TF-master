@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.dapp.mapper.GetProductListMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.dapp.dto.GetProductCategoriesResponse" >
+    <result column="category_id" property="cateCode" jdbcType="DECIMAL" />
+    <result column="parent_category_id" property="parentCateCode" jdbcType="DECIMAL" />
+    <result column="category_name" property="categoryName" jdbcType="VARCHAR" />
+    <result column="leaf_flag" property="leafFlag" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="BaseResultListMap" type="com.lkkhpg.dsis.admin.integration.dapp.dto.GetProductListData" >
+    <result column="code" property="saleOrganization" jdbcType="VARCHAR" />
+    <result column="cate_code" property="cateCode" jdbcType="DECIMAL" />
+    <result column="product_id" property="productId" jdbcType="DECIMAL" />
+    <result column="product_code" property="productCode" jdbcType="VARCHAR" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="dapp" property="dapp" jdbcType="VARCHAR" />
+    <result column="pv" property="pv" jdbcType="DECIMAL" />
+    <result column="inventory" property="inventory" jdbcType="DECIMAL" />
+    <result column="ordered_qty" property="orderedQty" jdbcType="DECIMAL" />
+    <result column="sales_org_id" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="product_type" property="productType" jdbcType="VARCHAR" />
+    <result column="product_count_type" property="productCountType" jdbcType="VARCHAR" />
+    <result column="stock_count_flag" property="stockCountFlag" jdbcType="VARCHAR" />
+    <result column="count_item_id" property="countItemId" jdbcType="VARCHAR" />
+    <result column="back_order" property="backOrder" jdbcType="VARCHAR" />
+    <result column="TAX_PERCENT" property="taxPercent" jdbcType="DECIMAL" />
+    <result column="ENABLE_TAX" property="enableTax" jdbcType="VARCHAR" />
+    <result column="PRICE_INCLUDE_TAX" property="priceIncludeTax" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="PriceResultMap" type="com.lkkhpg.dsis.admin.integration.dapp.dto.GetProductListPriceData" >
+    <result column="unit_price" property="price" jdbcType="DECIMAL" />
+    <result column="price_type" property="type" jdbcType="VARCHAR" />
+    <result column="currency" property="currency" jdbcType="VARCHAR" />
+    <result column="precision" property="precision" jdbcType="DECIMAL" />
+    <result column="DISABLE_TAX_FLAG" property="disableTaxFlag" jdbcType="VARCHAR" />
+  </resultMap>
+  <select id="selectTopCategory" resultMap="BaseResultMap" parameterType="java.lang.String">
+	SELECT b.category_id, t.category_name, b.parent_category_id, b.leaf_flag
+	  FROM inv_category_b b
+	  LEFT JOIN inv_category_tl t
+	    ON b.category_id = t.category_id
+	   AND t.lang = #{lang,jdbcType=VARCHAR}
+    <where>
+        AND B.PARENT_CATEGORY_ID is NULL
+    </where>
+    order by T.category_name
+  </select>
+  <select id="selectChilendCategory" resultMap="BaseResultMap" parameterType="java.util.Map">
+  	SELECT b.category_id, t.category_name, b.parent_category_id, b.leaf_flag
+	  FROM inv_category_b b
+	  LEFT JOIN inv_category_tl t
+	    ON b.category_id = t.category_id
+	   AND t.lang = #{lang,jdbcType=VARCHAR}
+	 WHERE EXISTS (SELECT 1
+	          FROM om_price_list            opl,
+	               om_price_list_detail     opld,
+	               spm_sales_organization_b sso,
+	               inv_item_b               ii,
+	               inv_item_category        iic
+	         WHERE opl.price_list_id = opld.price_list_id
+	           AND opl.sales_org_id = sso.sales_org_id
+	           AND opld.item_id = ii.item_id
+	           AND iic.item_id = ii.item_id
+	           AND iic.category_id = b.category_id
+	           AND sso.code IN
+	           <foreach item="saleOrganization" collection="saleOrganizationList" open="(" separator="," close=")">
+				   #{saleOrganization}
+			   </foreach>)
+       AND b.parent_category_id = #{categoryId,jdbcType=INTEGER}
+    ORDER BY T.category_name
+  </select>
+  <select id="selectProductList" resultMap="BaseResultListMap" parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.GetProductListRequest" >
+	SELECT sob.code,
+		   (SELECT
+         listagg(icb.category_id,
+                 ',') within GROUP(ORDER BY ib.item_id)
+          FROM inv_item_category ic,
+               inv_category_b    icb
+         WHERE ic.category_id = icb.category_id
+           AND ic.item_id = ib.item_id) cate_code,
+	       ib.item_id product_id,
+	       ib.item_number product_code,
+	       it.item_name product_name,
+	       iav.enabled_flag dapp,
+	       ib.publish_status,
+           (SELECT pld.unit_price
+              FROM om_price_list            pl,
+                   om_price_list_detail     pld
+             WHERE ib.item_id = pld.item_id
+               AND pl.price_list_id = pld.price_list_id
+               AND pl.sales_org_id = sob.sales_org_id
+               AND pl.price_list_id = pld.price_list_id
+               AND pld.price_type = 'PV'
+               AND pld.start_active_date <![CDATA[ <=  ]]> SYSDATE
+               AND coalesce(pld.end_active_date, SYSDATE) <![CDATA[ >=  ]]> SYSDATE) pv,
+           coalesce((SELECT SUM(ioq.quantity)
+                      FROM inv_onhand_quantity_qry_v ioq
+                     WHERE EXISTS (SELECT 'X'
+                              FROM spm_supply ssy
+                             WHERE ssy.sales_org_id = sob.sales_org_id
+                               AND ssy.inv_org_id = ioq.organization_id)
+                       AND ioq.item_id = ib.item_id),
+                    0) inventory,
+           coalesce((SELECT SUM(ioq.pending_qty)
+                      FROM inv_onhand_quantity_qry_v ioq
+                     WHERE EXISTS (SELECT 'X'
+                              FROM spm_supply ssy
+                             WHERE ssy.sales_org_id = sob.sales_org_id
+                               AND ssy.inv_org_id = ioq.organization_id)
+                       AND ioq.item_id = ib.item_id),
+                    0) ordered_qty,
+	       sob.sales_org_id,
+	       <!-- Mclin添加4个属性 -->
+	       ib.item_type product_type,
+	       ib.count_stock_flag stock_count_flag,
+	       ib.quantity_count_type product_count_type,
+	       ib.count_item_id count_item_id
+	  FROM 
+	       inv_item_b               ib,
+	       inv_item_tl              it,
+	       spm_sales_organization_b sob,
+	       inv_item_availability 	iav
+	 WHERE 
+   		 ib.item_id = it.item_id
+   		AND ib.item_id = iav.item_id
+	    AND iav.function_area = 'APP'
+   		AND ib.publish_status = 'Y'
+   		AND ib.validate_from <![CDATA[ <=  ]]> SYSDATE
+   		AND coalesce(ib.validate_to, SYSDATE) <![CDATA[ >=  ]]> SYSDATE
+    	AND it.lang = #{lang,jdbcType=VARCHAR}
+    	AND sob.code IN
+    	<foreach item="saleOrganization" collection="saleOrganizationList" open="(" separator="," close=")">
+			#{saleOrganization}
+		</foreach>
+        AND EXISTS
+               (SELECT 1
+                  FROM om_price_list        pl,
+                       om_price_list_detail pld
+                 WHERE pl.sales_org_id = sob.sales_org_id
+                   AND ib.item_id = pld.item_id
+                   AND pl.price_list_id = pld.price_list_id
+                   AND pld.start_active_date <![CDATA[ <=  ]]> SYSDATE
+                   AND coalesce(pld.end_active_date, SYSDATE) <![CDATA[ >=  ]]> SYSDATE)
+    <if test="dapp != 'N'.toString()">
+    	AND iav.enabled_flag = 'Y'
+    </if>
+    <if test="cateCode != 0">
+         AND EXISTS (SELECT 1
+          FROM inv_item_category iic
+         WHERE iic.category_id = #{cateCode,jdbcType=DECIMAL}
+           AND iic.item_id = ib.item_id)
+    </if>
+    <if test="productCodes != null">
+	    AND ib.item_number IN
+	    <foreach item="productCode" collection="productCodeList" open="(" separator="," close=")">
+			#{productCode}
+		</foreach>
+    </if>
+  </select>
+  <select id="selectPriceByItemId" resultMap="PriceResultMap" parameterType="java.util.Map" >
+    SELECT pld.unit_price, pld.price_type, pld.currency,coalesce(sc.precision,0) as precision,pld.DISABLE_TAX_FLAG
+	  FROM om_price_list pl, om_price_list_detail pld, spm_sales_organization_b sob,SPM_CURRENCY sc
+	 WHERE pl.price_list_id = pld.price_list_id
+	   AND pl.sales_org_id = sob.sales_org_id
+			and PLD.CURRENCY=sc.CURRENCY_CODE
+       AND pld.item_id = #{itemId,jdbcType=DECIMAL}
+       AND sob.code = #{saleOrganization,jdbcType=VARCHAR}
+       AND pld.unit_price is not null
+       AND pld.start_active_date <![CDATA[ <=  ]]> SYSDATE
+       AND coalesce(pld.end_active_date, SYSDATE) <![CDATA[ >=  ]]> SYSDATE
+  </select>
+  <!-- Mclin添加，查询销售组织对应的库存组织下满足条件的所有商品包下的商品的数量 -->
+  <select id="selectAllItemQuantityBySalesOrgId" resultMap="BaseResultListMap" parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.GetProductListRequest">
+    select ioq.item_id product_id, sum(ioq.quantity) inventory, sum(ioq.pending_qty) ordered_qty
+	  from inv_onhand_quantity_qry_v ioq
+	 where exists (select 1
+	          from spm_supply ss
+	         where ss.supply_type = 'ORG'
+	           and exists (select 1
+	                  from spm_sales_organization_b sob
+	                 where sob.code in
+	                   <foreach item="saleOrganization" collection="saleOrganizationList" open="(" separator="," close=")">
+				           #{saleOrganization}
+				       </foreach>
+	                   and ss.sales_org_id = sob.sales_org_id)
+	           and ioq.organization_id = ss.inv_org_id)
+	   and exists (select 1
+	          from inv_item_b b
+	         where b.item_type = 'ITEM'
+	           and b.count_stock_flag = 'O'
+	           and ioq.item_id = b.item_id)
+	 group by ioq.item_id
+  </select>
+  
+  <select id="selectProductsBySalesOrg" resultMap="BaseResultListMap" parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.GetProductListRequest" >
+	SELECT sob.code,
+	       (
+			SELECT
+				listagg (icb.category_id, ',') WITHIN GROUP (ORDER BY ib.item_id)
+			FROM
+				inv_item_category ic,
+				inv_category_b icb
+			WHERE
+				ic.category_id = icb.category_id
+			AND ic.item_id = ib.item_id
+		) cate_code,
+       ib.item_id product_id,
+       ib.item_number product_code,
+       it.item_name product_name,
+       coalesce(iav.enabled_flag,
+                'N') dapp,
+       (SELECT pld.unit_price
+          FROM om_price_list        pl,
+               om_price_list_detail pld
+         WHERE ib.item_id = pld.item_id
+           AND pl.price_list_id = pld.price_list_id
+           AND pl.sales_org_id = sob.sales_org_id
+           AND pl.price_list_id = pld.price_list_id
+           AND pld.price_type = 'PV'
+           AND pld.start_active_date <![CDATA[ <= ]]> SYSDATE
+           AND coalesce(pld.end_active_date,
+                        SYSDATE) >= SYSDATE) pv,
+       sob.sales_org_id,
+       (CASE
+         WHEN ib.item_type = 'PACKG'
+              AND ib.count_stock_flag = 'Y'
+              AND ib.quantity_count_type = 'IDV' THEN
+         coalesce(  (SELECT floor(MIN(t.quantity / t.need_quantity)) quantity
+             FROM (SELECT coalesce(SUM(ioq.quantity),
+                                   0) quantity,
+                          iih.quantity need_quantity
+                     FROM inv_item_hierarchy        iih,
+                          inv_item_b                iib,
+                          inv_item_b                b,
+                          inv_onhand_quantity_qry_v ioq,
+                          spm_supply                ss
+                    WHERE 1 = 1
+                      AND iih.parent_item_id = ib.item_id
+                      AND iih.item_id = iib.item_id
+                      AND ((iib.count_stock_flag = 'R' AND ioq.item_id = iib.count_item_id) OR
+                          (iib.count_stock_flag = 'O' AND ioq.item_id = iib.item_id))
+                      AND ioq.item_id = b.item_id
+                      AND ioq.organization_id = ss.inv_org_id
+                      AND ss.supply_type = 'ORG'
+                      AND b.item_type = 'ITEM'
+                      AND b.count_stock_flag = 'O'
+                      AND ss.sales_org_id = sob.sales_org_id
+                    GROUP BY iib.item_id,
+                             iih.quantity) t),0)
+         ELSE
+          coalesce((SELECT SUM(ioq.quantity)
+                     FROM inv_onhand_quantity_qry_v ioq
+                    WHERE EXISTS (SELECT 'X'
+                             FROM spm_supply ssy
+                            WHERE ssy.sales_org_id = sob.sales_org_id
+                              AND ssy.inv_org_id = ioq.organization_id)
+                      AND ioq.item_id = ib.item_id),
+                   0)
+       END) inventory,
+       
+       (CASE
+         WHEN ib.item_type = 'PACKG'
+              AND ib.count_stock_flag = 'Y'
+              AND ib.quantity_count_type = 'IDV' THEN
+         coalesce( (SELECT ceil(MIN(t.pending_qty / t.need_quantity)) pending_qty
+             FROM (SELECT coalesce(SUM(ioq.pending_qty),
+                                   0) pending_qty,
+                           iih.quantity need_quantity
+                     FROM inv_item_hierarchy        iih,
+                          inv_item_b                iib,
+                          inv_item_b                b,
+                          inv_onhand_quantity_qry_v ioq,
+                          spm_supply                ss
+                    WHERE 1 = 1
+                      AND iih.parent_item_id = ib.item_id
+                      AND iih.item_id = iib.item_id
+                      AND ((iib.count_stock_flag = 'R' AND ioq.item_id = iib.count_item_id) OR
+                          (iib.count_stock_flag = 'O' AND ioq.item_id = iib.item_id))
+                      AND ioq.item_id = b.item_id
+                      AND ioq.organization_id = ss.inv_org_id
+                      AND ss.supply_type = 'ORG'
+                      AND b.item_type = 'ITEM'
+                      AND b.count_stock_flag = 'O'
+                      AND ss.sales_org_id = sob.sales_org_id
+                    GROUP BY iib.item_id,
+                             iih.quantity) t),0)
+         ELSE
+          coalesce((SELECT SUM(ioq.pending_qty)
+                     FROM inv_onhand_quantity_qry_v ioq
+                    WHERE EXISTS (SELECT 'X'
+                             FROM spm_supply ssy
+                            WHERE ssy.sales_org_id = sob.sales_org_id
+                              AND ssy.inv_org_id = ioq.organization_id)
+                      AND ioq.item_id = ib.item_id),
+                   0)
+       END) ordered_qty,
+       
+       ib.back_order,
+       
+       coalesce((SELECT st.tax_percent
+                  FROM spm_org_param       sop,
+                       spm_org_param_value sopv,
+                       spm_tax             st
+                 WHERE 1 = 1
+                   AND sop.parameter = 'SPM.TAX_CODE'
+                   AND sopv.org_param_id = sop.org_param_id
+                   AND sopv.level_value = sob.sales_org_id
+                   AND sopv.level_id = 10003
+                   AND sopv.param_value = st.tax_code),
+                (SELECT st.tax_percent
+                   FROM spm_org_param       sop,
+                        spm_org_param_value sopv,
+                        spm_tax             st
+                  WHERE 1 = 1
+                    AND sop.parameter = 'SPM.TAX_CODE'
+                    AND sopv.org_param_id = sop.org_param_id
+                    AND sopv.level_value = sob.market_id
+                    AND sopv.level_id = 10002
+                    AND sopv.param_value = st.tax_code)) tax_percent,
+       
+       coalesce((SELECT sopv.param_value
+                  FROM spm_org_param       sop,
+                       spm_org_param_value sopv
+                 WHERE 1 = 1
+                   AND sop.parameter = 'SPM.ENABLE_TAX'
+                   AND sopv.org_param_id = sop.org_param_id
+                   AND sopv.level_value = sob.sales_org_id
+                   AND sopv.level_id = 10003),
+                (SELECT sopv.param_value
+                   FROM spm_org_param       sop,
+                        spm_org_param_value sopv
+                  WHERE 1 = 1
+                    AND sop.parameter = 'SPM.ENABLE_TAX'
+                    AND sopv.org_param_id = sop.org_param_id
+                    AND sopv.level_value = sob.market_id
+                    AND sopv.level_id = 10002)) enable_tax,
+       
+       coalesce((SELECT sopv.param_value
+                  FROM spm_org_param       sop,
+                       spm_org_param_value sopv
+                 WHERE 1 = 1
+                   AND sop.parameter = 'SPM.PRICE_INCLUDE_TAX'
+                   AND sopv.org_param_id = sop.org_param_id
+                   AND sopv.level_value = sob.sales_org_id
+                   AND sopv.level_id = 10003),
+                (SELECT sopv.param_value
+                   FROM spm_org_param       sop,
+                        spm_org_param_value sopv
+                  WHERE 1 = 1
+                    AND sop.parameter = 'SPM.PRICE_INCLUDE_TAX'
+                    AND sopv.org_param_id = sop.org_param_id
+                    AND sopv.level_value = sob.market_id
+                    AND sopv.level_id = 10002)) price_include_tax
+ 		
+	  FROM 
+	       inv_item_b               ib,
+	       inv_item_tl              it,
+	       spm_sales_organization_b sob,
+	       inv_item_availability 	iav
+	 WHERE 
+   		 ib.item_id = it.item_id
+   		AND ib.item_id = iav.item_id
+	    AND iav.function_area = 'APP'
+   		AND ib.publish_status = 'Y'
+   		AND ib.validate_from <![CDATA[ <=  ]]> SYSDATE
+   		AND coalesce(ib.validate_to, SYSDATE) <![CDATA[ >=  ]]> SYSDATE
+    	AND it.lang = #{lang,jdbcType=VARCHAR}
+    	AND sob.code IN
+    	<foreach item="saleOrganization" collection="saleOrganizationList" open="(" separator="," close=")">
+			#{saleOrganization}
+		</foreach>
+        AND EXISTS
+               (SELECT 1
+                  FROM om_price_list        pl,
+                       om_price_list_detail pld
+                 WHERE pl.sales_org_id = sob.sales_org_id
+                   AND ib.item_id = pld.item_id
+                   AND pl.price_list_id = pld.price_list_id
+                   AND pld.start_active_date <![CDATA[ <=  ]]> SYSDATE
+                   AND coalesce(pld.end_active_date, SYSDATE) <![CDATA[ >=  ]]> SYSDATE)
+    <if test="dapp != 'N'.toString()">
+    	AND iav.enabled_flag = 'Y'
+    </if>
+    <if test="cateCode != 0">
+         AND EXISTS (SELECT 1
+          FROM inv_item_category iic
+         WHERE iic.category_id = #{cateCode,jdbcType=DECIMAL}
+           AND iic.item_id = ib.item_id)
+    </if>
+    <if test="productCodes != null">
+	    AND ib.item_number IN
+	    <foreach item="productCode" collection="productCodeList" open="(" separator="," close=")">
+			#{productCode}
+		</foreach>
+    </if>
+     ORDER BY product_id,
+          sales_org_id
+  </select>
+</mapper>

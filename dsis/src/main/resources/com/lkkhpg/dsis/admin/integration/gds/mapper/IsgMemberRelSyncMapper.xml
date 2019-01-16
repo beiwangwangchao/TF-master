@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgMemberRelSyncMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberRelSync" >
+    <id column="INTERFACE_DETAIL_ID" property="interfaceDetailId" jdbcType="DECIMAL" />
+    <result column="INTERFACE_ID" property="interfaceId" jdbcType="DECIMAL" />
+    <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+    <result column="APP_DEALER_NO" property="appDealerNo" jdbcType="VARCHAR" />
+    <result column="APP_PERIOD" property="appPeriod" jdbcType="VARCHAR" />
+    <result column="APP_TYPE" property="appType" jdbcType="VARCHAR" />
+    <result column="SPOUSE_FULL_NAME" property="spouseFullName" jdbcType="VARCHAR" />
+    <result column="SPOUSE_CERTIFICATE_NATION_CODE" property="spouseCertificateNationCode" jdbcType="VARCHAR" />
+    <result column="SPOUSE_CERTIFICATE_TYPE" property="spouseCertificateType" jdbcType="VARCHAR" />
+    <result column="SPOUSE_CERTIFICATE_NO" property="spouseCertificateNo" jdbcType="VARCHAR" />
+    <result column="SPOUSE_SEX" property="spouseSex" jdbcType="VARCHAR" />
+    <result column="SPOUSE_MOBILE" property="spouseMobile" jdbcType="VARCHAR" />
+    <result column="SPOUSE_TELE" property="spouseTele" jdbcType="VARCHAR" />
+    <result column="SPOUSE_RACE" property="spouseRace" jdbcType="VARCHAR" />
+    <result column="SPOUSE_REF_DEALER_NO" property="spouseRefDealerNo" jdbcType="VARCHAR" />
+    <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="PROCESS_STATUS" property="processStatus" jdbcType="VARCHAR" />
+    <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP" />
+    <result column="PROCESS_MESSAGE" property="processMessage" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INTERFACE_DETAIL_ID, INTERFACE_ID, DEALER_NO, APP_DEALER_NO, APP_PERIOD, APP_TYPE, 
+    SPOUSE_FULL_NAME, SPOUSE_CERTIFICATE_NATION_CODE, SPOUSE_CERTIFICATE_TYPE, SPOUSE_CERTIFICATE_NO, 
+    SPOUSE_SEX, SPOUSE_MOBILE, SPOUSE_TELE, SPOUSE_RACE, SPOUSE_REF_DEALER_NO, COMMENTS, 
+    ADVISE_NO, PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, REQUEST_ID, PROGRAM_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from ISG_MEMBER_REL_SYNC
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from ISG_MEMBER_REL_SYNC
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberRelSync" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceDetailId" order="BEFORE" >
+      select ISG_MEMBER_REL_SYNC_S.nextval from dual
+    </selectKey>
+    insert into ISG_MEMBER_REL_SYNC (INTERFACE_DETAIL_ID, INTERFACE_ID, DEALER_NO, 
+      APP_DEALER_NO, APP_PERIOD, APP_TYPE, 
+      SPOUSE_FULL_NAME, SPOUSE_CERTIFICATE_NATION_CODE, 
+      SPOUSE_CERTIFICATE_TYPE, SPOUSE_CERTIFICATE_NO, 
+      SPOUSE_SEX, SPOUSE_MOBILE, SPOUSE_TELE, 
+      SPOUSE_RACE, SPOUSE_REF_DEALER_NO, COMMENTS, 
+      ADVISE_NO, PROCESS_STATUS, PROCESS_DATE, 
+      PROCESS_MESSAGE, REQUEST_ID, PROGRAM_ID
+      )
+    values (#{interfaceDetailId,jdbcType=DECIMAL}, #{interfaceId,jdbcType=DECIMAL}, #{dealerNo,jdbcType=VARCHAR}, 
+      #{appDealerNo,jdbcType=VARCHAR}, #{appPeriod,jdbcType=VARCHAR}, #{appType,jdbcType=VARCHAR}, 
+      #{spouseFullName,jdbcType=VARCHAR}, #{spouseCertificateNationCode,jdbcType=VARCHAR}, 
+      #{spouseCertificateType,jdbcType=VARCHAR}, #{spouseCertificateNo,jdbcType=VARCHAR}, 
+      #{spouseSex,jdbcType=VARCHAR}, #{spouseMobile,jdbcType=VARCHAR}, #{spouseTele,jdbcType=VARCHAR}, 
+      #{spouseRace,jdbcType=VARCHAR}, #{spouseRefDealerNo,jdbcType=VARCHAR}, #{comments,jdbcType=VARCHAR}, 
+      #{adviseNo,jdbcType=VARCHAR}, #{processStatus,jdbcType=VARCHAR}, current_timestamp, 
+      #{processMessage,jdbcType=VARCHAR}, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberRelSync" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceDetailId" order="BEFORE" >
+      select ISG_MEMBER_REL_SYNC_S.nextval from dual
+    </selectKey>
+    insert into ISG_MEMBER_REL_SYNC
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INTERFACE_DETAIL_ID,
+      <if test="interfaceId != null" >
+        INTERFACE_ID,
+      </if>
+      <if test="dealerNo != null" >
+        DEALER_NO,
+      </if>
+      <if test="appDealerNo != null" >
+        APP_DEALER_NO,
+      </if>
+      <if test="appPeriod != null" >
+        APP_PERIOD,
+      </if>
+      <if test="appType != null" >
+        APP_TYPE,
+      </if>
+      <if test="spouseFullName != null" >
+        SPOUSE_FULL_NAME,
+      </if>
+      <if test="spouseCertificateNationCode != null" >
+        SPOUSE_CERTIFICATE_NATION_CODE,
+      </if>
+      <if test="spouseCertificateType != null" >
+        SPOUSE_CERTIFICATE_TYPE,
+      </if>
+      <if test="spouseCertificateNo != null" >
+        SPOUSE_CERTIFICATE_NO,
+      </if>
+      <if test="spouseSex != null" >
+        SPOUSE_SEX,
+      </if>
+      <if test="spouseMobile != null" >
+        SPOUSE_MOBILE,
+      </if>
+      <if test="spouseTele != null" >
+        SPOUSE_TELE,
+      </if>
+      <if test="spouseRace != null" >
+        SPOUSE_RACE,
+      </if>
+      <if test="spouseRefDealerNo != null" >
+        SPOUSE_REF_DEALER_NO,
+      </if>
+      <if test="comments != null" >
+        COMMENTS,
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO,
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS,
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE,
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{interfaceDetailId,jdbcType=DECIMAL},
+      <if test="interfaceId != null" >
+        #{interfaceId,jdbcType=DECIMAL},
+      </if>
+      <if test="dealerNo != null" >
+        #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appDealerNo != null" >
+        #{appDealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appPeriod != null" >
+        #{appPeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="appType != null" >
+        #{appType,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseFullName != null" >
+        #{spouseFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseCertificateNationCode != null" >
+        #{spouseCertificateNationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseCertificateType != null" >
+        #{spouseCertificateType,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseCertificateNo != null" >
+        #{spouseCertificateNo,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseSex != null" >
+        #{spouseSex,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseMobile != null" >
+        #{spouseMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseTele != null" >
+        #{spouseTele,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseRace != null" >
+        #{spouseRace,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseRefDealerNo != null" >
+        #{spouseRefDealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberRelSync" >
+    update ISG_MEMBER_REL_SYNC
+    <set >
+      <if test="interfaceId != null" >
+        INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL},
+      </if>
+      <if test="dealerNo != null" >
+        DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appDealerNo != null" >
+        APP_DEALER_NO = #{appDealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appPeriod != null" >
+        APP_PERIOD = #{appPeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="appType != null" >
+        APP_TYPE = #{appType,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseFullName != null" >
+        SPOUSE_FULL_NAME = #{spouseFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseCertificateNationCode != null" >
+        SPOUSE_CERTIFICATE_NATION_CODE = #{spouseCertificateNationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseCertificateType != null" >
+        SPOUSE_CERTIFICATE_TYPE = #{spouseCertificateType,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseCertificateNo != null" >
+        SPOUSE_CERTIFICATE_NO = #{spouseCertificateNo,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseSex != null" >
+        SPOUSE_SEX = #{spouseSex,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseMobile != null" >
+        SPOUSE_MOBILE = #{spouseMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseTele != null" >
+        SPOUSE_TELE = #{spouseTele,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseRace != null" >
+        SPOUSE_RACE = #{spouseRace,jdbcType=VARCHAR},
+      </if>
+      <if test="spouseRefDealerNo != null" >
+        SPOUSE_REF_DEALER_NO = #{spouseRefDealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        COMMENTS = #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberRelSync" >
+    update ISG_MEMBER_REL_SYNC
+    set INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL},
+      DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+      APP_DEALER_NO = #{appDealerNo,jdbcType=VARCHAR},
+      APP_PERIOD = #{appPeriod,jdbcType=VARCHAR},
+      APP_TYPE = #{appType,jdbcType=VARCHAR},
+      SPOUSE_FULL_NAME = #{spouseFullName,jdbcType=VARCHAR},
+      SPOUSE_CERTIFICATE_NATION_CODE = #{spouseCertificateNationCode,jdbcType=VARCHAR},
+      SPOUSE_CERTIFICATE_TYPE = #{spouseCertificateType,jdbcType=VARCHAR},
+      SPOUSE_CERTIFICATE_NO = #{spouseCertificateNo,jdbcType=VARCHAR},
+      SPOUSE_SEX = #{spouseSex,jdbcType=VARCHAR},
+      SPOUSE_MOBILE = #{spouseMobile,jdbcType=VARCHAR},
+      SPOUSE_TELE = #{spouseTele,jdbcType=VARCHAR},
+      SPOUSE_RACE = #{spouseRace,jdbcType=VARCHAR},
+      SPOUSE_REF_DEALER_NO = #{spouseRefDealerNo,jdbcType=VARCHAR},
+      COMMENTS = #{comments,jdbcType=VARCHAR},
+      ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL}
+    where INTERFACE_DETAIL_ID = #{interfaceDetailId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select <include refid="Base_Column_List" />
+      from ISG_MEMBER_REL_SYNC
+    <where>
+        PROCESS_DATE &gt; #{processDateFrom,jdbcType=TIMESTAMP}
+        <if test="requestDateTo != null" >
+            AND PROCESS_DATE &lt; #{processDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="processStatus != null" >
+            AND PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="advoiseNo != null" >
+            AND ADVISE_NO = #{advoiseNo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by interface_id desc
+  </select>
+</mapper>

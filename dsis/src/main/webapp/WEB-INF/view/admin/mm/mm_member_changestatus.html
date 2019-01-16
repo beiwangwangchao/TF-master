@@ -1,0 +1,198 @@
+<#--
+ * description: 会员状态变更界面
+ * version: 1.0
+ * author: mclin
+ * .
+ *
+-->
+<#include "../include/head.html">
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+	<div id="member_btns" ></div>
+	<div id="member_query_form" ></div>
+	<div id="member_popup_form" style="display: none;" ></div>   
+    <div id="member_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    	$(function(){
+    		window['member_query_form'] = $("#member_query_form").ligerForm({
+                fields: [
+                    { 
+                    	type: 'popup', label: '会员ID', name: 'memberId',
+                    	//如果不需要把lov选中的textField值放进data中那么这个属性可以不设置，如果需要放在data中就需要设置
+	                    textField : 'memberId',
+	                    options:{
+	                    	readonly : false,//是否可编辑
+	                    	valueField : 'loginName',//选中的valueField,文本框有值时grid有选中效果
+	                    	textField : 'loginName',//选中的textField,文本框显示的grid字段
+	                    	grid : {
+	                    		columns : [ {
+	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+	                    			name : "loginName", width : 150, type : "int", align : "left"
+	                    		}, {
+	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername"/>',
+	                    			name : "loginName", width : 150, type : "text", align : "left"
+	                    		}, {
+	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.sponsorid"/>',
+	                    			name : "email", width : 150, type : "text", align : "left"
+	                    		}, {
+	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phonenumber"/>',
+	                    			name : "phone", width : 150, type : "text", align : "left"
+	                    		}, {
+	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberstatus"/>',
+	                    			name : "status", width : 150, type : "text", align : "left"
+	                    		} ],
+	                    		//数据查询的url
+	                    		url : '${base.contextPath}/sys/user/select'
+	                    	},
+	                    	//lov上的查询条件
+	                    	condition : {
+	                    		inputWidth : 150,
+	                    		labelWidth : 70,
+	                    		fields : [ {
+	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+	                    			name : "loginName", newline : true, type : "text"
+	                    		}, {
+	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername"/>',
+	                    			name : "name", newline : false, type : "text"
+	                    		} ]
+	                    	}
+	                    }
+                    },
+                    { type: 'text', label: '变更记录ID', newline: true, name: 'changeId' },
+                    {
+                    	type: 'date', name: 'fromYear', label:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.change.date.range"/>', newline:true, space : 10
+					},{ 							
+						type: 'date', display: '-',name: 'toYear', 
+						newline:false, space : 0, labelWidth : 15, rightToken : ' '
+					}
+                ]
+            });
+        
+            window['member_grid'] = $("#member_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [ { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.changeid"/>', 
+                	name: 'changeId', align: 'left', width: 100
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>', 
+                	name: 'memberId', align: 'left', width: 100
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.membername"/>', 
+                	name: 'memberName', align: 'left', width: 100
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.recommend.people.id"/>', 
+                	name: 'email', align: 'left', width: 100
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.phonenumber"/>', 
+                	name: 'phoneNumber', align: 'left', width: 120
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.operationtype"/>', 
+                	name: 'changeType', align: 'left', width: 100
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.applydate"/>', 
+                	name: 'changeDate', align: 'left', width: 100 
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvalstatus"/>', 
+                	name: 'examStatus', align: 'left', width: 100 
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvaldate"/>', 
+                	name: 'examDate', align: 'left', width: 100 
+                  }
+                ], 
+                url:'${base.contextPath}/sys/user/select',
+                toolbar: { items: [
+                                   { text: '<@spring.message "sys.hand.btn.create"/>', click: function(){}, icon: 'add'},
+                                   { line: true },
+                                   { text: '<@spring.message "sys.hand.btn.sendmsg"/>', click: function(){ }, icon: 'save'}
+                ] },
+                enabledEdit: false,
+                width: '100%', 
+                height: '99%', 
+                checkbox: true,
+                rownumbers: true
+            }); 
+            window['member_popup_form'] = $("#member_popup_form").ligerForm({
+            	fields: [ { 
+                         	type: 'popup', label: '会员ID', name: 'memberId',
+                         	//如果不需要把lov选中的textField值放进data中那么这个属性可以不设置，如果需要放在data中就需要设置
+     	                    textField : 'memberId',
+     	                    options:{
+     	                    	readonly : false,//是否可编辑
+     	                    	valueField : 'loginName',//选中的valueField,文本框有值时grid有选中效果
+     	                    	textField : 'loginName',//选中的textField,文本框显示的grid字段
+     	                    	grid : {
+     	                    		columns : [ {
+     	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+     	                    			name : "loginName", width : 150, type : "int", align : "left"
+     	                    		}, {
+     	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername"/>',
+     	                    			name : "loginName", width : 150, type : "text", align : "left"
+     	                    		}, {
+     	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.sponsorid"/>',
+     	                    			name : "email", width : 150, type : "text", align : "left"
+     	                    		}, {
+     	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phonenumber"/>',
+     	                    			name : "phone", width : 150, type : "text", align : "left"
+     	                    		}, {
+     	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberstatus"/>',
+     	                    			name : "status", width : 150, type : "text", align : "left"
+     	                    		} ],
+     	                    		//数据查询的url
+     	                    		url : '${base.contextPath}/sys/user/select'
+     	                    	},
+     	                    	//lov上的查询条件
+     	                    	condition : {
+     	                    		inputWidth : 150,
+     	                    		labelWidth : 70,
+     	                    		fields : [ {
+     	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+     	                    			name : "loginName", newline : true, type : "text"
+     	                    		}, {
+     	                    			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername"/>',
+     	                    			name : "name", newline : false, type : "text"
+     	                    		} ]
+     	                    	}
+     	                    }
+                         }, {
+                 			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberstatus"/>',
+                			name : "status", width : 150, type : "text", align : "left", newline : false
+                		}, {
+                			display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.statuschange.operationtype"/>',
+                			name : "changeType", width : 150, type : "combobox", align : "left", newline : true,
+                			options : {
+                				data : [{id:'pause',text :'<@spring.message "sys.hand.btn.pause"/>'},{id:'finish',text : '<@spring.message "type.com.lkkhpg.dsis.common.member.btn.memberdetails.terminate"/>'}]
+                			}
+                		} ]
+            });
+            $("#member_popup_form input[id$='_changeType']").attr('type', 'hidden');
+            window['member_btns'] = $("#member_btns").ligerForm({
+    			buttons: [
+    	                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){                        
+    	                        Hap.gridQuery({
+    	                            form:member_query_form,
+    	                            grid:member_grid
+    	                        })
+    	                    }}, {
+    	                    	text:'<@spring.message "sys.hand.btn.apply"/>', disabled:false, width: 60, click: function(){
+    	        		            $.ligerDialog.open({
+    	        		            	title :'<@spring.message "sys.hand.btn.change.status"/>',
+    	        		            	width : 700,
+    	        		            	height : 200,
+    	        		            	target:$("#member_popup_form"),
+    	        		            	buttons: [  { text: '<@spring.message "sys.hand.btn.submit"/>', onclick: function (i, d) { 
+    	        		            		alert('<@spring.message "sys.hand.btn.submit"/>');       				
+    	        		            	}}, { 
+    	        							text: '<@spring.message "sys.hand.btn.cancel"/>', onclick: function (i, d) { $("#member_popup_form").ligerHideTip(); d.hide(); }
+    	        		            	} ]                                                                   
+    	        		            });
+    	                    	}
+    	                    }
+    	                ]
+    		});
+    	});//$function
+    </script>
+</body>
+</html>

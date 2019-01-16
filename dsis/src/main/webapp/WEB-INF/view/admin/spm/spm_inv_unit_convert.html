@@ -1,0 +1,309 @@
+<#-- 
+ * description: 单位转换维护界面
+ * version: 1.0 
+ * author:min.hou
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?yesno=SYS.YES_NO&packTypeData=PM.PACK_TYPE"
+	type="text/javascript"></script>
+<script type="text/javascript">
+	$(function() {
+		/*商品查询*/
+		var item_query_form = window['item_query_form'] = $("#item_query_form").ligerForm({
+			inputWidth : 150,
+			space : 40,
+			fields : [{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.itemid" />',
+				type : 'text',
+				name : 'itemNumber',
+				newline : false,
+				//options : ${lovService.getLov(base.contextPath,base.locale,"lov_inv_item_unit_convert")}
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.itemname" />',
+				type : 'text',
+				name : 'itemName',
+				newline : false,
+			}],
+			buttons : [{
+				text : '<@spring.message "sys.hand.btn.query" />',
+				width : 60,
+				click : function() {
+					Hap.gridQuery({
+						form : item_query_form,
+						grid : item_show_grid
+					});
+					item_show_grid.set({
+						url : '${base.contextPath}/spm/unit/queryItemsOfUnitConvert',
+					});
+				}
+			}]
+		});
+		
+		/*商品列表*/
+		var item_show_grid = window['item_show_grid'] = $("#item_show_grid").ligerGrid({
+			unSetValidateAttr : false,
+			columns : [{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.itemid" />',
+				name : 'itemId',
+				type : 'text',
+				align : 'center',
+				textField:'itemNumber',
+				validate : {
+					required : true
+				},
+				editor : $.extend(${lovService.getLov(base.contextPath,base.locale,"lov_inv_unit_item_id")},{
+					onSelect:function(datas){
+						var p = this.options;
+						p.host_grid.updateCell('itemName',datas.data[0].itemName,p.host_grid_row);
+					}
+				})
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.itemname" />',
+				name : 'itemName',
+				type : 'text',
+				align : 'center',
+				editor : {
+					type : 'text'
+				}
+			}],
+			onAfterEdit : function(e) {
+				var param = {'itemId' : e.value};
+				unit_show_grid.set("parms",param);
+				unit_show_grid.loadData(1);
+			},
+			onBeforeEdit : function(e) {
+				if (e.record.__status != "add") {
+					return false;
+				}
+				if (e.column.columnname == "itemName") {
+					return false;
+				}
+				return true;
+			},
+			onSelectRow : function (data, rowindex, rowobj) {
+				//根据itemId获取单位转换信息
+				if (data.itemId) {
+					var param = {'itemId' : data.itemId};
+					unit_show_grid.set("parms",param);
+					unit_show_grid.loadData(1);
+				}
+			},
+			toolbar : {
+				items : [{
+					text : '<@spring.message "sys.hand.btn.new" />',
+					click : function() {
+						item_show_grid.addRow({
+							itemId : "",
+						});
+					},
+					icon : 'add'
+				}]
+			},
+			width : '99%',
+			height : '50%',
+			enabledEdit : true
+		});
+		
+		/*单位查询列表*/
+		var unit_show_grid = window['unit_show_grid'] = $("#unit_show_grid").ligerGrid({
+			unSetValidateAttr : false,
+			columns : [{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.fromuomcode" />',
+				name : 'fromUom',
+				type : 'text',
+				align : 'center',
+				editor : {
+					type : 'text'
+				},
+                validate : {
+                    required : true
+                }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.fromuomname" />',
+				name : 'fromUomName',
+				type : 'text',
+				align : 'center',
+				editor : {
+					type : 'text'
+				},
+                validate : {
+                    required : true
+                }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.uomconvertrate" />',
+				name : 'convertRate',
+				align : 'center',
+				editor : {
+					type : 'float'
+				},
+                validate : {
+                    required : true
+                }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.touom" />',
+				name : 'toUom',
+				type : 'text',
+				align : 'center',
+				textField : 'name',
+				editor : $.extend(${lovService.getLov(base.contextPath,base.local,"lov_uom_convert")}, {
+					onSelect:function(datas){
+						var p = this.options;
+						p.host_grid.updateCell('toUomName', datas.data[0].name, p.host_grid_row);
+					}
+				}),
+                validate : {
+                    required : true
+                }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.touomname" />',
+				name : 'toUomName',
+				type : 'text',
+				align : 'center',
+				editor : {
+					type : 'text'
+				},
+                validate : {
+                    required : true
+                }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.endactivedate" />',
+				name : 'endActiveDate',
+				type : 'date',
+				format : 'yyyy-MM-dd',
+				align : 'center',
+				editor : {
+					type : 'date'
+				}
+			}],
+			toolbar : {
+				items : [{
+					text : '<@spring.message "sys.hand.btn.new" />',
+					click : function() {
+						var unit_show_gridData = unit_show_grid.getData();
+						if (unit_show_gridData.length == 0) {
+							$.ligerDialog.warn('<@spring.message "msg.warning.dto.inventory.stockio.no_item_selected" />');
+							return false;
+						}
+						//将来源单位初始化
+						unit_show_grid.addRow({
+							convertId : "",
+							itemId : unit_show_gridData[0].itemId,
+							fromUom : unit_show_gridData[0].fromUom,
+							fromUomName : unit_show_gridData[0].fromUomName,
+							convertRate : "",
+							toUom : "",
+							toUomName : "",
+							endActiveDate : "",
+						});
+					},
+					icon : 'add'
+				},{
+	                line : true
+	            },{
+	            	text : '<@spring.message "sys.hand.btn.save" />',
+	            	click : function() {
+	            		var data = unit_show_grid.getData();
+	            		if (validator(data)) {
+		            		Hap.gridSave({
+		            			grid : unit_show_grid,
+		            			url : '${base.contextPath}/spm/unit/batchUpdateInvUnitConverts'
+		            		})
+	            		}
+	            	},
+	            	icon : "save"
+	            }]
+			},
+			onBeforeEdit : function(e) {
+				if (e.column.columnname == "toUomName" || e.column.columnname == "fromUom"
+						|| e.column.columnname == "fromUomName") {
+					return false;
+				}
+			},
+			onBeforeSubmitEdit : function(e) {
+				var rowData = unit_show_grid.getSelectedRow();
+				if (e.column.columnname == "toUom") {
+					if (e.text == rowData.fromUom) {
+						$.ligerDialog.warn("<@spring.message 'msg.warning.dto.item.unit.fromuom_not_select' />");
+						return false;
+					}
+				}
+				if (e.column.columnname == "convertRate") {
+					if (e.value < 0) {
+						$.ligerDialog.warn("<@spring.message 'msg.warning.dto.item.unit.fromuom_not_match' />");
+						return false;
+					}
+				}
+				if (e.column.columnname == "endActiveDate") {
+					if (e.value == null || e.value == "") {
+						return true;
+					}
+					now = new Date();
+					if (e.value < new Date(now.getFullYear(),now.getMonth(),now.getDate())) {
+						$.ligerDialog.warn("<@spring.message 'msg.error.spm.unit_endactivedate_error' />");
+						return false;
+					}
+				}
+			},
+			width : '99%',
+			height : '40%',
+			isSort : false,
+			enabledEdit : true,
+			url : "${base.contextPath}/spm/unit/queryInvUnitConverts",
+			delayLoad:true
+		});
+		
+	});
+	
+	//校验单位维护相关字段信息
+	function validator(data) {
+		for (var i=0; i<data.length; i++) {
+			if (data[i].fromUom == null || data[i].fromUom == '') {
+				$.ligerDialog.warn("<@spring.message 'msg.warning.dto.item.unit.fromuom_not_empty' />");			
+				return false;
+			}
+			if (data[i].fromUomName == null || data[i].fromUomName == '') {
+				$.ligerDialog.warn("<@spring.message 'msg.warning.dto.item.unit.fromuomname_not_empty' />");			
+				return false;
+			}
+			if (data[i].toUom == null || data[i].toUom == '') {
+				$.ligerDialog.warn("<@spring.message 'msg.warning.dto.item.unit.touom_not_empty' />");			
+				return false;
+			}
+			if (data[i].toUomName == null || data[i].toUomName == '') {
+				$.ligerDialog.warn("<@spring.message 'msg.warning.dto.item.unit.touomname_not_empty' />");			
+				return false;
+			}
+			if (data[i].convertRate == null || data[i].convertRate == '') {
+				$.ligerDialog.warn("<@spring.message 'msg.warning.dto.item.unit.convertrate_not_empty' />");			
+				return false;
+			}
+		}
+		//根据商品、目标单位为唯一性，不允许出现两条相同的商品、目标单位但转换值不同的记录�?
+		for (var i=0; i<data.length; i++) {
+			for (var j=i+1; j<data.length; j++) {
+				if (data[i].itemId == data[j].itemId && data[i].toUom == data[j].toUom) {
+					$.ligerDialog.warn("<@spring.message 'msg.warning.dto.item.unit.not_match' />");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+</script>
+
+<body style="padding-top: 10px;">
+	
+	<div id="showItemDialog" style="display:none">
+	</div>
+	<div>
+		<form id="item_query_form"></form>
+	</div>
+	
+	<div id="item_show_grid"></div>
+	
+	<div id="unit_show_grid"></div>
+	
+</body>

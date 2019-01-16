@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.member.mapper.MemUpstreamChangeMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.member.dto.MemUpstreamChange" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD" >
+    <id column="CHANGE_ID" property="changeId" jdbcType="DECIMAL" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="FROM_UP_MEMBER_ID" property="fromUpMemberId" jdbcType="DECIMAL" />
+    <result column="TO_UP_MEMBER_ID" property="toUpMemberId" jdbcType="DECIMAL" />
+    <result column="APPLY_DATE" property="applyDate" jdbcType="TIMESTAMP" />
+    <result column="APPROVAL_STATUS" property="approvalStatus" jdbcType="VARCHAR" />
+    <result column="APPROVAL_DATE" property="approvalDate" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="APP_NO" property="appNo" jdbcType="VARCHAR" />
+    <result column="SYN_STATUS" property="synStatus" jdbcType="VARCHAR" />
+    <result column="SYN_MESSAGE" property="synMessage" jdbcType="VARCHAR" />
+    <result column="SYN_DATE" property="synDate" jdbcType="TIMESTAMP" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="CHINESE_NAME" property="chineseName" jdbcType="VARCHAR" />
+    <result column="ENGLISH_NAME" property="englishName" jdbcType="VARCHAR" />
+    <result column="SPONSOR_ID" property="sponsorId" jdbcType="DECIMAL" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+    <result column="MARKET_NAME" property="marketName" jdbcType="VARCHAR" />
+    <result column="FROM_UP_MEMBER_CODE" property="fromUpMemberCode" jdbcType="VARCHAR" />
+    <result column="TO_UP_MEMBER_CODE" property="toUpMemberCode" jdbcType="VARCHAR" />
+    <result column="FROM_OVERSEAS_SPONSOR" property="fromOverseasSponsor" jdbcType="VARCHAR" />
+    <result column="TO_OVERSEAS_SPONSOR" property="toOverseasSponsor" jdbcType="VARCHAR" />
+    <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    CHANGE_ID, MEMBER_ID, FROM_UP_MEMBER_ID, TO_UP_MEMBER_ID, APPLY_DATE, APPROVAL_STATUS, 
+    APPROVAL_DATE,REMARK,ADVISE_NO,APP_NO,SYN_STATUS,SYN_MESSAGE, OBJECT_VERSION_NUMBER,
+    SYN_DATE, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, FROM_OVERSEAS_SPONSOR,TO_OVERSEAS_SPONSOR,
+    LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+    ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+    ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, MARKET_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEM_UPSTREAM_CHANGE
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </select>
+  <select id="queryUpstreamChange" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.member.dto.MemUpstreamChange" >
+   SELECT mmuc.change_id,
+       mmuc.member_id,
+       mmuc.from_up_member_id,
+       mmuc.to_up_member_id,
+       mmuc.apply_date,
+       mmuc.remark,
+       mmuc.advise_no,
+       mmuc.app_no,
+       mmuc.syn_status,
+       mmuc.syn_date,
+       mmuc.syn_message,
+       mmuc.approval_status,
+       mmuc.approval_date,
+       mmuc.from_up_member_code,
+       mmuc.to_up_member_code,
+       mm.member_code,
+       mm.english_name,
+       mm.chinese_name,
+       coalesce(smt.name, sm.name) market_name
+    FROM mm_mem_upstream_change_v mmuc,
+       mm_member_v                mm,
+       spm_market_b             sm
+    LEFT OUTER JOIN spm_market_tl smt
+    ON (sm.market_id = smt.market_id AND smt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+    <where>
+        <if test="memberCode != null" >
+           MM.MEMBER_CODE = #{memberCode,jdbcType=DECIMAL}
+        </if>
+        <if test="beforeDate != null" >
+           AND mmuc.apply_date <![CDATA[ >= ]]> #{beforeDate,jdbcType=TIMESTAMP}
+        </if>
+        <if test="afterDate != null" >
+           AND mmuc.apply_date <![CDATA[ <= ]]> #{afterDate,jdbcType=TIMESTAMP} + 1
+        </if>
+        AND MMUC.member_id = MM.MEMBER_ID
+        AND MMUC.MARKET_ID = SM.MARKET_ID
+        <if test="marketId != null" >
+        and MMUC.MARKET_ID = #{marketId,jdbcType=DECIMAL} 
+        </if>
+        <if test="marketId == null" >
+        and MMUC.MARKET_ID = #{request.marketId,jdbcType=DECIMAL} 
+        </if>
+    </where>
+    <if test="sortname =='applyDate' and sortorder == 'asc'">
+            order by APPLY_DATE asc
+    </if>
+    <if test="sortname =='applyDate' and sortorder == 'desc'">
+            order by APPLY_DATE desc
+    </if>
+
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from MM_MEM_UPSTREAM_CHANGE
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemUpstreamChange" >
+    <selectKey resultType="java.lang.Long" keyProperty="changeId" order="BEFORE" >
+      select MM_MEM_UPSTREAM_CHANGE_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_UPSTREAM_CHANGE (CHANGE_ID, MEMBER_ID, FROM_UP_MEMBER_ID, 
+      TO_UP_MEMBER_ID, APPLY_DATE, APPROVAL_STATUS, 
+      APPROVAL_DATE, REMARK, ADVISE_NO, 
+      APP_NO, SYN_STATUS, SYN_MESSAGE, 
+      SYN_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+      PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+      ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+      ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, 
+      ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+      ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+      ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+      ATTRIBUTE15)
+    values (#{changeId,jdbcType=DECIMAL}, #{memberId,jdbcType=DECIMAL}, #{fromUpMemberId,jdbcType=DECIMAL}, 
+      #{toUpMemberId,jdbcType=DECIMAL}, #{applyDate,jdbcType=TIMESTAMP}, #{approvalStatus,jdbcType=VARCHAR}, 
+      #{approvalDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{adviseNo,jdbcType=VARCHAR}, 
+      #{appNo,jdbcType=VARCHAR}, #{synStatus,jdbcType=VARCHAR}, #{synMessage,jdbcType=VARCHAR}, 
+      #{synDate,jdbcType=TIMESTAMP}, 1, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL},CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, 
+      #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, 
+      #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, 
+      #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, 
+      #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, 
+      #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, 
+      #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemUpstreamChange" useGeneratedKeys="true" >
+    <selectKey resultType="java.lang.Long" keyProperty="changeId" order="BEFORE" >
+      select MM_MEM_UPSTREAM_CHANGE_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_UPSTREAM_CHANGE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+        CHANGE_ID,
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="fromUpMemberId != null" >
+        FROM_UP_MEMBER_ID,
+      </if>
+      <if test="toUpMemberId != null" >
+        TO_UP_MEMBER_ID,
+      </if>
+      <if test="applyDate != null" >
+        APPLY_DATE,
+      </if>
+      <if test="approvalStatus != null" >
+        APPROVAL_STATUS,
+      </if>
+      <if test="approvalDate != null" >
+        APPROVAL_DATE,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="fromOverseasSponsor != null" >
+        FROM_OVERSEAS_SPONSOR,
+      </if>
+      <if test="toOverseasSponsor != null" >
+        TO_OVERSEAS_SPONSOR,
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID,
+      </if> 
+      
+      OBJECT_VERSION_NUMBER,
+      
+      <if test="appNo != null" >
+        APP_NO,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+      
+       CREATION_DATE,
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+        #{changeId,jdbcType=DECIMAL},
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="fromUpMemberId != null" >
+        #{fromUpMemberId,jdbcType=DECIMAL},
+      </if>
+      <if test="toUpMemberId != null" >
+        #{toUpMemberId,jdbcType=DECIMAL},
+      </if>
+      <if test="applyDate != null" >
+        #{applyDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approvalStatus != null" >
+        #{approvalStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDate != null" >
+        #{approvalDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="fromOverseasSponsor != null" >
+        #{fromOverseasSponsor,jdbcType=VARCHAR},
+      </if>
+      <if test="toOverseasSponsor != null" >
+        #{toOverseasSponsor,jdbcType=VARCHAR},
+      </if>
+      <if test="marketId != null" >
+        #{request.marketId,jdbcType=DECIMAL},
+      </if>
+      1,
+      <if test="appNo != null" >
+        #{appNo,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+       CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemUpstreamChange" >
+    update MM_MEM_UPSTREAM_CHANGE
+    <set >
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="fromUpMemberId != null" >
+        FROM_UP_MEMBER_ID = #{fromUpMemberId,jdbcType=DECIMAL},
+      </if>
+      <if test="toUpMemberId != null" >
+        TO_UP_MEMBER_ID = #{toUpMemberId,jdbcType=DECIMAL},
+      </if>
+      <if test="applyDate != null" >
+        APPLY_DATE = #{applyDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approvalStatus != null" >
+        APPROVAL_STATUS = #{approvalStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDate != null" >
+        APPROVAL_DATE = #{approvalDate,jdbcType=TIMESTAMP},
+      </if> 
+       OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.member.dto.MemUpstreamChange" >
+    update MM_MEM_UPSTREAM_CHANGE
+    set MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      FROM_UP_MEMBER_ID = #{fromUpMemberId,jdbcType=DECIMAL},
+      TO_UP_MEMBER_ID = #{toUpMemberId,jdbcType=DECIMAL},
+      APPLY_DATE = #{applyDate,jdbcType=TIMESTAMP},
+      APPROVAL_STATUS = #{approvalStatus,jdbcType=VARCHAR},
+      APPROVAL_DATE = #{approvalDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </update>
+  <!--   根据memberId查找记录 -->
+  <select id="queryUpstreamChangeByMemberId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from MM_MEM_UPSTREAM_CHANGE 
+    <where>
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+    </where>
+  </select>
+  <!--   更新同步状态和接口信息 -->
+  <update id="updateSynStatusAndMsgByMemberId" parameterType="java.util.Map" >
+    update MM_MEM_UPSTREAM_CHANGE
+     set APP_NO = #{appNo,jdbcType=VARCHAR} ,
+         SYN_STATUS = #{synStatus,jdbcType=VARCHAR} ,
+         SYN_MESSAGE = #{synMessage,jdbcType=VARCHAR} ,
+         SYN_DATE = CURRENT_TIMESTAMP
+         where MEMBER_ID = #{memberId,jdbcType=DECIMAL} and APPROVAL_STATUS = 'P'
+  </update>
+  <!-- 移线申请状态查询-更新审批状态-->
+  <update id="updateApproveStatusByAppNo" parameterType="java.util.Map">
+        update MM_MEM_UPSTREAM_CHANGE
+          set APPROVAL_STATUS = #{approvalStatus, jdbcType=VARCHAR},
+              SYN_STATUS = #{synStatus, jdbcType=VARCHAR},
+              SYN_MESSAGE = #{synMessage, jdbcType=VARCHAR},
+              APPROVAL_DATE = #{approvalDate,jdbcType=TIMESTAMP},
+              SYN_DATE = CURRENT_TIMESTAMP,
+              OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+              REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+              PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+              LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+              LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+              LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL}
+         where APP_NO = #{appNo,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="selectBySynStatusNoS" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from MM_MEM_UPSTREAM_CHANGE 
+    where SYN_STATUS != 'S' OR SYN_STATUS is null
+  </select>
+  
+  <select id="selectByAppNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEM_UPSTREAM_CHANGE
+    where APP_NO = #{appNo,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectAppNoByMemberCode" parameterType="java.lang.String" resultType="java.lang.String">
+      select mmuc.app_No
+        from mm_mem_upstream_change mmuc, mm_member mm
+      where mmuc.member_id = mm.member_id
+        and mmuc.approval_status = 'P'
+        and mm.member_code = #{memberCode,jdbcType=VARCHAR}
+  </select>
+</mapper>

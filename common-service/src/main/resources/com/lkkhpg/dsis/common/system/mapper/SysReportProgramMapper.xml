@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.system.mapper.SysReportProgramMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.system.dto.SysReportProgram" >
+    <id column="REPORT_PROGRAM_ID" jdbcType="DECIMAL" property="reportProgramId" />
+    <result column="PROGRAM_NAME" jdbcType="VARCHAR" property="programName" />
+    <result column="PROGRAM_CODE" jdbcType="VARCHAR" property="programCode" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="DATA_SERVICE_NAME" jdbcType="VARCHAR" property="dataServiceName" />
+    <result column="TEMPLATE_CODE" jdbcType="VARCHAR" property="templateCode" />
+    <result column="OBJECT_VERSION_NUMBER" jdbcType="DECIMAL" property="objectVersionNumber" />
+    <result column="REQUEST_ID" jdbcType="DECIMAL" property="requestId" />
+    <result column="PROGRAM_ID" jdbcType="DECIMAL" property="programId" />
+    <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+    <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+    <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="LAST_UPDATE_LOGIN" jdbcType="DECIMAL" property="lastUpdateLogin" />
+    <result column="ATTRIBUTE_CATEGORY" jdbcType="VARCHAR" property="attributeCategory" />
+    <result column="ATTRIBUTE1" jdbcType="VARCHAR" property="attribute1" />
+    <result column="ATTRIBUTE2" jdbcType="VARCHAR" property="attribute2" />
+    <result column="ATTRIBUTE3" jdbcType="VARCHAR" property="attribute3" />
+    <result column="ATTRIBUTE4" jdbcType="VARCHAR" property="attribute4" />
+    <result column="ATTRIBUTE5" jdbcType="VARCHAR" property="attribute5" />
+    <result column="ATTRIBUTE6" jdbcType="VARCHAR" property="attribute6" />
+    <result column="ATTRIBUTE7" jdbcType="VARCHAR" property="attribute7" />
+    <result column="ATTRIBUTE8" jdbcType="VARCHAR" property="attribute8" />
+    <result column="ATTRIBUTE9" jdbcType="VARCHAR" property="attribute9" />
+    <result column="ATTRIBUTE10" jdbcType="VARCHAR" property="attribute10" />
+    <result column="ATTRIBUTE11" jdbcType="VARCHAR" property="attribute11" />
+    <result column="ATTRIBUTE12" jdbcType="VARCHAR" property="attribute12" />
+    <result column="ATTRIBUTE13" jdbcType="VARCHAR" property="attribute13" />
+    <result column="ATTRIBUTE14" jdbcType="VARCHAR" property="attribute14" />
+    <result column="ATTRIBUTE15" jdbcType="VARCHAR" property="attribute15" />
+    <result column="ENTITY_CODE" jdbcType="VARCHAR" property="entityCode" />
+    <result column="ENTITY_KEY" jdbcType="VARCHAR" property="entityKey" />
+    <result column="ENTITY_KEY_DESC" jdbcType="VARCHAR" property="entityKeyDesc" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    REPORT_PROGRAM_ID, PROGRAM_NAME, PROGRAM_CODE, REMARK, DATA_SERVICE_NAME, TEMPLATE_CODE, 
+    OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15, ENTITY_CODE, ENTITY_KEY
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />,
+    (select m.name from
+	spm_market_tl m where m.market_id = cast(rp.entity_key as number) and m.lang = #{request.locale,jdbcType=VARCHAR}) as entity_key_desc
+    from SYS_REPORT_PROGRAM rp
+    where rp.REPORT_PROGRAM_ID = #{reportProgramId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SYS_REPORT_PROGRAM
+    where REPORT_PROGRAM_ID = #{reportProgramId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.system.dto.SysReportProgram" >
+    <selectKey resultType="java.lang.Long" keyProperty="reportProgramId" order="BEFORE" >
+      select SYS_REPORT_PROGRAM_S.nextval from dual
+    </selectKey>
+    insert into SYS_REPORT_PROGRAM (REPORT_PROGRAM_ID, PROGRAM_NAME, PROGRAM_CODE, REMARK, DATA_SERVICE_NAME, TEMPLATE_CODE,
+      OBJECT_VERSION_NUMBER, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15, ENTITY_CODE, ENTITY_KEY)
+    values (#{reportProgramId,jdbcType=DECIMAL}, #{programName,jdbcType=VARCHAR}, #{programCode,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{dataServiceName,jdbcType=VARCHAR}, #{templateCode,jdbcType=VARCHAR}, 1, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{entityCode,jdbcType=VARCHAR},
+      #{entityKey,jdbcType=VARCHAR})
+  </insert>
+  
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.system.dto.SysReportProgram" >
+    update SYS_REPORT_PROGRAM
+    set PROGRAM_NAME = #{programName,jdbcType=VARCHAR},
+      PROGRAM_CODE = #{programCode,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      DATA_SERVICE_NAME = #{dataServiceName,jdbcType=VARCHAR},
+      TEMPLATE_CODE = #{templateCode,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      ENTITY_CODE = #{entityCode,jdbcType=VARCHAR},
+      ENTITY_KEY = #{entityKey,jdbcType=VARCHAR}
+    where REPORT_PROGRAM_ID = #{reportProgramId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="querySysReportProgram" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.system.dto.SysReportProgram">
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_REPORT_PROGRAM
+    <where>
+		<if test="programCode != null">
+			Upper(program_code) like concat('%',concat(Upper(#{programCode, jdbcType=VARCHAR}), '%'))
+		</if>
+		<if test="programName != null">
+		    AND Upper(program_name) like concat('%',concat(Upper(#{programName, jdbcType=VARCHAR}), '%'))
+		</if>
+		<if test="remark != null">
+			AND Upper(remark) like concat('%',concat(Upper(#{remark, jdbcType=VARCHAR}), '%'))
+		</if>
+	</where>
+    Order by program_code
+  </select>
+  
+  <select id="checkReportNameRepeat" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select count(0) from SYS_REPORT_PROGRAM
+    where program_name = #{programName, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="checkReportCodeRepeat" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select count(0) from SYS_REPORT_PROGRAM
+    where program_code = #{programCode, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectProgramByCode" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_REPORT_PROGRAM rp
+    where rp.PROGRAM_CODE = #{programCode,jdbcType=DECIMAL}
+  </select>
+</mapper>

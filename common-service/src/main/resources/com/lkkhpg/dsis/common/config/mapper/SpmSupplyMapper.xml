@@ -1,0 +1,889 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmSupplyMapper">
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.config.dto.SpmSupply">
+    <id column="SUPPLY_ID" jdbcType="DECIMAL" property="supplyId" />
+    <result column="SUPPLY_TYPE" jdbcType="VARCHAR" property="supplyType" />
+    <result column="SALES_ORG_ID" jdbcType="DECIMAL" property="salesOrgId" />
+    <result column="COUNTRY_CODE" jdbcType="VARCHAR" property="countryCode" />
+    <result column="STATE_CODE" jdbcType="VARCHAR" property="stateCode" />
+    <result column="CITY_CODE" jdbcType="VARCHAR" property="cityCode" />
+    <result column="INV_ORG_ID" jdbcType="DECIMAL" property="invOrgId" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="DEFAULT_FLAG" jdbcType="VARCHAR" property="defaultFlag" />
+    <result column="OBJECT_VERSION_NUMBER" jdbcType="DECIMAL" property="objectVersionNumber" />
+    <result column="REQUEST_ID" jdbcType="DECIMAL" property="requestId" />
+    <result column="PROGRAM_ID" jdbcType="DECIMAL" property="programId" />
+    <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+    <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+    <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="LAST_UPDATE_LOGIN" jdbcType="DECIMAL" property="lastUpdateLogin" />
+    <result column="ATTRIBUTE_CATEGORY" jdbcType="VARCHAR" property="attributeCategory" />
+    <result column="ATTRIBUTE1" jdbcType="VARCHAR" property="attribute1" />
+    <result column="ATTRIBUTE2" jdbcType="VARCHAR" property="attribute2" />
+    <result column="ATTRIBUTE3" jdbcType="VARCHAR" property="attribute3" />
+    <result column="ATTRIBUTE4" jdbcType="VARCHAR" property="attribute4" />
+    <result column="ATTRIBUTE5" jdbcType="VARCHAR" property="attribute5" />
+    <result column="ATTRIBUTE6" jdbcType="VARCHAR" property="attribute6" />
+    <result column="ATTRIBUTE7" jdbcType="VARCHAR" property="attribute7" />
+    <result column="ATTRIBUTE8" jdbcType="VARCHAR" property="attribute8" />
+    <result column="ATTRIBUTE9" jdbcType="VARCHAR" property="attribute9" />
+    <result column="ATTRIBUTE10" jdbcType="VARCHAR" property="attribute10" />
+    <result column="ATTRIBUTE11" jdbcType="VARCHAR" property="attribute11" />
+    <result column="ATTRIBUTE12" jdbcType="VARCHAR" property="attribute12" />
+    <result column="ATTRIBUTE13" jdbcType="VARCHAR" property="attribute13" />
+    <result column="ATTRIBUTE14" jdbcType="VARCHAR" property="attribute14" />
+    <result column="ATTRIBUTE15" jdbcType="VARCHAR" property="attribute15" />
+    <result column="country_name" jdbcType="VARCHAR" property="countryName" />
+    <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+    <result column="city_name" jdbcType="VARCHAR" property="cityName" />
+    <result column="sales_org_name" jdbcType="VARCHAR" property="salesOrgName" />
+    <result column="sales_org_code" jdbcType="VARCHAR" property="salesOrgCode" />
+    <result column="inv_org_code" jdbcType="VARCHAR" property="invOrgCode" />
+    <result column="inv_org_name" jdbcType="VARCHAR" property="invOrgName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    SUPPLY_ID, SUPPLY_TYPE, SALES_ORG_ID, COUNTRY_CODE, STATE_CODE, CITY_CODE, INV_ORG_ID, 
+    REMARK, DEFAULT_FLAG, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from SPM_SUPPLY
+    where SUPPLY_ID = #{supplyId,jdbcType=DECIMAL}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from SPM_SUPPLY
+    where SUPPLY_ID = #{supplyId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply">
+    insert into SPM_SUPPLY (SUPPLY_ID, SUPPLY_TYPE, SALES_ORG_ID, 
+      COUNTRY_CODE, STATE_CODE, CITY_CODE, 
+      INV_ORG_ID, REMARK, DEFAULT_FLAG, 
+      OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+      )
+    values (#{supplyId,jdbcType=DECIMAL}, #{supplyType,jdbcType=VARCHAR}, #{salesOrgId,jdbcType=DECIMAL}, 
+      #{countryCode,jdbcType=VARCHAR}, #{stateCode,jdbcType=VARCHAR}, #{cityCode,jdbcType=VARCHAR}, 
+      #{invOrgId,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{defaultFlag,jdbcType=VARCHAR}, 
+      1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+     CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply">
+    <selectKey resultType="java.lang.Long" keyProperty="supplyId" order="BEFORE" >
+      SELECT SPM_SUPPLY_S.nextval from dual
+    </selectKey>
+    insert into SPM_SUPPLY
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="supplyId != null">
+        SUPPLY_ID,
+      </if>
+      <if test="supplyType != null">
+        SUPPLY_TYPE,
+      </if>
+      <if test="salesOrgId != null">
+        SALES_ORG_ID,
+      </if>
+      <if test="countryCode != null">
+        COUNTRY_CODE,
+      </if>
+      <if test="stateCode != null">
+        STATE_CODE,
+      </if>
+      <if test="cityCode != null">
+        CITY_CODE,
+      </if>
+      <if test="invOrgId != null">
+        INV_ORG_ID,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="defaultFlag != null">
+        DEFAULT_FLAG,
+      </if>
+        OBJECT_VERSION_NUMBER,
+        
+        
+      <if test="requestId != null">
+        REQUEST_ID,
+      </if>
+      <if test="programId != null">
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+        
+        
+      <if test="createdBy != null">
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null">
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+        
+        
+      <if test="lastUpdateLogin != null">
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null">
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null">
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null">
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null">
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null">
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null">
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null">
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null">
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null">
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null">
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null">
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null">
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null">
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null">
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null">
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null">
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="supplyId != null">
+        #{supplyId,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyType != null">
+        #{supplyType,jdbcType=VARCHAR},
+      </if>
+      <if test="salesOrgId != null">
+        #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="countryCode != null">
+        #{countryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateCode != null">
+        #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null">
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="invOrgId != null">
+        #{invOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="defaultFlag != null">
+        #{defaultFlag,jdbcType=VARCHAR},
+      </if>
+        1,
+        
+        
+      <if test="requestId != null">
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null">
+        #{programId,jdbcType=DECIMAL},
+      </if>
+       CURRENT_TIMESTAMP,
+       
+       
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null">
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+        
+        
+      <if test="lastUpdateLogin != null">
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null">
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null">
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null">
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null">
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null">
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null">
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null">
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null">
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null">
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null">
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null">
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null">
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null">
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null">
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null">
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null">
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply">
+    update SPM_SUPPLY
+    <set>
+      <if test="supplyType != null">
+        SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR},
+      </if>
+      <if test="salesOrgId != null">
+        SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="countryCode != null">
+        COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateCode != null">
+        STATE_CODE = #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null">
+        CITY_CODE = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="invOrgId != null">
+        INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="defaultFlag != null">
+        DEFAULT_FLAG = #{defaultFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="objectVersionNumber != null">
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      </if>
+      <if test="requestId != null">
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null">
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null">
+        
+      </if>
+      <if test="createdBy != null">
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null">
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null">
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      </if>
+      <if test="lastUpdateLogin != null">
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null">
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null">
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null">
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null">
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null">
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null">
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null">
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null">
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null">
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null">
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null">
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null">
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null">
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null">
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null">
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null">
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where SUPPLY_ID = #{supplyId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply">
+    update SPM_SUPPLY
+    set SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR},
+      SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR},
+      STATE_CODE = #{stateCode,jdbcType=VARCHAR},
+      CITY_CODE = #{cityCode,jdbcType=VARCHAR},
+      INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      DEFAULT_FLAG = #{defaultFlag,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where SUPPLY_ID = #{supplyId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="selectBySpmSupply" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply" resultMap="BaseResultMap">
+     select 
+    <include refid="Base_Column_List" />
+    from SPM_SUPPLY
+    <where>
+        <if test="salesOrgId != null">
+            AND SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+        </if>
+        <if test="supplyType != null">
+            AND SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR}
+        </if>
+        <if test="countryCode != null and countryCode != 'null'">
+            AND COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR}
+        </if>
+        <if test="countryCode != null and countryCode == 'null'">
+            AND COUNTRY_CODE IS NULL
+        </if>
+        <if test="stateCode != null and stateCode != 'null'">
+            AND STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+        </if>
+        <if test="stateCode != null and stateCode == 'null'">
+            AND STATE_CODE IS NULL 
+        </if>
+        <if test="cityCode != null and cityCode != 'null'">
+            AND CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+        </if>
+        <if test="cityCode != null and cityCode == 'null'">
+            AND CITY_CODE IS NULL
+        </if>
+    </where>
+  </select>
+  
+  <select id="queryBySpmSupply" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply" resultMap="BaseResultMap">
+   select s.supply_id, 
+       s.supply_type,
+       s.sales_org_id,
+       s.country_code,
+       s.state_code,
+       s.city_code,
+       s.inv_org_id,
+       s.remark,
+       s.default_flag,
+       ct.name        as country_name,
+       st.name        as state_name,
+       cit.name       as city_name,
+       spt.name       as sales_org_name,
+       sb.code        as sales_org_code,
+       ib.code        as inv_org_code,
+       it.name        as inv_org_name
+  from spm_supply s
+  left join spm_country_tl ct
+    on (s.country_code = ct.country_code and ct.lang = #{request.locale,jdbcType=VARCHAR})
+  left join spm_state_tl st
+    on (st.state_code = s.state_code and st.lang = #{request.locale,jdbcType=VARCHAR})
+  left join spm_city_tl cit
+    on (cit.city_code = s.city_code and cit.lang = #{request.locale,jdbcType=VARCHAR})
+  left join spm_sales_organization_b sb
+    on sb.sales_org_id = s.sales_org_id 
+  left join spm_sales_organization_tl spt
+    on (spt.sales_org_id = s.sales_org_id and spt.lang = #{request.locale,jdbcType=VARCHAR})
+  left join spm_inv_organization_b ib
+    on ib.inv_org_id = s.inv_org_id
+  left join spm_inv_organization_tl it
+    on (it.inv_org_id = s.inv_org_id and it.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+        <if test="salesOrgId != null">
+            AND s.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+        </if>
+        <if test="supplyType != null">
+            AND s.SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR}
+        </if>
+        <if test="countryCode != null">
+            AND s.COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR}
+        </if>
+        <if test="stateCode != null">
+            AND s.STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+        </if>
+        <if test="cityCode != null">
+            AND s.CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+        </if>
+        <if test="stateCode == null">
+            AND s.STATE_CODE is null
+        </if>
+        <if test="cityCode == null">
+            AND s.CITY_CODE is null
+        </if>
+        <if test="supplyId != null">
+            AND s.supply_id = #{supplyId,jdbcType=DECIMAL}
+        </if>
+    </where> 
+  </select>
+
+  <select id="queryInvOrgBySpmSupply" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply" resultMap="BaseResultMap">
+    SELECT
+      s.supply_id,
+      s.supply_type,
+      s.sales_org_id,
+      s.inv_org_id,
+      s.default_flag
+    FROM spm_supply s
+    <where>
+      s.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+      and s.default_flag = 'Y'
+    </where>
+
+  </select>
+
+  <select id="queryCompanyIdByInvOrgId" parameterType="java.lang.Long" resultType="java.lang.Long">
+      SELECT DISTINCT smb.COMPANY_ID
+      FROM spm_supply ss ,SPM_MARKET_B smb ,SPM_SALES_ORGANIZATION_B ssob
+      WHERE smb.MARKET_ID = ssob.MARKET_ID
+        AND ss.SALES_ORG_ID = ssob.SALES_ORG_ID
+        AND ss.INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+  </select>
+
+  <select id="queryIsCheckByMarketId" parameterType="java.lang.Long" resultType="java.lang.String">
+      SELECT scb.ATTRIBUTE3
+        FROM SPM_COMPANY_B scb , SPM_MARKET_B smb
+      WHERE scb.COMPANY_ID = smb.COMPANY_ID
+        AND smb.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+  </select>
+
+  <select id="queryBySupplyByUserAndRole" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply" resultMap="BaseResultMap">
+    select  b.*  from
+    (select t.supply_type,
+    t.sales_org_id,
+    t.country_code,
+    t.state_code,
+    t.city_code,
+    (select ct.name
+    from spm_country_tl ct
+    where ct.country_code = t.country_code
+    and ct.lang = #{request.locale,jdbcType=VARCHAR}) as country_name,
+    (select st.name
+    from spm_state_tl st
+    where st.state_code = t.state_code
+    and st.lang = #{request.locale,jdbcType=VARCHAR}) as state_name,
+    (select sct.name
+    from spm_city_tl sct
+    where sct.city_code = t.city_code
+    and sct.lang = #{request.locale,jdbcType=VARCHAR}) as city_name,
+    (select sot.name
+    from spm_sales_organization_tl sot
+    where sot.sales_org_id = t.sales_org_id
+    and sot.lang = #{request.locale,jdbcType=VARCHAR}) as sales_org_name,
+    (select sob.code
+    from spm_sales_organization_b sob
+    where sob.sales_org_id = t.sales_org_id) as sales_org_code
+    from (select s.supply_type,
+    s.sales_org_id,
+    s.country_code,
+    s.state_code,
+    s.city_code
+    from spm_supply s
+    group by (s.supply_type, s.sales_org_id, s.country_code,
+    s.state_code, s.city_code)
+    order by s.supply_type) t) b，
+    (SELECT sura.USER_ROLE_ASSIGN_ID, sura.USER_ID, sura.ROLE_ID, sura.ASSIGN_TYPE, sura.ASSIGN_VALUE, sura.DEFAULT_FLAG
+    FROM SYS_USER_ROLE_ASSIGN sura
+    WHERE sura.USER_ID = #{request.userId,jdbcType=VARCHAR}
+    AND sura.ROLE_ID = #{request.roleId,jdbcType=VARCHAR}
+    AND sura.ASSIGN_TYPE = 'SALES') sl
+    <where>
+      sl.ASSIGN_VALUE=b.SALES_ORG_ID
+      <if test="salesOrgId != null">
+        AND b.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+      </if>
+      <if test="supplyType != null">
+        AND b.SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR}
+      </if>
+      <if test="countryCode != null">
+        AND b.COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR}
+      </if>
+      <if test="stateCode != null">
+        AND b.STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+      </if>
+      <if test="cityCode != null">
+        AND b.CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+      </if>
+      <if test="countryName != null">
+        and Upper(b.country_name) like concat('%',concat(Upper(#{countryName,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="stateName != null">
+        and Upper(b.state_name) like concat('%',concat(Upper(#{stateName,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="cityName != null">
+        and Upper(b.city_name) like concat('%',concat(Upper(#{cityName,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="salesOrgName != null">
+        and Upper(b.sales_org_name) like concat('%',concat(Upper(#{salesOrgName,jdbcType=VARCHAR}),'%'))
+      </if>
+    </where>
+  </select>
+
+  <select id="queryBySupply" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply" resultMap="BaseResultMap">
+  select b.* from 
+      (select t.supply_type,
+       t.sales_org_id,
+       t.country_code,
+       t.state_code,
+       t.city_code,
+       (select ct.name
+          from spm_country_tl ct
+         where ct.country_code = t.country_code
+           and ct.lang = #{request.locale,jdbcType=VARCHAR}) as country_name,
+       (select st.name
+          from spm_state_tl st
+         where st.state_code = t.state_code
+           and st.lang = #{request.locale,jdbcType=VARCHAR}) as state_name,
+       (select sct.name
+          from spm_city_tl sct
+         where sct.city_code = t.city_code
+           and sct.lang = #{request.locale,jdbcType=VARCHAR}) as city_name,
+       (select sot.name
+          from spm_sales_organization_tl sot
+         where sot.sales_org_id = t.sales_org_id
+           and sot.lang = #{request.locale,jdbcType=VARCHAR}) as sales_org_name,
+       (select sob.code
+          from spm_sales_organization_b sob
+         where sob.sales_org_id = t.sales_org_id) as sales_org_code
+  from (select s.supply_type,
+               s.sales_org_id,
+               s.country_code,
+               s.state_code,
+               s.city_code
+          from spm_supply s
+         group by (s.supply_type, s.sales_org_id, s.country_code,
+                   s.state_code, s.city_code)
+         order by s.supply_type) t) b
+    <where>
+        <if test="salesOrgId != null">
+            AND b.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+        </if>
+        <if test="supplyType != null">
+            AND b.SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR}
+        </if>
+        <if test="countryCode != null">
+            AND b.COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR}
+        </if>
+        <if test="stateCode != null">
+            AND b.STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+        </if>
+        <if test="cityCode != null">
+            AND b.CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+        </if>
+        <if test="countryName != null">
+            and Upper(b.country_name) like concat('%',concat(Upper(#{countryName,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="stateName != null">
+            and Upper(b.state_name) like concat('%',concat(Upper(#{stateName,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="cityName != null">
+            and Upper(b.city_name) like concat('%',concat(Upper(#{cityName,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="salesOrgName != null">
+            and Upper(b.sales_org_name) like concat('%',concat(Upper(#{salesOrgName,jdbcType=VARCHAR}),'%'))
+        </if>
+    </where> 
+  </select>
+  
+  
+  <select id="queryByAddress" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply" resultMap="BaseResultMap">
+  select t.supply_type,
+       t.sales_org_id,
+       t.country_code,
+       t.state_code,
+       t.city_code,
+       (select ct.name
+          from spm_country_tl ct
+         where ct.country_code = t.country_code
+           and ct.lang = #{request.locale,jdbcType=VARCHAR}) as country_name,
+       (select st.name
+          from spm_state_tl st
+         where st.state_code = t.state_code
+           and st.lang = #{request.locale,jdbcType=VARCHAR}) as state_name,
+       (select sct.name
+          from spm_city_tl sct
+         where sct.city_code = t.city_code
+           and sct.lang = #{request.locale,jdbcType=VARCHAR}) as city_name,
+       (select sot.name
+          from spm_sales_organization_tl sot
+         where sot.sales_org_id = t.sales_org_id
+           and sot.lang = #{request.locale,jdbcType=VARCHAR}) as sales_org_name,
+       (select sob.code
+          from spm_sales_organization_b sob
+         where sob.sales_org_id = t.sales_org_id) as sales_org_code
+  from (select s.supply_type,
+               s.sales_org_id,
+               s.country_code,
+               s.state_code,
+               s.city_code
+          from spm_supply s
+         group by (s.supply_type, s.sales_org_id, s.country_code,
+                   s.state_code, s.city_code)
+         order by s.supply_type) t
+    <where>
+        <if test="salesOrgId != null">
+            AND t.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+        </if>
+        <if test="supplyType != null">
+            AND t.SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR}
+        </if>
+        <if test="countryCode != null">
+            AND t.COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR}
+        </if>
+        <if test="stateCode != null">
+            AND t.STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+        </if>
+        <if test="cityCode != null">
+            AND t.CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+        </if>
+        <if test="stateCode == null">
+            AND t.STATE_CODE IS NULL
+        </if>
+        <if test="cityCode == null">
+            AND t.CITY_CODE IS NULL
+        </if>
+    </where> 
+  </select>
+  
+  <select id="querySpmSupply" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply" resultType="java.lang.Integer">
+   select count(1)
+   from spm_supply
+   <where>
+        <if test="salesOrgId != null">
+            SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+        </if>
+        <if test="invOrgId != null">
+            AND INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+        </if>
+        <if test="supplyType != null">
+            AND SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR}
+        </if>
+        <if test="countryCode != null">
+            AND COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR}
+        </if>
+        <if test="stateCode != null and stateCode != ''">
+            AND STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+        </if>
+        <if test="cityCode != null and cityCode != ''">
+            AND CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+        </if>
+        <if test="stateCode == null or stateCode == ''">
+            AND STATE_CODE IS NULL
+        </if>
+        <if test="cityCode == null or cityCode == ''">
+            AND CITY_CODE IS NULL
+        </if>
+        
+    </where> 
+  </select>
+  
+  <delete id="deleteBySelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmSupply">
+    delete from SPM_SUPPLY
+     <where>
+            SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR}
+        <if test="salesOrgId != null">
+            AND SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+        </if>
+        <if test="invOrgId != null">
+            AND inv_org_id = #{invOrgId,jdbcType=VARCHAR}
+        </if>
+        <if test="countryCode != null">
+            AND COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR}
+        </if>
+        <if test="stateCode != null">
+            AND STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+        </if>
+        <if test="cityCode != null">
+            AND CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+        </if>
+        <if test="supplyId != null">
+            AND SUPPLY_ID = #{supplyId,jdbcType=VARCHAR}
+        </if>
+    </where>
+  </delete>
+  
+  <select id="selectBySalesOrgId" resultMap="BaseResultMap">
+  SELECT sup.inv_org_id
+              ,siot.name inv_org_name
+			  ,siob.code inv_org_code
+          FROM spm_supply sup
+          LEFT JOIN spm_inv_organization_b siob
+            ON sup.inv_org_id = siob.inv_org_id
+          LEFT JOIN spm_inv_organization_tl siot
+            ON siot.lang = #{request.locale,jdbcType=VARCHAR}
+           AND siot.inv_org_id = siob.inv_org_id
+         LEFT JOIN spm_location sl 
+          ON 1=1
+         LEFT join om_sales_order om
+           on om.delivery_location_id = sl.location_id
+         WHERE sup.supply_type = 'SITE'
+           AND om.delivery_type = 'SHIPP'
+           AND om.header_id =  #{orderHeaderId,jdbcType=DECIMAL}
+           AND sup.country_code = sl.country_code
+           AND sup.state_code = sl.state_code
+           AND sup.city_code = sl.city_code
+        UNION
+        SELECT sup.inv_org_id
+              ,siot.name inv_org_name
+              ,siob.code inv_org_code
+          FROM spm_supply sup
+          LEFT JOIN spm_inv_organization_b siob
+            ON sup.inv_org_id = siob.inv_org_id
+          LEFT JOIN spm_inv_organization_tl siot
+            ON siot.lang = #{request.locale,jdbcType=VARCHAR}
+           AND siot.inv_org_id = siob.inv_org_id
+         LEFT JOIN spm_location sl 
+          ON 1=1
+         left join om_sales_order om
+           on om.delivery_location_id = sl.location_id
+         WHERE sup.supply_type = 'SITE'
+           AND om.delivery_type = 'SHIPP'
+           AND om.header_id =  #{orderHeaderId,jdbcType=DECIMAL}
+           AND sup.country_code = sl.country_code
+           AND sup.state_code = sl.state_code
+        UNION
+       SELECT sup.inv_org_id
+              ,siot.name inv_org_name
+              ,siob.code inv_org_code
+          FROM spm_supply sup
+          LEFT JOIN spm_inv_organization_b siob
+            ON sup.inv_org_id = siob.inv_org_id
+          LEFT JOIN spm_inv_organization_tl siot
+            ON siot.lang = #{request.locale,jdbcType=VARCHAR}
+           AND siot.inv_org_id = siob.inv_org_id
+         LEFT JOIN spm_location sl 
+          ON 1=1
+         left join om_sales_order om
+           on om.delivery_location_id = sl.location_id
+         WHERE sup.supply_type = 'SITE'
+           AND om.delivery_type = 'SHIPP'
+           AND om.header_id =  #{orderHeaderId,jdbcType=DECIMAL}
+           AND sup.country_code = sl.country_code
+        UNION
+        SELECT sup.inv_org_id
+              ,siot.name inv_org_name
+              ,siob.code inv_org_code
+          FROM spm_supply sup
+          LEFT JOIN spm_inv_organization_b siob
+            ON sup.inv_org_id = siob.inv_org_id
+          LEFT JOIN spm_inv_organization_tl siot
+            ON siot.lang = #{request.locale,jdbcType=VARCHAR}
+           AND siot.inv_org_id = siob.inv_org_id
+         left join om_sales_order om
+          ON 1=1
+         WHERE sup.supply_type = 'ORG'
+           AND om.header_id =  #{orderHeaderId,jdbcType=DECIMAL}
+           AND sup.sales_org_id =  om.sales_org_id
+  </select>
+  
+</mapper>

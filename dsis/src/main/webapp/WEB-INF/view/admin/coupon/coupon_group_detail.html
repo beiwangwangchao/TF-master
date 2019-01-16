@@ -1,0 +1,510 @@
+<#--
+        * description: 分组详情界面
+        * version: 1.0
+        * author: xinjia.yao
+        * Copyright LKK Health Products Group Limited.
+        *
+        -->
+    <#include "../include/head.html">
+        <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+        <script src="${base.contextPath}/common/code?groupStatusData=PDM.GROUP_STATUS" type="text/javascript"></script>
+        <body style="padding: 15px">
+        <div id="allBtn" ></div>
+        <form id="coupon_detail_form"></form>
+        <div id="coupon_detail_grid" ></div>
+        <script>
+            var oldMarketIdValue = null;
+            var salesOrgByMarket = [];
+            var oldCouponCode1 = null;
+            var oldCouponCode2 = null;
+            <#assign isedit = (RequestParameters.isedit!'0') />
+            var marketId = ${RequestParameters.marketId!_marketId};
+            $(function() {
+                window['coupon_detail_form'] = $("#coupon_detail_form").ligerForm(
+                    {
+                        fields : [
+                            {  type : 'combobox',
+                                label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+                                name : 'marketId',
+                                newline : false ,
+                                options : {
+                                    value : marketId,
+                                    valueField : 'marketId',
+                                    textField : 'name',
+                                    cancelable : false,
+                                    async : false,
+                                    url : '${base.contextPath}/om/order/queryMarketList',
+                                    onSuccess : function(data){
+                                        this.setValue(marketId);
+                                    },
+                                    onBeforeSelect : function(){ //该事件用于将初次加载标志置false,记录原值以及将重复标记置为true
+                                        oldMarketIdValue = $.ligerui.get('marketId').getValue();
+                                    },
+                                    onSelected : function (value){
+                                        $.ajax({
+                                            type: "POST",
+                                            dataType: "json",
+                                            async : false,
+                                            data : {marketId : value},
+                                            url : "${base.contextPath}/om/order/getSalesOrgData",
+                                            success: function(data) {
+                                                salesOrgByMarket = data.rows;
+                                            }
+                                        });
+                                        liger.get("salesOrgId").setData(salesOrgByMarket);
+                                        if (!value) {
+                                            return false;
+                                        }
+                                        if (marketId != value) {
+                                            $.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.refresh_page"/>', $l('sys.hand.tip.info'),function(yes) {
+                                                if(yes){
+                                                    var newMarketId = $.ligerui.get('marketId').getValue();
+                                                    var tabid = window.top.tab.selectedTabId;
+                                                    var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                                    window.top.f_removeTab(tabid);
+                                                    parent.f_addTab(tabid,tabname,"${base.contextPath}/coupon/coupon_group_detail.html?marketId="+newMarketId);
+                                                }else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+                                                    $.ligerui.get('marketId').setValue(oldMarketIdValue);
+                                                }
+                                            });
+                                        }
+                                    }
+
+                                },
+                                validate : {
+                                    required : true
+                                },
+                                group : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupbasicinformation"/>'
+                            },
+                            {
+                                label: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition"/>',
+                                newline:false,
+                                name: 'salesOrgId',
+                                type : "combobox",
+                                options : {
+                                    valueField: "salesOrgId",
+                                    textField: "name",
+                                    isMultiSelect : false,
+                                    isShowCheckBox : false
+                                }
+                            },
+
+                            {
+                                type : 'select',
+                                label : '<@spring.message "com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupstatus"/>',
+                                newline : false,
+                                name : 'groupStatus',
+                                options: {
+                                    data : groupStatusData,
+                                    valueField : 'value',
+                                    textField : 'meaning',
+                                    value : 'ENABL',
+                                    disabled :true
+                                }
+                            },
+                            {
+                                type : 'text',
+                                label : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupcode"/>',
+                                newline : true,
+                                name : 'groupCode',
+                                validate : {
+                                    required : true,
+                                    digitLettersUnderscore : true
+                                }
+                            },
+                            {
+                                type : 'text',
+                                label : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupname"/>',
+                                newline : false,
+                                name : 'groupName',
+                                validate : {
+                                    required : true,
+                                    maxlength:200
+                                }
+                            },
+                            {
+                                type : 'text',
+                                label : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.groupDesc"/>',
+                                newline : false,
+                                name : 'groupDesc',
+                                validate : {
+                                    required : true,
+                                    maxlength:200
+                                }
+                            },
+                            {
+                                type : 'date',
+                                label : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.effective_date_from"/>',
+                                newline : true,
+                                name : 'effectiveDateFrom',
+                                validate : {
+                                    required : true
+                                },
+                                options: {
+                                    cancelable : false,
+                                    showTime : true,
+                                    format: 'yyyy-MM-dd',
+                                    onChangeDate:function(v){
+                                        var g = this;
+                                        if(v){
+                                            var startDate = new Date(v),
+                                                endDate = liger.get("effectiveDateTo").getValue();
+                                            sysDate = new Date();
+                                            if(endDate!=null){
+                                                if(startDate.getTime() > endDate.getTime()) {
+                                                    Hap.showError('<@spring.message "msg.error.coupongroup.effectivedateto_must_bigger_than_effectivedatefrom"/>');
+                                                    g.clear();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                type : 'date',
+                                label : '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.effective_date_to"/>',
+                                newline : false,
+                                name : 'effectiveDateTo',
+                                options: {
+                                    cancelable : false,
+                                    showTime : true,
+                                    format: 'yyyy-MM-dd',
+                                    onChangeDate:function(v){
+                                        var g = this;
+                                        var fromDate = liger.get("effectiveDateFrom").getValue();
+                                        var endDate = new Date(v);
+                                        var sysDate = new Date();
+                                        if(fromDate){
+                                            var startDate = new Date(fromDate);
+                                            if(startDate.getTime() > endDate.getTime()) {
+                                                Hap.showError('<@spring.message "msg.error.coupongroup.effectivedateto_must_bigger_than_effectivedatefrom"/>');
+                                                g.clear();
+                                                return;
+                                            }
+                                        }
+                                        endDate = new Date(endDate.getFullYear(),endDate.getMonth(),endDate.getDate());
+                                        sysDate = new Date(sysDate.getFullYear(),sysDate.getMonth(),sysDate.getDate());
+                                        if(endDate < sysDate){
+                                            Hap.showError('<@spring.message "msg.error.coupongroup.effectivedateto_must_bigger_than_now"/>');
+                                            g.clear();
+                                        }
+
+                                    }
+                                }
+                            }
+                        ]
+                    });
+                window['coupon_detail_grid'] = $("#coupon_detail_grid").ligerGrid({
+                        unSetValidateAttr:false,
+                        title: '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.includingcoupons"/>',
+                        columns: [{
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.couponcode"/>',
+                            name: 'couponCode',
+                            align: 'left',
+                            width: 200,
+                            editor:
+                                $.extend(
+                                    ${lovService.getLov(base.contextPath,base.locale, "lov_coupon_query")},{
+                                        onChangeValue: function(v) {
+                                            if(!v || v == null || v == ""){
+                                                var p = this.options;
+                                                var curRow = p.host_grid_row;
+                                                p.host_grid.updateRow(curRow, {
+                                                    couponCode : "",
+                                                    couponName : ""
+
+                                                })
+                                            }else{
+                                                var p = this.options;
+                                                var curRow = p.host_grid_row;
+                                                p.host_grid.updateRow(curRow, {
+                                                    couponCode : "",
+                                                    couponName : ""
+                                                })
+                                            }
+                                        },
+                                        staticOptions : function(e){
+                                            if($.ligerui.get("salesOrgId").getValue() == ""){
+                                                e.column.editor.parms = {
+                                                    marketId : $.ligerui.get("marketId").getValue()
+                                                }
+                                            }
+                                            else{
+                                                e.column.editor.parms = {
+                                                    marketId : $.ligerui.get("marketId").getValue(),
+                                                    salesOrgId : $.ligerui.get("salesOrgId").getValue()
+                                                }}
+                                        },
+                                        onSelect : function(datas){
+                                            var p = this.options;
+                                            var curRow = p.host_grid_row;
+                                            p.host_grid.updateRow(curRow, {
+                                                couponCode : datas.data[0].couponCode,
+                                                couponName: datas.data[0].name
+                                            });
+                                        },
+                                        onChanged :function(){//移除掉重叠的错误标签
+                                            //$('.l-text-field.error').parent().parent().remove();
+                                        }
+                                    }
+                                ),
+                            validate : {
+                                required : true
+                            }
+                        }, {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.couponsname"/>',
+                            name: 'couponName',
+                            align: 'left',
+                            width: 200,
+                            type: 'text',
+                            validate : {
+                                required : true
+                            }
+                        },
+                            {
+                                display: '<@spring.message "type.com.lkkhpg.dsis.common.coupon.dto.coupongroup.sequence"/>',
+                                name: 'sequence',
+                                align: 'left',
+                                width: 300,
+                                editor: { type: "int"},
+                                validate : {
+                                    required : true,
+                                    digits : true,
+                                    min : 1
+                                }
+                            }
+                        ],
+                    <#if isedit == '1'>
+                url:'${base.contextPath}/couponGroupR/query?groupCode=${RequestParameters.groupCode!}',
+                </#if>
+                enabledEdit: true,
+                    //delayLoad : true,
+                    //isSingleCheck : true,
+                    width: '99%',
+                    height: '98%',
+                    checkbox : true,
+                    onLoaded : function(e){
+                    oldCouponCode1 = e.data.rows[0].couponCode;
+                    oldCouponCode2 = e.data.rows[1].couponCode;
+                    $('.l-grid-loading').remove();
+                }
+            });
+                $('.togglebtn').click(function (){
+                    if($('.togglebtn').hasClass("togglebtn-down")){
+                        $('#coupon_detail_grid').hide();
+                    }
+                    else{
+                        $('#coupon_detail_grid').show();
+                    }
+                });
+                addRows(2);
+                //
+
+                window['allBtn'] = $('#allBtn').ligerForm({
+                        buttons : [
+                            {
+                                text : $l('sys.hand.btn.save'),
+                                id : 'save_btn',
+                                name : 'save_btn',
+                                width : 80,
+                                click : function() {
+                                    f_save();
+                                }
+                            },
+                            {
+                                text : '<@spring.message "sys.hand.common.enable"/>',
+                                id : 'enable_btn',
+                                name : 'enable_btn',
+                                width : 80,
+                                disabled : true,
+                                click : function() {
+                                    $.ligerDialog.confirm('<@spring.message "msg.info.coupon.enable_group"/>', function (isyes) {
+                                        if(isyes){
+                                            liger.get('groupStatus').setValue('ABLED');
+                                            liger.get('save_btn').setDisabled(true);
+                                            liger.get('enable_btn').setDisabled(true);
+                                            liger.get('disable_btn').setEnabled(true);
+                                            f_setFieldsReadonly();
+                                            $.ajax({
+                                                async:false,
+                                                type : 'POST',
+                                                url:"${base.contextPath}/couponGroup/updateGroupStatus?groupStatus="+liger.get('groupStatus').getValue()+"&groupCode="+liger.get('groupCode').getValue(),
+                                                success:function(data){
+                                                    return;
+                                                }
+                                            });
+                                        }
+                                    })
+                                }
+                            },
+                            {
+                                text : '<@spring.message "sys.hand.common.disable"/>',
+                                id : 'disable_btn',
+                                name : 'disable_btn',
+                                disabled : true,
+                                width : 80,
+                                click : function() {
+                                    $.ligerDialog.confirm('<@spring.message "msg.info.coupon.disable_group"/>', function (isyes) {
+                                        if(isyes){
+                                            liger.get('enable_btn').setDisabled(false);
+                                            liger.get('groupStatus').setValue('DISAB');
+                                            liger.get('save_btn').setDisabled(true);
+                                            liger.get('enable_btn').setDisabled(true);
+                                            liger.get('disable_btn').setDisabled(true);
+                                            f_setFieldsReadonly();
+                                            $.ajax({
+                                                async:false,
+                                                type : 'POST',
+                                                url:"${base.contextPath}/couponGroup/updateGroupStatus?groupStatus="+liger.get('groupStatus').getValue()+"&groupCode="+liger.get('groupCode').getValue(),
+                                                success:function(data){
+                                                    return;
+                                                }
+                                            });
+                                        }
+                                    })
+                                }
+                            },
+                        ]
+                    })
+                    <#if isedit == '1'>
+                $.ajax({
+                    type : 'POST',
+                    dataType : 'json',
+                    url : '${base.contextPath}/coupon/queryCouponGroupDetail',
+                    data : {
+                        groupCode : '${RequestParameters.groupCode!}'
+                    },
+                    success : function (data){
+                        if(data.success){
+                            groupStatus1 = data.rows[0].groupStatus;
+                            window['coupon_detail_form'].setData({'marketId':data.rows[0].marketId});
+                            window['coupon_detail_form'].setData({'salesOrgId':data.rows[0].salesOrgId});
+                            window['coupon_detail_form'].setData({'groupCode':data.rows[0].groupCode});
+                            window['coupon_detail_form'].setData({'groupName':data.rows[0].groupName});
+                            window['coupon_detail_form'].setData({'groupDesc':data.rows[0].groupDesc});
+                            window['coupon_detail_form'].setData({'groupStatus':groupStatus1});
+                            window['coupon_detail_form'].setData({'effectiveDateFrom':data.rows[0].effectiveDateFrom});
+                            window['coupon_detail_form'].setData({'effectiveDateTo':data.rows[0].effectiveDateTo});
+                            if(groupStatus1 == "ENABL"){
+                                liger.get('save_btn').setEnabled(true);
+                                liger.get('enable_btn').setEnabled(true);
+                                liger.get('disable_btn').setDisabled(true);
+                            }
+                            else if(groupStatus1 == "ABLED"){
+                                liger.get('save_btn').setDisabled(true);
+                                liger.get('enable_btn').setDisabled(true);
+                                liger.get('disable_btn').setEnabled(true);
+                                f_setFieldsReadonly();
+                            }
+                            else{
+                                liger.get('save_btn').setDisabled(true);
+                                liger.get('enable_btn').setDisabled(true);
+                                liger.get('disable_btn').setDisabled(true);
+                                f_setFieldsReadonly();
+                            }
+                        }
+                    }
+                });
+                $.ligerui.get('groupCode').setDisabled(true);
+                </#if>
+            });
+            function addRows(lineNumber) {
+                for (var i = 0; i < lineNumber; i++) {
+                    addLine();
+                }
+            }
+
+            function addLine() {
+                var object = {
+                    couponCode : "",
+                    couponName : "",
+                    sequence : ""
+                };
+                window['coupon_detail_grid'].addRow(object);
+            }
+            function f_save(){
+                //获取传到后台的数据
+                var couponDetailFormData = window['coupon_detail_form'].getData();
+                var couponDetailGridData = window['coupon_detail_grid'].getData();
+                var couponGroupCode = couponDetailFormData.groupCode;
+                var couponGroupName = couponDetailFormData.groupName;
+                var couponGroupDesc = couponDetailFormData.groupDesc;
+                var couponGroupOrgId = couponDetailFormData.salesOrgId;
+                var couponGroupMarketId = couponDetailFormData.marketId;
+                var couponGroupStatus = couponDetailFormData.groupStatus;
+                var effectiveDateFrom= couponDetailFormData.effectiveDateFrom;
+                var effectiveDateTo= couponDetailFormData.effectiveDateTo;
+
+                var status = 'add';
+            <#if isedit == '1'>
+                status = 'update'
+                    </#if>
+                var saveCouponGroupData = {"groupCode":couponGroupCode
+                    ,"groupName": couponGroupName,"groupDesc":couponGroupDesc,
+                    "salesOrgId": couponGroupOrgId,"groupStatus":couponGroupStatus,
+                    "marketId":couponGroupMarketId,
+                    "couponGroupRList":couponDetailGridData,"status": status,
+                    "effectiveDateFrom":effectiveDateFrom,
+                    "effectiveDateTo":effectiveDateTo,
+                    "oldCouponCodeList":[oldCouponCode1,oldCouponCode2]};
+                //将数据传到后台
+                if(Hap.validateForm(window['coupon_detail_form'])
+                    &&Hap.validateGrid(window['coupon_detail_grid'])){
+                    /* if(effectiveDateTo!=null && new Date()>effectiveDateTo){
+                     Hap.showError('<@spring.message "msg.error.coupongroup.effectivedateto_must_bigger_than_now"/>');
+                     }
+                     else if(effectiveDateTo!=null && effectiveDateFrom>effectiveDateTo){
+                     Hap.showError('<@spring.message "msg.error.coupongroup.effectivedateto_must_bigger_than_effectivedatefrom"/>');
+                     }
+                     else */ if(couponDetailGridData[0].couponCode == couponDetailGridData[1].couponCode){
+                        Hap.showError('<@spring.message "msg.error.coupongroup.twosamecoupons"/>');
+                    }
+                    else if(couponDetailGridData[0].sequence == couponDetailGridData[1].sequence){
+                        Hap.showError('<@spring.message "msg.error.coupongroup.twosamesequence"/>');
+                    }
+                    else{
+                        $.ligerDialog.confirm('<@spring.message "sys.hand.tip.save_confirm"/>', function (isyes) {
+                            if(isyes){
+                                $.ajax({
+                                    async:false,
+                                    type : 'POST',
+                                    dataType : "json",
+                                    contentType : "application/json",
+                                    url:"${base.contextPath}/couponGroup/save",
+                                    data:JSON2.stringify(saveCouponGroupData),
+                                    success:function(data){
+                                        if(data.success==true){
+                                            Hap.showSuccess('<@spring.message "sys.hand.preferences.save.success"/>',
+                                                function() {
+                                                    $.ligerui.get('groupCode').setDisabled(true);
+                                                    //$("#coupon_detail_grid").ligerGrid().columns[1].editor.readonly = true;
+                                                    var tabid = window.top.tab.selectedTabId;
+                                                    var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                                    window.top.f_removeTab(tabid);
+                                                    parent.f_addTab(tabid,tabname,"${base.contextPath}/coupon/coupon_group_detail.html?isedit=1&groupCode=" + liger.get('groupCode').getValue() + "&marketId="+liger.get('marketId').getValue());
+                                                },{allowClose : false});
+                                        }}
+                                })
+                            }
+                        })
+                    }
+                }
+            }
+            function f_setFieldsReadonly(){
+                liger.get("marketId").setDisabled(true);
+                liger.get("salesOrgId").setDisabled(true);
+                liger.get("groupCode").setDisabled(true);
+                liger.get("groupName").setDisabled(true);
+                liger.get("groupDesc").setDisabled(true);
+                liger.get("effectiveDateFrom").setDisabled(true);
+                liger.get("effectiveDateTo").setDisabled(true);
+
+                liger.get('save_btn').setDisabled(true);
+                window['coupon_detail_grid'].options.enabledEdit = false;
+                window['coupon_detail_grid'].options.columns[0].validate.required=false;
+                window['coupon_detail_grid'].options.columns[2].validate.required=false;
+                window['coupon_detail_grid'].reRender();
+            }
+        </script>
+        </body>
+        </html>

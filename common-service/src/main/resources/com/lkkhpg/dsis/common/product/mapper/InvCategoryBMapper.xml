@@ -1,0 +1,655 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.product.mapper.InvCategoryBMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+        <id column="CATEGORY_ID" property="categoryId" jdbcType="DECIMAL"/>
+        <result column="CATEGORY_NAME" property="categoryName" jdbcType="VARCHAR"/>
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR"/>
+        <result column="PARENT_CATEGORY_ID" property="parentCategoryId" jdbcType="DECIMAL"/>
+        <result column="DEFAULT_VALUE" property="defaultValue" jdbcType="VARCHAR"/>
+        <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR"/>
+        <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP"/>
+        <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP"/>
+        <result column="LEAF_FLAG" property="leafFlag" jdbcType="VARCHAR"/>
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL"/>
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL"/>
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL"/>
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR"/>
+        <result column="LEAF_FLAG" property="leafFlag" jdbcType="VARCHAR"/>
+        <result column="SORT_NUM" property="sortNum" jdbcType="DECIMAL"/>
+
+    </resultMap>
+    <sql id="Base_Column_List">
+    CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, PARENT_CATEGORY_ID, DEFAULT_VALUE, ENABLED_FLAG, 
+    START_ACTIVE_DATE, END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15,LEAF_FLAG,SORT_NUM
+  </sql>
+    <sql id="Base_Column_List_Tl">
+    B.CATEGORY_ID, T.CATEGORY_NAME, T.DESCRIPTION, B.PARENT_CATEGORY_ID, B.DEFAULT_VALUE, B.ENABLED_FLAG, 
+    B.START_ACTIVE_DATE, B.END_ACTIVE_DATE, B.OBJECT_VERSION_NUMBER, B.REQUEST_ID, B.PROGRAM_ID, B.CREATION_DATE, 
+    B.CREATED_BY, B.LAST_UPDATED_BY, B.LAST_UPDATE_DATE, B.LAST_UPDATE_LOGIN, B.ATTRIBUTE_CATEGORY, 
+    B.ATTRIBUTE1, B.ATTRIBUTE2, B.ATTRIBUTE3, B.ATTRIBUTE4, B.ATTRIBUTE5, B.ATTRIBUTE6, B.ATTRIBUTE7, 
+    B.ATTRIBUTE8, B.ATTRIBUTE9, B.ATTRIBUTE10, B.ATTRIBUTE11, B.ATTRIBUTE12, B.ATTRIBUTE13, B.ATTRIBUTE14, 
+    B.ATTRIBUTE15,B.LEAF_FLAG,B.SORT_NUM
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Short">
+        select
+        <include refid="Base_Column_List"/>
+        from INV_CATEGORY_B
+        where CATEGORY_ID = #{categoryId,jdbcType=DECIMAL}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from INV_CATEGORY_B
+    where CATEGORY_ID = #{categoryId,jdbcType=DECIMAL}
+    </delete>
+
+    <select id="beforeInsert" resultType="java.lang.Long"
+            parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+      select count(*)
+      from INV_CATEGORY_B b
+      <where>
+          <if test="categoryName != null">
+          and b.category_name = #{categoryName, jdbcType=VARCHAR}
+          </if>
+          and (b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
+              or b.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+                     (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+              or b.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
+                     (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+              )
+      </where>
+    </select>
+
+
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+        <selectKey resultType="java.lang.Long" keyProperty="categoryId" order="BEFORE">
+            select inv_category_b_s.nextval from dual
+        </selectKey>
+        insert into INV_CATEGORY_B (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION,
+        PARENT_CATEGORY_ID, DEFAULT_VALUE, ENABLED_FLAG,
+        START_ACTIVE_DATE, END_ACTIVE_DATE, OBJECT_VERSION_NUMBER,
+        REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10,
+        ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14, ATTRIBUTE15,LEAF_FLAG,SORT_NUM)
+        values (#{categoryId,jdbcType=DECIMAL}, #{categoryName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR},
+        #{parentCategoryId,jdbcType=DECIMAL}, #{defaultValue,jdbcType=VARCHAR}, #{enabledFlag,jdbcType=VARCHAR},
+        #{startActiveDate,jdbcType=TIMESTAMP}, #{endActiveDate,jdbcType=TIMESTAMP}, 1,
+        #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP,
+        #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP,
+        #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR},
+        (select company_id from spm_market_b where market_id = #{request.marketId,jdbcType=VARCHAR}),
+        #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR},
+        #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR},
+        #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{leafFlag,jdbcType=VARCHAR},
+        #{sortNum,jdbcType=DECIMAL})
+    </insert>
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+        <selectKey resultType="java.lang.Short" keyProperty="categoryId" order="BEFORE">
+            select inv_category_b.nextval from dual
+        </selectKey>
+        insert into INV_CATEGORY_B
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            CATEGORY_ID,
+            <if test="categoryName != null">
+                CATEGORY_NAME,
+            </if>
+            <if test="description != null">
+                DESCRIPTION,
+            </if>
+            <if test="parentCategoryId != null">
+                PARENT_CATEGORY_ID,
+            </if>
+            <if test="defaultValue != null">
+                DEFAULT_VALUE,
+            </if>
+            <if test="enabledFlag != null">
+                ENABLED_FLAG,
+            </if>
+            <if test="startActiveDate != null">
+                START_ACTIVE_DATE,
+            </if>
+            <if test="endActiveDate != null">
+                END_ACTIVE_DATE,
+            </if>
+            OBJECT_VERSION_NUMBER,
+
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            CREATION_DATE,
+
+
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            LAST_UPDATE_DATE,
+
+
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY,
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1,
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2,
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3,
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4,
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5,
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6,
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7,
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8,
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9,
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10,
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11,
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12,
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13,
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14,
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15,
+            </if>
+            <if test="leafFlag != null">
+                LEAF_FLAG,
+            </if>
+            <if test="sortNum != null">
+                SORT_NUM,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{categoryId,jdbcType=DECIMAL},
+            <if test="categoryName != null">
+                #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="parentCategoryId != null">
+                #{parentCategoryId,jdbcType=DECIMAL},
+            </if>
+            <if test="defaultValue != null">
+                #{defaultValue,jdbcType=VARCHAR},
+            </if>
+            <if test="enabledFlag != null">
+                #{enabledFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="startActiveDate != null">
+                #{startActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endActiveDate != null">
+                #{endActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            1,
+
+
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            CURRENT_TIMESTAMP,
+
+
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            CURRENT_TIMESTAMP,
+
+
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                #{attribute15,jdbcType=VARCHAR},
+            </if>
+            <if test="leafFlag != null">
+                #{leafFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNum != null">
+                #{sortNum,jdbcType=DECIMAL}
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+        update INV_CATEGORY_B
+        <set>
+            <if test="categoryName != null">
+                CATEGORY_NAME = #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                DESCRIPTION = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="parentCategoryId != null">
+                PARENT_CATEGORY_ID = #{parentCategoryId,jdbcType=DECIMAL},
+            </if>
+            <if test="defaultValue != null">
+                DEFAULT_VALUE = #{defaultValue,jdbcType=VARCHAR},
+            </if>
+            <if test="enabledFlag != null">
+                ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="startActiveDate != null">
+                START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endActiveDate != null">
+                END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+            </if>
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            ATTRIBUTE2 = (select company_id from spm_market_b where market_id = #{request.marketId,jdbcType=VARCHAR}),
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+            <if test="leafFlag != null">
+                LEAF_FLAG = #{leafFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNum != null">
+                SORT_NUM = #{sortNum,jdbcType=DECIMAL}
+            </if>
+        </set>
+        where CATEGORY_ID = #{categoryId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+    update INV_CATEGORY_B
+    set CATEGORY_NAME = #{categoryName,jdbcType=VARCHAR},
+      DESCRIPTION = #{description,jdbcType=VARCHAR},
+      PARENT_CATEGORY_ID = #{parentCategoryId,jdbcType=DECIMAL},
+      DEFAULT_VALUE = #{defaultValue,jdbcType=VARCHAR},
+      ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      OBJECT_VERSION_NUMBER =  OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = CURRENT_TIMESTAMP,
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      LEAF_FLAG = #{leafFlag,jdbcType=VARCHAR},
+      SORT_NUM = #{sortNum,jdbcType=DECIMAL}
+    where CATEGORY_ID = #{categoryId,jdbcType=DECIMAL}
+  </update>
+    <select id="queryCategoryLov" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+        select
+        <include refid="Base_Column_List_Tl"/>
+        from INV_CATEGORY_B B
+        LEFT JOIN
+        INV_CATEGORY_TL T
+        ON B.CATEGORY_ID = T.CATEGORY_ID
+        AND T.LANG = #{request.locale,jdbcType=VARCHAR}
+        <where>
+            (b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
+              or b.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+                (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+              or b.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
+                (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+            )
+            <if test="categoryName != null and categoryName != ''">
+                AND T.CATEGORY_NAME like concat('%',concat(#{categoryName,jdbcType=VARCHAR},'%'))
+            </if>
+        </where>
+        <if test="sortname != null">
+            <bind name='_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+            ORDER BY ${_colName} ${sortorder}
+        </if>
+
+    </select>
+    <select id="queryCategory" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+        select
+        <include refid="Base_Column_List_Tl"/>
+        from INV_CATEGORY_B B
+        LEFT JOIN
+        INV_CATEGORY_TL T
+        ON B.CATEGORY_ID = T.CATEGORY_ID
+        AND T.LANG = #{request.locale,jdbcType=VARCHAR}
+        <where>
+            (b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
+              or b.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+                 (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+              or b.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
+                 (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+            )
+            <if test="categoryId !=null and categoryId != '' ">
+                AND B.CATEGORY_ID = #{categoryId,jdbcType=DECIMAL}
+            </if>
+            <if test="categoryName != null and categoryName != ''">
+                AND T.CATEGORY_NAME = #{categoryName,jdbcType=VARCHAR}
+            </if>
+            <if test="parentCategoryId !=null and parentCategoryId != '' ">
+                AND B.PARENT_CATEGORY_ID = #{parentCategoryId,jdbcType=DECIMAL}
+            </if>
+        </where>
+    </select>
+    <select id="queryTopCategory" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List_Tl"/>
+        FROM INV_CATEGORY_B B
+        LEFT JOIN
+        INV_CATEGORY_TL T
+        ON B.CATEGORY_ID = T.CATEGORY_ID
+        AND T.LANG = #{request.locale,jdbcType=VARCHAR}
+        <where>
+            AND B.PARENT_CATEGORY_ID is NULL
+        </where>
+        order by T.category_name
+    </select>
+
+    <select id="queryChildrenCategory" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+        SELECT
+        <include refid="Base_Column_List_Tl"/>
+        FROM INV_CATEGORY_B B
+        LEFT JOIN
+        INV_CATEGORY_TL T
+        ON B.CATEGORY_ID = T.CATEGORY_ID
+        AND T.LANG = #{request.locale,jdbcType=VARCHAR}
+        <where>
+            (b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
+               or b.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+                  (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+               or b.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
+                  (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+            )
+            <if test="categoryId != null">
+                and B.PARENT_CATEGORY_ID = #{categoryId,jdbcType=INTEGER}
+            </if>
+        </where>
+        order by B.category_name
+    </select>
+
+    <select id="queryBottomCategory" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select ic_t.CATEGORY_ID, ic_t.CATEGORY_NAME
+      from INV_CATEGORY_TL ic_t
+      left join INV_ITEM_CATEGORY ic
+        on (ic_t.CATEGORY_ID = ic.CATEGORY_ID AND ic_t.LANG = #{request.locale, jdbcType = VARCHAR})
+     where  exists (select 1
+              from inv_item_b b
+             where b.item_type = #{ _parameter, jdbcType = VARCHAR}
+               and b.item_id = ic.item_id)
+     group by (ic_t.CATEGORY_ID, ic_t.CATEGORY_NAME)
+  </select>
+
+    <!-- 查询商品类别下拉框@author mclin -->
+    <select id="queryCategorySelection" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+      select icb.CATEGORY_ID, icbt.CATEGORY_NAME as CATEGORY_NAME
+      from INV_CATEGORY_B icb LEFT OUTER JOIN INV_CATEGORY_TL icbt
+    on (icb.CATEGORY_ID = icbt.CATEGORY_ID AND icbt.LANG = #{request.locale,jdbcType=VARCHAR})
+    where icb.ENABLED_FLAG = 'Y'
+      and (icb.END_ACTIVE_DATE >= CURRENT_TIMESTAMP or icb.END_ACTIVE_DATE is null)
+      and PARENT_CATEGORY_ID != 0
+  </select>
+
+    <!-- 根据库存组织查询商品类别@shenqb -->
+    <select id="queryCategorysByInvOrgId" resultMap="BaseResultMap" parameterType="java.util.Map">
+      	select DISTINCT CB.CATEGORY_ID, CB.CATEGORY_NAME from INV_ITEM_CATEGORY iic
+		LEFT JOIN INV_CATEGORY_B cb on CB.CATEGORY_ID = IIC.CATEGORY_ID
+		LEFT JOIN INV_ITEM_B iib on iib.item_id = iic.item_id
+		LEFT JOIN INV_ITEM_ASSIGN iia on iia.item_id = iib.item_id
+		where iia.assign_value = #{invOrgId,jdbcType=DECIMAL} and iia.enabled_flag = 'Y'
+		order BY CB.CATEGORY_ID 
+  </select>
+
+    <!-- 查询所有底层商品类别下拉框，不区分商品类型 -->
+    <!--updated by 11816 at 2017/12/08 13:48-->
+    <select id="queryAllBottomCategory" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+      select icb.CATEGORY_ID, icbt.CATEGORY_NAME as CATEGORY_NAME
+      from INV_CATEGORY_B icb LEFT OUTER JOIN INV_CATEGORY_TL icbt
+    on (icb.CATEGORY_ID = icbt.CATEGORY_ID AND icbt.LANG = #{request.locale,jdbcType=VARCHAR})
+    where icb.ENABLED_FLAG = 'Y'
+    and (icb.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
+              or icb.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+                     (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+              or icb.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
+                     (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+              )
+      and (icb.END_ACTIVE_DATE >= CURRENT_TIMESTAMP or icb.END_ACTIVE_DATE is null)
+      and LEAF_FLAG = 'Y'
+         order by sort_num
+  </select>
+
+
+    <select id="queryAllCategoryItem" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+        select icb.CATEGORY_ID, icbt.CATEGORY_NAME as CATEGORY_NAME,icb.PARENT_CATEGORY_ID,icb.LEAF_FLAG
+        from INV_CATEGORY_B icb LEFT OUTER JOIN INV_CATEGORY_TL icbt
+        on (icb.CATEGORY_ID = icbt.CATEGORY_ID AND icbt.LANG = #{request.locale,jdbcType=VARCHAR})
+        where icb.ENABLED_FLAG = 'Y'
+        and (icb.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
+        or icb.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+        (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+        or icb.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
+        (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+        )
+        and (icb.END_ACTIVE_DATE >= CURRENT_TIMESTAMP or icb.END_ACTIVE_DATE is null)
+    </select>
+
+    <!-- 查询商品类别"0"下的所有底层商品类别 -->
+    <select id="queryCategoriesByParent" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+        SELECT
+        <include refid="Base_Column_List_Tl"/>
+        FROM INV_CATEGORY_B B
+        LEFT JOIN
+        INV_CATEGORY_TL T
+        ON B.CATEGORY_ID = T.CATEGORY_ID
+        AND T.LANG = #{request.locale,jdbcType=VARCHAR}
+        <where>
+            <if test="parentCategoryId != null">
+                B.PARENT_CATEGORY_ID = #{parentCategoryId,jdbcType=INTEGER}
+            </if>
+        </where>
+        order by B.category_name
+    </select>
+
+    <!-- 查询所有商品一级列表 rpt用@author guanghui.liu -->
+    <select id="queryParentCates" resultMap="BaseResultMap">
+	SELECT
+	    ICB.CATEGORY_ID,
+	    ICT.CATEGORY_NAME
+	FROM
+	    INV_CATEGORY_B ICB,
+	    INV_CATEGORY_TL ICT
+	WHERE
+	    ICT.CATEGORY_ID = ICB.CATEGORY_ID
+	AND ICB.ENABLED_FLAG = 'Y'
+	AND (
+	    ICB.END_ACTIVE_DATE >= CURRENT_TIMESTAMP
+	    OR ICB.END_ACTIVE_DATE IS NULL
+	)
+	AND ICT.LANG = #{request.locale,jdbcType=VARCHAR}
+	AND ICB.PARENT_CATEGORY_ID = 0
+  </select>
+
+</mapper>

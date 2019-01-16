@@ -1,0 +1,392 @@
+<#--
+ * description: ipoint奖金记录
+ * version: 1.0 
+ * author:wangc
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?ibStatus=IC.IPOINT_BONUS_STATUS&adjustmenttype=BM.ADJUSTMENT_TYPE&bonusType=BM.ADJUSTMENT_REASON"
+	type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+<body style="padding: 10px;">
+<form id="bm_ipoint_bonus_form"></form>
+<div id="bm_ipoint_bonus_grid"></div>
+<script type="text/javascript">
+var salesOrgId = _salesOrgId;
+var marketId = null;
+//原值保存
+var oldValue = null;
+//保存销售组织数据
+var salesOrgData ;
+
+function initForm(){
+    window['bm_ipoint_bonus_form'] = $("#bm_ipoint_bonus_form").ligerForm({
+        fields : [ 
+        {
+        	label : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.salesOrg" />',
+        	name : "salesOrgId",
+	    	newline : false,
+	    	type : "combobox",
+	    	options : {
+	        	value : salesOrgId,
+                valueField : 'salesOrgId',
+                textField : 'name',
+                /* url : '${base.contextPath}/sys/salesOrg/queryOrg', */
+                data : salesOrgData,
+                isShowCheckBox: false,
+                isMultiSelect: false,
+                cancelable : false,
+                onSuccess : function(){
+                	this.setValue(salesOrgId);
+                },
+                onBeforeSelect : function(){ //该事件用于将初次加载标志置false,记录原值以及将重复标记置为true
+                	oldValue = $.ligerui.get('salesOrgId').getValue();
+                },
+                onSelected :function (value,text){
+                	if (!value) {
+                		return false;
+                	}
+                	if (salesOrgId != value) {
+                		$.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.refresh_page"/>', $l('sys.hand.tip.info'),function(yes) {
+                            if(yes){
+                                var newSalesOrgId = $.ligerui.get('salesOrgId').getValue();
+                                var tabid = window.top.tab.selectedTabId;
+              			    	var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                window.top.f_removeTab(tabid);
+                                parent.f_addTab(tabid,tabname,"${base.contextPath}/bm/bm_ipoint_bonus_query.html?salesOrgId="+newSalesOrgId);
+                            }else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+                                $.ligerui.get('salesOrgId').setValue(oldValue);
+                            }
+                        });
+                	}
+                }
+            },
+            validate : {
+                required : true
+            }
+        },
+        {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.bonusnumber" />',
+            name : "bonusNumber",
+            newline: false,
+            type : 'text',
+        } , {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.periodid" />',
+            name : "periodId",
+            newline: false,
+            type : "select",
+            options : {
+                valueField : 'periodId',
+                textField : 'periodName',
+                url : '${base.contextPath}/bm/getBonusPeriod?marketId=' + marketId
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.status" />',
+            name : "status",
+            type : "select",
+            options : {
+                valueField : 'value',
+                textField : 'meaning',
+                data : ibStatus,
+                isShowCheckBox: true,
+			    isMultiSelect: true
+            }
+        }, 
+        {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.memberid" />',
+            name : "memberCode",
+            newline: false,
+            type : "popup",
+            textField:'memberCode',
+            options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+             	onLoadData: function(){
+                this.setParm('marketId', marketId)
+            } ,
+              	onChangeValue: function(){
+                this.setParm('marketId', marketId)
+            }  
+        	},{parms:{"marketId" : marketId}})
+        }, 
+        {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.approveddate" />',
+            name : "approvedDate",
+            newline: false,
+            format : 'yyyy-MM-dd',
+            type : "date",
+        }],
+        buttons : [ {
+            text : '<@spring.message "sys.hand.btn.query"/>',
+            disabled : false,
+            width : 60,
+            click : function() {
+            	 Hap.gridQuery({
+                     form : bm_ipoint_bonus_form,
+                     grid : bm_ipoint_bonus_grid
+                 })
+            }
+        }]
+    });
+}
+
+function initGrid(){
+    window['bm_ipoint_bonus_grid'] = $("#bm_ipoint_bonus_grid").ligerGrid({
+        columns : [
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.bonusnumber" />',
+                name : 'bonusNumber',
+                width : 100,
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.bonustype" />',
+                name : 'bonusType',
+                width : 100,
+                render: function(item) {
+                    for (var i = 0; i < bonusType.length; i++) {
+                        if (bonusType[i].value == item.bonusType) {
+                            return bonusType[i].meaning;
+                        }
+                    }
+                }
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.adjtype" />',
+                name : 'adjType',
+                width : 100,
+                render: function(item) {
+                    for (var i = 0; i < adjustmenttype.length; i++) {
+                        if (adjustmenttype[i].value == item.adjType) {
+                            return adjustmenttype[i].meaning;
+                        }
+                    }
+                }
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.memberid" />',
+                name : 'memberCode',
+                width : 100
+
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.periodid" />',
+                name : 'periodName',
+                width : 100
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.status" />',
+                name : 'status',
+                width : 100,
+                render: function(item) {
+                    for (var i = 0; i < ibStatus.length; i++) {
+                        if (ibStatus[i].value == item.status) {
+                            return ibStatus[i].meaning;
+                        }
+                    }
+                }
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.amount" />',
+                name : 'amount',
+                align : 'right',
+                width : 100
+            },
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.approveddate" />',
+                name : 'approvedDate',
+                width : 100,
+                format: 'yyyy-MM-dd',
+                type : 'date',
+                editor : {
+                	type : 'date'
+                },
+                validate : {
+                	required : true
+                }
+            },{
+                display :  '<@spring.message "type.com.lkkhpg.dsis.common.bonus.remark" />',
+                name : 'remark',
+                width : 200,
+                editor: {
+                    type : 'text'
+                }
+            }
+        ],
+        url : '${base.contextPath}/bm/ipointBonus/query',
+        enabledEdit : true,
+        delayLoad : true,
+        width : '99%',
+        height : '98%',
+        checkbox: true,
+        pageSize :20,
+        toolbar : {
+            items : [
+                    {
+                        text : '<@spring.message "sys.hand.btn.submitapprove" />',
+                        click : f_submit,
+                        <#if accessService.access("SUBMIT_EDITABLE") == false>
+                        disable:true, 
+                        </#if>
+                        icon : 'save'
+                    }
+                    ,
+                    {
+                        text : '<@spring.message "sys.hand.btn.approve" />',
+                        click : f_approve,
+                        <#if accessService.access("APPROVAL_EDITABLE") == false>
+                        disable:true, 
+                        </#if>
+                        icon : 'ok'
+                    },
+                    {
+                    	text : '<@spring.message "sys.hand.btn.reject" />',
+                        click : f_reject,
+                        <#if accessService.access("REJECT_EDITABLE") == false>
+                        disable:true, 
+                        </#if>
+                        icon : 'delete'
+                    },
+                    { line: true },
+                    {                	
+                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                        menu:{ width: 120, items:
+	                            [
+		                 			{                	
+		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+		                 			    click:   function (){exportSelected("bm_ipoint_bonus_form","bm_ipoint_bonus_grid",{"bonusType":bonusType,"adjType":adjustmenttype,"status":ibStatus},_basePath);}
+		                 			},
+		                 			{ line: true },
+		                 			{                	
+		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+		                 			    click: function (){exportDirectAll("bm_ipoint_bonus_form","bm_ipoint_bonus_grid",{"bonusType":bonusType,"adjType":adjustmenttype,"status":ibStatus},_basePath);}
+		                 			    
+		                 			}
+	                          ]
+                     	}                        
+                    }
+                    ]
+        },
+        onBeforeEdit : function(editParm){
+        	var e = this;
+        	clickGridRecord = editParm.record;
+        	var columnname = editParm.column.columnname;
+        	if(editParm.record.status == "ALED"){
+        		if(columnname=='approvedDate'|| columnname=='remark'){
+            		return false;
+            	}
+        	}
+        },
+    });
+}
+/*提交*/    
+function f_submit(){
+	var rows = bm_ipoint_bonus_grid.getSelectedRows();
+	if(!rows || rows.length < 1){
+		$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.bonus.tip.selectonerecord" />');
+		return;
+	}
+	for(var i in rows){
+		rows[i].marketId = marketId;
+	}
+	$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.bonus.tip.issubmit" />',function(yes){
+		if(yes){
+			Hap.ajax({
+				type : 'POST',
+				url : '${base.contextPath}/bm/ipointBonus/submit',
+				data : rows,
+				success : function(json) {
+					$.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+		            	/* window.location = '${base.contextPath}/bm/bm_ipoint_bonus_query.html' */
+		            	Hap.gridQuery({
+                     		form : bm_ipoint_bonus_form,
+                     		grid : bm_ipoint_bonus_grid
+                 		})
+		            });
+				}
+			})
+		}
+	});
+}
+/*审核*/
+function f_approve(){
+	var rows = bm_ipoint_bonus_grid.getSelectedRows();
+	if(!rows || rows.length < 1){
+		$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.bonus.tip.selectonerecord" />');
+		return;
+	}
+	for(var i in rows){
+		rows[i].marketId = marketId;
+	}
+	$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.bonus.tip.isapprove" />',function(yes){
+		if(yes){
+			Hap.ajax({
+				type : 'POST',
+				url : '${base.contextPath}/bm/ipointBonus/approve',
+				data : rows,
+				success : function(json) {
+					$.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+		            	/* window.location = '${base.contextPath}/bm/bm_ipoint_bonus_query.html' */
+		            	Hap.gridQuery({
+                     		form : bm_ipoint_bonus_form,
+                     		grid : bm_ipoint_bonus_grid
+                 		})
+		            });
+				}
+			})
+		}
+	});
+}
+/*拒绝*/
+function f_reject(){
+	var rows = bm_ipoint_bonus_grid.getSelectedRows();
+	if(!rows || rows.length < 1){
+		$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.bonus.tip.selectonerecord" />');
+		return;
+	}
+	for(var i in rows){
+		rows[i].marketId = marketId;
+	}
+	$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.bonus.tip.isreject" />',function(yes){
+		if(yes){
+			Hap.ajax({
+				type : 'POST',
+				url : '${base.contextPath}/bm/ipointBonus/reject',
+				data : rows,
+				success : function(json) {
+					$.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+		            	/* window.location = '${base.contextPath}/bm/bm_ipoint_bonus_query.html' */
+		            	Hap.gridQuery({
+                     		form : bm_ipoint_bonus_form,
+                     		grid : bm_ipoint_bonus_grid
+                 		})
+		            });
+				}
+			})
+		}
+	});
+}
+
+$(function(){
+	salesOrgId = ${RequestParameters.salesOrgId!_salesOrgId};
+	 $.ajax({
+		 type: "POST",
+         dataType: "json",
+         url : "${base.contextPath}/sys/salesOrg/queryOrg",
+         success: function(data) {
+        	 salesOrgData = data.rows;
+        	 for (var i =0; i < salesOrgData.length; i++) {
+        		 if (salesOrgData[i].salesOrgId == salesOrgId) {
+        			 
+        			 marketId = salesOrgData[i].market.marketId;
+        			 initForm();
+                	 initGrid();
+        			 break;
+        		 }
+        	 }
+        	 
+         }
+	 });
+});
+</script>
+
+</html>

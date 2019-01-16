@@ -1,0 +1,76 @@
+<#--
+ * description: MWS图片上传
+ * version: 1.0 
+ * author:njq.niu@hand-china.com
+ * Copyright LKK Health Products Group Limited 
+ * 
+-->
+<#include "../include/head.html">
+<link href="${base.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="${base.contextPath}/resources/css/attach/webuploader.css"></link> 
+<script type="text/javascript" src="${base.contextPath}/resources/js/attach/webuploader.js"></script>
+<body style="padding: 10px;">
+    <center>
+        <div id="picker"><@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.select_image"/></div>
+        <div id="uploading" style="display:none;" class="webuploader-pick">Uploading . . . </div>
+    </center>
+    <style>
+        .webuploader-pick {
+            width:200px;
+            margin:auto 0px;
+        }
+    </style>
+    <script type="text/javascript">
+    
+        
+        function closeUploadDialog(json){
+            parent.showImage('${RequestParameters.sourceType!}','${RequestParameters.sourceKey!}',json.file.fileId)
+            var dialog = frameElement.dialog;
+            dialog.close(); 
+        }
+        
+        
+        var uploader = WebUploader.create({
+            swf : '${base.contextPath}/js/Uploader.swf',
+            server : '${base.contextPath}/sys/attach/upload',
+            pick : '#picker',
+            auto : true,
+            accept: {
+                title: 'Images',
+                extensions: 'gif,jpg,jpeg,png',
+                mimeTypes: 'image/*'
+            },
+            formData:{
+                sourceType: '${RequestParameters.sourceType!}',
+                sourceKey: '${RequestParameters.sourceKey!}' 
+            },
+            onUploadSuccess : function(file, response) {
+                if(response.message=='UPLOAD_SUCCESS'){
+                    closeUploadDialog(response);
+                }else if(response.message == 'UPLOAD_ERROR' && response.info == 'SINGLE_FILE_SIZE_MAX_ERROR'){
+                    $.ligerDialog.error('<@spring.message "msg.error.upload.too_large"/>', $l('sys.hand.tip.info'), function(){
+                        closeUploadDialog();
+                    });
+                }else if(response.message == 'UPLOAD_ERROR' && response.info == 'FILE_DISALLOWD_ERROR'){
+                    $.ligerDialog.error('<@spring.message "msg.error.upload.wrong_format"/>', $l('sys.hand.tip.info'), function(){
+                        closeUploadDialog();
+                    });
+                }else{ 
+                    $.ligerDialog.error('<@spring.message "msg.error.upload.upload_wrong"/>', $l('sys.hand.tip.info'), function(){
+                        closeUploadDialog();
+                    });
+                    /* $.ligerDialog.alert('Error', 'Unknown upload error!', response.message); */
+                    //alert('error')
+                }
+                $('#picker').css('display','block');
+                $('#uploading').css('display','none');
+                
+            },
+            onStartUpload: function(){
+                $('#picker').css('display','none');
+                $('#uploading').css('display','block');
+            }
+        });
+    </script>
+</body>
+</html>

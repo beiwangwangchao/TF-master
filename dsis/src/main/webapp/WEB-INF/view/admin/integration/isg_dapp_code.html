@@ -1,0 +1,233 @@
+<#--
+ * description: DAPP appCode 维护
+ * version: 1.0
+ * author: shengyang.zhou
+ * Copyright LKK Health Products Group Limited.  
+ *
+-->
+<#include "../include/head.html">
+<body style="padding: 10px; overflow: hidden;">
+<form id="dapp_code_form"></form>
+<div id="dapp_code_grid"></div>
+<script type="text/javascript">
+
+
+    Hap.toggleGridCheckBox = function (para) {
+        var grid = $.ligerui.get(para.gid);
+        if (!grid.options.enabledEdit)return;
+        var row = grid.getRow(para.rowid);
+        var newValue = para.checkValue;
+        if (row[para.columnname] == para.checkValue) {
+            newValue = para.uncheckValue;
+        }
+        row[para.columnname] = newValue;
+        if (row.__status == 'nochanged')row.__status = 'update';
+        grid.reRender({rowdata: row});
+        grid.trigger('afterEdit', {
+            column  : grid.getColumnByName(para.columnname),
+            record  : row,
+            value   : newValue,
+            rowindex: row.__index
+        });
+    };
+
+    Hap.createGridCheckBoxRender = function (config) {
+        config = config || {};
+        var cv = config.checkValue || 'Y';
+        var ucv = config.uncheckValue || 'N';
+        return function (data, idx, value, col) {
+            var cls = 'l-checkbox';
+            if (value == cv) cls += ' l-checkbox-checked';
+            var p = {
+                gid         : this.id,
+                checkValue  : cv,
+                uncheckValue: ucv,
+                rowid       : data.__id,
+                columnname  : col.columnname
+            };
+
+            var p_json = JSON2.stringify(p).replace(/"/g, "\'");
+
+            return "<a href='javascript:void(0);' class='" + cls + "' onclick=\"Hap.toggleGridCheckBox(" + p_json + ")\"></a>"
+        }
+    };
+
+    window.randomString = function (len) {
+        var text = ['abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '1234567890'];
+        var rand = function (min, max) {
+            return Math.floor(Math.max(min, Math.random() * (max + 1)));
+        }
+        var pw = '';
+        for (var i = 0; i < len; ++i) {
+            var strpos = rand(0, text.length - 1);
+            pw += text[strpos].charAt(rand(0, text[strpos].length));
+        }
+        return pw;
+    }
+
+    $(function () {
+        window['dapp_code_form'] = $("#dapp_code_form").ligerForm({
+            fields     : [{
+                label: '<@spring.message "type.com.lkkhpg.dsis.admin.integration.dapp.dto.isgdappauthcode.appcode"/>',
+                name : "appCode"
+            }],
+            buttons    : [{
+                text    : '<@spring.message "sys.hand.btn.query"/>',
+                disabled: false,
+                width   : 60,
+                click   : function () {
+                    Hap.gridQuery({
+                        form: dapp_code_form,
+                        grid: dapp_code_grid
+                    })
+                }
+            }],
+            onEnterDown: function () {
+                this.options.buttons[0].click();
+            }
+        });
+
+        window['dapp_code_grid'] = $("#dapp_code_grid").ligerGrid({
+            //unSetValidateAttr : false,
+            columns        : [
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.dapp.dto.isgdappauthcode.appcode"/>',
+                    name    : 'appCode',
+                    editor  : {
+                        type: 'text'
+                    },
+                    align   : 'left',
+                    validate: {
+                        required: true
+                    },
+                    width   : 180
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.admin.integration.dapp.dto.isgdappauthcode.appsecret"/>',
+                    name    : 'appSecret',
+                    width   : 200,
+                    editor  : {
+                        type: 'text'
+                    },
+                    align   : 'left',
+                    validate: {
+                        required: true
+                    }
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.admin.integration.dapp.dto.isgdappauthcode.expire"/>',
+                    name   : 'expire',
+                    width  : 100,
+                    format : 'yyyy-MM-dd',
+                    editor : {
+                        type: 'date'
+                    }
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.admin.integration.dapp.dto.isgdappauthcode.whitelistenabled"/>',
+                    align  : 'center',
+                    width  : 90,
+                    name   : 'whiteListEnabled',
+                    render : Hap.createGridCheckBoxRender(),
+                    options: {
+                        defaultValue: 'N'
+                    }
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.admin.integration.dapp.dto.isgdappauthcode.whitelist"/>',
+                    width  : 200,
+                    name   : 'whiteList',
+                    editor : {
+                        type: 'text'
+                    }
+                },
+                {
+                    display: '<@spring.message "sys.hand.common.description"/>',
+                    width  : 200,
+                    name   : 'description',
+                    editor : {
+                        type: 'text'
+                    }
+                }
+            ],
+            url            : '${base.contextPath}/integration/dapp/codes',
+            toolbar        : {
+                items: [{
+                    text   : '<@spring.message "sys.hand.btn.new"/>',
+                    disable: false,
+                    click  : function () {
+                        dapp_code_grid.addRow({
+                            appCode         : "udds_" + randomString(20),
+                            appSecret       : randomString(32),
+                            whiteListEnabled: 'N'
+                        });
+                    },
+                    icon   : 'add'
+                }, {
+                    line: true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click: function () {
+                        Hap.gridDelete({
+                            grid: dapp_code_grid,
+                            url : '${base.contextPath}/integration/dapp/delete'
+                        })
+
+                    },
+                    icon : 'delete'
+                }, {
+                    line: true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.save"/>',
+                    click: function () {
+                        Hap.gridSave({
+                            grid: dapp_code_grid,
+                            url : '${base.contextPath}/integration/dapp/submit'
+                        })
+                    },
+                    icon : 'save'
+                }, {
+                    line: true
+                }, {
+                    text : "Generate",
+                    click: function () {
+                        var rowToBeGenerate = dapp_code_grid.getCheckedRows();
+	                    if(rowToBeGenerate.length==0){
+	                    	Hap.showError("Please check row(s) to generate.");
+		                    return;
+	                    }
+                        $.ligerDialog.confirm('Are you sure to re-generate ' + rowToBeGenerate.length+' checked AppCode', $l('sys.hand.tip.info'), function (yes) {
+                            if (!yes)return;
+	                        $.each(rowToBeGenerate,function(i,r){
+                                var prefix = 'udds';
+                                r.appCode = r.appCode || '';
+                                var idx = r.appCode.indexOf('_');
+                                if (idx > 0) {
+                                    prefix = r.appCode.substring(0, idx);
+                                }
+                                if (r.__status == 'add')
+                                    dapp_code_grid.updateCell("appCode", prefix + "_" + randomString(20), r.__id);
+                                dapp_code_grid.updateCell("appSecret", randomString(32), r.__id);
+	                        });
+                            Hap.showSuccess('Generate Success.<br/>Remember to save changes.')
+                        });
+                    }
+                }]
+            },
+            onBeforeEdit   : function (e) {
+                if (e.column.columnname == 'appCode')
+                    return e.record.__status == 'add';
+                return true;
+            },
+            enabledEdit    : true,
+            checkbox       : true,
+            width          : '99%',
+            height         : '98%',
+            pageSizeOptions: [10, 20, 30, 40, 50],
+            pageSize       : '10'
+        });
+    })
+    ;
+</script>
+</body>
+</html>

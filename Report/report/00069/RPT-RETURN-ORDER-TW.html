@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<?xml version="1.0" encoding="UTF-8" ?>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style type="text/css" >
+        /*竖向*/
+        @page  {
+            size: A4 portrait;
+            mso-page-orientation:portrait;
+			mso-header-margin:0pt;
+			mso-footer-margin:0pt;
+			mso-paper-source:0;
+			margin-top: -30px;
+			margin-bottom : -30px;
+			margin-left : 10px;
+			margin-right : 10px;
+			width : 210mm;
+			height : 297mm;
+        }
+
+        body{
+            font-family:'Arial Unicode MS';
+			font-size:10pt;
+        }
+		table{
+			font-size:10pt;
+			border-spacing : 0pt;
+			table-layout: fixed;
+		}
+        td{
+            padding: 1pt;
+            height: 4.572mm;
+        }
+		tr{
+			border-bottom: 0px;
+			border-top : 0px;
+		}
+        .bottom_line {
+            border-bottom: 1px solid #000000;
+        }
+        .top_line {
+            border-top: 1px solid #000000;
+        }
+        .font_bold {
+            font-weight: bold;
+        }
+.border_all {
+  border: 1px solid black;
+}
+    </style>
+</head>
+<body class="">
+ <#list lines as line> 
+        <#if line_index != lines?size -1>
+            <div style="width:100%;page-break-after:always">
+         <#else>
+            <div style="width:100%;page-break-after:avoid;margin-top:8px;">
+         </#if>
+		 &nbsp;
+    <div style="width: 100%;height: 130mm;margin-top: 10mm">
+        <div style="width: 100%;height: 35mm">
+            <div style="float: left;width: 40%;">
+                <table width="100%" border="1" cellspacing="1" cellpadding="1">
+                    <tr>
+                        <td style="text-align: center;" width="20%">名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;稱</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;"  width="80%">${head.companyName!}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;word-break:break-all;word-wrap:break-word;" width="20%">營利事業統一編號</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;"  width="80%">${head.brNo!}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;word-break:break-all;word-wrap:break-word;" width="20%">營業所在地&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;址</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;" width="80%">${head.address!}</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="float: left;width: 50%">
+                <div style="float: left;width: 100%;text-align: left;height: 15mm;font-size:20px">&nbsp;&nbsp;&nbsp;營業人銷貨退回進貨退出折讓證明單</div>
+                <div style="float: left;width: 100%;text-align:center;letter-spacing: 20px;font-size:20px">&nbsp;&nbsp;${head.printDate!}</div>
+            </div>
+        </div>		
+        <div style="float: left;width: 100%;height: 90mm;margin-left: auto;margin-right: auto">
+            <table style="width: 100%;line-height: 15px;" border="1" cellspacing="1" cellpadding="1">
+				<colgroup> 
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="10%"></col>
+					<col width="20%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="17%"></col>
+					<col width="8%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+				</colgroup>
+                <tr>
+					 <td colspan="6" align="center" style="letter-spacing: 10px">開&nbsp;&nbsp;&nbsp;&nbsp;立&nbsp;&nbsp;&nbsp;&nbsp;發&nbsp;&nbsp;&nbsp;&nbsp;票</td>
+                     <td colspan="5" align="center" style="letter-spacing: 5px">退&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;貨&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;或&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;折&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;讓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;內&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;容</td>
+                     <td colspan="3" rowspan="2" style="text-align: center;word-break:break-all;word-wrap:break-word;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(打V處)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;備     註</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" align="center" style="word-break:break-all;word-wrap:break-word;">聯式</td>
+                    <td rowspan="2" align="center">年</td>
+                    <td rowspan="2" align="center">月</td>
+                    <td rowspan="2" align="center">日</td>
+                    <td rowspan="2" align="center" style="word-break:break-all;word-wrap:break-word;">字號</td>
+                    <td rowspan="2" align="center">號碼</td>
+                    <td rowspan="2" style="letter-spacing: 10px" align="center">品&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</td>
+                    <td rowspan="2" align="center">數&nbsp;&nbsp;&nbsp;量</td>
+                    <td rowspan="2" align="center">單&nbsp;&nbsp;&nbsp;價</td>
+                    <td colspan="2" align="center" style="letter-spacing: 20px">退出或折讓</td>
+                </tr>
+                <tr>
+                    <td align="center">金額(不含稅之進貨額)</td>
+                    <td align="center">營業稅額</td>
+                    <td align="center">應稅</td>
+                    <td align="center">零稅率</td>
+                    <td align="center">免稅</td>
+                </tr>
+				<#list line as ln>
+                <tr>
+                    <td align="center"></td>
+                    <td align="right">${ln.payYear!}</td>
+                    <td align="right">${ln.payMom!}</td>
+                    <td align="right">${ln.payDay!}</td>
+                    <td align="right">${ln.zg!}</td>
+                    <td align="left" style="white-space: nowrap;overflow: hidden;">${ln.invoiceNum!}</td>
+                    <td align="left" style="word-break:break-all;word-wrap:break-word;">${ln.itemName!}</td>
+                    <td align="right">${ln.quantity!}</td>
+                    <td align="right">${ln.price!}</td>
+                    <td align="right">${ln.amount!}</td>
+                    <td align="right">${ln.taxAmount!}</td>
+                    <td align="center">${ln.taxable!}</td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                </tr>
+				</#list>
+				<!-- 当记录不足12条时，用于补全表格 -->
+				<#if line?size &lt;12>
+					<#list 1..(12-line?size) as l>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>							
+						</tr>
+					</#list>
+				</#if>
+				<#list line as l>
+					<#if l_index == line?size-1>	
+                <tr>
+                    <td colspan="9" align="center" style="letter-spacing: 10px">合&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;計</td>
+                    <td align="right">${l.totalAmount!}</td>
+                    <td align="right">${l.totalTaxAmount!}</td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                </tr>
+                	</#if>
+                </#list>
+            </table>
+			
+            <table style="width: 100%;float: left;line-height: 15px;margin-top: 1mm">
+				<colgroup>
+					<col width="28%"></col>
+					<col width="32%"></col>
+					<col width="15%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+				</colgroup>
+                <tr>
+                    <td align="letf" colspan="2" >&nbsp;&nbsp;本證明單所列銷貨退回進貨退出或折讓，確屬事實，特此證明。</td>
+                    <td rowspan="2" align="left" >地&nbsp;&nbsp;址：</td>
+                    <td rowspan="2" style="letter-spacing: 5px;word-break:break-all;word-wrap:break-word;">縣市</td>
+                    <td rowspan="2"></td>
+                    <td rowspan="2" style="letter-spacing: 5px;text-align: center">鄉  鎮區</td>
+                    <td rowspan="2"></td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">村里</td>
+                    <td></td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">街路</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="width: 6%">&nbsp;&nbsp;原進貨營業人(或原買受人)名稱：</td>
+					<td rowspan="2">${foot.memberName!} </td>
+                </tr>
+                <tr></tr>
+                <tr>
+                    <td>&nbsp;&nbsp;營利事業統一編號：</td>
+                    <td>${foot.vbrNember!}</td>
+					<td></td>
+                    <td>段</td>
+                    <td></td>
+                    <td>巷</td>
+                    <td align="left">弄</td>
+                    <td></td>
+                    <td>號</td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">樓室</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;&nbsp;第一聯：交付原銷貨人作為銷項稅額之扣減憑證。</td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+	<!-- 第二联 -->
+	<div style="width: 100%;height: 130mm;margin-top: 15mm">
+        <div style="width: 100%;height: 35mm">
+            <div style="float: left;width: 40%;">
+                <table width="100%" border="1" cellspacing="1" cellpadding="1">
+                    <tr>
+                        <td style="text-align: center;" width="20%">名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;稱</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;"  width="80%">${head.companyName!}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;word-break:break-all;word-wrap:break-word;" width="20%">營利事業統一編號</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;"  width="80%">${head.brNo!}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;word-break:break-all;word-wrap:break-word;" width="20%">營業所在地&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;址</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;" width="80%">${head.address!}</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="float: left;width: 50%">
+                <div style="float: left;width: 100%;text-align: left;height: 15mm;font-size:20px">&nbsp;&nbsp;&nbsp;營業人銷貨退回進貨退出折讓證明單</div>
+                <div style="float: left;width: 100%;text-align:center;letter-spacing: 20px;font-size:20px">&nbsp;&nbsp;${head.printDate!}</div>
+            </div>
+        </div>		
+        <div style="float: left;width: 100%;height: 90mm;margin-left: auto;margin-right: auto">
+            <table style="width: 100%;line-height: 15px;" border="1" cellspacing="1" cellpadding="1">
+				<colgroup> 
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="10%"></col>
+					<col width="20%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="17%"></col>
+					<col width="8%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+				</colgroup>
+                <tr>
+					 <td colspan="6" align="center" style="letter-spacing: 10px">開&nbsp;&nbsp;&nbsp;&nbsp;立&nbsp;&nbsp;&nbsp;&nbsp;發&nbsp;&nbsp;&nbsp;&nbsp;票</td>
+                     <td colspan="5" align="center" style="letter-spacing: 5px">退&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;貨&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;或&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;折&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;讓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;內&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;容</td>
+                     <td colspan="3" rowspan="2" style="text-align: center;word-break:break-all;word-wrap:break-word;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(打V處)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;備     註</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" align="center" style="word-break:break-all;word-wrap:break-word;">聯式</td>
+                    <td rowspan="2" align="center">年</td>
+                    <td rowspan="2" align="center">月</td>
+                    <td rowspan="2" align="center">日</td>
+                    <td rowspan="2" align="center" style="word-break:break-all;word-wrap:break-word;">字號</td>
+                    <td rowspan="2" align="center">號碼</td>
+                    <td rowspan="2" style="letter-spacing: 10px" align="center">品&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</td>
+                    <td rowspan="2" align="center">數&nbsp;&nbsp;&nbsp;量</td>
+                    <td rowspan="2" align="center">單&nbsp;&nbsp;&nbsp;價</td>
+                    <td colspan="2" align="center" style="letter-spacing: 20px">退出或折讓</td>
+                </tr>
+                <tr>
+                    <td align="center">金額(不含稅之進貨額)</td>
+                    <td align="center">營業稅額</td>
+                    <td align="center">應稅</td>
+                    <td align="center">零稅率</td>
+                    <td align="center">免稅</td>
+                </tr>
+				<#list line as ln>
+                <tr>
+                    <td align="center"></td>
+                    <td align="right">${ln.payYear!}</td>
+                    <td align="right">${ln.payMom!}</td>
+                    <td align="right">${ln.payDay!}</td>
+                    <td align="right">${ln.zg!}</td>
+                    <td align="left" style="white-space: nowrap;overflow: hidden;">${ln.invoiceNum!}</td>
+                    <td align="left" style="word-break:break-all;word-wrap:break-word;">${ln.itemName!}</td>
+                    <td align="right">${ln.quantity!}</td>
+                    <td align="right">${ln.price!}</td>
+                    <td align="right">${ln.amount!}</td>
+                    <td align="right">${ln.taxAmount!}</td>
+                    <td align="center">${ln.taxable!}</td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                </tr>
+				</#list>
+				<!-- 当记录不足12条时，用于补全表格 -->
+				<#if line?size &lt;12>
+					<#list 1..(12-line?size) as l>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>							
+						</tr>
+					</#list>
+				</#if>	
+                <#list line as l>
+					<#if l_index == line?size-1>	
+                <tr>
+                    <td colspan="9" align="center" style="letter-spacing: 10px">合&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;計</td>
+                    <td align="right">${l.totalAmount!}</td>
+                    <td align="right">${l.totalTaxAmount!}</td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                </tr>
+                	</#if>
+                </#list>
+            </table>
+			
+            <table style="width: 100%;float: left;line-height: 15px;margin-top: 1mm">
+				<colgroup>
+					<col width="28%"></col>
+					<col width="32%"></col>
+					<col width="15%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+				</colgroup>
+                <tr>
+                    <td align="letf" colspan="2" >&nbsp;&nbsp;本證明單所列銷貨退回進貨退出或折讓，確屬事實，特此證明。</td>
+                    <td rowspan="2" align="left" >地&nbsp;&nbsp;址：</td>
+                    <td rowspan="2" style="letter-spacing: 5px;word-break:break-all;word-wrap:break-word;">縣市</td>
+                    <td rowspan="2"></td>
+                    <td rowspan="2" style="letter-spacing: 5px;text-align: center">鄉  鎮區</td>
+                    <td rowspan="2"></td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">村里</td>
+                    <td></td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">街路</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="width: 6%">&nbsp;&nbsp;原進貨營業人(或原買受人)名稱：</td>
+					<td rowspan="2">${foot.memberName!} </td>
+                </tr>
+                <tr></tr>
+                <tr>
+                    <td>&nbsp;&nbsp;營利事業統一編號：</td>
+                    <td>${foot.vbrNember!}</td>
+					<td></td>
+                    <td>段</td>
+                    <td></td>
+                    <td>巷</td>
+                    <td align="left">弄</td>
+                    <td></td>
+                    <td>號</td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">樓室</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;&nbsp;第二聯：交付原銷貨人作為銷項稅額之扣減憑證。</td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+	<!-- 第三联 -->
+		<div style="width: 100%;height: 130mm;margin-top: 40mm">
+        <div style="width: 100%;height: 35mm">
+            <div style="float: left;width: 40%;">
+                <table width="100%" border="1" cellspacing="1" cellpadding="1">
+                    <tr>
+                        <td style="text-align: center;" width="20%">名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;稱</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;"  width="80%">${head.companyName!}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;word-break:break-all;word-wrap:break-word;" width="20%">營利事業統一編號</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;"  width="80%">${head.brNo!}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;word-break:break-all;word-wrap:break-word;" width="20%">營業所在地&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;址</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;" width="80%">${head.address!}</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="float: left;width: 50%">
+                <div style="float: left;width: 100%;text-align: left;height: 15mm;font-size:20px">&nbsp;&nbsp;&nbsp;營業人銷貨退回進貨退出折讓證明單</div>
+                <div style="float: left;width: 100%;text-align:center;letter-spacing: 20px;font-size:20px">&nbsp;&nbsp;${head.printDate!}</div>
+            </div>
+        </div>		
+        <div style="float: left;width: 100%;height: 90mm;margin-left: auto;margin-right: auto">
+            <table style="width: 100%;line-height: 15px;" border="1" cellspacing="1" cellpadding="1">
+				<colgroup> 
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="10%"></col>
+					<col width="20%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="17%"></col>
+					<col width="8%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+				</colgroup>
+                <tr>
+					 <td colspan="6" align="center" style="letter-spacing: 10px">開&nbsp;&nbsp;&nbsp;&nbsp;立&nbsp;&nbsp;&nbsp;&nbsp;發&nbsp;&nbsp;&nbsp;&nbsp;票</td>
+                     <td colspan="5" align="center" style="letter-spacing: 5px">退&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;貨&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;或&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;折&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;讓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;內&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;容</td>
+                     <td colspan="3" rowspan="2" style="text-align: center;word-break:break-all;word-wrap:break-word;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(打V處)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;備     註</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" align="center" style="word-break:break-all;word-wrap:break-word;">聯式</td>
+                    <td rowspan="2" align="center">年</td>
+                    <td rowspan="2" align="center">月</td>
+                    <td rowspan="2" align="center">日</td>
+                    <td rowspan="2" align="center" style="word-break:break-all;word-wrap:break-word;">字號</td>
+                    <td rowspan="2" align="center">號碼</td>
+                    <td rowspan="2" style="letter-spacing: 10px" align="center">品&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</td>
+                    <td rowspan="2" align="center">數&nbsp;&nbsp;&nbsp;量</td>
+                    <td rowspan="2" align="center">單&nbsp;&nbsp;&nbsp;價</td>
+                    <td colspan="2" align="center" style="letter-spacing: 20px">退出或折讓</td>
+                </tr>
+                <tr>
+                    <td align="center">金額(不含稅之進貨額)</td>
+                    <td align="center">營業稅額</td>
+                    <td align="center">應稅</td>
+                    <td align="center">零稅率</td>
+                    <td align="center">免稅</td>
+                </tr>
+				<#list line as ln>
+                <tr>
+                    <td align="center"></td>
+                    <td align="right">${ln.payYear!}</td>
+                    <td align="right">${ln.payMom!}</td>
+                    <td align="right">${ln.payDay!}</td>
+                    <td align="right">${ln.zg!}</td>
+                    <td align="left" style="white-space: nowrap;overflow: hidden;">${ln.invoiceNum!}</td>
+                    <td align="left" style="word-break:break-all;word-wrap:break-word;">${ln.itemName!}</td>
+                    <td align="right">${ln.quantity!}</td>
+                    <td align="right">${ln.price!}</td>
+                    <td align="right">${ln.amount!}</td>
+                    <td align="right">${ln.taxAmount!}</td>
+                    <td align="center">${ln.taxable!}</td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                </tr>
+				</#list>
+				<!-- 当记录不足12条时，用于补全表格 -->
+				<#if line?size &lt;12>
+					<#list 1..(12-line?size) as l>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>							
+						</tr>
+					</#list>
+				</#if>	
+                <#list line as l>
+					<#if l_index == line?size-1>	
+                <tr>
+                    <td colspan="9" align="center" style="letter-spacing: 10px">合&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;計</td>
+                    <td align="right">${l.totalAmount!}</td>
+                    <td align="right">${l.totalTaxAmount!}</td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                </tr>
+                	</#if>
+                </#list>
+            </table>
+			
+            <table style="width: 100%;float: left;line-height: 15px;margin-top: 1mm">
+				<colgroup>
+					<col width="28%"></col>
+					<col width="32%"></col>
+					<col width="15%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+				</colgroup>
+                <tr>
+                    <td align="letf" colspan="2" >&nbsp;&nbsp;本證明單所列銷貨退回進貨退出或折讓，確屬事實，特此證明。</td>
+                    <td rowspan="2" align="left" >地&nbsp;&nbsp;址：</td>
+                    <td rowspan="2" style="letter-spacing: 5px;word-break:break-all;word-wrap:break-word;">縣市</td>
+                    <td rowspan="2"></td>
+                    <td rowspan="2" style="letter-spacing: 5px;text-align: center">鄉  鎮區</td>
+                    <td rowspan="2"></td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">村里</td>
+                    <td></td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">街路</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="width: 6%">&nbsp;&nbsp;原進貨營業人(或原買受人)名稱：</td>
+					<td rowspan="2">${foot.memberName!} </td>
+                </tr>
+                <tr></tr>
+                <tr>
+                    <td>&nbsp;&nbsp;營利事業統一編號：</td>
+                    <td>${foot.vbrNember!}</td>
+					<td></td>
+                    <td>段</td>
+                    <td></td>
+                    <td>巷</td>
+                    <td align="left">弄</td>
+                    <td></td>
+                    <td>號</td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">樓室</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;&nbsp;第三聯：由進貨人作為進項稅額之扣減憑證。</td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+	<!--第四聯 -->
+			<div style="width: 100%;height: 130mm;margin-top: 15mm">
+        <div style="width: 100%;height: 35mm">
+            <div style="float: left;width: 40%;">
+                <table width="100%" border="1" cellspacing="1" cellpadding="1">
+                    <tr>
+                        <td style="text-align: center;" width="20%">名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;稱</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;"  width="80%">${head.companyName!}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;word-break:break-all;word-wrap:break-word;" width="20%">營利事業統一編號</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;"  width="80%">${head.brNo!}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;word-break:break-all;word-wrap:break-word;" width="20%">營業所在地&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;址</td>
+                        <td style="text-align: left;word-break:break-all;word-wrap:break-word;" width="80%">${head.address!}</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="float: left;width: 50%">
+                <div style="float: left;width: 100%;text-align: left;height: 15mm;font-size:20px">&nbsp;&nbsp;&nbsp;營業人銷貨退回進貨退出折讓證明單</div>
+                <div style="float: left;width: 100%;text-align:center;letter-spacing: 20px;font-size:20px">&nbsp;&nbsp;${head.printDate!}</div>
+            </div>
+        </div>		
+        <div style="float: left;width: 100%;height: 90mm;margin-left: auto;margin-right: auto">
+            <table style="width: 100%;line-height: 15px;" border="1" cellspacing="1" cellpadding="1">
+				<colgroup> 
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="10%"></col>
+					<col width="20%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="17%"></col>
+					<col width="8%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+				</colgroup>
+                <tr>
+					 <td colspan="6" align="center" style="letter-spacing: 10px">開&nbsp;&nbsp;&nbsp;&nbsp;立&nbsp;&nbsp;&nbsp;&nbsp;發&nbsp;&nbsp;&nbsp;&nbsp;票</td>
+                     <td colspan="5" align="center" style="letter-spacing: 5px">退&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;貨&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;或&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;折&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;讓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;內&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;容</td>
+                     <td colspan="3" rowspan="2" style="text-align: center;word-break:break-all;word-wrap:break-word;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(打V處)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;備     註</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" align="center" style="word-break:break-all;word-wrap:break-word;">聯式</td>
+                    <td rowspan="2" align="center">年</td>
+                    <td rowspan="2" align="center">月</td>
+                    <td rowspan="2" align="center">日</td>
+                    <td rowspan="2" align="center" style="word-break:break-all;word-wrap:break-word;">字號</td>
+                    <td rowspan="2" align="center">號碼</td>
+                    <td rowspan="2" style="letter-spacing: 10px" align="center">品&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</td>
+                    <td rowspan="2" align="center">數&nbsp;&nbsp;&nbsp;量</td>
+                    <td rowspan="2" align="center">單&nbsp;&nbsp;&nbsp;價</td>
+                    <td colspan="2" align="center" style="letter-spacing: 20px">退出或折讓</td>
+                </tr>
+                <tr>
+                    <td align="center">金額(不含稅之進貨額)</td>
+                    <td align="center">營業稅額</td>
+                    <td align="center">應稅</td>
+                    <td align="center">零稅率</td>
+                    <td align="center">免稅</td>
+                </tr>
+				<#list line as ln>
+                <tr>
+                    <td align="center"></td>
+                    <td align="right">${ln.payYear!}</td>
+                    <td align="right">${ln.payMom!}</td>
+                    <td align="right">${ln.payDay!}</td>
+                    <td align="right">${ln.zg!}</td>
+                    <td align="left" style="white-space: nowrap;overflow: hidden;">${ln.invoiceNum!}</td>
+                    <td align="left" style="word-break:break-all;word-wrap:break-word;">${ln.itemName!}</td>
+                    <td align="right">${ln.quantity!}</td>
+                    <td align="right">${ln.price!}</td>
+                    <td align="right">${ln.amount!}</td>
+                    <td align="right">${ln.taxAmount!}</td>
+                    <td align="center">${ln.taxable!}</td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                </tr>
+				</#list>
+				<!-- 当记录不足12条时，用于补全表格 -->
+				<#if line?size &lt;12>
+					<#list 1..(12-line?size) as l>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>							
+						</tr>
+					</#list>
+				</#if>	
+               <#list line as l>
+					<#if l_index == line?size-1>	
+                <tr>
+                    <td colspan="9" align="center" style="letter-spacing: 10px">合&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;計</td>
+                    <td align="right">${l.totalAmount!}</td>
+                    <td align="right">${l.totalTaxAmount!}</td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                    <td align="center"></td>
+                </tr>
+                	</#if>
+                </#list>
+            </table>
+			
+            <table style="width: 100%;float: left;line-height: 15px;margin-top: 1mm">
+				<colgroup>
+					<col width="28%"></col>
+					<col width="32%"></col>
+					<col width="15%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+					<col width="3%"></col>
+					<col width="5%"></col>
+					<col width="3%"></col>
+				</colgroup>
+                <tr>
+                    <td align="letf" colspan="2" >&nbsp;&nbsp;本證明單所列銷貨退回進貨退出或折讓，確屬事實，特此證明。</td>
+                    <td rowspan="2" align="left" >地&nbsp;&nbsp;址：</td>
+                    <td rowspan="2" style="letter-spacing: 5px;word-break:break-all;word-wrap:break-word;">縣市</td>
+                    <td rowspan="2"></td>
+                    <td rowspan="2" style="letter-spacing: 5px;text-align: center">鄉  鎮區</td>
+                    <td rowspan="2"></td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">村里</td>
+                    <td></td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">街路</td>
+                </tr>
+                <tr>
+                    <td rowspan="2" style="width: 6%">&nbsp;&nbsp;原進貨營業人(或原買受人)名稱：</td>
+					<td rowspan="2">${foot.memberName!} </td>
+                </tr>
+                <tr></tr>
+                <tr>
+                    <td>&nbsp;&nbsp;營利事業統一編號：</td>
+                    <td>${foot.vbrNember!}</td>
+					<td></td>
+                    <td>段</td>
+                    <td></td>
+                    <td>巷</td>
+                    <td align="left">弄</td>
+                    <td></td>
+                    <td>號</td>
+                    <td rowspan="2" style="letter-spacing: 2px;word-break:break-all;word-wrap:break-word;">樓室</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;&nbsp;第四聯：由進貨人作為記帳憑証。</td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</#list>
+</body>
+</html>

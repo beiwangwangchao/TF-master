@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.system.ProfileValueMapper">
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.system.ProfileValue">
+    <id column="PROFILE_VALUE_ID" jdbcType="DECIMAL" property="profileValueId" />
+    <result column="PROFILE_ID" jdbcType="DECIMAL" property="profileId" />
+    <result column="LEVEL_ID" jdbcType="DECIMAL" property="levelId" />
+    <result column="LEVEL_VALUE" jdbcType="VARCHAR" property="levelValue" />
+    <result column="LEVEL_NAME" jdbcType="VARCHAR" property="levelName" />
+    <result column="PROFILE_VALUE" jdbcType="VARCHAR" property="profileValue" />
+    <result column="OBJECT_VERSION_NUMBER" jdbcType="DECIMAL" property="objectVersionNumber" />
+    <result column="REQUEST_ID" jdbcType="DECIMAL" property="requestId" />
+    <result column="PROGRAM_ID" jdbcType="DECIMAL" property="programId" />
+    <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+    <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+    <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="LAST_UPDATE_LOGIN" jdbcType="DECIMAL" property="lastUpdateLogin" />
+    <result column="ATTRIBUTE_CATEGORY" jdbcType="VARCHAR" property="attributeCategory" />
+    <result column="ATTRIBUTE1" jdbcType="VARCHAR" property="attribute1" />
+    <result column="ATTRIBUTE2" jdbcType="VARCHAR" property="attribute2" />
+    <result column="ATTRIBUTE3" jdbcType="VARCHAR" property="attribute3" />
+    <result column="ATTRIBUTE4" jdbcType="VARCHAR" property="attribute4" />
+    <result column="ATTRIBUTE5" jdbcType="VARCHAR" property="attribute5" />
+    <result column="ATTRIBUTE6" jdbcType="VARCHAR" property="attribute6" />
+    <result column="ATTRIBUTE7" jdbcType="VARCHAR" property="attribute7" />
+    <result column="ATTRIBUTE8" jdbcType="VARCHAR" property="attribute8" />
+    <result column="ATTRIBUTE9" jdbcType="VARCHAR" property="attribute9" />
+    <result column="ATTRIBUTE10" jdbcType="VARCHAR" property="attribute10" />
+    <result column="ATTRIBUTE11" jdbcType="VARCHAR" property="attribute11" />
+    <result column="ATTRIBUTE12" jdbcType="VARCHAR" property="attribute12" />
+    <result column="ATTRIBUTE13" jdbcType="VARCHAR" property="attribute13" />
+    <result column="ATTRIBUTE14" jdbcType="VARCHAR" property="attribute14" />
+    <result column="ATTRIBUTE15" jdbcType="VARCHAR" property="attribute15" />
+  </resultMap>
+  
+  
+  <resultMap id="ExtResultMap" type="java.util.Map">
+    <id column="level_Id" jdbcType="VARCHAR" property="levelId" />
+    <result column="level_name" jdbcType="VARCHAR" property="levelName" />
+    <result column="level_Value" jdbcType="VARCHAR" property="levelValue" />
+    
+  </resultMap>
+  
+  
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    PROFILE_VALUE_ID, PROFILE_ID, LEVEL_ID, LEVEL_VALUE, PROFILE_VALUE, OBJECT_VERSION_NUMBER, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  <select id="selectLevelValuesForUser" resultMap="ExtResultMap">
+   SELECT su.user_name level_Name,su.user_id level_Value,'30' level_Id
+FROM sys_user su
+   
+   </select>
+   <select id="selectLevelValuesForRole" resultMap="ExtResultMap">
+select sr.role_code level_Name,sr.role_id level_Value, '20' level_Id from sys_role_b sr
+   
+   </select>
+   
+   <select id="selectLevelValuesForGlobal" resultMap="ExtResultMap">
+select 'GLOBAL' level_Name,'GLOBAL' level_Value, '10' level_Id from DUAL
+   
+   </select>
+  
+  <select id="selectProfileValues" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.system.ProfileValue">
+        select t.PROFILE_VALUE_ID, t.PROFILE_ID, t.LEVEL_ID, t.LEVEL_VALUE, t.PROFILE_VALUE, t.OBJECT_VERSION_NUMBER, t.
+    REQUEST_ID, t.PROGRAM_ID, t.CREATION_DATE, t.CREATED_BY, t.LAST_UPDATED_BY, t.LAST_UPDATE_DATE, t.
+    LAST_UPDATE_LOGIN, t.ATTRIBUTE_CATEGORY, t.ATTRIBUTE1, t.ATTRIBUTE2, t.ATTRIBUTE3, t.ATTRIBUTE4, t.
+    ATTRIBUTE5, t.ATTRIBUTE6, t.ATTRIBUTE7, t.ATTRIBUTE8, t.ATTRIBUTE9, t.ATTRIBUTE10, t.ATTRIBUTE11, t.
+    ATTRIBUTE12, t.ATTRIBUTE13, t.ATTRIBUTE14, t.ATTRIBUTE15,(
+  CASE
+    WHEN t.LEVEL_id='30'
+    THEN
+      (SELECT su.user_name level_Name
+      FROM sys_user su
+      WHERE su.user_id=t.LEVEL_VALUE
+      )
+    WHEN t.LEVEL_id='20'
+    THEN
+      (SELECT sr.role_code level_Name
+      FROM sys_role_b sr
+      WHERE sr.role_id=t.LEVEL_VALUE
+      )
+    WHEN t.LEVEL_id='10'
+    THEN t.LEVEL_VALUE
+  END ) level_name
+        from SYS_PROFILE_VALUE t
+        <where>
+            <if test="profileValueId != null">
+                t.profile_value_id = #{profileValueId,jdbcType=DECIMAL}
+            </if>
+            <if test="profileId != null">
+                AND t.profile_id = #{profileId,jdbcType=DECIMAL}
+            </if>
+            <if test="levelId != null">
+                AND t.level_id = #{levelId,jdbcType=DECIMAL}
+            </if>
+            <if test="levelValue != null">
+                AND t.level_value = #{levelValue,jdbcType=VARCHAR}
+            </if>
+            <if test="profileValue != null">
+                AND t.profile_value = #{profileValue,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_PROFILE_VALUE
+    where PROFILE_VALUE_ID = #{profileValueId,jdbcType=DECIMAL}
+  </select>
+   <delete id="deleteByProfileId" parameterType="com.lkkhpg.dsis.platform.dto.system.ProfileValue">
+    delete from SYS_PROFILE_VALUE
+    where PROFILE_ID = #{profileId,jdbcType=DECIMAL}
+  </delete>
+  <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.ProfileValue">
+    delete from SYS_PROFILE_VALUE
+    where PROFILE_VALUE_ID = #{profileValueId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.ProfileValue">
+    <selectKey keyProperty="profileValueId" order="BEFORE" resultType="long">
+      select SYS_PROFILE_VALUE_s.nextval from dual
+    </selectKey>
+    insert into SYS_PROFILE_VALUE (PROFILE_VALUE_ID, PROFILE_ID, LEVEL_ID, 
+      LEVEL_VALUE, PROFILE_VALUE, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15)
+    values (#{profileValueId,jdbcType=DECIMAL}, #{profileId,jdbcType=DECIMAL}, #{levelId,jdbcType=DECIMAL}, 
+      #{levelValue,jdbcType=VARCHAR}, #{profileValue,jdbcType=VARCHAR},
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.platform.dto.system.ProfileValue">
+    <selectKey keyProperty="profileValueId" order="BEFORE" resultType="long">
+      select SYS_PROFILE_VALUE_s.nextval from dual
+    </selectKey>
+    insert into SYS_PROFILE_VALUE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      PROFILE_VALUE_ID,
+      <if test="profileId != null">
+        PROFILE_ID,
+      </if>
+      <if test="levelId != null">
+        LEVEL_ID,
+      </if>
+      <if test="levelValue != null">
+        LEVEL_VALUE,
+      </if>
+      <if test="profileValue != null">
+        PROFILE_VALUE,
+      </if>
+      <if test="objectVersionNumber != null">
+        OBJECT_VERSION_NUMBER,
+      </if>
+      <if test="requestId != null">
+        REQUEST_ID,
+      </if>
+      <if test="programId != null">
+        PROGRAM_ID,
+      </if>
+      <if test="creationDate != null">
+        CREATION_DATE,
+      </if>
+      <if test="createdBy != null">
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null">
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateDate != null">
+        LAST_UPDATE_DATE,
+      </if>
+      <if test="lastUpdateLogin != null">
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null">
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null">
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null">
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null">
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null">
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null">
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null">
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null">
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null">
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null">
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null">
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null">
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null">
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null">
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null">
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null">
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      #{profileValueId,jdbcType=DECIMAL},
+      <if test="profileId != null">
+        #{profileId,jdbcType=DECIMAL},
+      </if>
+      <if test="levelId != null">
+        #{levelId,jdbcType=DECIMAL},
+      </if>
+      <if test="levelValue != null">
+        #{levelValue,jdbcType=VARCHAR},
+      </if>
+      <if test="profileValue != null">
+        #{profileValue,jdbcType=VARCHAR},
+      </if>
+      <if test="objectVersionNumber != null">
+        #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null">
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null">
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null">
+        #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null">
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null">
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null">
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null">
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null">
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null">
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null">
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null">
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null">
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null">
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null">
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null">
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null">
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null">
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null">
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null">
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null">
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null">
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null">
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.platform.dto.system.ProfileValue">
+    update SYS_PROFILE_VALUE
+    <set>
+    LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+    OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      <if test="profileId != null">
+        PROFILE_ID = #{profileId,jdbcType=DECIMAL},
+      </if>
+      <if test="levelId != null">
+        LEVEL_ID = #{levelId,jdbcType=DECIMAL},
+      </if>
+      <if test="levelValue != null">
+        LEVEL_VALUE = #{levelValue,jdbcType=VARCHAR},
+      </if>
+      <if test="profileValue != null">
+        PROFILE_VALUE = #{profileValue,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null">
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null">
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null">
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateLogin != null">
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null">
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null">
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null">
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null">
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null">
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null">
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null">
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null">
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null">
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null">
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null">
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null">
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null">
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null">
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null">
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null">
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where PROFILE_VALUE_ID = #{profileValueId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.ProfileValue">
+    update SYS_PROFILE_VALUE
+    set PROFILE_ID = #{profileId,jdbcType=DECIMAL},
+      LEVEL_ID = #{levelId,jdbcType=DECIMAL},
+      LEVEL_VALUE = #{levelValue,jdbcType=VARCHAR},
+      PROFILE_VALUE = #{profileValue,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where PROFILE_VALUE_ID = #{profileValueId,jdbcType=DECIMAL}
+  </update>
+
+
+  <select id="selectByProfileIdAndUserId" resultMap="BaseResultMap">
+    SELECT 
+           <include refid="Base_Column_List" />
+      FROM sys_profile_value t
+     WHERE profile_id = #{profileId,jdbcType=DECIMAL}
+       AND (level_value = to_char(#{userId,jdbcType=DECIMAL}) OR
+            level_value IN
+            (SELECT to_char(role_id)
+               FROM sys_user_role
+              WHERE user_id = #{userId,jdbcType=DECIMAL}) OR
+            level_value IS NULL)
+     ORDER BY level_id DESC
+    </select>
+    
+    <!-- 根据request和profileName按优先级获取配置文件值 -->
+    <select id="selectPriorityValues" resultMap="BaseResultMap" parameterType="java.lang.String">
+	    SELECT spv.profile_value_id,
+	           spv.profile_id,
+	           spv.level_id,
+	           spv.level_value,
+	           spv.profile_value
+	      FROM sys_profile_value spv,
+	      	   sys_profile sp
+	     WHERE spv.profile_id = sp.profile_id
+	       AND sp.profile_name =  #{profileName,jdbcType=VARCHAR}
+	       AND ((spv.level_id = '30' AND spv.level_value = #{request.accountId,jdbcType=DECIMAL,javaType=java.lang.Long})
+	           OR (spv.level_id = '20' AND spv.level_value = #{request.roleId,jdbcType=DECIMAL,javaType=java.lang.Long})
+	           OR (spv.level_id = '10'))
+	     ORDER BY spv.level_id DESC
+    </select>
+</mapper>

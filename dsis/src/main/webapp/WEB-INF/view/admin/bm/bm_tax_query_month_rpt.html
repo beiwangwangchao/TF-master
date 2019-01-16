@@ -1,0 +1,133 @@
+<#--
+ * description: RPT-00172报表.
+ * version: 1.0
+ * author: huanghanrui
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+
+<body style="padding: 10px;">
+	<script
+		src="${base.contextPath}/common/code?exportTypeData=SYS.REPORT_EXPORT_TYPE&reportType=SYS.NHI_REPORT_TYPE"></script>
+    <form id="down_form"></form>
+    <form id="down" method="POST" target="_blank"></form>
+    <script type="text/javascript">
+    $(function() {
+    	window['down_form'] = $('#down_form').ligerForm({
+    		fields : [{
+    			label : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.exporttype"/>',
+    			name : "docType",
+    			newline : true,
+    			type : 'select',
+    			labelwidth : 120,
+    			options : {
+    				valueField: 'value',
+    				textField: 'meaning',
+    				data:exportTypeData
+    			},
+    			validate:{
+    				required:true
+    			}
+    		},{
+    			display : '<@spring.message "msg.report.description"/>',
+    			name : "reportProgramCode",
+    			newline: true,
+    			labelwidth : 120,
+    			type : 'select',
+    			options : {
+    				valueField: 'value',
+    				textField: 'meaning',
+    				data:reportType,
+    				onBeforeSelect : function(data) {
+    					if(data == 'RPT-00172'){
+    						$.ligerui.get('docType').setValue('');
+    						down_form.setFieldValidate("docType", {required : false});
+    						$.ligerui.get('docType').setDisabled(true);
+    					}else{
+    						down_form.setFieldValidate("docType", {required : true});
+    						$.ligerui.get('docType').setEnabled(false);
+    					}
+    				}
+    			},
+    			validate:{
+    				required:true
+    			}
+    		},{
+    			display : '<@spring.message "type.com.lkkhpg.dsis.report.periodfrom"/>',
+    			name : "dateFrom",
+    			newline: true,
+    			type : 'select',
+    			labelwidth : 120,
+    			options : {
+    				valueField : 'periodName',
+    				textField : 'periodName',
+    				url : '${base.contextPath}/bm/getBonusPeriod?marketId='
+    			},
+    			validate : {
+    				required : true
+    			}
+    		},{
+    			display : '<@spring.message "type.com.lkkhpg.dsis.report.periodto"/>',
+    			name : "dateTo",
+    			newline: true,
+    			labelwidth : 120,
+    			type : 'select',
+    			options : {
+    				valueField : 'periodName',
+    				textField : 'periodName',
+    				url : '${base.contextPath}/bm/getBonusPeriod?marketId=',
+    				onBeforeSelect : function(data) {
+    					var dateFrom = liger.get('dateFrom').getValue();
+    					if(data <= dateFrom){
+    						Hap.showError('<@spring.message "msg.error.years_from_the_declaration_date_to_not_exceed_declared"/>');
+    						return false;
+    					}
+    				}
+    			},
+    			validate : {
+    				required : true
+    			}
+    		},{
+    			display : '<@spring.message "msg.membership_number_from"/>',
+    			name : 'memberCodeForm',
+    			newline: true,
+    			labelwidth : 120,
+    			type : 'text',
+    			style : 'display:none'
+    			//options  : ${lovService.getLov(base.contextPath, base.locale, "report_service_center_mmeber_code")}
+    		},{
+    			display : '<@spring.message "msg.membership_number_to"/>',
+    			name : 'memberCodeTo',
+    			newline: true,
+    			labelwidth : 120,
+    			type : 'text',
+    			style : 'display:none'
+    			//options  : ${lovService.getLov(base.contextPath, base.locale, "report_service_center_mmeber_code")}
+    		}],
+    		buttons : [{
+    			text : '<@spring.message "type.com.lkkhpg.dsis.common.order.download"/>',
+    			disabled : false,
+    			width : 60,
+    			click : downLoadpopConfirm
+    		}]
+    	});
+    });
+    function downLoadpopConfirm(){
+    	if(Hap.validateForm(down_form)){
+    		var docType = liger.get('docType').getValue();
+    		var reportProgramCode = liger.get('reportProgramCode').getValue();
+    		var dateFrom = liger.get('dateFrom').getValue();
+    		var dateTo = liger.get('dateTo').getValue();
+    		var memberCodeForm = liger.get('memberCodeForm').getValue();
+    		var memberCodeTo = liger.get('memberCodeTo').getValue();
+    		if (reportProgramCode == 'RPT-00172') {
+    			$("#down").attr("action","${base.contextPath}/bm/demo/down?dateFrom="+dateFrom+"&dateTo="+dateTo+"&memberCodeForm="+memberCodeForm+"&memberCodeTo="+memberCodeTo).submit();
+    		} else {
+    			$("#down").attr("action","${base.contextPath}/report/run?docType="+docType+"&reportProgramCode="+reportProgramCode+"&dateFrom="+dateFrom+"&dateTo="+dateTo+"&memberCodeForm="+memberCodeForm+"&memberCodeTo="+memberCodeTo).submit();
+    		}
+    	}
+	}
+    </script>
+</body>
+</html>

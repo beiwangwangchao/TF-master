@@ -1,0 +1,591 @@
+<#include "/mws/include/header.html">
+<!-- ========== MENU END ========== -->
+
+<!-- ========== CSS START ========= -->
+<link href="${base.contextPath}/resources/css/date/bootstrap-datetimepicker${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/bootstrap-combobox${resource_suffix!}.css" rel="stylesheet">
+<style>
+
+    /*在小于 767 像素的屏幕，微小屏幕，更低分辨率的手机*/ 
+    @media (max-width: 767px) {
+        #table_title{
+            display: none;
+        }
+    }
+    
+</style>
+<!-- ========== CSS END ========= -->
+
+<!-- ========== JS START ========= -->
+<script src="${base.contextPath}/resources/js/bootstrap-combobox${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/navbar${resource_suffix!}.js"></script>
+
+<script type="text/javascript">
+$l('type.hand.commom.date.days.sunday','<@spring.message "type.hand.commom.date.days.sunday"/>');
+$l('type.hand.commom.date.days.monday','<@spring.message "type.hand.commom.date.days.monday"/>');
+$l('type.hand.commom.date.days.tuesday','<@spring.message "type.hand.commom.date.days.tuesday"/>');
+$l('type.hand.commom.date.days.wednesday','<@spring.message "type.hand.commom.date.days.wednesday"/>');
+$l('type.hand.commom.date.days.thursday','<@spring.message "type.hand.commom.date.days.thursday"/>');
+$l('type.hand.commom.date.days.friday','<@spring.message "type.hand.commom.date.days.friday"/>');
+$l('type.hand.commom.date.days.saturday','<@spring.message "type.hand.commom.date.days.saturday"/>');
+
+$l('type.hand.commom.date.daysshort.sunday','<@spring.message "type.hand.commom.date.daysshort.sunday"/>');
+$l('type.hand.commom.date.daysshort.monday','<@spring.message "type.hand.commom.date.daysshort.monday"/>');
+$l('type.hand.commom.date.daysshort.tuesday','<@spring.message "type.hand.commom.date.daysshort.tuesday"/>');
+$l('type.hand.commom.date.daysshort.wednesday','<@spring.message "type.hand.commom.date.daysshort.wednesday"/>');
+$l('type.hand.commom.date.daysshort.thursday','<@spring.message "type.hand.commom.date.daysshort.thursday"/>');
+$l('type.hand.commom.date.daysshort.friday','<@spring.message "type.hand.commom.date.daysshort.friday"/>');
+$l('type.hand.commom.date.daysshort.saturday','<@spring.message "type.hand.commom.date.daysshort.saturday"/>');
+
+$l('type.hand.commom.date.daysmin.sunday','<@spring.message "type.hand.commom.date.daysmin.sunday"/>');
+$l('type.hand.commom.date.daysmin.monday','<@spring.message "type.hand.commom.date.daysmin.monday"/>');
+$l('type.hand.commom.date.daysmin.tuesday','<@spring.message "type.hand.commom.date.daysmin.tuesday"/>');
+$l('type.hand.commom.date.daysmin.wednesday','<@spring.message "type.hand.commom.date.daysmin.wednesday"/>');
+$l('type.hand.commom.date.daysmin.thursday','<@spring.message "type.hand.commom.date.daysmin.thursday"/>');
+$l('type.hand.commom.date.daysmin.friday','<@spring.message "type.hand.commom.date.daysmin.friday"/>');
+$l('type.hand.commom.date.daysmin.saturday','<@spring.message "type.hand.commom.date.daysmin.saturday"/>');
+
+$l('type.hand.commom.date.months.january','<@spring.message "type.hand.commom.date.months.january"/>');
+$l('type.hand.commom.date.months.february','<@spring.message "type.hand.commom.date.months.february"/>');
+$l('type.hand.commom.date.months.march','<@spring.message "type.hand.commom.date.months.march"/>');
+$l('type.hand.commom.date.months.april','<@spring.message "type.hand.commom.date.months.april"/>');
+$l('type.hand.commom.date.months.may','<@spring.message "type.hand.commom.date.months.may"/>');
+$l('type.hand.commom.date.months.june','<@spring.message "type.hand.commom.date.months.june"/>');
+$l('type.hand.commom.date.months.july','<@spring.message "type.hand.commom.date.months.july"/>');
+$l('type.hand.commom.date.months.august','<@spring.message "type.hand.commom.date.months.august"/>');
+$l('type.hand.commom.date.months.september','<@spring.message "type.hand.commom.date.months.september"/>');
+$l('type.hand.commom.date.months.october','<@spring.message "type.hand.commom.date.months.october"/>');
+$l('type.hand.commom.date.months.november','<@spring.message "type.hand.commom.date.months.november"/>');
+$l('type.hand.commom.date.months.december','<@spring.message "type.hand.commom.date.months.december"/>');
+
+$l('type.hand.commom.date.monthsshort.january','<@spring.message "type.hand.commom.date.monthsshort.january"/>');
+$l('type.hand.commom.date.monthsshort.february','<@spring.message "type.hand.commom.date.monthsshort.february"/>');
+$l('type.hand.commom.date.monthsshort.march','<@spring.message "type.hand.commom.date.monthsshort.march"/>');
+$l('type.hand.commom.date.monthsshort.april','<@spring.message "type.hand.commom.date.monthsshort.april"/>');
+$l('type.hand.commom.date.monthsshort.may','<@spring.message "type.hand.commom.date.monthsshort.may"/>');
+$l('type.hand.commom.date.monthsshort.june','<@spring.message "type.hand.commom.date.monthsshort.june"/>');
+$l('type.hand.commom.date.monthsshort.july','<@spring.message "type.hand.commom.date.monthsshort.july"/>');
+$l('type.hand.commom.date.monthsshort.august','<@spring.message "type.hand.commom.date.monthsshort.august"/>');
+$l('type.hand.commom.date.monthsshort.september','<@spring.message "type.hand.commom.date.monthsshort.september"/>');
+$l('type.hand.commom.date.monthsshort.october','<@spring.message "type.hand.commom.date.monthsshort.october"/>');
+$l('type.hand.commom.date.monthsshort.november','<@spring.message "type.hand.commom.date.monthsshort.november"/>');
+$l('type.hand.commom.date.monthsshort.december','<@spring.message "type.hand.commom.date.monthsshort.december"/>');
+
+$l('type.hand.commom.date.today','<@spring.message "type.hand.commom.date.today"/>');
+
+$l('type.hand.commom.date.meridiem.am','<@spring.message "type.hand.commom.date.meridiem.am"/>');
+$l('type.hand.commom.date.meridiem.pm','<@spring.message "type.hand.commom.date.meridiem.pm"/>');
+
+</script>
+
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/date/bootstrap-datetimepicker.zh-CN${resource_suffix!}.js"></script>
+
+<script
+    src="${base.contextPath}/common/code?orderStatusData=OM.SALES_STATUS&salesChannelData=OM.SALES_CHANNEL&&orderTypeData=OM.ORDER_TYPE"
+    type="text/javascript">
+</script>
+
+<!-- 初始化页面 -->
+<script type="text/javascript">
+var memberRole = "";
+<#if memberRole??>
+    memberRole = "${memberRole}";
+</#if>
+$(function(){
+    
+    $("#pageBar").navbar({
+        url : "${base.contextPath}/orderHistory/queryProductsByOrderNumber",
+        pagesize : 4,
+        autoQuery : true,
+        parms : function() {
+            return getSearchData();
+        },
+        onLoad : function(data) {
+               if(data.success){
+                    initSearchForm();
+                    if(data.total == 0){
+                       $("#table_body").html("<div style='width: 100%; height: 300px; text-align: center; font-size: 50px; color: red;'><@spring.message 'mws.orderlist.nodata'/></div>");
+                      }
+                       else{
+                       initTable(data);
+                       }
+                    //alert(JSON2.stringify(data));           
+               }
+               else{
+                   $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'mws.menu.loadfail'/>", function(){
+                        return true; 
+                    })
+               }
+           }
+    })
+});
+</script>
+    
+<!-- 事件监听 -->
+<script type="text/javascript">
+$(document).ready(function(){
+    
+    //查询条件的切换
+    $(".form_btn_more").click(function(){
+        $(this).toggleClass("glyphicon-chevron-down");
+        $(this).toggleClass("glyphicon-chevron-up");
+        
+        if( $(this).hasClass("glyphicon-chevron-down") ) {
+            $(this).text("<@spring.message 'mws.orderlist.search_more'/>");
+            $("#collapseOne").css("display","none");
+            
+            $(".name_or_num").removeAttr("disabled");
+            
+            $("#num").val("");
+            $("#orderStatus").val("");$("#orderStatus").prev().find("input").val("");
+            $("#salesChannel").val("");$("#salesChannel").prev().find("input").val("");
+            $("#orderType").val("");$("#orderType").prev().find("input").val("");
+            $("#dateB").val("");
+            $("#dateE").val("");
+        }
+        else{
+            $(this).text("<@spring.message 'mws.orderlist.search_simple'/>");
+            $("#collapseOne").css("display","block");
+            
+            $(".name_or_num").attr("disabled",'disabled');
+            
+            $(".name_or_num").val("");
+        }
+    });
+
+    //模糊查询和详细查询
+    $(".btn_search").click(function(){
+        $("#table_body").html("<div style='width: 100%; height: 300px; text-align: center; font-size: 50px;'><@spring.message 'mws.menu.loading'/></div>");
+        $('nav#pageBar').query();
+    })
+
+    //切换页数时显示等待加载
+    $("#pageBar").on("click", "span", function(){
+        $("#table_body").html("<div style='width: 100%; height: 300px; text-align: center; font-size: 50px;'><@spring.message 'mws.menu.loading'/></div>");
+    })
+
+});
+</script>
+
+<!-- 调用方法 -->
+<script type="text/javascript">
+/* 初始化搜索表单 */
+function initSearchForm(){
+    var htmlStr = "";
+    for(var key in orderStatusData){
+        if(orderStatusData[key].value == "WPAY" || orderStatusData[key].value == "PAYIN" || orderStatusData[key].value == "COMP" || orderStatusData[key].value == "VOID"
+            || orderStatusData[key].value == "CANCL" || orderStatusData[key].value == "REF" || orderStatusData[key].value == "REFUN" ||orderStatusData[key].value =="REFU"
+            || orderStatusData[key].value == "REFF" ){
+                htmlStr += "<option value="+ orderStatusData[key].value + ">" + orderStatusData[key].meaning + "</option>";
+            }
+    }
+    $("#orderStatus").append(htmlStr);
+
+    htmlStr = "";
+    for(var key in salesChannelData){
+        htmlStr += "<option value=" + salesChannelData[key].value + ">" + salesChannelData[key].meaning + "</option>";
+    }
+    $("#salesChannel").append(htmlStr);
+
+    htmlStr = "";
+    for(var key in orderTypeData){
+        if(orderTypeData[key].value == "NMDP" || orderTypeData[key].value == "STDP" || orderTypeData[key].value == "BIGF" || orderTypeData[key].value == "RDEM"){
+                htmlStr += "<option value=" + orderTypeData[key].value + ">"+orderTypeData[key].meaning+"</option>";
+        }
+        
+    }
+    $("#orderType").append(htmlStr);
+
+    /* 动态添加option后才能调用.combobox()美化 */
+    $('#orderStatus').combobox();   
+    $('#salesChannel').combobox();
+    $('#orderType').combobox();
+}
+
+/* 初始化表格 */
+function initTable(data){
+    $("#table_body").html("");
+    var htmlStr = "";
+    for(var i = 0; i < data.rows.length; i++){
+        var headerId = data.rows[i].headerId;
+        var orderDate = data.rows[i].orderDate;
+        var orderNumber = data.rows[i].orderNumber;
+        var orderStatus = data.rows[i].orderStatus;
+        var actrualPaySum = data.rows[i].actrualPayAmt;
+        var productsList = data.rows[i].lines;
+        var pvSum = 0;
+
+        
+         htmlStr += "<div class='panel panel-default'>"
+                +         "<div class='smailTitle panel-heading'>"
+                +             "<span class='h5' style='float:right;'>" + orderDate + "</span>"
+                +             "<span class='h5'><@spring.message 'mws.orderlist.tableitem_ordernumber'/>：</span>"
+                +             "<span class='h5'>" + orderNumber + "</span>"
+                +         "</div>"
+                +       "<div class='panel-body' style='padding: 0px;'>"
+                +           "<div class='goods col-md-7 col-sm-7 col-xs-12' style='border: 1px solid #dddddd; padding: 15px 0px;'>";
+
+        
+                for(j in productsList){
+            var itemId = productsList[j].itemId;
+            var itemName = productsList[j].itemName;
+            var itemAmount = productsList[j].quantity;
+            //var itemImgId = productsList[j].itemImg ? productsList[j].itemImg[0].fileId : "";
+            var itemImgId = productsList[j].fileId;
+            var itemImgSrc = "${base.contextPath}/resources/img/NOT_IMAGE.png";
+            var disAmt = productsList[j].unitSellingPrice;
+            var pvAmt = productsList[j].pv;
+            var publishStatus = productsList[j].publishStatus;
+            
+            pvSum += parseFloat(pvAmt) * parseFloat(itemAmount);
+
+            if (itemImgId != "" && itemImgId !=null) {
+                itemImgSrc = "${base.contextPath}/sys/image/view?fileId=" + itemImgId + "&compressLevel=L";
+            }
+            
+            if(j>0){
+                htmlStr += "<div class='col-md-12 col-sm-12 col-xs-12'><hr></div>";
+            }
+
+            htmlStr += "<div class='goods_item col-md-12 col-sm-12 col-xs-12'>"
+                    +      "<div class='col-md-3 col-sm-4 col-xs-4 post-image' style='padding: 0px;'>"
+                    +          "<img style='width: 80px;height: 80px' src='" + itemImgSrc + "'"
+                    +              "alt='img' class='img-responsive'>"
+                    +      "</div>"
+                    +      "<div class='col-md-9 col-sm-8 col-xs-8' style='padding: 0px;'>";
+                    if (publishStatus == "N") {
+                        htmlStr += "<div class='col-md-12 col-sm-12 col-xs-12'><a style='font-size: 18px;' onclick='showDialog(" + itemId + ")'>" + itemName + "</a></div>";
+                    }
+                    else {
+                        htmlStr += "<div class='col-md-12 col-sm-12 col-xs-12'><a style='font-size: 18px;' href='${base.contextPath}/product/product.html?categoryId=&itemId=" + itemId + "'>" + itemName + "</a></div>";
+                    }
+
+                    /*modified by furong.tang*/
+            /*if(memberRole != "VIP"){
+            htmlStr +=         "<div class='col-md-4 col-sm-12 col-xs-4'>"
+                    +              "<div class='title_text col-md-12 col-sm-6 col-xs-12' style='font-weight: bolder;'><@spring.message 'mws.orderlist.tableitem_unitprice'/></div>"
+                    +              "<div class='col-md-12 col-sm-6 col-xs-12'>" + disAmt.toFixed(2) + "</div>"
+                    +          "</div>"
+                    +          "<div class='col-md-4 col-sm-12 col-xs-4'>"
+                    +              "<div class='title_text col-md-12 col-sm-6 col-xs-12' style='font-weight: bolder;'><@spring.message 'mws.orderlist.tableitem_pv'/></div>"
+                    +              "<div class='col-md-12 col-sm-6 col-xs-12'>" + pvAmt + "</div>"
+                    +          "</div>";
+            }else{*/
+            htmlStr +=         "<div class='col-md-4 col-sm-12 col-xs-4 col-md-offset-3 col-xs-offset-3'>"
+                    +              "<div class='title_text col-md-12 col-sm-6 col-xs-12' style='font-weight: bolder;'><@spring.message 'mws.orderlist.tableitem_unitprice'/></div>"
+                    +              "<div class='col-md-12 col-sm-6 col-xs-12'>" + disAmt.toFixed(2) + "</div>"
+                    +          "</div>"
+                    +          "<div class='col-md-1 col-sm-12 col-xs-1'>"
+                    +              "<div class='title_text col-md-12 col-sm-6 col-xs-12' style='font-weight: bolder;'></div>"
+                    +              "<div class='col-md-12 col-sm-6 col-xs-12'></div>"
+                    +          "</div>";
+            //}
+            htmlStr +=         "<div class='col-md-4 col-sm-12 col-xs-4'>"
+                    +              "<div class='title_text col-md-12 col-sm-6 col-xs-12' style='font-weight: bolder;'><@spring.message 'mws.orderlist.tableitem_quantity'/></div>"
+                    +              "<div class='col-md-12 col-sm-6 col-xs-12'>" + itemAmount +"</div>"
+                    +          "</div>"
+                    +      "</div>"
+                    +  "</div>";
+        }
+        htmlStr +=          "</div>";
+        
+        htmlStr +=     "<div class='sum col-md-5 col-sm-5 col-xs-12' style=' padding:15px 0px;'>"
+                +          "<div class='col-md-4 col-sm-4 col-xs-4' style='text-align: center;'>";
+        /*modified by furong.tang*/
+        /*if(memberRole != "VIP"){
+        htmlStr +=         "<div class='title_text navbar-toggle' style='margin: 0px; padding: 0px; float: none;font-weight: bolder;'><@spring.message 'mws.orderlist.table_pvsum'/></div>"
+                +              "<div class='sum_PV'>" + pvSum + "</div>"
+                +          "</div>";
+        }else{*/
+        htmlStr +=         "<div class='title_text navbar-toggle' style='margin: 0px; padding: 0px; float: none;font-weight: bolder;'></div>"
+                +              "<div class='sum_PV'></div>"
+                +          "</div>";
+        //}
+        htmlStr +=     "<div class='col-md-4 col-sm-4 col-xs-4' style='text-align: center;'>"
+                +                  "<div class='title_text navbar-toggle' style='margin: 0px; padding: 0px; float: none;font-weight: bolder;'><@spring.message 'mws.orderlist.table_actrualpaysum'/></div>"
+                +                  "<div class='sum_total'>" + actrualPaySum.toFixed(2) + "</div>"
+                +              "</div>"
+                +              "<div class='col-md-4 col-sm-4 col-xs-4' style='text-align: center;'>"
+                +                  "<div class='title_text navbar-toggle' style='margin: 0px; padding: 0px; float: none;font-weight: bolder;'><@spring.message 'mws.orderlist.table_orderstatus'/></div>"
+                +                  "<div class='sum_status'>" + getMeaning(orderStatus, orderStatusData) + "</div>"
+                +                  "<div><a href='${base.contextPath}/account/account-order-history.html?headerId=" + headerId + "'><@spring.message 'mws.orderlist.tableitem_detail'/></a></div>"
+                +              "</div>"
+                +          "</div>"
+                +      "</div>"; 
+                
+        htmlStr +=      "</div>"
+                +  "</div>";
+    } 
+    $("#table_body").html(htmlStr);
+}
+
+//获取快码code
+function getMeaning(code, codeList){
+	for (var i = 0; i < codeList.length; i++) {
+		if (codeList[i].value == code) {
+			return codeList[i].meaning;
+		}
+	}
+}
+
+//获取查询参数
+function getSearchData(){
+    var data = new Object();
+    if( $(".name_or_num").val() != "" && $(".name_or_num").val() != null ){
+        data.orderNumber = $(".name_or_num").val();
+    }
+    else {
+        if($("#num").val() != "" && $("#num").val() != null) {
+        data.orderNumber = $("#num").val();
+        }
+        if($("#orderStatus").val() != "" && $("#orderStatus").val() != null) {
+            data.orderStatus = $("#orderStatus").val();
+        }
+        if($("#salesChannel").val() != "" && $("#salesChannel").val() != null) {
+            data.channel = $("#salesChannel").val();
+        }
+        if($("#orderType").val() != "" && $("#orderType").val() != null) {
+            data.orderType = $("#orderType").val();
+        }
+         if($("#dateB").val() != "" && $("#dateB").val() != null) {
+            
+        	 data.dateB = new Date($("#dateB").val());
+        }
+        if($("#dateE").val() != "" && $("#dateE").val() != null) {
+            data.dateE = new Date($("#dateE").val());
+        } 
+    }
+    return data;
+}
+
+//显示提示框
+function showDialog(itemId){
+
+    $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", "<@spring.message 'mws.orderlist.dialog_unpublished'/>", function(){
+        return true; 
+    })
+}
+
+</script>
+<!-- ========== JS END ========= -->
+
+<!-- ========== CONTENT START ========== -->
+
+<section id="content">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.menu.myaccount"/></li>
+        </ol>
+        <div class="row">
+        
+            <!-- Sidebar Start -->
+            <#include "../include/account-menu.html">
+            <!-- Sidebar End -->
+            
+            <!-- Posts Start -->
+            <div class="col-sm-8 col-md-9">
+                <div class="panel panel-default" style="border:0px;">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><@spring.message "mws.orderlist.title_orderhistory"/></h3>
+                    </div>
+                    <div class="panel-body">
+                    
+                        <!--查询条件-->
+                        <form id="searchForm" role="form" method="POST" class="portlet details-form">
+                            <div class="row">
+                                <div class="col-md-9 col-sm-8 form-group">
+                                    <input type="text" name="name_or_num" class="name_or_num form-control"  placeholder="<@spring.message 'mws.orderlist.search_nameornumber'/>">
+                                </div>
+                                <div class="col-md-2 col-sm-3 col-xs-11 col-md-offset-1 col-xs-offset-1 form-group" style="padding: 0px; z-index: 2;">
+                                    <span class="form_btn_more glyphicon glyphicon-chevron-down" style="cursor: pointer;"><@spring.message 'mws.orderlist.search_more'/></span>
+                                </div>
+                                
+                                <div id="collapseOne" style="display: none;">
+                                    <div class="col-md-4 col-sm-6 form-group">
+                                        <label for="num"><@spring.message 'mws.orderlist.search_ordernumber'/></label>
+                                        <input type="text" id="num" class="form-control">
+                                    </div>
+                                     <div class="col-md-4 col-sm-6 form-group">
+                                        <label for="orderStatus"><@spring.message 'mws.orderlist.search_orderstatus'/></label>
+                                        <select class="form-control" id="orderStatus">
+                                            <option></option>
+                                        </select>
+                                    </div>
+                                     <div class="col-md-4 col-sm-6 form-group">
+                                        <label for="salesChannel"><@spring.message 'mws.orderlist.search_saleschannel'/></label>
+                                        <select class="form-control" id="salesChannel">
+                                            <option></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-sm-6 form-group">
+                                        <label for="orderType"><@spring.message 'mws.orderlist.search_ordertype'/></label>
+                                        <select class="form-control" id="orderType">
+                                            <option></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-sm-6 form-group">
+                                        <label for="dateB"><@spring.message 'mws.orderlist.search_datebegin'/></label>
+                                        <input  id="dateB" class="form-control" type="text" value="">
+                                    </div>
+                                    <div class="col-md-4 col-sm-6 form-group">
+                                        <label for="dateE"><@spring.message 'mws.orderlist.search_dateend'/></label>
+                                        <input  id="dateE" class="form-control" type="text" value="">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-12 col-sm-12" style="padding: 0px;">
+                                    <div class="col-md-2 col-sm-3 col-xs-12">
+                                        <a class="btn_search btn-sm btn-info form-control" 
+                                           style="text-align: center; cursor: pointer; font-size: 16px; font-weight: bolder; min-width: 100px;">
+                                            <@spring.message 'mws.orderlist.search_btn'/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                        
+                        <!--查询结果-->
+
+                        <div id="table_title" class="row navbar-collapse" style="background-color: #eeeeee;text-align: center; padding: 0px;">
+                            <div class="col-md-7 col-sm-7 col-xs-6 h5">
+                                <div class="title_text col-md-12 col-sm-12 col-xs-12" style="font-weight: bolder;">
+                                    <@spring.message 'mws.orderlist.table_goods'/>
+                                </div>
+                            </div>
+                            <div class="col-md-5 col-sm-5 col-xs-6 h5">
+                                <div class="title_text col-md-4 col-sm-4 col-xs-4" style="font-weight: bolder;">
+                                    <!--modified by furong.tang-->
+                                    <!--<#if memberRole != "VIP">
+                                    <@spring.message 'mws.orderlist.table_pvsum'/>
+                                    </#if>-->
+                                </div>
+                                <div class="title_text col-md-4 col-sm-4 col-xs-4" style="font-weight: bolder;">
+                                    <@spring.message 'mws.orderlist.table_actrualpaysum'/>
+                                </div>
+                                <div class="title_text col-md-4 col-sm-4 col-xs-4" style="font-weight: bolder;">
+                                    <@spring.message 'mws.orderlist.table_orderstatus'/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="height: 20px"></div><!--拉开底边距-->
+                        
+                        <div id="table_body" class="row">
+                            <div style='width: 100%; height: 300px; text-align: center; font-size: 50px;'><@spring.message 'mws.menu.loading'/></div>
+<!--                         
+                             <div class="panel panel-default">
+                                <div class="smailTitle panel-heading">
+                                         <span class="h5">2016-03-17</span>
+                                        <span class="h5">订单号：</span>
+                                        <span class="h5">1719158433352812</span>
+                                </div>
+                                <div class="panel-body" style="padding: 0px;">
+                                    <div class="goods col-md-7 col-sm-7 col-xs-12" style="border: 1px solid #dddddd; padding: 15px 0px;">
+                                        <div class="goods_item col-md-12 col-sm-12 col-xs-12">
+                                            <div class="col-md-3 col-sm-4 col-xs-4 post-image" style="padding: 0px;">
+                                                <img style="width: 80px;height: 80px" src="${base.contextPath}/resources/img/b_GestAid.jpg"
+                                                    alt="Reshape Panties" class="img-responsive">
+                                            </div>
+                                            <div class="col-md-9 col-sm-8 col-xs-8" style="padding: 0px;">
+                                                    <div class="col-md-12 col-sm-12 col-xs-12">无限极精华乳液（经典）特惠套装包</div>
+                                                    <div class="col-md-4 col-sm-12 col-xs-4">
+                                                        <div class="title_text col-md-12 col-sm-6 col-xs-12" style="font-weight: bolder;">单价</div>
+                                                        <div class="col-md-12 col-sm-6 col-xs-12">129.00</div>
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-12 col-xs-4">
+                                                        <div class="title_text col-md-12 col-sm-6 col-xs-12" style="font-weight: bolder;">PV</div>
+                                                        <div class="col-md-12 col-sm-6 col-xs-12">20</div>
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-12 col-xs-4">
+                                                        <div class="title_text col-md-12 col-sm-6 col-xs-12" style="font-weight: bolder;">数量</div>
+                                                        <div class="col-md-12 col-sm-6 col-xs-12">1</div>
+                                                    </div>
+                                                    </div>
+                                            </div>
+
+                                        <div class="col-md-12 col-sm-12 col-xs-12"><hr></div>
+                                        
+                                        <div class="goods_item col-md-12 col-sm-12 col-xs-12">
+                                            <div class="col-md-3 col-sm-4 col-xs-4 post-image" style="padding: 0px;">
+                                                <img style="width: 80px;height: 80px" src="${base.contextPath}/resources/img/b_GestAid.jpg"
+                                                    alt="Reshape Panties" class="img-responsive">
+                                            </div>
+                                            <div class="col-md-9 col-sm-8 col-xs-8" style="padding: 0px;">
+                                                    <div class="col-md-12 col-sm-12 col-xs-12">无限极精华乳液（经典）特惠套装包</div>
+                                                    <div class="col-md-4 col-sm-12 col-xs-4">
+                                                        <div class="title_text col-md-12 col-sm-6 col-xs-12" style="font-weight: bolder;">单价</div>
+                                                        <div class="col-md-12 col-sm-6 col-xs-12">129.00</div>
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-12 col-xs-4">
+                                                        <div class="title_text col-md-12 col-sm-6 col-xs-12" style="font-weight: bolder;">PV</div>
+                                                        <div class="col-md-12 col-sm-6 col-xs-12">20</div>
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-12 col-xs-4">
+                                                        <div class="title_text col-md-12 col-sm-6 col-xs-12" style="font-weight: bolder;">数量</div>
+                                                        <div class="col-md-12 col-sm-6 col-xs-12">1</div>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="sum col-md-5 col-sm-5 col-xs-12" style=" padding:15px 0px;">
+                                        <div class="col-md-4 col-sm-4 col-xs-4" style="text-align: center;">
+                                            <div class="title_text navbar-toggle" style="margin: 0px; padding: 0px; float: none;font-weight: bolder;">PV总计</div>
+                                            <div class="sum_PV">80</div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-xs-4" style="text-align: center;">
+                                            <div class="title_text navbar-toggle" style="margin: 0px; padding: 0px; float: none;font-weight: bolder;">实付款</div>
+                                            <div class="sum_total">1399.00</div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-xs-4" style="text-align: center;">
+                                            <div class="title_text navbar-toggle" style="margin: 0px; padding: 0px; float: none;font-weight: bolder;">交易状态</div>
+                                            <div class="sum_status">已完成</div>
+                                            <div><a href="#">订单详情</a></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                             -->
+                            
+                            
+                            
+                        </div>
+                        <!-- 分页栏 -->
+                <div class="row col-md-offset-8 col-sm-offset-6 col-xs-offset-7 col-md-4 col-sm-6 col-xs-5" style="padding:0px;"><nav id="pageBar"></nav></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Posts End -->
+        </div>
+    </div>
+</section>
+<script>
+$('#dateB').datetimepicker({
+    format: "yyyy-mm-dd",
+    autoclose: true,
+    todayBtn: true,
+    keyboardNavigation:true,
+    pickerPosition: "bottom-left",
+    language: "zh-CN" ,
+    startView:2,
+    minView:2,
+    maxView:2
+});
+$('#dateE').datetimepicker({
+    format: "yyyy-mm-dd",
+    autoclose: true,
+    todayBtn: true,
+    keyboardNavigation:true,
+    pickerPosition: "bottom-left",
+    language: "zh-CN" ,
+    startView:2,
+    minView:2,
+    maxView:2 
+});
+</script>
+<!-- ========== CONTENT END ========== -->
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

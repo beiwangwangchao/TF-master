@@ -1,0 +1,331 @@
+<#--
+ * description: 维护成本
+ * version: 1.0 
+ * author: huangjiajing
+ * .
+ * 
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?periodYear=SPM.PERIOD_YEAR&periodMonth=SPM.PERIOD_MONTH&transactionType=INV.TRANSACTION_TYPE" type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<body style="padding: 10px;">
+    <form id="inv_details_form"></form>
+    <div id="inv_details_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    	var currentInvOrgId = _invOrgId;
+    	$(function() {
+    		invOrgIdCurrency();
+    	});
+        window['inv_details_form'] = $("#inv_details_form").ligerForm({
+            fields : [ {  
+                	name:'invOrgId',
+                	label:'<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.organization"/>',
+                	newline : false ,
+                	type:'combobox',
+                    options:{
+                        valueField : 'invOrgId',
+    					textField : 'name',
+    					url : _basePath + "/spm/assignOrg/get",
+    					isMultiSelect : false,
+    					isShowCheckBox : false,
+    					onSelected : function(value,text) {
+    						if (!value) {
+    							return false;
+    						}
+    						if (value != currentInvOrgId) {
+    							currentInvOrgId = value;
+    							invOrgIdCurrency(currentInvOrgId);
+    							//清空Grid数据
+    							inv_details_grid.deleteRange(inv_details_grid.rows);
+    						}
+    					},
+    					onSuccess : function(data) {
+    	                	this.setValue(currentInvOrgId);
+    	                }
+                    },
+                    editor : {
+                    	required : true
+                    }
+                }, {
+                	name:'currency',
+                	label:'<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.currencycode"/>',
+                	readonly : true,
+                	newline:false,
+                	type:'text'
+                }, { 
+                	name : 'year', 
+                	label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.year"/>', 
+                	newline : true ,
+                    type : 'select',
+                	options: {
+                        valueField: 'value',
+                        textField: 'meaning',
+                        data: periodYear
+                    },
+                    validate : {
+                        required : true
+                    }
+                }, { 
+                	name : 'month', 
+                	label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.month"/>', 
+                	newline : false ,
+                    type : 'select',
+                    options: {
+                        valueField: 'value',
+                        textField: 'meaning',
+                        data: periodMonth
+                    },
+                    validate : {
+                        required : true
+                    }
+                }
+            ],
+            buttons : [
+                {
+                    text : '<@spring.message "mws.orderhistory.sum_get"/>',
+                    <#if accessService.access("QUERY_EDITABLE") == false>
+                    disabled:true,
+                    </#if>
+                    width : 60,
+                    click : function() {
+                    	f_getInvCost();
+                    }
+                }, {
+                    text : '<@spring.message "sys.hand.btn.submit"/>',
+                    <#if accessService.access("SUBMIT_EDITABLE") == false>
+                    disabled:true,
+                    </#if>
+                    width : 60,
+                    click : function() {
+                    	f_submitInvCost();
+	                }
+               	}]
+        	});
+        var inv_details_grid;
+        inv_details_grid = window['inv_details_grid'] = $("#inv_details_grid").ligerGrid({
+            columns : [
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.itemid"/>',
+                    name : 'itemNumber',
+                    align : 'left',
+                    width : 150
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+                    name : 'itemName',
+                    align : 'left',
+                    width : 150
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotnum"/>',
+                    name : 'lotNumber',
+                    align : 'left',
+                    width : 150
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.expirydate"/>',
+                    name : 'expiryDate',
+                    align : 'left',
+                    width : 150
+                },
+                {
+                    display : '<@spring.message "sys.hand.btn.transactiontype"/>',
+                    name : 'trxType',
+                    align : 'left',
+                    width : 150,
+                    render : function(item) {
+                        for (var i = 0; i < transactionType.length; i++) {
+                            if (transactionType[i]['value'] == item.trxType)
+                                return transactionType[i]['meaning']
+                        }
+                        return item.trxType;
+                    }
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.quantity"/>',
+                    name : 'quantity',
+                    align : 'left',
+                    width : 150
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.unitprice"/>',
+                    name : 'unitCost',
+                    align : 'left',
+                    width : 150,
+                    editor:{
+                    	type:'float'
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                {
+                    name : 'remark',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.remarks"/>',
+                    align : 'left',
+                    width : 200,
+                    editor:{
+                        type:'text'
+                    }
+                }
+            ],
+            url : '${base.contextPath}/inv/details/query',
+            enabledEdit : true,
+            width : '99%',
+            height : '520',
+            usePager: false,
+            delayLoad:true,
+            rownumbers : true,
+            onBeforeSubmitEdit : function(e) {
+                if (e.column.columnname == "unitCost") {
+                    if(e.value < 0){
+                    	Hap.showError('<@spring.message "msg.error.inv.unit_cost_not_less_than_zero"/>');
+                        return false;
+                    }
+                }
+            },
+            onBeforeEdit: function(rowdata){
+                if(rowdata.column.name == 'unitCost'){
+                    return true;            
+                }else if(rowdata.column.name == 'remark'){
+                    return true;            
+                }{
+                    return false;
+                }
+            }
+        });
+        
+    //获取成本
+    function f_getInvCost() {
+    	if (!Hap.validateForm(inv_details_form)) {
+        	return false;
+        }
+    	var year = liger.get('year').getValue();
+    	var month = liger.get('month').getValue();
+    	var obj = new Object();
+    	obj.invOrgId = currentInvOrgId;
+    	obj.year = year;
+    	obj.month = month;
+    	$.ligerDialog.waitting($l('sys.hand.tip.processing'));
+    	Hap.ajax({
+    		//校验是否能获取
+            url : '${base.contextPath}/inv/details/check?invOrgId='+currentInvOrgId+'&year='+year+'&month='+month,
+            data : [],
+            success : function(json) {
+            	if(json.success){
+            		Hap.ajax({
+            			//校验是否已经获取
+                        url : '${base.contextPath}/inv/details/checkdb?invOrgId='+currentInvOrgId+'&year='+year+'&month='+month,
+                        data : [],
+                        success : function(json) {
+                        	if(json.message == '1'){
+                        		Hap.ajax({
+                        			url : '${base.contextPath}/inv/details/get',
+                                    data : obj,
+                                    success : function(json) {
+                                        if(json.success){
+                                            Hap.gridQuery({
+                                                form : inv_details_form,
+                                                grid : inv_details_grid
+                                            });
+                                        }
+                                        $.ligerDialog.closeWaitting();
+                                    }
+                        		});
+                            } else if (json.message == '2') {
+                            	$.ligerDialog.warn('<@spring.message "sys.hand.btn.delete.list"/>',function(){
+                            		$.ligerDialog.waitting($l('sys.hand.tip.processing'));
+                            		Hap.ajax({
+                            			url : '${base.contextPath}/inv/details/get',
+                                        data : obj,
+                                        success : function(json) {
+                                            if(json.success){
+                                                Hap.gridQuery({
+                                                    form : inv_details_form,
+                                                    grid : inv_details_grid
+                                                });
+                                            }
+                                            $.ligerDialog.closeWaitting();
+                                        }
+                            		});
+                                });
+                            }
+                        }
+                    });
+            	}
+            }
+        });
+    }
+    
+    //提交成本
+    function f_submitInvCost() {
+        if (!Hap.validateForm(inv_details_form)) {
+        	return false;
+        }
+    	if (!Hap.validateGrid(inv_details_grid)) {
+    		return false;
+    	}
+       	var year = liger.get('year').getValue();
+        var month = liger.get('month').getValue();
+       	$.ligerDialog.confirm('<@spring.message "msg.warning.dto.sys.commit"/>', function (yes) {
+    		if(yes){
+    			$.ligerDialog.waitting($l('sys.hand.tip.processing'));
+    			var param = new Array();
+    			param.push(inv_details_form.getData());
+    			if(inv_details_grid.getData() != null){
+    				if(!Hap.validateGrid(inv_details_grid)){
+    					return false;
+    				}
+    				param = param.concat(inv_details_grid.getData());
+    				/* Hap.gridSave({
+                        grid : inv_details_grid,
+                        url:'${base.contextPath}/inv/details/save',
+                        success:function(){}
+                    }); */
+    			}
+                Hap.ajax({
+                    url:'${base.contextPath}/inv/details/submit',
+                    dataType : "json",
+                    data : param,
+                    success:function(json,opt){
+                        if (inv_details_grid.rows.length > 0) {
+	                        inv_details_grid.deleteRange(inv_details_grid.rows);
+                        }
+                        Hap.showSuccess("<@spring.message "sys.hand.tip.success"/>"); 
+                    }
+                })
+        	}
+   		})
+    }
+
+    //获取本位币
+    function invOrgIdCurrency() {
+    	var invOrgId =currentInvOrgId;
+        var params = [{
+            orgType: 'INV',
+            orgId: invOrgId,
+            paramNames: ['SPM.CURRENCY']
+        }];
+        Hap.ajax({
+                url : '${base.contextPath}/spm/orgParam/get',
+                data : params,
+                success : function(json) {
+                    var currency = json.rows[0].paramValues['SPM.CURRENCY'] == undefined ? null : json.rows[0].paramValues['SPM.CURRENCY'][0];
+                    Hap.ajax({
+                        url : '${base.contextPath}/spm/currency/query?currencyCode='+currency,
+                        data : [],
+                        success : function(json) {
+                            var currencyName = json.rows[0].currencyName;
+                            if(currencyName != null){
+                            	liger.get('currency').setValue(currencyName);
+                            } else {
+                                liger.get('currency').setValue(null);
+                            }
+                        }
+                    });
+                }
+        });
+    }
+</script>
+</body>
+</html>

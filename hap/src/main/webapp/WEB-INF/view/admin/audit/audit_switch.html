@@ -1,0 +1,80 @@
+<#--
+ * description: 审计开关
+ * version: 1.0
+ * author: xiawang.liu
+ * @Copyright
+ *
+-->
+<#include "../include/head.html">
+
+<body style="padding: 10px; overflow: hidden;">
+<div id="audit_switch_grid"></div>
+<script src="${base.contextPath}/common/code?yesNo=SYS.YES_NO" type="text/javascript"></script>
+<!-- <script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script> -->
+<script>
+    window['audit_switch_grid'] = $("#audit_switch_grid").ligerGrid({
+        columns   : [
+			{
+                type: 'hidden',
+                id:'entityId',
+                name: 'entityId'
+            },
+            {
+                display: '审计对象',
+                name   : 'entityCode',
+                width  : 200,
+                validate: {
+                    required: true
+                }
+            },
+            {
+                display: '对象描述',
+                name   : 'description',
+                width  :200,
+                editor: {
+                    type: 'text'
+                }
+            },
+            {
+                display: '开启审计',
+                name   : 'auditFlag',
+                width  : 80,
+                editor: {
+                    type: 'select',
+                    valueField: "value",
+                    textField: "meaning",
+                    data: yesNo
+                },
+                render: function(item) {
+                	for (var i in yesNo) {
+                        if (yesNo[i].value == item.auditFlag) {
+                            return yesNo[i].meaning;
+                        }
+                    }
+                	return '';
+                }, 
+                validate: {
+                    required: true
+                }
+            }
+        ],
+        toolbar: {
+        	items:[
+        	       { text: '<@spring.message "sys.hand.btn.save"/>', 
+        	    	 click: function(){
+        	    		 Hap.gridSave({
+        	    			    grid : audit_switch_grid,
+        	    			    url : '${base.contextPath}/sys/audit/save'
+        	    		 })}, 
+                     icon: 'save'}]},
+        url       : '${base.contextPath}/sys/audit/queryAll',
+        delayLoad : false,
+        width     : '99%',
+        usePager  : false,
+        height    : '98%',
+        enabledEdit: true
+    });
+    window['audit_switch_grid'].toggleCol('entityId', false);
+</script>
+</body>
+</html>

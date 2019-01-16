@@ -1,0 +1,155 @@
+<#--
+ * description: 库存量查询界面.
+ * version: 1.0 
+ * author: Zhaoqi
+ * Copyright LKK Health Products Group Limited. 
+ * 
+-->
+
+<#include "../include/head.html">
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<body style="padding: 3px; overflow: hidden;">
+    <form id="d_um_001_form" ></form>  
+    <div id="d_um_001_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    
+    var invOrgS = [];
+    function queryInvOrgS(){
+    	$.ajax({
+ 			url: '${base.contextPath}/spm/invOrganization/queryInvOrgsByRole',
+ 			type:"POST",
+ 			dataType:"json",
+ 			contentType : "application/json",
+             data : '',
+             async: false,
+             success : function(json) {
+                 if(json.success){
+                	 $(json.rows).each(function(i,o){
+                		 invOrgS.push({"invOrgId":o.invOrgId,"name":o.name})
+                	 })
+                 }
+             },
+             error : function() {
+             }
+ 		})    	 
+    }
+    
+    $(function(){
+    	queryInvOrgS();
+        window['d_um_001_form'] = $("#d_um_001_form").ligerForm({
+              fields: [
+					{ 
+						label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.organizationid"/>',
+						type: 'select',
+						newline: false,
+						name: 'organizationId',
+						options: {
+                    	    textField: 'name',
+                    	    valueField: 'invOrgId',
+                    	    //url : "${base.contextPath}/spm/invOrganization/queryInvOrgsByRole",
+                    	    data: invOrgS,
+                    	    cancelable: false,
+                    	    onSelected: function(newKey, newValue){
+                    	    	//清空查询结果
+                    	    	if (d_um_001_grid.currentData != null && d_um_001_grid.currentData.rows.length > 0) {
+        	            	        var rows = d_um_001_grid.currentData.rows;
+        	            	        rows.splice(0, rows.length);
+        	            	        d_um_001_grid.reRender();
+        	            	    }
+                    	    }
+	                    },
+	                    validate: {
+	                    	required: true,
+	                    }
+					},
+                  /* {
+                      name : "itemNumber", type : "popup", display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>', newline: false,
+                      textField:'itemNumber',
+                      options: ${lovService.getLov(base.contextPath, base.locale, "lov_im_onhandqty_itemnumber_qry")}
+                  }, */
+                  /* {
+                      name : "organizationId", display : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.organization"/>', type : "combobox",newline : false,
+                      textField :'name',
+                      validate : { required : true },
+                      options : {
+                          value : "${Session._invOrgId}",
+                          valueField:'invOrgId',
+                          textField:'name',
+                          url:'${base.contextPath}/spm/organization/query'
+                      }
+                  }, */
+                  { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>', newline:false, name: 'itemNumber'
+					  	
+					},
+                  /*  隐藏按批次到期日查询条件 20180207 by mingqing.wei
+                  { name : "expiryDateFrom", display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.expirydatefrom"/>',
+                    type : "date" ,
+                    newline: false,
+                    format : "yyyy-MM-dd"
+                  },
+                  { name : "expiryDateTo", display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.expirydateto"/>',
+                      type : "date" ,
+                      newline: false,
+                      format : "yyyy-MM-dd"
+                    },
+                    */
+                  /* { name : "lotNumber", display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotnum"/>', type : "combobox", newline: true,
+                      options:{'setting':  ${lovService.getLov(base.contextPath, base.locale, "im_lot_number_autocomplete")},
+                          hasGrid: false
+                      }
+                  } */
+                  /*  隐藏批次号查询条件输入框 20180207 by mingqing.wei
+					{ type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotnum"/>', newline:true, name: 'lotNumber'
+					  	
+					},
+					*/
+              ], buttons: [
+                  { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                      var itemNumber = $("input[ligeruiid='itemNumber'][type='text']").val();
+                      //以防用户不是从select或者popupGrid选中的值，所以给隐藏input赋值
+                      $("#itemNumber").val(itemNumber);//这个隐藏input的值将会在gridQuery时自动使用
+                      var lotNumber = $("input[ligeruiid='lotNumber'][type='text']").val();
+                      $("#lotNumber").val(lotNumber);
+                      Hap.gridQuery({
+                          form:d_um_001_form,
+                          grid:d_um_001_grid
+                      })
+                  }}
+              ]
+          });
+          //liger.get('organizationName').setValue(_invOrgName);
+          
+       	  liger.get('organizationId').setValue(_invOrgId);
+          liger.get('organizationId').setText(_invOrgName);
+        
+          window['d_um_001_grid'] = $("#d_um_001_grid").ligerGrid({
+              delayLoad: true,
+              unSetValidateAttr:false,
+              columns: [
+                { name: 'itemNumber', display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>' }, 
+                { name: 'itemName', display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>' },
+                /* 隐藏批次号和批次到期日 20180207 by mingqing.wei
+                { name: 'lotNumber', display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotnum"/>' },
+                { name: 'expiryDate', display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.expirydate"/>' },
+                */
+
+                { name: 'quantity', display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage"/>' },
+                { name: 'uomName', display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.uomcode"/>' },
+                { name: 'availableQty', display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.availableqty"/>' },
+                { name: 'pendingQty', display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.pendingqty"/>' },
+                //{ name: 'currencyCode', display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.currencycode"/>' },
+                /* { name: 'unitCost', display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.unitprice"/>' },
+                { name: 'cost', display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.totalprice"/>' } */
+              ], 
+              url:'${base.contextPath}/im/onhand/query',
+              rownumbers:true,
+              enabledEdit: false,
+              width: '99%', 
+              height: '98%', 
+              checkbox: false
+          });
+          
+      });
+  </script>
+</body>
+</html> 

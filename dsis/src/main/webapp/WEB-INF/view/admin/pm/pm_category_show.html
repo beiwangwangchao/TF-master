@@ -1,0 +1,882 @@
+<#--
+ * description: 商品类别管理页面 
+ * version: 1.0 
+ * author:chenjingxiong
+ * .
+-->  
+<#include "../include/head.html">
+<!-- 商品类型lookup -->
+<script src="${base.contextPath}/common/code?pt=inv.product_type&yesNo=SYS.YES_NO&pack=PM.PACK_TYPE"  type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script> 
+<body>
+<!-- queryForm -->
+<html>
+ <head></head>
+ <body>
+  <form id="catgQueryForm" style="margin: 0px; padding: 10px;"></form> 
+  
+  <div style="height:35px;"> 
+   <button class="l-button" onclick="expandAll();">
+   <@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.launchAll" /></button>
+   <button class="l-button" onclick="collapseAll();">
+   <@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.foldAll" /></button>
+   <button class="l-button" id="addNodeBtn" onclick="addTreeItem()" disabled="disabled">
+   <@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.addCategory" /></button>
+   <button class="l-button" id="deleteNodeBtn" disabled="disabled" onclick="removeTreeItem()" hidden="hidden">
+   <@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.deleteCategory" /></button>
+  </div> 
+  
+  <div> 
+   <div id="layout"> 
+    <!-- layout left --> 
+    <div position="left" style="height:100%;overflow:scroll;"> 
+     <div id="toolBarDiv"></div> 
+     <!-- liger_tree--> 
+     <div id="treeDiv" style="padding-bottom:20px"> 
+      <div id="tree"></div>
+     </div> 
+    </div> 
+    <!-- layout center --> 
+    <div position="center" style="overflow:scroll" title='<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.detailinfo" />'>
+     <div id="detailDiv" style="display:none"> 
+      <form id="detailForm" data-validate="{errorPlacement:validTextTip}"></form> 
+      <div id="detailGrid" style="overflow:scroll"></div> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <div style="display:none"> 
+   <!-- product query dialog --> 
+   <div id="prodtQueryDialog"> 
+    <form id="prodtQueryForm"></form> 
+    <div id="prodtQueryGrid"></div> 
+   </div> 
+   <!-- add category dialog --> 
+   <div id="addCategoryDialog"> 
+    <form id="addCategoryForm" data-validate="{errorPlacement:validTextTip}" ></form> 
+   </div> 
+   <div id="deleteCategoryDialog"> 
+    <div id="deleteRadioDiv"> 
+     <table> 
+      <tbody>
+       <tr>
+        <td><input type="radio" value="deleteAll" name="deleteChoice" /></td>
+        <td><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.deleteSelfAndSubCategory" /></td>
+       </tr> 
+       <tr>
+        <td><input type="radio" value="deleteItself" name="deleteChoice" /></td>
+        <td><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.deleteSelfOnly" /></td>
+       </tr> 
+      </tbody>
+     </table> 
+    </div> 
+   </div> 
+  </div>
+ </body>
+</html>
+<script type="text/javascript">
+
+var detailForm; // 商品类别详情form
+var detailGrid; //商品类别详情表格对象
+var prodtQueryGrid; //商品查询弹出框表格对象
+var treeManager; //商品类别树对象
+var categoryQueryForm; // 查询form
+var node;
+var adDisable=true;//删除类别，类别详情新增和删除不可用
+
+var _basePath = "${base.contextPath}";
+var addCatgFormManager; // 商品类别树添加类别form对象
+$(function() {
+
+	// 页面布局
+	$("#layout").ligerLayout({
+        leftWidth: 300
+    });
+    //2018/01/22 by15750
+	//如果 用户是sysadmin 删除类别，类别详情新增和删除可用
+	if(getCookie('loginName') == 'sysadmin'){
+        adDisable=false;
+        $("#deleteNodeBtn").removeAttr("hidden");
+        $("#deleteNodeBtn").attr("class", "l-button","disabled");
+    }
+	
+	// 查询form
+    categoryQueryForm = $("#catgQueryForm").ligerForm({
+        fields: [{
+            type: 'text',
+            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.categoryid" />',
+            validate: {
+                digits: true
+            },
+            name: 'categoryId'
+        },
+        {
+            type: 'text',
+            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.categoryname" />',
+            newline: false,
+            name: 'categoryName',
+        }],
+        buttons: [{
+            text: '<@spring.message "sys.hand.btn.query"/>',
+            id: 'queryBtn',
+            newline: false,
+            click: queryCategory
+        }]
+    });
+
+    /* 详情页面form */
+    detailForm = $("#detailForm").ligerForm({
+        enabledSort: false,
+        fields: [{
+            type: 'text',
+            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.categoryid" />',
+            readonly: true,
+            name: 'categoryId',
+            width: '120px'
+        },
+        {
+            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.categoryname" />',
+            newline: false,
+            type: 'tl',
+            options: {
+                idField: 'categoryId',
+                dto: 'com.lkkhpg.dsis.common.product.dto.InvCategoryB'
+            },
+            validate: {
+                required: true
+            },
+            name: 'categoryName',
+            width: '130px'
+        },
+        {
+            type: 'text',
+            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.creationdata" />',
+            newline: false,
+            readonly: true,
+            name: 'creationDate',
+            width: '120px'
+        },
+        /*{
+            type: 'int',
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.sort_number" />',
+            name: 'sortNum',
+            newline: true,
+            width: '60px',
+            /!*validate: {
+                maxlength: 5,
+            },*!/
+        },*/
+           // 新增字段  根据商品类别确认价格  用数据库备用字段 attribute14   update by 15750 2018/03/07
+        {
+            /*display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.defaultflag"/>',*/
+            display:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.attribute14" />',//根据商品类别确认价格
+            name : "attribute14", newline : true, type : "combobox",
+            width: '120px',
+            options : {
+                valueField : 'value',
+                textField : 'meaning',
+                data : yesNo,
+                onSelected: function() {
+                    var attribute14 = $.ligerui.get('attribute14').getValue();
+                    if (attribute14 == "N") {
+                        $.ligerui.get('attribute15').setValue("");
+                        $.ligerui.get('attribute15').set('disabled', true);
+                        window['detailForm'] .setFieldValidate("attribute15", {required : false});
+                    }else if (attribute14 == "Y"){
+                        $.ligerui.get('attribute15').setEnabled();
+                        window['detailForm'] .setFieldValidate("attribute15", {required : true});
+                    }else{
+                        $.ligerui.get('attribute15').setValue("");
+                        $.ligerui.get('attribute15').set('disabled', true);
+                        window['detailForm'] .setFieldValidate("attribute15", {required : false});
+                    }
+                }
+
+            }
+        },
+         //新增字段 “商品类别价格” 用数据库备用字段 attribute15 update by 15750 2018/03/07
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category.attribute14" />',//'商品类别价格'
+            name: 'attribute15',
+            newline : false,
+            width: 90,
+            type: 'float',
+            align: "right",
+            validate: {
+                required: false,
+            },
+        }
+
+        ],
+        buttons: [{
+            text: '<@spring.message "sys.hand.btn.save"/>',
+            click: save
+        }]
+    });
+
+    /* 详情页面表格 */
+    detailGrid = $("#detailGrid").ligerGrid({
+        columns: [{
+            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemnumber" />',
+            name: 'itemNumber',
+            width: 300,
+            render: function(rowdata) {
+                return "<a href='javascript:void(0);' /*onclick='viewDetail(" + rowdata.itemId  + "," + rowdata.marketId +", \""+rowdata.itemType+"\")'*/>" + rowdata.itemNumber + "</a> "
+            }
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname" />',
+            name: 'itemName',
+            width: 300
+        }],
+        toolbar: {
+            items: [{
+                text: '<@spring.message "sys.hand.btn.new"/>',
+                disable: adDisable,
+                icon: 'add',
+                click: openAddWin
+            },
+            {
+                line: true
+            },
+            {
+                text: '<@spring.message "sys.hand.btn.delete"/>',
+                disable:false ,//adDisable,
+                icon: 'delete',
+                click: deleteRow
+            },
+            {
+                line: true
+            }]
+        },
+        enabledEdit: true,
+        width: '99%',
+        url: _basePath + "/pm/category/queryItems",
+        delayLoad: true,
+        checkbox: true,
+        rownumbers: true,
+        isScroll: true
+    });
+
+    /* 商品类别树 */
+    treeManager = $("#tree").ligerTree({
+        checkbox: false,
+        url: _basePath + '/pm/category/queryTop',
+        textFieldName: "categoryName",
+        idFieldName: "categoryId",
+        isLeaf: function(data) {
+        	// 判断是否为叶子节点
+            return data.children && data.children.length == 0;
+        },
+        onClick: function() {
+            node = treeManager.getSelected(); // 选中的树节点
+            // 选择节点，删除按钮可点击
+            if (node) {
+                $("#deleteNodeBtn").removeAttr("disabled");
+                $("#deleteNodeBtn").attr("class", "l-button");
+                $("#addNodeBtn").removeAttr("disabled");
+                $("#addNodeBtn").attr("class", "l-button");
+            } else {
+                $("#deleteNodeBtn").removeAttr("class");
+                $("#deleteNodeBtn").attr("disabled", "disabled");
+                $("#addNodeBtn").removeAttr("class");
+                $("#addNodeBtn").attr("disabled", "disabled");
+            }
+        },
+        onSelect: function() {
+            $("#detailDiv").show();
+            node = treeManager.getSelected();
+            detailForm.clear();
+            liger.get("categoryId").setValue(node.data.categoryId);
+            liger.get("categoryName").setValue(node.data.categoryName);
+            liger.get("creationDate").setValue(node.data.creationDate);
+            //update by 15750 2018/03/07
+            liger.get("attribute14").setValue(node.data.attribute14);
+            liger.get("attribute15").setValue(node.data.attribute15);
+            //liger.get("sortNum").setValue(node.data.sortNum);
+
+            //2018/01/22 by15750
+            /*若categoryId为0，也就是为商品类别时 不可修改名字*/
+            if(liger.get('categoryId').getValue() == 0){
+                liger.get("categoryName").setDisabled(true);
+            }else{
+                liger.get("categoryName").setEnabled(true);
+            }
+
+            if (node.data.children.length > 0) {
+                detailGrid.grid.hide();
+                detailGrid.loadData({});
+            } else {
+                detailGrid.grid.show();
+                detailGrid.setParm("categoryId", node.data.categoryId);
+                detailGrid.options.dataType = 'server';
+                detailGrid.options.newPage = 1;
+                detailGrid.reload();
+            }
+        },
+        onCancelselect: function() {
+        	detailGrid.loadData({});
+            $("#detailDiv").hide();
+        }
+    });
+
+    /* 商品类别树添加类别form */
+    addCatgFormManager = $("#addCategoryForm").ligerForm({
+        fields: [{
+            type: 'tl',
+            name: 'addCatgName',
+            options: {
+                idField: 'categoryId',
+                dto: 'com.lkkhpg.dsis.common.product.dto.InvCategoryB'
+            },
+            validate: {
+                required: true
+            }
+        }]
+    });
+
+    /* 初始化弹出框的内容 */
+    prodtQuery();
+     //2018/01/22 by15750
+    /* 获取Cookie中的值 */
+    function getCookie(cookie_name) {
+        var allcookies = document.cookie;
+        var cookie_pos = allcookies.indexOf(cookie_name);//索引的长度
+
+        if (cookie_pos != -1) {
+            // 把cookie_pos放在值的开始，只要给值加1即可。
+            cookie_pos += cookie_name.length + 1;
+            var cookie_end = allcookies.indexOf(";", cookie_pos);
+            if (cookie_end == -1) {
+                cookie_end = allcookies.length;
+            }
+            var value = unescape(allcookies.substring(cookie_pos, cookie_end));
+        }
+        return value;
+    }
+    
+    /* 删除树节点的单选按钮 */
+    $("#deleteRadioDiv input:radio").ligerRadio()
+
+    $("#deleteNodeBtn").removeAttr("class");
+    $("#deleteNodeBtn").attr("disabled", "disabled");
+    $("#addNodeBtn").removeAttr("class");
+    $("#addNodeBtn").attr("disabled", "disabled");
+});
+
+/**
+ * 打开商品选择窗口
+ */
+function openAddWin() {
+	checkProduct = [];
+	prodtQueryForm.clear();
+    prodtQueryForm.setData({'categoryId':liger.get('categoryId').getValue()});
+    Hap.gridQuery({
+        form: prodtQueryForm,
+        grid: prodtQueryGrid
+    });
+    
+    /* 打开商品搜索弹出框 */
+    $.ligerDialog.open({
+        height: 480,
+        width: 800,
+        title: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.querylovtitle" />',
+        showMax: false,
+        showToggle: true,
+        showMin: false,
+        isResize: false,
+        slide: false,
+        target: $("#prodtQueryDialog"),
+        buttons: [{
+            text: '<@spring.message "sys.hand.btn.ok" />',
+            onclick: selectedProduct
+        },
+        {
+            text: '<@spring.message "sys.hand.btn.cancel" />',
+            onclick: function(i, d) {
+                $("input").ligerHideTip();
+                d.hide();
+            }
+        }]
+    });
+}
+
+/* 
+ * 删除商品详情表行 
+ */
+function deleteRow() {
+    detailGrid.deleteSelectedRow();
+}
+
+/* 
+ * 保存按钮点击事件
+ */
+function save() {
+    var forms = liger.get("detailForm");
+
+    if (forms.valid()) {
+        var category = forms.getData();
+        category["items"] = detailGrid.getChanges();
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON2.stringify(category),
+            url: _basePath + "/pm/category/save",
+            error: function(data) {
+                Hap.showError(data);
+            },
+            success: function(response) {
+                if (response.success) {
+                    Hap.showSuccess('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.savesuccess" />');
+                    detailGrid.reload();
+                    treeManager.getSelected().data.categoryName = category.categoryName;
+                    treeManager.getSelected().data.creationDate = category.creationDate;
+                    //update by 15750 2018/03/07
+                    treeManager.getSelected().data.attribute14 = category.attribute14;
+                    treeManager.getSelected().data.attribute15 = category.attribute15;
+                    //treeManager.getSelected().data.sortNum = category.sortNum;
+                    $($("span",".l-selected")[0]).text(category.categoryName);
+                    /* $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+                    	window.location = '${base.contextPath}/pm/pm_category_show.html';
+                    }); */
+                    
+                }
+            }
+        });
+    }
+}
+
+/* 
+ * 查询类别并定位 
+ */
+function queryCategory() {
+    var form = liger.get("catgQueryForm");
+    var data = form.getData();
+
+    if ((data.categoryId == "" || data.categoryId == null) && (data.categoryName == "" || data.categoryName == null)) {
+        Hap.showError('<@spring.message "sys.hand.validate.inputquerycondition" />');
+        return false;
+    }
+  
+    if (form.valid()) {
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            data: data,
+            url: _basePath + '/pm/category/query',
+            error: function(data) {
+                Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.neterror" />');
+            },
+            success: function(data) {
+                if (data.length != 0) {
+                    // 定位到查找到的那个商品类别名称节点 
+                    treeManager.selectNode(data[0].categoryId);
+                    // 持续展开
+                    var n = treeManager.getNodeDom(treeManager.getSelected().data.treedataindex);
+                    expandNode(n);
+                    
+                    $("#detailDiv").show();
+                } else {
+                    Hap.showError("查找不到该记录！");
+                }
+            }
+        });
+    }
+}
+
+/* 
+ *展开全部类别点击事件 
+ */
+function expandAll() {
+    treeManager.expandAll();
+}
+
+/* 
+ *收缩全部类别点击事件 
+ */
+function collapseAll() {
+    treeManager.collapseAll();
+}
+
+/* 
+ * 展开某个节点的上层节点
+ */
+function expandNode(node) {
+    var parentNode = treeManager.getParentTreeItem(node);
+    if (parentNode != null) {
+        $(".l-expandable-close:first", parentNode).click();
+        expandNode(parentNode);
+    }
+}
+
+/* 
+ * 商品类别树添加类别 ，先判断选中的商品类别是否有商品包，无则插入数据
+ */
+function addTreeItem() {
+    if (detailGrid.getData().length > 0) {
+        Hap.showError('<@spring.message "msg.error.product.subcategory_fail"/>');
+        return false;
+    }
+    addCatgFormManager.clear();
+    $.ligerDialog.open({
+        title: '<@spring.message "sys.hand.btn.please.enter.the.name.of.the.commodity.category"/>',
+        showMax: false,
+        showToggle: true,
+        showMin: false,
+        isResize: false,
+        slide: false,
+        target: $("#addCategoryDialog"),
+        buttons: [{
+            text: '<@spring.message "sys.hand.btn.ok" />',
+            onclick: function(i, d) {
+                insertData();
+                $("input").ligerHideTip();
+                d.hide();
+            }
+        },
+        {
+            text: '<@spring.message "sys.hand.btn.cancel" />',
+            onclick: function(i, d) {
+                $("input").ligerHideTip();
+                d.hide();
+            }
+        }]
+    });
+
+}
+
+/* 
+ * 新增商品类别插入数据 
+ */
+function insertData() {
+	if (addCatgFormManager.valid()) {
+	    var newCategoryName = liger.get("addCatgName").getValue(); // 新增类别名称
+	    
+	    var node = treeManager.getSelected(); // 选中的树节点
+	    var parentCategoryId = 0;
+	    if (node) {
+	        parentCategoryId = node.data.categoryId; //新增类别的父ID
+	    }
+	    
+	    var tls = addCatgFormManager.getData().__tls;
+	    var newData = {
+	        "categoryName": newCategoryName,
+            //update by 15750 2018/03/07
+            "attribute14":"N",
+	        "parentCategoryId": parentCategoryId,
+	        "__tls" : tls
+	    };
+	    
+	    $.ajax({
+	        type: "post",
+	        dataType: "json",
+	        contentType: "application/json",
+	        data: JSON2.stringify(newData),
+	        url: _basePath + "/pm/category/save",
+	        error: function(data) {
+	            Hap.showError(data);
+	        },
+	        success: function(response) {
+	            if (response.success) {
+	            	Hap.showSuccess("<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.savesuccess" />");
+	                var data = response.rows[0];
+	                var nodes = [];
+	                nodes.push({
+	                    "categoryId": data.categoryId,
+	                    "categoryName": data.categoryName,
+                        "creationDate":data.creationDate,
+                        //update by 15750 2018/03/07
+                        "attribute14":data.attribute14,
+	                    "children": [],
+	                    "parentCategoryId": data.parentCategoryId
+	                });
+	                treeManager.append(node ? node.target: null, nodes);
+	                if (node) {
+	                    detailGrid.grid.hide()
+	                }
+	            }
+	        }
+	    });
+    }
+}
+
+/* 
+ * 商品类别树删除节点 
+ */
+function removeTreeItem() {
+
+    var node = treeManager.getSelected();
+    if (node) {
+    	deleteOne();
+    }
+}
+
+/* 
+ * 删除选中类别及其所有子类别
+ */
+function deleteAll() {
+    // 获取选中的节点信息 
+    var node = treeManager.getSelected();
+    // 选中的商品类别ID
+    var deleteData = {
+        "categoryId": node.data.categoryId,
+        "parentCategoryId": node.data.parentCategoryId
+    }
+
+    $.ligerDialog.confirm('<@spring.message "msg.warning.system.delete_or_not"/>"',
+    function(yes) {
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            data: deleteData,
+            url: _basePath + "/pm/category/batchDelete",
+            error: function(data) {
+                Hap.showError(data);
+            },
+            success: function(response) {
+                if (response.success) {
+                	Hap.showSuccess("<@spring.message "msg.info.sys.delete_successful"/>");
+                    treeManager.remove(node);
+                    $("#detailDiv").hide();
+                }
+            }
+        });
+
+    });
+
+}
+/* 
+ * 仅删除选中类别，其子类别升级一层 
+ */
+function deleteOne() {
+    // 获取选中的节点信息
+    var node = treeManager.getSelected();
+    
+    var warningMsg = '<@spring.message "msg.warning.system.delete_or_not"/>';
+    // 如果该节点为子节点且已分配商品
+    if (node.data.children.length == 0 && detailGrid.data.rows.length > 0) {
+    	warningMsg = '<@spring.message "msg.warning.product.delete_with_item"/>';
+    }
+
+    //2018/01/22 by15750
+    var cId=node.data.categoryId;
+    // 不能删除商品类别
+    if(cId == 0){
+        Hap.showError('<@spring.message "msg.error.category_can_not_delete" />');
+        return false;
+    }
+    $.ligerDialog.confirm(warningMsg,
+    function(yes) {
+        if (yes) {
+            // 选中的商品类别ID 
+            var deleteData = {
+                "categoryId": node.data.categoryId,
+                "parentCategoryId": node.data.parentCategoryId
+            }
+
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                data: deleteData,
+                url: _basePath + "/pm/category/delete",
+                error: function(data) {
+                    Hap.showError(data);
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Hap.showSuccess("<@spring.message "msg.info.sys.delete_successful"/>");
+                        treeManager.remove(node);
+                        treeManager.selectNode(deleteData.parentCategoryId);
+                        var parent = treeManager.getSelected();
+                        treeManager.reloadNode(parent, _basePath + '/pm/category/queryChildren?categoryId=' + deleteData.parentCategoryId);
+
+                        $("#detailDiv").hide();
+                    }
+                }
+            });
+        }
+
+    });
+}
+
+/* 
+ * 商品搜索弹出框
+ */
+function prodtQuery() {
+    window['prodtQueryForm'] = $("#prodtQueryForm").ligerForm({
+        fields: [{
+            type: 'text',
+            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemnumber" />',
+            name: 'itemNumber',
+            newline: false
+        },
+        {
+            type: 'text',
+            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname" />',
+            name: 'itemName',
+            newline: false
+        },
+        {
+            type: 'combobox',
+            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.redeemflag" />',
+            name: 'redeemFlag',
+            newline: false,
+            options: {
+                valueField: "value",
+                textField: "meaning",
+                data: yesNo
+            }
+        },
+        {
+            type: 'combobox',
+            label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.starteraid" />',
+            name: 'starterAid',
+            newline: false,
+            options: {
+                valueField: "value",
+                textField: "meaning",
+                data: pack
+            }
+        }],
+        buttons: [{
+            text: '<@spring.message "sys.hand.btn.query" />',
+            click: function() {
+            	prodtQueryForm.setData({'categoryId':liger.get('categoryId').getValue()});
+            	Hap.gridQuery({
+                    form: prodtQueryForm,
+                    grid: prodtQueryGrid
+                }
+
+                )
+
+            }
+        }]
+    });
+    
+    prodtQueryGrid = $("#prodtQueryGrid").ligerGrid({
+        columns: [{
+            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemnumber" />',
+            name: 'itemNumber'
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname" />',
+            name: 'itemName'
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.description" />',
+            name: 'description'
+        }],
+        url: '${base.contextPath}/inv/item/queryFilter',
+        params: function() {
+            return [{
+                categoryId: liger.get('categoryId').getValue()
+            }];
+        },
+        enabledEdit: true,
+        delayLoad: true,
+        width: 770,
+        height:300,
+        checkbox: true,
+        isChecked: f_isChecked,
+        onCheckRow: f_onCheckRow,
+        onCheckAllRow: f_onCheckAllRow
+    });
+}
+
+// 已选中商品
+var checkProduct = [];
+
+function findCheckedProduct(itemId) {
+    for (var i = 0; i < checkProduct.length; i++) {
+        if (checkProduct[i].itemId == itemId) return i;
+    }
+    return - 1;
+}
+
+function addCheckedProduct(data) {
+    if (findCheckedProduct(data.itemId) == -1) checkProduct.push(data);
+}
+
+function removeCheckedProduct(itemId) {
+    var i = findCheckedProduct(itemId);
+    if (i == -1) return;
+    checkProduct.splice(i, 1);
+}
+
+function f_isChecked(rowdata) {
+    if (findCheckedProduct(rowdata.itemId) == -1) {
+        return false;
+    }
+    return true;
+}
+
+function f_onCheckRow(checked, data) {
+    if (checked) {
+        addCheckedProduct(data);
+    } else {
+        removeCheckedProduct(data.itemId);
+    }
+}
+
+function f_onCheckAllRow(checked) {
+    for (var rowid in this.records) {
+        if (checked) {
+            addCheckedProduct(this.records[rowid]);
+        } else {
+            removeCheckedProduct(this.records[rowid]['itemId']);
+        }
+    }
+}
+
+/**
+ * 选择商品/商品包，并添加到表格上
+ */
+function selectedProduct(i, d) {
+	
+    var checkProducts = [];
+    
+    for (var i = 0 ; i < checkProduct.length; i++) {
+    	checkProducts.push($.extend(true,{},checkProduct[i]));
+    }
+    
+    var gridDatas = detailGrid.getData();
+    
+    for(var i =0; i < gridDatas.length; i++) {
+    	var gridData = gridDatas[i];
+    	if(findCheckedProduct(gridData.itemId) >= 0){
+    		Hap.showError('<@spring.message "msg.error.product_can_not_assign" />');
+    		return false;
+    		// removeCheckedProduct(gridData.itemId)
+    	}
+    }
+    
+    var row = detailGrid.getSelectedRow();
+    detailGrid.addRows(checkProducts, row, false);
+    checkProduct = [];
+    d.hide();
+}
+
+function viewDetail(itemId, marketId, itemType){
+	//校验该商品是否在这个市场下，是则打开详情页，不是则提示
+	if(marketId != _marketId){
+		$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.item.category.tip.samemarket"/>');
+	}else{
+		if (itemType == 'ITEM') { 
+	        window.top.f_removeTab('ITEM_CREATE');
+	        window.top.f_addTab('ITEM_CREATE','<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.data.details.page"/>','pm/pm_item_show.html?itemId='+itemId);
+	    } else {
+	        window.top.f_removeTab('PACKAGE_CREATE');
+	        window.top.f_addTab('PACKAGE_CREATE','<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.package.details.page"/>','pm/pm_package_show.html?itemId='+itemId);
+	    }
+	}
+	
+}
+</script>
+</body>
+ <style type="text/css">
+  #tree{
+   width: 200px !important;
+  }
+ </style>
+</html>

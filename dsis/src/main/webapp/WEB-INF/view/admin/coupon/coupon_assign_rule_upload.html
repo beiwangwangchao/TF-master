@@ -1,0 +1,43 @@
+<#-- * description: 优惠券上传界面 * version: 1.0 *
+        author:zhiwei.zhang@hand-china.com * Copyright LKK Health Products Group
+        Limited. * -->
+    <#include "../include/head.html">
+
+        <body style="padding: 0px; margin: 25px 10px 0px 10px;">
+        <form id="couponuploadform" action="${base.contextPath}/coupon/assignrule/uploadExcel" method="post"
+              enctype="multipart/form-data" target="hidden_frame"
+              style="margin-left: 40px">
+            <input type="file" id="csvFile" name="csvFile" /> <br />
+            <div id="fileUpload" style="display: none;">
+                <span id="fileUploadMsg"></span>
+            </div>
+        </form>
+        <iframe name='hidden_frame' id="hidden_frame" style="display: none;"></iframe>
+        <script type="text/javascript">
+            Hap.setFormDefaultBtn(f_cancel, f_sumbit);
+
+            function f_cancel() {
+                var dialog = frameElement.dialog;
+                dialog.close();
+            }
+
+            function f_sumbit() {
+                document.getElementById("couponuploadform").submit();
+                $("#fileUploadMsg").html('<@spring.message "msg.csv.upload.uploading"/>');
+                $("#fileUpload").show();
+            }
+
+            function uploadMessage(msg,isImportSuccess){
+                if(isImportSuccess){
+                    $.ligerDialog.success('<@spring.message "msg.excel.import_rule_success"/>', '<@spring.message "sys.hand.tip.info"/>', function () {
+                        parent.coupon_assign_rule_query_grid.reload();
+                        f_cancel();
+                    });
+                }else{
+                    $("#fileUploadMsg").html(msg);
+                    $("#fileUpload").show();
+                }
+            }
+        </script>
+        </body>
+        </html>

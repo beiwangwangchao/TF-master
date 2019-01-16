@@ -1,0 +1,293 @@
+<#include "/mws/include/header.html">
+<body class="blog">
+
+	<script src="${base.contextPath}/resources/js/navbar${resource_suffix!}.js"></script>
+	<script
+		src="${base.contextPath}/common/code?eventStatus=SYS.EVENT_STATUS&eventPrivacy=SYS.EVENT_PRIVACY"
+		type="text/javascript"></script>
+
+	<script type="text/javascript">
+	var initData;
+	var eventsList=[];
+	var memberId=${Session.memberId};
+	$(function(){
+		 $("#pageBar").navbar({
+	        url : "${base.contextPath}/event/queryEvent",
+	        pagesize : 3,
+			autoQuery : true,
+			parms: function(){
+				return getQueryparms();
+			},
+			onLoad : function(data) {
+				initData=data;
+	        	   if(data.success){
+	        		   initEvents(data);
+	               }
+	        	   else{
+	            	   alert("error");
+	               }  
+	           }
+	    }) 
+	    getQueryparms();
+	});
+	function getQueryparms(){
+		var SysEvent ={};
+		for(var i=0;i<eventStatus.length;i++){
+			if(eventStatus[i].meaning=='已发布'){
+				SysEvent.status=eventStatus[i].value;
+				break;
+			}
+		}
+		for(var i=0;i<eventPrivacy.length;i++){
+			if(eventPrivacy[i].meaning=='公开'){
+				SysEvent.eventSecret=eventPrivacy[i].value;
+				break;
+			}
+		}
+		return SysEvent;
+		
+	}
+	
+	function initEvents(data){
+		eventsList=[];
+		var htmlStr = "";
+		for(var i=0;i<data.rows.length;i++){
+			htmlStr+="<article class='post' id='event_"+i+"'>"
+					+	"<h3 class='entry-title'>"+data.rows[i].eventName+"</h3>"
+					+		"<div class='entry-meta'>"
+					+			"<span class='date'><i class='fa fa-calendar'></i>"+data.rows[i].eventDate+"</span>"
+					+"<span class='location'><i class='fa fa-map-marker'></i>"+data.rows[i].eventAddress+"</span>"
+					+		"</div>"
+					+		"<div class='row'>"
+					+			"<div class='col-xs-8 col-sm-6 col-md-6 col-lg-6'><img src='${base.contextPath}/sys/attach/file/view?fileId="+data.rows[i].fileId+"' class='img-responsive' alt='Image not exists '></div>"
+					+		"</div>"
+					+		"<div class='entry-content row'>"
+					+			"<div class='col-xs-1 col-sm-1 col-md-1 col-lg-1'><label  class='control-label'><@spring.message 'mws.menu.event.content'/>:</label></div><div class='col-xs-8 col-sm-8 col-md-8 col-lg-8'><p>"+data.rows[i].description+"</p></div>"
+					+		"</div>";
+					/*显示剩余人数*/
+					htmlStr+="<div><div class='entry-content'>"
+							+			"<p maxNumber='"+data.rows[i].maxMember+"' quality='"+(data.rows[i].maxMember-data.rows[i].participants)+"'><label  class='control-label' quality='"+(data.rows[i].maxMember-data.rows[i].participants)+"' ><@spring.message 'mws.menu.event.remainingnumber'/>:"+(data.rows[i].maxMember-data.rows[i].participants)+"</p>"
+							+		"</div>"
+					 		+"<form class='form-inline row' id='form_in_"+i+"'>"
+							+		"</form></div>"
+							+	"</article>";
+					var formObject={};
+					formObject.formId='form_in_'+i;
+					formObject.formEventId=data.rows[i].eventId;
+			eventsList.push(formObject);
+		}
+		$("#event_content").html(htmlStr);
+		initForm();
+	}
+
+	//初始化事件的form，查询该会员是否加入此事件，加入则显示加入人数，否则显示可加入
+ 	function initForm(){
+		for(var i=0;i<eventsList.length;i++){
+			var indexFormId=eventsList[i].formId;
+			var eventId=eventsList[i].formEventId;
+			$.ajax({
+	            type : "POST",
+	            url : "${base.contextPath}/event/queryAttendanceByEventIdAndMemberId",
+	            data : {
+	            	memberId : memberId,
+	            	eventId : eventId
+	            },
+	            dataType : "json",
+	            async:false,
+	            success : function(data) {
+	            	var formHtml='';
+	            	var checkAttend=$("#"+eventsList[i].formId).parent().find("div").find("p").attr("quality");
+            		var maxNumber=$("#"+eventsList[i].formId).parent().find("div").find("p").attr("maxNumber");
+	            	if(data.rows==null||data.rows==''||data.rows==undefined){
+	            		
+	            		if(checkAttend=='0'&&maxNumber!='null'){
+	            			formHtml+="<div class='col-xs-4'><lable class='control-label' style='color:red'><@spring.message 'mws.event.full'/>!</lable><div>";//如果该事件人数已满，且该会员未加入此事件，显示人数已满，并隐藏剩余人数
+	            			$("#"+eventsList[i].formId).parent().find("div").find("p").hide();
+	            		}else{//如果该事件人数未满，且该会员未加入过此事件，则显示可加入
+
+	            			formHtml+="<div class='form-group col-sm-6 col-md-5 col-lg-4 col-xs-6'>"
+								+				"<div class='row'>"
+								+					"<div class='col-xs-6 col-sm-6 col-md-6 col-lg-5'><label for='join-num' style='color:#A0522D'><@spring.message 'mws.event.participants'/>:</label>"
+								+					"</div>"
+								+					"<div class='col-xs-6 col-sm-6 col-md-6 col-lg-6 input-group'>"
+	                   			+         				 "<span class='input-group-btn'>"
+	                      		+	           				"<button class='btn-sub btn btn-default' type='button' style='width: 26px;height:34px;'>"
+	                    	    + 		           				"<div style='font-size: 18px; position: relative; top: -4px; left: -9px;'>－</div>"
+	                      		+	           				"</button>"
+	                   			+          				"</span>"
+	                   			+          				"<input type='text' class='Qty form-control' maxlength='7' value='0' style='text-align: center;'>"
+	                   			+          				"<span class='input-group-btn'>"
+	                      		+	           				"<button class='btn-add btn btn-default' type='button' style='width: 26px;height:34px;'>"
+	                    	    + 		           				"<div style='font-size: 18px; position: relative; top: -4px; left: -9px;'>＋</div>"
+	                      		+              				"</button>"
+	                   			+          				"</span>"
+								+					"</div>"
+								+				"</div>"		
+								+	  "</div>"
+								+	  "<div class='form-group col-sm-3 col-md-2 col-lg-1 col-xs-4'>"
+								+	  "<button type='button' onclick='join($(this),"+eventId+");' class='btn btn-primary'style='border-radius:8px;' ><@spring.message 'mws.event.join'/></button>"
+								+	  "</div>";
+	            			}	            		
+	            		}else{//当前会员已加入改时间，则显示可退出
+	            			formHtml+="<div class='form-group col-sm-6 col-md-5 col-lg-4 col-xs-6'>"
+								+				"<label for='join-num' style='color:green'><@spring.message 'mws.event.alreadyjoin'/>.<@spring.message 'mws.event.numberofpeople'/>:"+data.rows+"</label>"		
+								+			"</div>"
+								+			"<div class='form-group col-sm-3 col-md-2 col-lg-1 col-xs-4'>"
+								+			"<button type='button' onclick='quit("+eventId+");' class='btn btn-success' style='border-radius:8px;'><@spring.message 'mws.event.quit'/></button>"
+								+			"</div>";
+	            		}
+        			if(maxNumber=='null'){//当前事件没有人数上限的情况下，显示可加入并隐藏剩余人数
+        				$("#"+eventsList[i].formId).parent().find("div").find("p").hide();
+        			}
+					$("#"+indexFormId+"").html(formHtml);
+	            	}
+	            });
+			
+		}
+	} 
+			
+		
+	
+	
+		function join(e,eventId) {
+			
+			var eParent=parseInt(e.parent().parent().find("input").val());
+			if(eParent==null||eParent==''||eParent==undefined||eParent<=0){
+				alert("<@spring.message 'mws.event.invalidinput'/>");
+				return;
+			}
+			var r=confirm("<@spring.message 'mws.event.confirmjoin'/>?");
+			if(r==true){
+				$.ajax({
+		            type : "POST",
+		            url : "${base.contextPath}/event/addMember",
+		            data : {
+		            	memberId : memberId,
+		            	eventId : eventId,
+		            	paticipants:eParent
+		            },
+		            dataType : "json",
+		            success : function(data) {
+		            	if(data.success){
+		            		alert("<@spring.message 'mws.event.alreadyjoin'/>");
+		            	}else{
+		            		if(data.message=="msg.error.event.member_event_not_same_market"){
+		            			alert("<@spring.message 'mws.event.othermarket'/>");
+		            		}
+		            		if(data.message=="msg.info.sys.save_exceed"){
+		            			alert("<@spring.message 'mws.event.numberlimit'/>");
+		            		}
+		            		if(data.message=="msg.error.event_status_pub"){
+		            			alert("<@spring.message 'mws.event.systembusy'/>");
+		            		}
+		            		if(data.message=="msg.error.event.join_event_repeat"){
+		            			alert("<@spring.message 'mws.event.systembusy'/>");
+		            		}
+		            		
+		            	}
+		            	$('nav#pageBar').query($('nav#pageBar span.selected').attr('data-page'));//加入后更新当前页活动状态
+		            	},
+		            
+		            });
+			}
+			
+		}
+		
+		function quit(eventId){
+			var r=confirm("<@spring.message 'mws.event.confirmquit'/>?");
+			if(r==true){
+				$.ajax({
+		            type : "POST",
+		            url : "${base.contextPath}/event/quitEvent",
+		            data : {
+		            	memberId : memberId,
+		            	eventId : eventId
+		            },
+		            dataType : "json",
+		            success : function(data) {
+		            	if(data.success){
+		            		alert("<@spring.message 'mws.event.alreadyquit'/>");
+		            	}else{
+		            		alert("<@spring.message 'mws.event.systembusy'/>");
+		            	}
+		            	$('nav#pageBar').query($('nav#pageBar span.selected').attr('data-page'));//退出后后更新当前页活动状态
+		            },
+		            	
+		            });
+			}
+			 
+		}
+	</script>
+	<!-- ========== MENU END ========== -->
+
+	<!-- ========== CONTENT START ========== -->
+
+	<section id="content">
+		<div class="container">
+
+			<ol class="breadcrumb">
+				<li><a href="index.html"><@spring.message "mws.menu.home"/></a></li>
+				<li><@spring.message "mws.nav.event"/></li>
+			</ol>
+
+			<div class="row">
+
+				<!-- Posts Start -->
+				<div class="col-sm-12">
+					<div class="row" id="event_content">
+					</div>
+
+
+					<div class="row col-sm-offset-9 col-md-offset-9 col-md-3 col-sm-3"><nav id="pageBar"></nav></div>
+
+				</div>
+
+			</div>
+		</div>
+	</section>
+	<!-- 事件监听 -->
+	<script type="text/javascript">
+	$(document).ready(function(){
+		//数量减1
+		$("#event_content").on("click", ".btn-sub", function(){
+			var thisQty = $(this).parent().next();
+			var result = 0;
+		    if($.trim( thisQty.val() ) > 0){
+				result = parseInt( $.trim(thisQty.val()) ) - 1;
+			}
+			thisQty.val(result);
+		})
+		
+			//数量加1
+	$("#event_content").on("click",".btn-add",function(){
+		var thisQty = $(this).parent().prev();
+		var result = 1;		
+		if($.trim( thisQty.val() ) != ""){
+	        if($.trim( thisQty.val() ) > 0 || $.trim( thisQty.val() ) == 0){
+				result = parseInt( $.trim(thisQty.val()) ) + 1;
+			}
+		}		
+		thisQty.val(result);
+	})
+	
+		//只允许键盘输入数字
+	$("#event_content").on("keyup",".Qty",function(){
+		var thisQty = $(this);
+		var valueTxt = $(this).val();
+
+		var afterQty = $.trim( valueTxt.replace(/\D|^0/g,'') );
+		if(afterQty == ''){
+			afterQty = 0;
+		}
+		else{
+			afterQty = parseInt(afterQty);
+		}
+		thisQty.val(afterQty);
+	})
+	});
+	</script>
+
+	<!-- ========== CONTENT END ========== -->
+
+	<!-- ========== FOOTER START ========== -->
+	<#include "/mws/include/footer.html">

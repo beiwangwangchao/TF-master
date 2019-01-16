@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.integration.payment.mapper.PayRefundRequestMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.integration.payment.dto.PayRefundRequest">
+        <id column="OUT_REFUND_NO" property="outRefundNo" jdbcType="VARCHAR" />
+        <result column="TRANSACTION_ID" property="transactionId" jdbcType="VARCHAR" />
+        <result column="OUT_TRADE_NO" property="outTradeNo" jdbcType="VARCHAR" />
+        <result column="PARTNER" property="partner" jdbcType="VARCHAR" />
+        <result column="SUBJECT" property="subject" jdbcType="VARCHAR" />
+        <result column="REFUND_FEE" property="refundFee" jdbcType="DECIMAL" />
+        <result column="TOTAL_FEE" property="totalFee" jdbcType="DECIMAL" />
+        <result column="TRANSPORT_FEE" property="transportFee" jdbcType="DECIMAL" />
+        <result column="REDUND_REASON" property="redundReason" jdbcType="VARCHAR" />
+        <result column="SERVICE_TYPE" property="serviceType" jdbcType="VARCHAR" />
+        <result column="REFUND_EXPLAIN" property="refundExplain" jdbcType="VARCHAR" />
+        <result column="ISREFUND" property="isrefund" jdbcType="VARCHAR" />
+        <result column="SUBPARTNER" property="subpartner" jdbcType="VARCHAR" />
+        <result column="TRANS_CHANNEL" property="transChannel" jdbcType="VARCHAR" />
+        <result column="MD5_ENCODE" property="md5Encode" jdbcType="VARCHAR" />
+        <result column="REFUND_ID" property="refundId" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="SALEES_OR_ID" property="salesOrgId" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="selectPayRefund" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.integration.payment.dto.PayRefundRequest">
+        SELECT
+        PRR.OUT_REFUND_NO,
+        PRR.TRANSACTION_ID,
+        PRR.OUT_TRADE_NO,
+        PRR.PARTNER,
+        PRR.SUBJECT,
+        PRR.REFUND_FEE,
+        PRR.TOTAL_FEE,
+        PRR.TRANSPORT_FEE,
+        PRR.REDUND_REASON,
+        PRR.SERVICE_TYPE,
+        PRR.REFUND_EXPLAIN,
+        PRR.ISREFUND,
+        PRR.SUBPARTNER,
+        PRR.TRANS_CHANNEL,
+        PRR.MD5_ENCODE,
+        prr.CREATION_DATE,
+        PRR.ATTRIBUTE15
+        FROM
+        TF_PAY_REFUND_REQUEST prr
+        <where>
+            1=1
+            <if test="salesOrgId !=null">
+                AND prr.SALEES_OR_ID=#{salesOrgId,jdbcType=VARCHAR}
+            </if>
+            <if test="outTradeNo != null">
+                AND Upper(prr.OUT_TRADE_NO) like concat('%',concat( Upper(#{outTradeNo,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="redundReason !=null">
+                AND Upper(prr.REDUND_REASON) like concat('%',concat( Upper(#{redundReason,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="returnDateFrom !=null">
+                AND prr.CREATION_DATE &gt;= #{returnDateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="returnDateTo !=null">
+                AND prr.CREATION_DATE &lt;= #{returnDateTo,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </select>
+    <!--退货单号lov查询  updated by 15750 at 2018/02/09   -->
+    <select id="queryPayRefundLov" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.integration.payment.dto.PayRefundRequest">
+        SELECT
+        PRR.OUT_REFUND_NO,
+        PRR.TRANSACTION_ID,
+        PRR.OUT_TRADE_NO,
+        PRR.PARTNER,
+        PRR.SUBJECT,
+        PRR.REFUND_FEE,
+        PRR.TOTAL_FEE,
+        PRR.TRANSPORT_FEE,
+        PRR.REDUND_REASON,
+        PRR.SERVICE_TYPE,
+        PRR.REFUND_EXPLAIN,
+        PRR.ISREFUND,
+        PRR.SUBPARTNER,
+        PRR.TRANS_CHANNEL,
+        PRR.MD5_ENCODE,
+        prr.CREATION_DATE,
+        PRR.ATTRIBUTE15
+        FROM
+        TF_PAY_REFUND_REQUEST prr
+        <where>
+            PRR.ISREFUND='REF'
+            and PRR.SERVICE_TYPE='退货退款(已自提或已发货物)'
+            AND prr.ATTRIBUTE1 is null
+            <if test="invOrgId !=null">
+                AND PRR.OUT_TRADE_NO in (select  PRR.OUT_TRADE_NO from TF_PAY_REFUND_REQUEST prr,OM_SALES_LINE osl,OM_SALES_ORDER oso
+                where OSO.ORDER_NUMBER=PRR.OUT_TRADE_NO
+                and OSL.HEADER_ID=OSO.HEADER_ID and OSL.DEFAULT_INV_ORG_ID=#{invOrgId,jdbcType=DECIMAL})
+            </if>
+            <if test="salesOrgId !=null">
+                AND prr.SALEES_OR_ID=#{salesOrgId,jdbcType=VARCHAR}
+            </if>
+            <if test="transactionId !=null">
+                AND prr.TRANSACTION_ID=#{transactionId,jdbcType=VARCHAR}
+            </if>
+            <if test="outTradeNo != null">
+                AND Upper(prr.OUT_TRADE_NO) like concat('%',concat( Upper(#{outTradeNo,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="redundReason !=null">
+                AND Upper(prr.REDUND_REASON) like concat('%',concat( Upper(#{redundReason,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="returnDateFrom !=null">
+                AND prr.CREATION_DATE &gt;= #{returnDateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="returnDateTo !=null">
+                AND prr.CREATION_DATE &lt;= #{returnDateTo,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="insert" parameterType="com.lkkhpg.dsis.integration.payment.dto.PayRefundRequest">
+        INSERT INTO  TF_PAY_REFUND_REQUEST(OUT_REFUND_NO,TRANSACTION_ID,OUT_TRADE_NO,PARTNER,SUBJECT,REFUND_FEE,TOTAL_FEE,TRANSPORT_FEE,REDUND_REASON,
+        SERVICE_TYPE,REFUND_EXPLAIN,ISREFUND,SUBPARTNER,TRANS_CHANNEL,MD5_ENCODE,REFUND_ID,SALEES_OR_ID,ATTRIBUTE15)
+        VALUES ( #{outRefundNo,jdbcType=VARCHAR},#{transactionId,jdbcType=VARCHAR},#{outTradeNo,jdbcType=VARCHAR},#{partner,jdbcType=VARCHAR},
+        NULL ,#{refundFee,jdbcType=DECIMAL}, #{totalFee,jdbcType=DECIMAL},#{transportFee,jdbcType=DECIMAL} ,#{redundReason,jdbcType=VARCHAR},
+        #{serviceType,jdbcType=VARCHAR},#{refundExplain,jdbcType=VARCHAR},#{isrefund,jdbcType=VARCHAR} ,#{subpartner,jdbcType=VARCHAR},#{transChannel,jdbcType=VARCHAR},#{md5Encode,jdbcType=VARCHAR},NULL ,#{salesOrgId,jdbcType=VARCHAR},#{attribute15,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="selectOutTradeNo" resultType="java.lang.Long" parameterType="com.lkkhpg.dsis.integration.payment.dto.PayRefundRequest">
+        SELECT COUNT(*)
+        FROM TF_PAY_REFUND_REQUEST prr
+        <where>
+            1=1
+            <if test="outTradeNo!=null">
+                AND  prr.OUT_TRADE_NO=#{outTradeNo,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <update id="update" parameterType="com.lkkhpg.dsis.integration.payment.dto.PayRefundRequest">
+        UPDATE TF_PAY_REFUND_REQUEST t  SET
+        t.ISREFUND=#{isrefund,jdbcType=VARCHAR},
+        t.REFUND_ID=#{refundId,jdbcType=VARCHAR}
+        where t.OUT_TRADE_NO=#{outTradeNo,jdbcType=VARCHAR}
+    </update>
+    <update id="update1" parameterType="com.lkkhpg.dsis.integration.payment.dto.PayRefundRequest">
+        UPDATE TF_PAY_REFUND_REQUEST t  SET
+        t.ATTRIBUTE1=1
+        where t.OUT_REFUND_NO=#{outRefundNo,jdbcType=VARCHAR}
+    </update>
+
+    <delete id="deleteRefund"  parameterType="java.lang.String">
+        delete from TF_PAY_REFUND_REQUEST
+        where OUT_TRADE_NO=#{out_trade_no,jdbcType=VARCHAR}
+    </delete>
+
+</mapper>

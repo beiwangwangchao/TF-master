@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.mws.mapper.IndexImageMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.mws.dto.IndexImage">
+        <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL"/>
+        <result column="FILE_ID" property="fileId" jdbcType="DECIMAL"/>
+        <result column="URL" property="url" jdbcType="VARCHAR"/>
+        <result column="MODULE_CODE" property="moduleCode" jdbcType="VARCHAR"/>
+        <result column="FILE_PATH" property="filePath" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List" >
+        MARKET_ID, FILE_ID, URL, MODULE_CODE
+    </sql>
+    
+    <select id="getIndexSliderImages" resultMap="BaseResultMap"  parameterType="com.lkkhpg.dsis.mws.dto.IndexImage">
+        SELECT I.URL,
+               L.FILE_ID,       substr(L.file_path,
+              instr(L.file_path,
+                    '/',
+                    -1,
+                    2)+1 ) file_path
+        FROM SYS_MWS_IMAGES I
+        LEFT JOIN (SELECT F.FILE_ID, A.SOURCE_KEY, A.SOURCE_TYPE,f.file_path
+               FROM SYS_FILE F, SYS_ATTACHMENT A
+              WHERE F.ATTACHMENT_ID = A.ATTACHMENT_ID) L
+        ON I.MODULE_TYPE = L.SOURCE_TYPE
+        AND I.IMAGE_ID = L.SOURCE_KEY
+        WHERE I.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+        AND I.MODULE_TYPE = 'MWS_SITE_CAROUSEL'
+        ORDER BY I.SORT_NUMBER ASC
+    </select>
+    
+    <select id="getIndexContentImages" resultMap="BaseResultMap"  parameterType="com.lkkhpg.dsis.mws.dto.IndexImage">
+        SELECT I.URL,
+               L.FILE_ID,
+               substr(L.file_path, instr(L.file_path, '/', -1, 2) + 1 ) file_path
+        FROM SYS_MWS_IMAGES I
+        LEFT JOIN (SELECT F.FILE_ID, A.SOURCE_KEY, A.SOURCE_TYPE,f.file_path
+               FROM SYS_FILE F, SYS_ATTACHMENT A
+              WHERE F.ATTACHMENT_ID = A.ATTACHMENT_ID) L
+        ON I.MODULE_TYPE = L.SOURCE_TYPE
+        AND I.IMAGE_ID = L.SOURCE_KEY
+        WHERE I.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+        AND I.MODULE_TYPE = 'MWS_SITE_MAIN'
+        ORDER BY I.SORT_NUMBER ASC
+    </select>
+    
+    <select id="getHeadersImageId" resultType="java.lang.Long"  parameterType="com.lkkhpg.dsis.mws.dto.IndexImage">
+		SELECT L.FILE_ID
+		  FROM SYS_MWS_IMAGES I
+		  LEFT JOIN (SELECT F.FILE_ID, A.SOURCE_KEY, A.SOURCE_TYPE
+		               FROM SYS_FILE F, SYS_ATTACHMENT A
+		              WHERE F.ATTACHMENT_ID = A.ATTACHMENT_ID) L
+		    ON I.MODULE_TYPE = L.SOURCE_TYPE
+		   AND I.IMAGE_ID = L.SOURCE_KEY
+		 WHERE I.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+		   AND I.MODULE_TYPE = 'MWS_SITE_BANNER'
+		   AND I.MODULE_CODE= #{moduleCode,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="getHeadersImageUrl" resultType="java.lang.String"  parameterType="com.lkkhpg.dsis.mws.dto.IndexImage">
+        SELECT I.URL
+          FROM SYS_MWS_IMAGES I
+          LEFT JOIN (SELECT F.FILE_ID, A.SOURCE_KEY, A.SOURCE_TYPE
+                       FROM SYS_FILE F, SYS_ATTACHMENT A
+                      WHERE F.ATTACHMENT_ID = A.ATTACHMENT_ID) L
+            ON I.MODULE_TYPE = L.SOURCE_TYPE
+           AND I.IMAGE_ID = L.SOURCE_KEY
+         WHERE I.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+           AND I.MODULE_TYPE = 'MWS_SITE_BANNER'
+           AND I.MODULE_CODE= #{moduleCode,jdbcType=VARCHAR}
+    </select>
+</mapper>

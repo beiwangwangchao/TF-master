@@ -1,0 +1,535 @@
+<#--
+ * description: 采购订单维护界面
+ * version: 1.0 
+ * author: huangjiajing
+ * .
+ * 
+-->
+
+<#include "../include/head.html">
+<body style="padding: 10px;">
+        <script src="${base.contextPath}/common/code?incortems=INV.INCORTEMS&telCountryCode=SYS.TEL_COUNTRY_CODE"
+            type="text/javascript"></script>
+            <script src="${base.contextPath}/common/code?countStockData=PM.COUNT_STOCK&packageCountStockData=PM.PACKAGE_COUNT_STOCK
+&priceTypeData=PM.PRICE_TYPE&yesno=SYS.YES_NO&packTypeData=PM.PACK_TYPE&currencyData=SPM.CURRENCY" type="text/javascript"></script>
+    <form id="grid_tool"></form>
+    <form id="po_header_form"></form>
+    <div id="po_header_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    <#assign isedit = (RequestParameters.isedit!'0')/>
+    var organizationId = ${RequestParameters._invOrgId!_invOrgId};
+    jQuery.validator.addMethod("stringMaxLength", function(value, element, param) {  
+        var length = value.length;  
+        for(var i = 0; i < value.length; i++){  
+            if(value.charCodeAt(i) > 127){  
+                length = length + 2;  
+            }  
+        }  
+        return this.optional(element) || ( length <= param );  
+    }, "<@spring.message "sys.hand.btn.string240"/>");
+    var trxNumber="${RequestParameters.trxNumber!'0'}";
+    $(function() {
+    	window['grid_tool'] = $("#grid_tool").ligerForm({
+            buttons : [
+                {
+                   text : '<@spring.message "sys.hand.btn.save"/>',
+                   disabled : false,
+                   width : 60,
+                   click : function() {
+                       f_save();
+                   }
+                },{
+                   text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.print"/>',
+                   disabled : false,
+                   width : 60,
+                   click: function(){
+                       var poHeaderId = po_header_form.getData().poHeaderId;
+                       $.ligerDialog.open({
+                           id : 'dialog1',
+                           height : 200,
+                           width : 500,
+                           title : '<@spring.message "type.com.lkkhpg.dsis.common.order.download"/>',
+                           url : 'po_header_rpt.html?poHeaderId='+poHeaderId,
+                           showMax : false,
+                           showToggle : true,
+                           showMin : false,
+                           isResize : true,
+                           slide : false,
+                           center : 0
+                       });
+                   }
+                },
+                {
+                    text : '<@spring.message "sys.hand.btn.submit"/>',
+                    disabled : false,
+                    width : 60,
+                    click : function() {
+                        f_submit();
+                    }
+                }
+                           ]
+    	})
+        window['po_header_form'] = $("#po_header_form").ligerForm({
+            fields : [
+                {name : "__status",type : "hidden",options:{value:"<#if isedit =='1'>update<#else>add</#if>"},newline : false},
+                {name : "poHeaderId",type : "hidden",newline : false},
+                //{name : "trxNumber",newline : false ,type:'text',readonly : true,},
+				{ name : 'poNumber', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poheadernumber"/>', newline : false ,type:'text',readonly : true,
+                },
+                { name : 'orderDate', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.orderdate"/>', newline : false,type:'date',
+                    validate : {
+                        required : true
+                    }},
+	            { name : 'marketId', type : 'popup', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.marketid"/>', newline : false ,
+                	textField:'name',
+	            	options:$.extend(${lovService.getLov(base.contextPath,base.locale, "lov_market")},{ 
+                        onSelect : function(datas){
+                            marketCurrency(datas.data[0].marketId);
+                        }
+                    }),
+	            	validate : {
+                        required : true
+                    }
+                },
+	            { name : 'poTo', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poto"/>', type : 'text', newline:true ,
+	            	validate : {
+                        required : true
+                    }
+                },
+	            { name : 'vendorName', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.vendorname"/>', type : 'popup', newline:false,
+	            	textField:'vendorName',
+	            	valueField:'name',
+	            	options  : ${lovService.getLov(base.contextPath, base.locale, "lov_record")},
+                    validate : {
+                        required : true
+                    }
+	            },
+                { name : 'deliveryTo', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.deliveryto"/>', newline : false , type : 'text',
+                    validate : {
+                        required : true
+                    }
+	            },
+                { name : 'contacts', label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.receivegoodsname"/>', newline : true , type : 'text',
+                        validate : {
+                            required : true
+                        }
+                },
+                { name : 'fax', label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.fax"/>', newline : false , type : 'text',
+                        validate : {
+                            required : false
+                        }
+                },
+                {
+                    name : 'areaCode',
+                    type : 'select',
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phoneno"/>',
+                    newline : false , 
+                    attr : { placeHolder : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.countrycode"/>' },
+                    space : 8,
+                    width: 41,
+                    options: {
+                        valueField: "value",
+                        textField: "meaning",
+                        data: telCountryCode
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                { name : 'phone', label : '-', newline : false , type : 'text',
+                	hideLabel: true,
+                	width:130,
+                    validate : {
+                        required : true
+                    }
+                },
+                { name : 'currency', label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.currency"/>', newline : true , type : 'select',
+                    validate : {
+                        required : true
+                    },
+                    options:{
+                        valueField:'currencyCode',
+                        textField : 'currencyName',
+                        url:"${base.contextPath}/spm/currency/query?page=-1"
+                    }
+                },
+                { name : 'incoterm', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.incoterm"/>', newline : false,type:'select',
+                	textField:'meaning',
+                	valueField:'value',
+                	options : {
+                        valueField : "value",
+                        textField : "meaning",
+                        data : incortems,
+                        value: "PSTIN"
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                { name : 'expectedDate', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.expecteddate"/>', newline : false , type : 'date',
+                	validate : {
+                        required : true
+                    }
+                },
+                { name : 'deliveryAddress', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.deliveryaddress"/>', newline : true ,width:810, type : "text",
+                	validate : {
+                        required : true
+                    }
+                },
+                { name : 'remark', label : '<@spring.message "sys.hand.common.comment"/>', newline : true ,width:810,height:100, type : "textarea",
+                	validate : {
+                        required : true,
+                        stringMaxLength : 240
+                    }
+                }
+	        ]
+        });
+         var po_header_grid;
+         po_header_grid = window['po_header_grid'] = $("#po_header_grid").ligerGrid({
+            columns : [
+                {
+   	                display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.itemid"/>',
+   	                name : 'itemId',
+   	                align : 'left',
+   	                width : 200,
+	   	            textField : 'itemNumber',
+   	                type:'text'
+    	        },
+    	        {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+                    name : 'itemName',
+                    textField : 'itemName',
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.uomcode"/>',
+                    name : 'uomCode',
+                    hide:true,
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.uomcode"/>',
+                    name : 'uomName',
+                    textField:'unitName',
+                    align : 'left',
+                    width : 200
+                },
+                /*{
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.packagequantity"/>',
+                    name : 'packageQuantity',
+                    textField:'packageQuantity',
+                    align : 'left',
+                    width : 200,
+                    editor:{
+                        type:'int'
+                    },
+                    validate : {
+                        required : true
+                    }
+                },*/
+                /*{
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.minquantity"/>',
+                    name : 'minQuantity',
+                    align : 'left',
+                    width : 200,
+                    editor:{
+                        type:'int'
+                    },
+                    validate : {
+                        required : true
+                    }
+                },*/
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.quantity"/>',
+                    name : 'quantity',
+                    align : 'left',
+                    width : 200,
+                    editor:{
+                        type:'int'
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+                {
+                    display: '价格',
+                    name: 'unitPrice',
+                    width: 90,
+                    editor: {
+                        type: 'float',
+                    },
+                    align: "right",
+                    validate: {
+                        required: true
+                    }
+                }
+            ],
+            <#if isedit == '1'>
+            url : '${base.contextPath}/inv/poline/queryNoPage?poHeaderId=${RequestParameters.poHeaderId!}',
+            </#if>
+            enabledEdit : true,
+            checkbox:true,
+            width : '99%',
+            height : '310',
+            usePager: false,
+            onBeforeSubmitEdit : function(e) {
+            	if (e.column.columnname == "packageQuantity") {
+                    if(e.value < 0){
+                        return false;
+                    }
+                }
+                if (e.column.columnname == "minQuantity") {
+                    if(e.value < 0){
+                    	$.ligerDialog.warn("<@spring.message 'type.com.lkkhpg.dsis.common.im.dto.poheader.mingmin'/>");
+                        return false;
+                    }
+                }
+                if (e.column.columnname == "quantity") {
+                    if(e.value < 0){
+                        $.ligerDialog.warn("<@spring.message 'type.com.lkkhpg.dsis.common.im.dto.poheader.mingmin'/>");
+                        return false;
+                    }
+                }
+            },
+            toolbar : {
+                items: [
+                    {
+                        text: '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.add"/>',
+                        disable:false, 
+                        click: function(){
+                         //po_header_grid.addRow({})
+                        f_import_province();
+                        }, icon: 'add'
+                    },
+                    { line: true },
+                    { 
+                        text : '<@spring.message "sys.hand.btn.delete"/>',
+                        click : function(){
+                          Hap.gridDelete({
+                                 grid : po_header_grid
+                             })
+                        }, 
+                        icon : 'delete'
+                    }
+                ]
+            }
+        });
+         <#if isedit == '1'>
+         Hap.loadForm({form:po_header_form,url:'${base.contextPath}/inv/poheader/query',para:{poHeaderId:${RequestParameters.poHeaderId}},callback:function(){
+         }});
+         var poNumberComponent= $.ligerui.get('poNumber');
+         poNumberComponent.setReadonly(true);
+         </#if>
+        if(trxNumber == "null"){
+            //alert(1111111111)
+            liger.get('grid_tool').setEditable(true);
+            liger.get('po_header_form').setEditable(true);
+            liger.get('po_header_grid').setEditable(true);
+        }else if(trxNumber == ""){
+            //alert(3333333333)
+            liger.get('grid_tool').setEditable(true);
+            liger.get('po_header_form').setEditable(true);
+            liger.get('po_header_grid').setEditable(true);
+        }else if(trxNumber == 0){
+            //alert(4444444444444)
+            liger.get('grid_tool').setEditable(true);
+            liger.get('po_header_form').setEditable(true);
+            liger.get('po_header_grid').setEditable(true);
+        }else{
+            //alert(22222222222)
+            //alert(trxNumber)
+            liger.get('grid_tool').setEditable(false);
+            liger.get('po_header_form').setEditable(false);
+            liger.get('po_header_grid').setEditable(false);
+        }
+         liger.get('currency').setDisabled(true);
+    });
+    
+    
+    function f_save(){
+    	var po_header_grid_save = $.ligerui.get('po_header_grid').getData();
+    	if(po_header_grid_save == null || po_header_grid_save == ""){
+    		Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.order.salesline.item_not_null"/>');
+    		return false;
+    	}
+    	Hap.submitForm({
+            form:po_header_form,
+            grid:po_header_grid,
+            gridName:"poLines",
+            url:'${base.contextPath}/inv/poheader/save',
+            success:function(json,opt){
+                $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+                	liger.get('poNumber').setValue(json.rows[0].poNumber);
+                	po_header_form.setData({'__status':'update'});
+                	po_header_form.setData({'poHeaderId':json.rows[0].poHeaderId});
+                	var poNumberComponent= $.ligerui.get('poNumber');
+                    poNumberComponent.setReadonly(true);
+                }); 
+            }   
+        })
+    }
+
+    function f_submit(){
+        var form = po_header_form, grids = po_header_grid ? [].concat(po_header_grid) : [],
+            gridNames = [].concat("poLines"),wa = true;
+        if (!form || form.con) return;
+        if(Hap.validateForm(form) && Hap.validateGrid(grids)){
+            var d = form.getData();
+            for ( var key in d) {
+                if (!d[key]) {
+                    delete d[key]
+                }
+            }
+            if(grids.length > 0) {
+                $.each(grids,function(i,grid){
+                    grid.endEdit();
+                    d[gridNames[i]] = grid.getData();
+                })
+            }
+            form.con= $.ajax({
+                url : '${base.contextPath}/inv/poheader/submit',
+                type : "POST",
+                dataType : "json",
+                contentType : "application/json",
+                data : JSON2.stringify(wa === false ? d : [d]),
+                success : function(json) {
+                    liger.get('grid_tool').setEditable(false);
+                    liger.get('po_header_form').setEditable(false);
+                    liger.get('po_header_grid').setEditable(false);
+                    window.top.f_removeTab('IM_STOCKIO_CREATE');
+                    window.top.f_addTab('IM_STOCKIO_CREATE', '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.create"/>', 'im/im_stockio_create.html?isedit=1&trxId='+json.rows[0].trxId+ "&organizationId=" + organizationId);
+                },
+                error : function() {}
+            });
+        };
+        //alert("提交");
+    }
+    
+    function marketCurrency(marketId){
+        var params = [{
+            orgType: 'MKT',
+            orgId: marketId,
+            paramNames: ['SPM.CURRENCY']}];
+         Hap.ajax({
+                url : '${base.contextPath}/spm/orgParam/get',
+                data : params,
+                success : function(json) {
+                    var currency = json.rows[0].paramValues['SPM.CURRENCY'] == undefined ? null : json.rows[0].paramValues['SPM.CURRENCY'][0];
+                    if(currency){
+                        liger.get('currency').setValue(currency);
+                    } else {
+                        liger.get('currency').setValue(null);
+                    }
+                }
+        });
+    }
+    
+    function f_import_province() {
+        var fn = $.ligerui.getPopupFn({
+            onSelect : function(e){
+            	f_select_header(e);
+            },
+            title:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.querylovtitle"/>',
+            condition: {
+                fields: [{
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemnumber"/>',
+                    name: "itemNumber",
+                    type: "text"
+                },
+                {
+                    type: "text",
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname"/>',
+                    name: "itemName",
+                    newline: false
+                },{
+                    type: "select",
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category"/>',
+                    name: "categoryId",
+                    newline: false,
+                    options: {
+                        url: '${base.contextPath}/inv/item/querytype?itemType=ITEM',
+                        valueField: "categoryId",
+                        textField: "categoryName"
+                    }
+                },{
+                    type: "select",
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.product.dto.invitem.redeemflag"/>',
+                    name: "redeemFlag",
+                    newline: false,
+                    options : {
+                        valueField : 'value',
+                        textField : 'meaning',
+                        data : yesno,
+                    }
+                },{
+                    type: "select",
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.starteraid"/>',
+                    name: "starterAid",
+                    newline: false,
+                    options : {
+                        valueField : 'value',
+                        textField : 'meaning',
+                        data : packTypeData,
+                    }
+                }
+                ]
+            }, 
+            grid: {
+                columns: [{
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemnumber"/>',
+                    name: 'itemNumber',
+                    type: 'text',
+                    width: 200
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemname"/>',
+                    name: 'itemName',
+                    width: 200,
+                    editor:{
+                        type:'tl',
+                        idField: 'itemId',
+                        dto: 'com.lkkhpg.dsis.common.product.dto.InvItem'
+                    }
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.description"/>',
+                    name: 'description',
+                    width: 200,
+                    editor:{
+                        type:'tl',
+                        idField: 'itemId',
+                        dto: 'com.lkkhpg.dsis.common.product.dto.InvItem'
+                    }
+                }],
+                url:'${base.contextPath}/inv/poheaderitem/query',
+                checkbox: true/* ,
+                onCheckRow:true */
+            },
+            delayLoad : true,
+        });
+        fn();
+    }
+    
+    function f_select_header(e){
+        var selectRows = e.data;
+        var gridRows = po_header_grid.getData();
+        //var lastEditRow = po_header_grid.lastEditRow;
+        if(gridRows.length > 0){
+            for(var i = 0; i< selectRows.length; i++){
+                var itemIdSel = selectRows[i].itemId;
+                for(var j=0;j<gridRows.length;j++){
+                    var itemIdGrid = gridRows[j].itemId;
+                    if(itemIdSel == itemIdGrid){
+                        $.ligerDialog.error('<@spring.message "msg.error.pm.item_repeat"/>');
+                        return false;
+                    }
+                }
+            }
+        }
+	    po_header_grid.addRows(e.data);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.system.mapper.SysScheduleMessageMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.system.dto.SysMsScheduleMessage">
+        <result column="MS_MESSAGE_ID" property="msMessageId" jdbcType="DECIMAL" />
+        <result column="MESSAGE_NAME" property="messageName" jdbcType="VARCHAR" />
+        <result column="MESSAGE_TYPE" property="messageType" jdbcType="VARCHAR" />
+        <result column="MESSAGE_STATUS" property="messageStatus" jdbcType="VARCHAR" />
+        <result column="PUBLISH_CHANNEL" property="publishChannel" jdbcType="VARCHAR" />
+        <result column="PUBLISH_DATE_TYPE" property="publishDateType" jdbcType="VARCHAR" />
+        <result column="PUBLISH_DATE" property="publishDate" jdbcType="TIMESTAMP" />
+        <result column="SENDER" property="sender" jdbcType="DECIMAL" />
+        <result column="MESSAGE_CONTENT" property="messageContent" jdbcType="CLOB" />
+        <result column="SENDER_CODE" property="senderCode" jdbcType="VARCHAR" />
+        <result column="ASSIGN_ID" property="assignId" jdbcType="DECIMAL" />
+        <result column="ASSIGN_TYPE" property="assignType" jdbcType="VARCHAR" />
+        <result column="ASSIGN_VALUE" property="assignValue" jdbcType="VARCHAR" />
+        <result column="STATUS" property="status" jdbcType="VARCHAR" />
+        <result column="ACCOUNT_ID" property="accountId" jdbcType="DECIMAL" />
+        <result column="member_id" property="memberId" jdbcType="DECIMAL" />
+        <result column="member_name" property="memberName" jdbcType="VARCHAR" />
+        <result column="market_name" property="marketName" jdbcType="VARCHAR" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="phone_no" property="phoneNo" jdbcType="VARCHAR" />
+        <result column="area_code" property="areaCode" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="DECIMAL" />
+        <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="selectScheduleMessage4User" resultMap="BaseResultMap">
+        SELECT ms.MS_MESSAGE_ID,
+        MESSAGE_NAME,
+        MESSAGE_TYPE,
+        MESSAGE_STATUS,
+        PUBLISH_CHANNEL,
+        PUBLISH_DATE_TYPE,
+        PUBLISH_DATE,
+        SENDER ,
+        MESSAGE_CONTENT,
+        SENDER_CODE,
+        ASSIGN_ID,
+        ASSIGN_TYPE,
+        ASSIGN_VALUE,
+        STATUS,
+        ACCOUNT_ID,
+        area_code,
+        phone_no,
+        email,
+        user_id,
+        user_name
+        FROM SYS_MS_MESSAGE ms,
+        SYS_MS_MESSAGE_ASSIGN ma,
+        sys_user su,
+        sys_acc_rel sar
+        WHERE message_status ='DRAFT'
+        AND ma.assign_type ='USER'
+        AND
+        PUBLISH_DATE_TYPE !='NOW'
+        AND PUBLISH_DATE &lt;=CURRENT_TIMESTAMP
+        AND ms.ms_message_id = ma.ms_message_id
+        AND
+        ma.ASSIGN_VALUE =su.USER_ID
+        and sar.REL_PARTY_ID = su.USER_ID
+        and su.status='ACTV' 
+    </select>
+    <select id="selectScheduleMessage4Member" resultMap="BaseResultMap">
+        SELECT ms.MS_MESSAGE_ID,
+        MESSAGE_NAME,
+        MESSAGE_TYPE,
+        MESSAGE_STATUS,
+        PUBLISH_CHANNEL,
+        PUBLISH_DATE_TYPE,
+        PUBLISH_DATE,
+        SENDER ,
+        MESSAGE_CONTENT,
+        SENDER_CODE,
+        ASSIGN_ID,
+        ASSIGN_TYPE,
+        ASSIGN_VALUE,
+        STATUS,
+        ACCOUNT_ID,
+        area_code,
+        phone_no,
+        email,
+        member_name,
+        member_id
+        FROM SYS_MS_MESSAGE ms,
+        SYS_MS_MESSAGE_ASSIGN ma,
+        MM_MEMBER_v mm,
+        sys_acc_rel sar
+        WHERE message_status ='DRAFT'
+        AND ma.assign_type ='MEM'
+        AND PUBLISH_DATE_TYPE !='NOW'
+        AND PUBLISH_DATE &lt;=CURRENT_TIMESTAMP
+        AND ms.ms_message_id = ma.ms_message_id
+        AND
+        ma.ASSIGN_VALUE =mm.member_id
+        AND sar.REL_PARTY_ID = mm.member_id
+        and mm.status='ACTV'
+    </select>
+</mapper>

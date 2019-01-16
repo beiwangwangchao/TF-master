@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.OrderTypeMapper">
+	<resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.OrderType">
+		<id column="ORDER_TYPE_ID" property="orderTypeId" jdbcType="DECIMAL" />
+		<result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+		<result column="NAME" property="name" jdbcType="VARCHAR" />
+		<result column="ORDER_TYPE" property="orderType" jdbcType="VARCHAR" />
+		<result column="PRICE_TYPE" property="priceType" jdbcType="VARCHAR" />
+		
+		<result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+		<result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+        <collection property="salesType" ofType="com.lkkhpg.dsis.common.order.dto.SalesType" column="ORDER_TYPE_ID">  
+             <id column="SALES_TYPE_ID" property="salesTypeId" jdbcType="DECIMAL" />
+             <result column="ORDER_TYPE_ID" property="orderTypeId" jdbcType="DECIMAL" />
+             <result column="SALES_TYPE" property="salesType" jdbcType="VARCHAR" />
+             <result column="SALES_TYPE" property="itemSalesType" jdbcType="VARCHAR" />
+             <result column="SALES_TYPE_NAME" property="itemSalesTypeName" jdbcType="VARCHAR" />
+             <result column="FREE_FLAG" property="freeFlag" jdbcType="VARCHAR" />
+             <result column="CAL_PV_FLAG" property="calPvFlag" jdbcType="VARCHAR" />
+             <result column="TAX_PRICE" property="taxPrice" jdbcType="VARCHAR" />  
+        </collection>  
+	</resultMap>
+	
+	<insert id="insert" parameterType="com.lkkhpg.dsis.common.order.dto.OrderType" >
+    <selectKey resultType="java.lang.Long" keyProperty="orderTypeId" order="BEFORE" >
+		select OM_ORDER_TYPE_s.nextval from dual
+    </selectKey>
+    	INSERT INTO OM_ORDER_TYPE (
+			ORDER_TYPE_ID, SALES_ORG_ID, ORDER_TYPE, PRICE_TYPE
+		)
+		VALUES (#{orderTypeId,jdbcType=DECIMAL}, #{salesOrgId,jdbcType=DECIMAL},
+			#{orderType,jdbcType=VARCHAR}, #{priceType,jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.lkkhpg.dsis.common.order.dto.OrderType" >
+		update OM_ORDER_TYPE
+		set SALES_ORG_ID = #{salesOrgId,jdbcType=VARCHAR},
+		  ORDER_TYPE = #{orderType,jdbcType=VARCHAR},
+		  PRICE_TYPE = #{priceType,jdbcType=VARCHAR}
+		where ORDER_TYPE_ID = #{orderTypeId,jdbcType=DECIMAL}
+	</update>
+	
+	<select id="queryByOrderType" resultMap="BaseResultMap" parameterType ="com.lkkhpg.dsis.common.order.dto.OrderType">
+	    select oot.ORDER_TYPE_ID, oot.SALES_ORG_ID, tl.NAME, oot.ORDER_TYPE, oot.PRICE_TYPE
+	      from OM_ORDER_TYPE oot
+	        LEFT JOIN SPM_SALES_ORGANIZATION_B b
+			  ON (OOT.SALES_ORG_ID = B.SALES_ORG_ID)
+			LEFT JOIN SPM_SALES_ORGANIZATION_TL tl
+			  ON (tl.SALES_ORG_ID = b.SALES_ORG_ID AND tl.lang = #{request.locale,jdbcType=VARCHAR})
+		<where>
+		    (oot.sales_org_id in
+		       (select b.sales_org_id
+		          from SPM_SALES_ORGANIZATION_B b
+		         where EXISTS (SELECT 1
+		                  FROM sys_user_role_assign sura
+		                 WHERE sura.assign_type = 'SALES'
+		                   AND sura.assign_value = b.sales_org_id
+		                   AND sura.user_id = #{request.userId, jdbcType=DECIMAL}
+		                   AND sura.role_id = #{request.roleId, jdbcType=DECIMAL}
+		                   AND (b.end_active_date > current_timestamp or
+		                       b.end_active_date is null))))
+		    <if test="orderTypeId != null">
+			    and oot.ORDER_TYPE_ID = #{orderTypeId,jdbcType=DECIMAL}
+			</if>
+			<if test="salesOrgId != null">
+			    and oot.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL}
+			</if>
+			<if test="orderType != null">
+			    and oot.ORDER_TYPE = #{orderType,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	
+	<select id="queryAll" resultMap="BaseResultMap">
+	    select oot.ORDER_TYPE_ID, oot.SALES_ORG_ID, tl.NAME, oot.ORDER_TYPE, oot.PRICE_TYPE
+	      from OM_ORDER_TYPE oot
+	        LEFT JOIN SPM_SALES_ORGANIZATION_B b
+			  ON (OOT.SALES_ORG_ID = B.SALES_ORG_ID)
+			LEFT JOIN SPM_SALES_ORGANIZATION_TL tl
+			  ON (tl.SALES_ORG_ID = b.SALES_ORG_ID AND tl.lang = #{request.locale,jdbcType=VARCHAR})
+		<where>
+		    oot.sales_org_id in
+		       (select b.sales_org_id
+		          from SPM_SALES_ORGANIZATION_B b
+		         where EXISTS (SELECT 1
+		                  FROM sys_user_role_assign sura
+		                 WHERE sura.assign_type = 'SALES'
+		                   AND sura.assign_value = b.sales_org_id
+		                   AND sura.user_id = #{request.userId, jdbcType=DECIMAL}
+		                   AND sura.role_id = #{request.roleId, jdbcType=DECIMAL}
+		                   AND (b.end_active_date > current_timestamp or
+		                       b.end_active_date is null)))
+		</where>
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    	delete from OM_ORDER_TYPE
+		where ORDER_TYPE_ID = #{orderTypeId,jdbcType=DECIMAL}
+	</delete>
+    
+    <select id="queryForOrder"  resultMap="BaseResultMap">
+    SELECT
+        ot.ORDER_TYPE_ID, ot.SALES_ORG_ID, ot.ORDER_TYPE, ot.PRICE_TYPE, 
+        st.SALES_TYPE_ID, st.ORDER_TYPE_ID, st.SALES_TYPE, st.FREE_FLAG, st.CAL_PV_FLAG, st.TAX_PRICE
+    FROM
+        om_order_type ot
+    LEFT JOIN om_sales_type st ON ot.order_type_id = st.order_type_id
+    WHERE
+        ot.sales_org_id = #{salesOrgId ,jdbcType = DECIMAL}
+    AND ot.order_type = #{orderType ,jdbcType = VARCHAR}
+    AND st.sales_type = #{salesType ,jdbcType = VARCHAR}
+    </select>
+    
+    <select id="queryBySalesOrgAndOrderType" resultMap="BaseResultMap">
+    SELECT
+        ot.ORDER_TYPE_ID, ot.SALES_ORG_ID, ot.ORDER_TYPE, ot.PRICE_TYPE
+    FROM
+        om_order_type ot
+    WHERE
+        ot.sales_org_id = #{salesOrgId ,jdbcType = DECIMAL}
+    AND ot.order_type = #{orderType ,jdbcType = VARCHAR}
+    </select>
+    <select id="queryBySalesOrgId" resultType="java.util.HashMap">
+    SELECT
+        CV ."VALUE" "value",
+        TL.MEANING "meaning"
+    FROM
+       SYS_CODE_B C,
+        SYS_CODE_VALUE_B CV,
+        SYS_CODE_VALUE_TL TL,
+        OM_ORDER_TYPE OD
+    WHERE
+        C.CODE = 'OM.ORDER_TYPE'
+    AND C.CODE_ID = "CV".CODE_ID
+    AND "CV".CODE_VALUE_ID = TL.CODE_VALUE_ID
+    AND OD.SALES_ORG_ID = #{salesOrgId}
+    AND OD.ORDER_TYPE = CV ."VALUE"
+    AND TL.LANG =  #{request.locale,jdbcType=VARCHAR}
+    </select>
+</mapper>

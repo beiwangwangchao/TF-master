@@ -1,0 +1,581 @@
+<#-- 
+ * description: 查询Release月度奖金. 
+ * version: 1.0 
+ * author: li.peng 
+ * CopyrightLKK Health Products Group Limited. 
+ * 
+--> 
+<#include "../include/head.html">
+<style>
+</style>
+<script
+	src="${base.contextPath}/common/code?releaseType=BM.REALEASE_STATUS&&bonusType=BM.RE_BONUS_TYPE"
+	type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+<body style="padding: 10px;">
+	<form id="d_bm_011_form"></form>
+	<div id="d_bm_011_grid"></div>
+	
+	<form id="bonus_type_grid"></form>
+	<form id="release_type"></form>
+<form id="downCSV" method="POST" target="_blank"></form>
+	<script type="text/javascript">
+	var marketId = _marketId;
+    //原值保存
+    var oldValue = null;
+    
+	function intiForm(){
+		window['d_bm_011_form'] = $("#d_bm_011_form").ligerForm({
+			prefixID:'bm_011_form',
+	        fields : [ {
+	        	display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+		    	name : "marketId",
+		    	newline : false,
+		    	type : "combobox",
+		    	options : {
+		        	value : marketId,
+	                valueField : 'marketId',
+	                textField : 'name',
+	                url : '${base.contextPath}/spm/market/queryMarketsByRole',
+	                isShowCheckBox: false,
+	                isMultiSelect: false,
+	                cancelable : false,
+	                onSuccess : function(){
+	                	this.setValue(marketId);
+	                },
+	                onBeforeSelect : function(){ //该事件用于将初次加载标志置false,记录原值以及将重复标记置为true
+	                	oldValue = $.ligerui.get('bm_011_formmarketId').getValue();
+	                },
+	                onSelected :function (value,text){
+	                	if (!value) {
+	                		return false;
+	                	}
+	                	if (marketId != value) {
+	                		$.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.refresh_page"/>', $l('sys.hand.tip.info'),function(yes) {
+	                            if(yes){
+	                                var newMarketId = $.ligerui.get('bm_011_formmarketId').getValue();
+	                                var tabid = window.top.tab.selectedTabId;
+	              			    	var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+	                                window.top.f_removeTab(tabid);
+	                                parent.f_addTab(tabid,tabname,"${base.contextPath}/bm/bm_release_query.html?marketId="+newMarketId);
+	                            }else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+	                                $.ligerui.get('bm_011_formmarketId').setValue(oldValue);
+	                            }
+	                        });
+	                	}
+	                }
+	            },
+	            validate : {
+	                required : true
+	            }
+		    },{
+	            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.memberid"/>',
+	            name : "memberCode",
+	            newline: true,
+	            type : "popup",
+	            textField:'memberCode',
+	            options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+	             	onLoadData: function(){
+	                this.setParm('marketId', marketId)
+	            } ,
+	              	onChangeValue: function(){
+	                this.setParm('marketId', marketId)
+	            }  
+	        	},{parms:{"marketId" : marketId}})
+	        }, {
+	            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.bonustype"/>',
+	            name : "bonusType",
+	            newline: false,
+	            type : "select",
+	            options : {
+	                valueField : 'value',
+	                textField : 'meaning',
+	                data : bonusType
+	            }
+	        },{
+	            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.period"/>',
+	            name : "periodId",
+	            newline: false,
+	            type : 'select',
+	            options : {
+	                valueField : 'periodId',
+	                textField : 'periodName',
+	                url : '${base.contextPath}/bm/bonusfinal/getPeriod?marketId='+marketId
+	            }
+	        } ],
+	        buttons : [ {
+	            text : '<@spring.message "sys.hand.btn.query"/>',
+	            disabled : false,
+	            width : 60,
+	            click : function() {
+	                 Hap.gridQuery({
+	                     form : d_bm_011_form,
+	                     grid : d_bm_011_grid
+	                 })
+	            }
+	        }]
+	    });
+	}
+	 function initColums(market){
+	        var columns =[{
+	            display:'<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.bonuscode"/>',
+	            name:"bonusCode",
+	            width : 150,
+	         },
+	         {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.memberid"/>',
+	             name : 'memberCode',
+	             width : 180,
+	         },
+	         {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.membername"/>',
+	             name : 'memberName',
+	             width : 200,
+	         },
+	         {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.companyname"/>',
+	             name : 'companyName',
+	             width : 200,
+	         },
+	         {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.marketname"/>',
+	             name : 'marketName',
+	             width : 150
+	         },
+	         {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.period"/>',
+	             name : 'periodName',
+	             width : 80
+	         },
+	         {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.bonustype"/>',
+	             name : 'bonusType',
+	             align : 'right',
+	             width : 80,
+	             render: function(item) {
+	                    for (var i = 0; i < bonusType.length; i++) {
+	                        if (bonusType[i].value == item.bonusType) {
+	                            return bonusType[i].meaning;
+	                        }
+	                    }
+	                }
+	         },
+	         {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.preTaxAmt"/>',
+	             name : 'preTaxAmt',
+	             align : 'right',
+	             width : 80
+	         }
+	        ];
+	        var withholdingTaxAmt = {
+	                 display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.pretaxamt"/>',
+	                 name : 'taxAmt01',
+	                 align : 'right',
+	                 width : 80
+	             }
+	        var invoice = {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.invoicetax"/>',
+	             name : 'taxAmt02',
+	             align : 'right',
+	             width : 80
+	         };
+	         var consume ={
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.consumetax"/>',
+	             name : 'taxAmt02',
+	             align : 'right',
+	             width : 80
+	         };
+	         var health = {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.nhttax"/>',
+	             name : 'clearTaxAmt03',
+	             align : 'right',
+	             width : 80
+	         };
+	        
+	        if("HK" == market){
+	        }else if('MY' == market){
+	            columns.push(consume);
+	        }else if('TW' == market){
+	        	
+	            columns.push(invoice);
+	            columns.push(health);
+	            
+	        }
+	         var suffCol = [
+	         {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.deliveramt"/>',
+	             name : 'deliverAmt',
+	             align : 'right',
+	             width : 80
+	         },{
+                 display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.status"/>',
+                 name : 'status',
+                 align : 'right',
+                 width : 80,
+                 render: function(item) {
+                     for (var i = 0; i < releaseType.length; i++) {
+                         if (releaseType[i].value == item.status) {
+                             return releaseType[i].meaning;
+                         }
+                     }
+                 }
+             },
+	         {
+	             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.comments"/>',
+	             name : 'comments',
+	             align : 'right',
+	             width : 150
+	         }
+	     ];
+	         return columns.concat(suffCol);
+	    }
+	
+    function initGrid(columns){
+    	window['d_bm_011_grid'] = $("#d_bm_011_grid").ligerGrid({
+            columns : columns,
+            toolbar:{
+                items : [
+                         {
+                             text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.lov.bonusrelease"/>',
+                             icon: 'add',
+                             <#if accessService.access("PAY_EDITABLE") == false>
+		                        disable:true, 
+		                     </#if>
+                             click : bonusRelease
+                         },
+                         {
+                             text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.unlock"/>',
+                             icon: 'back',
+                             <#if accessService.access("UNLOCK_EDITABLE") == false>
+		                        disable:true, 
+		                     </#if>
+                             click : fallbackRelease
+                         },
+                         /* {
+                        	 text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.print"/>',
+                        	 <#if accessService.access("PRINT_EDITABLE") == false>
+		                        disable:true, 
+		                     </#if>
+                        	 click : function() {
+                        		 
+                        	 },
+                        	 icon: 'save'
+                         }, */
+                         { line: true },
+                         {                	
+                             text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                             menu:{ width: 120, items:
+     	                            [
+     		                 			{                	
+     		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+     		                 			    click:   function (){exportSelected("d_bm_011_form","d_bm_011_grid",{"bonusType":bonusType,"status":releaseType},_basePath);}
+     		                 			},
+     		                 			{ line: true },
+     		                 			{                	
+     		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+     		                 			    click: function (){exportDirectAll("d_bm_011_form","d_bm_011_grid",{"bonusType":bonusType,"status":releaseType},_basePath);}
+     		                 			    
+     		                 			}
+     	                          ]
+                          	}                        
+                         }
+                         ]
+             },
+            url:"${base.contextPath}/bm/release/query",
+            enabledEdit :false,
+            resizable: false,  
+            delayLoad :true,
+            checkbox: true,
+            width : '99%',
+            height : '98%',
+            pageSize :20
+        });
+    }
+   
+   var lovEditorWin 
+   function bonusRelease(){
+	   if(!lovEditorWin){
+		   window['bonus_type_grid'] = $("#bonus_type_grid").ligerForm({
+	            prefixID:'bonus_type_grid',
+	            fields : [{
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.bonustype"/>',
+	                name : "bonusType",
+	                newline: false,
+	                type : "select",
+	                options : {
+	                    valueField : 'value',
+	                    textField : 'meaning',
+	                    data : bonusType
+	                },
+	                validate:{
+	                    required: true
+	                },
+	                editor : {
+						onSelected : function(value){
+							if (null != value && "" != value) {
+								showPeriod(value);	
+							}
+						}	
+					}
+	            },
+	            {
+	            	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.period"/>',
+	                name : "periodId",
+	                newline: true,
+	                type : "text",
+	                readonly : true
+	            }]  
+	        });
+		   
+		   /* bonus_type_grid.setVisible(["periodId"],false); */
+		   
+           lovEditorWin = $.ligerDialog.open({
+               height:150,
+               width: 350,
+               allowClose:false,
+               title : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.lov.bonusrelease"/>',
+               target: $("#bonus_type_grid"),
+               buttons: [{
+                   text: '<@spring.message "sys.hand.btn.ok"/>',
+                   onclick: function(item, dialog) {
+                	   var obj = bonus_type_grid.getData();
+                       obj.marketId = marketId.toString();
+                	   if(Hap.validateForm(bonus_type_grid)){
+                		   $.ligerDialog.confirm('<@spring.message "msg.bm_pay_combine_confirm"/>', function (yes){
+                			   if(yes){
+                				   dialog.hide();
+                        		   var options1 = {
+                        	               url:"${base.contextPath}/bm/release/release",
+                        	               contentType: "application/json",
+                        	               data:obj,
+                        	               success:function(data){
+                        	                   /* var m = $.ligerDialog.open({ 
+                        	                       url: '${base.contextPath}/bm/bm_release_choose.html', 
+                        	                       width: 1200, 
+                        	                       height: 650,
+                        	                       data:data.rows[0],
+                        	                       title:"<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.lov.bonusrelease"/>",
+                        	                       onClose:function(){
+                        	                    	   Hap.gridQuery({
+                        	                               form : d_bm_011_form,
+                        	                               grid : d_bm_011_grid
+                        	                           })
+                        	                       }
+                        	                   }
+                        	                   ) */
+                        	                   autoCombine(data.rows[0]);
+                        	               }
+                        	       }
+                        	       Hap.ajax(options1); 
+                        		   clearForm();
+                			   }
+                		   });
+                	   }
+                   }
+               },
+               {
+                   text: '<@spring.message "sys.hand.btn.cancel"/>',
+                   onclick: function(item, dialog) {
+                	   clearForm();
+                       dialog.hide();
+                   }
+               }],
+           });
+       }
+       lovEditorWin.show();
+   }
+   
+   function autoCombine(combine){
+	   Hap.showLoading();
+	   var options = {
+				url:"${base.contextPath}/bm/release/combine",
+				data:combine,
+				success:function(){
+					parent.$.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>');
+					Hap.hideLoading();
+					Hap.gridQuery({
+                         form : d_bm_011_form,
+                         grid : d_bm_011_grid
+                     })
+				}
+		}
+		Hap.ajax(options);
+   }
+   
+   function clearForm(){
+	   bonus_type_grid.setData({
+		   bonusType:"",
+		   periodId : ""
+	   })
+	   
+   }
+   
+   function showPeriod(value){
+	   bonus_type_grid.setData({
+			periodId : ""
+	   });
+	   $.ajax({
+			url: "${base.contextPath}/bm/bonustype/period",
+			type:"POST",
+			dataType:"json",
+			data: {
+				bonusType : value,
+				queryType : 'issue',
+				marketId : marketId
+			} ,
+            success : function(data) {
+            	if (data.total > 0) {
+            		bonus_type_grid.setData({
+            			periodId : data.rows[0].periodName
+            		});
+            		/* bonus_type_grid.setVisible(["periodId"],true); */
+            	}
+            },
+            error : function() {
+               alert("error");
+            }
+		});
+   }
+   
+   var lovRaleaseType;
+   function fallbackRelease(){
+	   if(!lovRaleaseType){
+		   window['release_type'] = $("#release_type").ligerForm({
+	            prefixID:'release_type',
+	            fields : [{
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.bonustype"/>',
+	                name : "bonusType",
+	                newline: false,
+	                type : "select",
+	                options : {
+	                    valueField : 'value',
+	                    textField : 'meaning',
+	                    data : bonusType
+	                },
+	                validate:{
+	                    required: true
+	                },
+	                editor : {
+						onSelected : function(value){
+							if (null != value && "" != value) {
+								showPeriod2(value);	
+							}
+						}	
+					}
+	            },
+	            {
+	            	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.period"/>',
+	                name : "periodId",
+	                newline: true,
+	                type : "text",
+	                readonly : true
+	            }]  
+	       });
+		   
+		   lovRaleaseType = $.ligerDialog.open({
+			   height:150,
+               width: 350,
+               allowClose:false,
+               title : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.unlock"/>',
+               target: $("#release_type"),
+               buttons: [{
+                   text: '<@spring.message "sys.hand.btn.ok"/>',
+                   onclick: function(item, dialog) {
+                	   var obj = release_type.getData();
+                       obj.marketId = marketId.toString();
+                	   if(Hap.validateForm(release_type)){
+                		   $.ligerDialog.confirm('<@spring.message "msg.bm_unlock_confirm"/>', function (yes){
+                				if(yes){
+                					dialog.hide();
+                					Hap.showLoading();
+                         		    var options1 = {
+                         	               url:"${base.contextPath}/bm/release/rollback",
+                         	               contentType: "application/json",
+                         	               data:obj,
+                         	               success:function(data){
+                         	            	   $.ligerDialog.success('<@spring.message "msg.success.bm_release_rollback"/>');
+                         	            	   Hap.hideLoading();
+                         	            	   Hap.gridQuery({
+                 	                               form : d_bm_011_form,
+                 	                               grid : d_bm_011_grid
+                 	                           })
+                         	               }
+                         	        }
+                         	        Hap.ajax(options1);
+                         		    clearForm2();
+                				}
+                		   });	
+                	   }
+                   }
+               },
+               {
+                   text: '<@spring.message "sys.hand.btn.cancel"/>',
+                   onclick: function(item, dialog) {
+                	   clearForm2();
+                       dialog.hide();
+                   }
+               }]
+		   });
+		   
+	   }
+	   lovRaleaseType.show();
+   }
+   
+   function clearForm2(){
+	   release_type.setData({
+		   bonusType:"",
+		   periodId : ""
+	   })
+   }
+   
+   function showPeriod2(value){
+	   release_type.setData({
+			periodId : ""
+	   });
+	   $.ajax({
+			url: "${base.contextPath}/bm/bonustype/period",
+			type:"POST",
+			dataType:"json",
+			data: {
+				bonusType : value,
+				queryType : 'issueBack',
+				marketId : marketId
+			} ,
+            success : function(data) {
+            	if (data.total > 0) {
+            		release_type.setData({
+            			periodId : data.rows[0].periodName
+            		});
+            	}
+            },
+            error : function() {
+               alert("error");
+            }
+		});
+   }
+   
+   $(function(){
+	   marketId = ${RequestParameters.marketId!_marketId};
+	   var marketCode = ''
+	    $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    /* contentType: "application/json", */
+                    url: "${base.contextPath}/bm/release/market",
+                    data: {
+        				marketId : marketId
+        			} ,
+                    success: function(data) {
+                         marketCode = data.code;
+                         intiForm();
+                         /* liger.get("bm_011_formmarketId").setValue(_marketId);
+                         liger.get("bm_011_formmarketId").setText(_marketName); */
+                         initGrid(initColums(marketCode));
+                    }
+                });
+	   
+   })
+   
+</script>
+</html>

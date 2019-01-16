@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.admin.integration.dapp.mapper.IsgDappAuthCodeMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.dapp.dto.IsgDappAuthCode">
+        <id column="APP_CODE" jdbcType="VARCHAR" property="appCode" />
+        <result column="APP_SECRET" jdbcType="VARCHAR" property="appSecret" />
+        <result column="EXPIRE" jdbcType="TIMESTAMP" property="expire" />
+        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+        <result column="WHITE_LIST_ENABLED" jdbcType="VARCHAR" property="whiteListEnabled" />
+        <result column="WHITE_LIST" jdbcType="CLOB" property="whiteList" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        APP_CODE, APP_SECRET, EXPIRE, DESCRIPTION, WHITE_LIST_ENABLED, WHITE_LIST
+    </sql>
+
+    <select id="selectList" parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.IsgDappAuthCode" resultMap="BaseResultMap">
+      select * from ISG_DAPP_AUTH_CODE c
+      <where>
+          <if test="appCode!=null">
+              c.app_code LIKE #{appCode,jdbcType=VARCHAR}
+          </if>
+      </where>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select 
+        <include refid="Base_Column_List" />
+        from ISG_DAPP_AUTH_CODE
+        where APP_CODE = #{appCode,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from ISG_DAPP_AUTH_CODE
+        where APP_CODE = #{appCode,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.IsgDappAuthCode">
+        insert into ISG_DAPP_AUTH_CODE (APP_CODE, APP_SECRET, EXPIRE, 
+            DESCRIPTION, WHITE_LIST_ENABLED, WHITE_LIST
+            )
+        values (#{appCode,jdbcType=VARCHAR}, #{appSecret,jdbcType=VARCHAR}, #{expire,jdbcType=TIMESTAMP}, 
+            #{description,jdbcType=VARCHAR}, #{whiteListEnabled,jdbcType=VARCHAR}, #{whiteList,jdbcType=CLOB}
+            )
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.IsgDappAuthCode">
+        update ISG_DAPP_AUTH_CODE
+        <set>
+            <if test="appSecret != null">
+                APP_SECRET = #{appSecret,jdbcType=VARCHAR},
+            </if>
+            <if test="expire != null">
+                EXPIRE = #{expire,jdbcType=TIMESTAMP},
+            </if>
+            <if test="description != null">
+                DESCRIPTION = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="whiteListEnabled != null">
+                WHITE_LIST_ENABLED = #{whiteListEnabled,jdbcType=VARCHAR},
+            </if>
+            <if test="whiteList != null">
+                WHITE_LIST = #{whiteList,jdbcType=CLOB},
+            </if>
+        </set>
+        where APP_CODE = #{appCode,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.admin.integration.dapp.dto.IsgDappAuthCode">
+        update ISG_DAPP_AUTH_CODE
+        set APP_SECRET = #{appSecret,jdbcType=VARCHAR},
+            EXPIRE = #{expire,jdbcType=TIMESTAMP},
+            DESCRIPTION = #{description,jdbcType=VARCHAR},
+            WHITE_LIST_ENABLED = #{whiteListEnabled,jdbcType=VARCHAR},
+            WHITE_LIST = #{whiteList,jdbcType=CLOB}
+        where APP_CODE = #{appCode,jdbcType=VARCHAR}
+    </update>
+</mapper>

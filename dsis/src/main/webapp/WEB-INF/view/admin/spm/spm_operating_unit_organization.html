@@ -1,0 +1,129 @@
+<#--
+ * description: 库存组织关联窗口.
+ * version: 1.0
+ * author: hanrui.huang
+ * .
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?languageData=SPM.LANGUAGE&taxTypeData=OM.TAX_CALCULATION_TYPE&currencyCodes=SPM.CURRENCY&taxLevelData=SPM.TAX_CALCULATION_LEVEL&timezoneData=SPM.TIME_ZONE" type="text/javascript"></script>
+<body style="padding: 10px;">
+    <div id="spm_operating_unit_grid"></div>
+    <script type="text/javascript">
+    <#assign operationUnitId = (RequestParameters.operationUnitId!'0')/>
+    var clickGridRecord;
+    function f_save() {
+        var grid = spm_operating_unit_grid.rows;
+        for (var i = 0; i < grid.length; i++) {
+			grid[i].operationUnitId = ${RequestParameters.operationUnitId};
+		}
+        Hap.ajax({
+        	url:"${base.contextPath}/spm/spmInvOrganization/save",
+        	data:grid,
+        	success:function(data){
+        		Hap.showSuccess($l('sys.hand.tip.success'),
+        				function() {
+        			f_cancel();
+        		});
+        	}
+        })
+    }
+    function f_cancel() {
+    	var dialog = frameElement.dialog;
+        dialog.close();
+    }
+    //表单底部按钮 
+    Hap.setFormDefaultBtn(f_cancel, f_save);
+    
+    $(function(){
+        window['spm_operating_unit_grid'] = $("#spm_operating_unit_grid").ligerGrid({
+            unSetValidateAttr:false,
+            columns: [ 
+              { 
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.organizationcode"/>',
+                  name: 'code', 
+                  align: 'left',
+                  value : 'code'
+              }, 
+              { 
+                  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.organizationname"/>',
+                  name: 'name', align: 'left'
+              }
+            ], 
+            <#if operationUnitId != '0' > 
+            url:'${base.contextPath}/spm/spmInvOrganization/query?operationUnitId=${RequestParameters.operationUnitId}',
+            </#if>
+            toolbar: { 
+                items: [
+                        {
+                            text: '<@spring.message "sys.hand.btn.new"/>',
+                            disable:false,
+                            click: function(){
+                            	f_import_province();
+                            },
+                            icon: 'add' 
+                        },
+                        { line: true },
+                        {
+                            text: '<@spring.message "sys.hand.btn.delete"/>',
+                            disable:false,
+                            click: function(){
+                            	Hap.gridDelete({
+                                    url: '${base.contextPath}/spm/spmInvOrganization/save?operationUnitId=null',
+                                    grid: spm_operating_unit_grid,
+                                });
+                            },
+                            icon: 'delete' 
+                        }
+                        ]
+            },
+            enabledEdit: true,
+            width: '99%', 
+            height: '90%',
+            checkbox : true,
+            rownumbers: true
+        });
+    });
+
+  //分配会员表，新增是弹处的选择框
+    function f_import_province() {
+        //debugger;
+        var options = ${lovService.getLov(base.contextPath,base.locale, "lov_org")};
+        options.grid.checkbox = true;
+        options.grid.isSingleCheck = false;
+        //debugger;
+        var fn = $.ligerui.getPopupFn({
+            onSelect : function(e){
+                f_select_market(e);
+            },
+            condition: options.condition,
+            grid: options.grid,
+            title: options.title,
+            delayLoad : true
+        });
+        fn();
+    }
+
+    function f_select_market(e){
+        var selectRows = e.data;
+        if(selectRows == null || selectRows == undefined || selectRows.length < 1){
+        	Hap.showError('<@spring.message "msg.error.config.country.selectrecord" />');
+        }
+        var gridRows = spm_operating_unit_grid.getData();
+        if(gridRows.length > 0){
+            for(var i = 0; i< selectRows.length; i++){
+                var marketCodeSel = selectRows[i].code;
+                for(var j=0;j<gridRows.length;j++){
+                    var marketCodeGrid = gridRows[j].code;
+                    if(marketCodeSel == marketCodeGrid){
+                    	Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.member.error"/>');
+                        return;
+                    }
+                }
+            }
+        }
+        spm_operating_unit_grid.addRows(e.data);
+    }
+    </script>
+</body>
+</html>

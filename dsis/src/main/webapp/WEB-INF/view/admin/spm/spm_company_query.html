@@ -1,0 +1,140 @@
+<#--
+ * description: 公司查询界面
+ * version: 1.0
+ * author: liang.rao
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+
+<body>
+    <script src="${base.contextPath}/common/code?companyTypeCode=SPM.COMPANY_TYPE" type="text/javascript"></script>
+    <form id="spm_company_form" ></form>  
+    
+    <div id="spm_company_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+        /*add furong.tang*/
+        var companyIsDispaly = [{value:"",meaning:""}];
+        /*add furong.tang*/
+    $(function(){
+        window['spm_company_form'] = $("#spm_company_form").ligerForm({
+                fields: [
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.code"/>',
+                      newline:false, 
+                      name: 'code',
+                      valueField : 'text'},
+                    { label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.name"/>',
+                      newline:false,
+                      name: 'name',
+                      type: 'text'
+                    },
+                    { type: 'select', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.companytype"/>',
+                      newline:false, 
+                      name: 'companyType',
+                      options: {
+                          valueField: 'value',
+                          textField: 'meaning',
+                          data: companyTypeCode
+                      }
+                    }
+                ], 
+                buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                        Hap.gridQuery({
+                            form:spm_company_form,
+                            grid:spm_company_grid
+                        })
+                    }}
+                ]
+            });
+        
+            window['spm_company_grid'] = $("#spm_company_grid").ligerGrid({
+                columns: [ {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.code"/>',
+                    name: 'code', align: 'left', width: '22%',
+                    render: function (row){
+                        return "<a href='javascript:void(0);' onclick='companyedit(" + row.companyId + ")'>" + row.code + "</a> "
+                    }
+                  }, { 
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.name"/>',
+                    name: 'name', align: 'left', width: '22%'
+                  }, {
+                    type: 'select',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.companytype"/>',
+                    name: 'companyType', align: 'left', width: '22%',
+                    options : {
+                    valueField: 'value',
+                    textField: 'meaning',
+                    data: companyTypeCode
+                    },
+                    render: function (item) {
+                        return getCodeDesc(companyTypeCode, item.companyType);
+                    }
+                  },{
+                    type: 'select',
+                    display: '是否显示库存',
+                    name: 'attribute1', align: 'left', width: '22%',
+                    options :{
+                        valueField: 'value',
+                        textField: 'meaning',
+                        data: companyIsDispaly
+                    },
+                    render: function (item) {
+                        return getIsDisplayDesc(companyIsDispaly, item.attribute1);
+                    }
+
+                }
+                ], 
+                url:'${base.contextPath}/spm/company/query',
+                toolbar: { items: [
+                                   { text: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.construction"/>',disable:false, click: function(){create_company();}, icon: 'add' },
+                                   { line: true },
+                     ]
+                     },
+                enabledEdit: true,
+                delayLoad:true,
+                width: '100%', 
+                height: '99%', 
+                rownumbers: true,
+                pageSizeOptions:[10,20],
+                pageSize:'10' 
+            }); 
+           
+          });//$function
+          
+          function create_company(){
+              var path = "${base.contextPath}/spm/spm_company_edit.html";
+              window.top.f_removeTab('spm_company_add');
+              window.parent.f_addTab('spm_company_add', 
+            		  '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmcompany.companycreate" />',path);
+          }
+          /*转换公司类型值、含义*/
+          function getCodeDesc(data, value){
+                    for (var i in data) {
+                        if (data[i].value == value) {
+                        return data[i].meaning;
+                    }
+                }
+                return '';
+            }
+          function getIsDisplayDesc(data, value){
+              for (var i in data) {
+                  if (value == 'Y') {
+                      data[i].meaning = '是';
+                      return data[i].meaning;
+                  } else if (value == 'N') {
+                      data[i].meaning = '否';
+                      return data[i].meaning;
+                  }
+              }
+              return '';
+
+          }
+          function companyedit(id) {
+           	  window.top.f_removeTab('spm_company_edit');
+              window.top.f_addTab('spm_company_edit', '<@spring.message "sys.hand.tab.company"/>', 
+            		  '${base.contextPath}/spm/spm_company_edit.html?companyId=' + id);
+          }
+    </script>
+</body>
+</html>

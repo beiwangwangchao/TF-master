@@ -1,0 +1,175 @@
+<#include "/mws/include/header.html">
+	<!-- ========== MENU END ========== -->
+	<!-- ========== CONTENT START ========== -->
+	<script>
+        //跟踪订单
+        function redirectOrder() {
+            window.location.href = "${base.contextPath}/account/account-order-history.html?headerId=" + $("#sourceKey").text();
+        }
+        function closeWindows() {
+            open(location, '_self').close();
+        }
+	</script>
+
+
+	<section id="content">
+		<div class="container">
+			<#if headerId??>
+				<span style="display: none;" id="sourceKey">${headerId}</span>
+			</#if>
+			<#if status??>
+				<span style="display: none;" id="orderStatus">${status}</span>
+			</#if>
+			<#if  status == '0'>
+				<div class="row" style="margin-top: 50px">
+					<div class="col-md-2 col-sm-2" style="margin-top: 30px">
+						<div class="col-md-offset-6">
+							<img src="${base.contextPath}/resources/img/u100.png">
+						</div>
+					</div>
+				<div class="col-md-6 col-sm-6" style="margin-top: 35px">
+				<div class="row">
+					<div class="col-sm-6 form-group" style="font-weight: bolder; font-size: 20px; color: black"><@spring.message "mws.payment.result.success"/></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>:</label>
+						<#if orderNumber??>
+							<span  >${orderNumber}</span>
+						</#if>
+					</div>
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.sum_actualpay"/>:</label>
+						<#if actrualPayAmt??>
+						<span style="color: red;" >${actrualPayAmt?string('0.00')}</span>
+					    </#if>
+					</div>
+				</div>
+
+				<div class="row" >
+					<div class="col-sm-3 form-group" style="font-weight: bolder;font-size:20px;color: black">
+						你可以
+					</div>
+
+					<div class="col-sm-9 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+						<div style='font-size: 20px;' class="col-md-6"><a href='${base.contextPath}/index.html'> 返回继续购物 </a></div>
+						<div style='font-size: 20px;' class="col-md-6"><a href='#' onclick="redirectOrder()"> 查看交易详情</a></div>
+					</div>
+				</div>
+<!-- 				<div class="row">
+					<div class="col-md-2 form-group">
+						<button class="btn btn-default btn-sm">关闭窗口</button>
+					</div>
+				</div> -->
+				<div style="margin-bottom: 160px; margin-top: 80px">
+					<p style="font-size: small">
+						<@spring.message "mws.payment.selector.relatecustomer"/>
+					</p>
+				</div>
+			</div>
+		</div>
+		<#elseif  status == '3'>
+		<div class="row" style="margin-top: 50px">
+			<div class="col-md-2 col-sm-2" style="margin-top: 30px">
+				<div class="col-md-offset-6">
+					<img src="${base.contextPath}/resources/img/u100.png">
+				</div>
+			</div>
+			<div class="col-md-6 col-sm-6" style="margin-top: 35px">
+				<div class="row">
+					<div class="col-sm-6 form-group" style="font-weight: bolder; font-size: 20px; color: black"><@spring.message "mws.payment.result.processing"/></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>:</label>
+						<#if orderNumber??>
+							<span  tyle="color: red;">${orderNumber}</span>
+						</#if>
+					</div>
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.sum_actualpay"/>:</label>
+						<#if actrualPayAmt??>
+							<span style="color: red;" >${actrualPayAmt?string('0.00')}</span>
+						</#if>
+					</div>
+				</div>
+				<div class="row" >
+					<div class="col-sm-3 form-group" style="font-weight: bolder;font-size:20px;color: black">
+						你可以
+					</div>
+
+					<div class="col-sm-9 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+						<div style='font-size: 20px;' class="col-md-6"><a href='${base.contextPath}/index.html'> 返回继续购物 </a></div>
+						<div style='font-size: 20px;' class="col-md-6"><a href='#' onclick="redirectOrder()"> 查看交易详情</a></div>
+					</div>
+				</div>
+<!-- 				<div class="row">
+					<div class="col-md-2 form-group">
+						<button class="btn btn-default btn-sm" onclick="closeWindows()">关闭窗口</button>
+					</div>
+				</div> -->
+				<div style="margin-bottom: 160px; margin-top: 80px">
+					<p style="font-size: small">
+						<@spring.message "mws.payment.selector.relatecustomer"/>
+					</p>
+				</div>
+			</div>
+		</div>
+		<#else>
+		<div class="row" style="margin-top: 50px">
+			<div class="col-md-2 col-sm-2" style="margin-top: 30px">
+				<div class="col-md-offset-6">
+					<img src="${base.contextPath}/resources/img/warming.png">
+				</div>
+			</div>
+			<div class="col-md-6 col-sm-6" style="margin-top: 35px">
+				<div class="row">
+					<div class="col-sm-6 form-group" style="font-weight: bolder; font-size: 20px; color: black"><@spring.message "mws.payment.result.fail"/></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>:</label>
+						<#if orderNumber??>
+							<span style="color: red;">${orderNumber}</span>
+						</#if>
+					</div>
+					<div class="col-sm-6 form-group" style="color: black; border-right: 1px solid #E8E8E8; height: 24px;">
+						<label><@spring.message "mws.orderhistory.sum_actualpay"/>:</label>
+						<#if actrualPayAmt??>
+							<span style="color: red;">${actrualPayAmt?string('0.00')}</span>
+						</#if>
+					</div>
+				</div>
+				<div class="row" >
+					<div class="col-sm-3 form-group" style="font-weight: bolder;font-size:20px;color: black">
+						你可以
+					</div>
+
+					<div class="col-sm-9 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+						<div style='font-size: 20px;' class="col-md-6"><a href='${base.contextPath}/index.html'> 返回继续购物 </a></div>
+						<div style='font-size: 20px;' class="col-md-6"><a href='#' onclick="redirectOrder()"> 查看交易详情</a></div>
+					</div>
+				</div>
+<!-- 				<div class="row">
+					<div class="col-md-2 form-group">
+						<button class="btn btn-default btn-sm">关闭窗口</button>
+					</div>
+				</div> -->
+				<div style="margin-bottom: 160px; margin-top: 80px">
+					<p style="font-size: small">
+						<@spring.message "mws.payment.selector.relatecustomer"/>
+					</p>
+				</div>
+			</div>
+			
+
+		</div>
+		</#if>
+ 
+	</div>
+
+</section>
+
+<!-- ========== CONTENT END ========== -->
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

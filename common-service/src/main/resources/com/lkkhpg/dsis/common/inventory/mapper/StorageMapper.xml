@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.inventory.mapper.StorageMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.inventory.dto.Storage">
+        <id column="TRX_ID" property="trxId" jdbcType="DECIMAL" />
+        <result column="TRX_DATE" property="trxDate" jdbcType="TIMESTAMP" />
+        <result column="TRX_NUMBER" property="trxNumber" jdbcType="VARCHAR" />
+        <result column="ORGANIZATION_ID" property="organizationId" jdbcType="DECIMAL" />
+        <result column="ITEM_NAME"  property="itemName" jdbcType="VARCHAR"/>
+        <result column="ITEM_NUMBER"  property="itemNumber" jdbcType="VARCHAR"/>
+        <result column="NAME" property="name" jdbcType="VARCHAR"/>
+        <result column="MEANING" property="meaning" jdbcType="VARCHAR"/>
+        <result column="CATEGORY_NAME" property="categoryName" jdbcType="VARCHAR"/>
+        <result column="UNIT_PRICE" property="unitPrice" jdbcType="VARCHAR" />
+        <result column="QUANTITY" property="quantity" jdbcType="DECIMAL" />
+        <result column="USER_NAME" property="userName" jdbcType="VARCHAR"/>
+        <result column="TRX_DATE" property="trxDateFrom" jdbcType="TIMESTAMP" />
+        <result column="TRX_DATE" property="trxDateTo" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <select id="queryStorage" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.dto.Storage">
+  SELECT IST.TRX_DATE,
+       IST.TRX_NUMBER,
+       IST.ORGANIZATION_ID,
+       SIOT.NAME,
+       SCVB.MEANING,
+       ICBT.CATEGORY_NAME,
+       IIB.ITEM_NAME,
+       IIB.ITEM_NUMBER,
+       ISTD.QUANTITY,
+       ISTD.UNIT_PRICE,
+       ISTD.CREATED_BY,
+       SU.USER_NAME
+  FROM INV_CATEGORY_B          ICB,
+       INV_CATEGORY_TL         ICBT,
+       INV_ITEM_CATEGORY       IIC,
+       SYS_USER                SU,
+       SYS_CODE_B              SCB,
+       SYS_CODE_VALUE_B        SCVB,
+       SPM_INV_ORGANIZATION_TL SIOT,
+       SPM_INV_ORGANIZATION_B  SIOB,
+       INV_ITEM_B              IIB,
+       INV_STOCK_TRX           IST,
+       INV_STOCK_TRX_DETAIL    ISTD
+
+ WHERE IST.ORGANIZATION_ID = SIOT.INV_ORG_ID
+   AND IST.TRX_ID = ISTD.TRX_ID
+   AND SIOT.INV_ORG_ID = SIOB.INV_ORG_ID
+   AND SIOT.LANG = 'zh_CN'
+   AND IIB.ITEM_ID = ISTD.ITEM_ID
+   AND SCB.CODE_ID = SCVB.CODE_ID
+   AND ISTD.OPER_TYPE = SCVB.VALUE
+   AND SCB.CODE = 'INV.ADJUSTMENT_TYPE'
+   AND ISTD.CREATED_BY = SU.USER_ID(+)
+   AND ICB.CATEGORY_ID = ICBT.CATEGORY_ID
+   AND ICBT.LANG = 'zh_CN'
+   AND ICB.CATEGORY_ID = IIC.CATEGORY_ID
+   AND IIC.ITEM_ID = ISTD.ITEM_ID
+   <if test="organizationId != null" >
+   AND IST.ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL}
+   </if>
+   <if test="trxNumber !=null">
+       AND UPPER(TRX_NUMBER) like concat('%', concat(UPPER(#{trxNumber, jdbcType=VARCHAR}),'%'))
+   </if>
+        <if test="trxDateFrom != null and trxDateTo != null">
+            AND trunc(TRX_DATE) between #{trxDateFrom, jdbcType=TIMESTAMP} and #{trxDateTo, jdbcType=TIMESTAMP}
+        </if>
+        <if test="trxDateFrom != null and trxDateTo == null">
+            AND trunc(TRX_DATE) <![CDATA[ >= ]]> #{trxDateFrom, jdbcType=TIMESTAMP}
+        </if>
+        <if test="trxDateFrom == null and trxDateTo != null">
+            AND trunc(TRX_DATE)  <![CDATA[ <= ]]> #{trxDateTo, jdbcType=TIMESTAMP}
+        </if>
+    </select>
+
+</mapper>

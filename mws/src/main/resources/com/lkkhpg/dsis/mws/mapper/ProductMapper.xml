@@ -1,0 +1,879 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.mws.mapper.ProductMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.mws.dto.Product">
+        <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL"/>
+        <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR"/>
+        <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR"/>
+        <result column="ITEM_TYPE" property="itemType" jdbcType="VARCHAR"/>
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR"/>
+        <result column="ITEM_AMOUNT" property="itemAmount" jdbcType="DECIMAL"/>
+        <result column="UOM_CODE" property="uomCode" jdbcType="VARCHAR"/>
+        <result column="UOM_NAME" property="uomName" jdbcType="VARCHAR"/>
+        <result column="DIS_AMT" property="disAmt" jdbcType="DECIMAL"/>
+        <result column="MIN_ORDER_QUANTITY" property="minOrderQuantity" jdbcType="DECIMAL"/>
+        <result column="PV_AMT" property="pvAmt" jdbcType="DECIMAL"/>
+        <result column="PV_BUY" property="pvBuy" jdbcType="DECIMAL"/>
+        <result column="CATEGORY_ID" property="categoryId" jdbcType="DECIMAL"/>
+        <result column="CATEGORY_NAME" property="categoryName" jdbcType="VARCHAR"/>
+        <result column="TAX" property="tax" jdbcType="VARCHAR"/>
+        <result column="FUNCTION_AREA" property="functionArea" jdbcType="VARCHAR"/>
+        <result column="ORG_ID" property="orgId" jdbcType="DECIMAL"/>
+        <result column="SORT_By" property="sortBy" jdbcType="VARCHAR"/>
+        <result column="REDEEM_ABILITY" property="redeemAbility" jdbcType="VARCHAR"/>
+        <result column="SALES_AID" property="salesAid" jdbcType="VARCHAR"/>
+        <result column="PUBLISH_STATUS" property="publishStatus" jdbcType="VARCHAR"/>
+        <result column="CURRENCY_SYMBOL" property="currencySymbol" jdbcType="VARCHAR"/>
+        <result column="GGCS_CONTENT" property="ggcsContentB" jdbcType="BLOB"/>
+        <result column="BCFS_CONTENT" property="bcfsContentB" jdbcType="BLOB"/>
+        <result column="SYSM_CONTENT" property="sysmContentB" jdbcType="BLOB"/>
+        <result column="SPJJ_CONTENT" property="spjjContentB" jdbcType="BLOB"/>
+        <result column="ZYSX_CONTENT" property="zysxContentB" jdbcType="BLOB"/>
+        <result column="SHFW_CONTENT" property="shfwContentB" jdbcType="BLOB"/>
+
+        <result column="hideStandardParam" property="hideStandardParam" jdbcType="VARCHAR"/>
+
+        <result column="SORT_NUM" property="sortNum" jdbcType="DECIMAL"/>
+        <!--add by furong.tang-->
+        <result column="INV_ORG" property="ivnOrgId" jdbcType="DECIMAL"/>
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR"/>
+        <result column="DIS_KG" property="dis_kg" jdbcType="DECIMAL"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ITEM_ID, ITEM_NUMBER, ITEM_NAME, ITEM_TYPE, ITEM_AMOUNT, UOM_CODE, UOM_NAME, DIS_AMT, MIN_ORDER_QUANTITY,
+        PV_AMT, CATEGORY_ID, CATEGORY_NAME, ORG_ID, SORT_By, REDEEM_ABILITY, SALES_AID, CURRENCY_SYMBOL, TAX, SYS_DATE,
+        SHFW_CONTENT, GGCS_CONTENT, BCFS_CONTENT, SYSM_CONTENT, SPJJ_CONTENT, ZYSX_CONTENT, DESCRIPTION, FUNCTIONAREA, PUBLISH_STATUS, SORT_NUM
+    </sql>
+
+    <select id="getSimpleProductsByWhereClause" resultMap="BaseResultMap">
+        SELECT iib.item_number,
+        COALESCE(iit.item_name, iib.item_name) ITEM_NAME,
+        COALESCE(iit.description, iib.description) DESCRIPTION,
+        iib.MIN_ORDER_QUANTITY,
+        iib.uom_code,
+        iib.publish_status,
+        iib.item_id,
+        iib.item_type,
+        iib.starter_aid,
+        ium.name uom_name,
+        iib.sort_num,
+        (SELECT
+        IAS.ASSIGN_VALUE
+        FROM INV_ITEM_B IB
+        LEFT OUTER JOIN INV_ITEM_ASSIGN IAS ON IAS.ITEM_ID = IB.ITEM_ID
+        WHERE IB.ITEM_ID = iib.item_id
+        AND IAS.ASSIGN_TYPE = 'INV'
+        AND IAS.ENABLED_FLAG = 'Y'
+        AND IAS.ATTRIBUTE1 = 'Y') INV_ORG,
+        (select COALESCE(ict.category_name, icb.category_name)
+        from inv_category_b icb, inv_category_tl ict
+        where icb.category_id = ict.category_id
+        and ict.lang = #{request.locale,jdbcType=VARCHAR}
+        and icb.category_id = #{product.categoryId,jdbcType=DECIMAL}) categoryName ,
+        COALESCE((SELECT opd.unit_price
+        FROM om_price_list opl,
+        om_price_list_detail opd
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opd.price_list_id
+        AND opd.price_type = #{priceType,jdbcType=VARCHAR}
+        AND opd.item_id = iib.item_id
+        AND SYSDATE >= opd.start_active_date
+        AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+        AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) dis_amt,
+        COALESCE((SELECT opd.attribute15
+        FROM om_price_list opl,
+        om_price_list_detail opd
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opd.price_list_id
+        AND opd.price_type = #{priceType,jdbcType=VARCHAR}
+        AND opd.item_id = iib.item_id
+        AND SYSDATE >= opd.start_active_date
+        AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+        AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),'0') dis_kg,
+        (SELECT iiat.content
+        from inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'GGCS') ggcs_content,
+        (SELECT iiat.hide
+        from inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'GGCS') hideStandardParam,
+        (SELECT sc.symbol
+        FROM spm_currency sc
+        WHERE sc.currency_code = #{product.currencyCode,jdbcType=VARCHAR}) currency_symbol,
+        <!--COALESCE((SELECT opd.unit_price
+           FROM om_price_list        opl,
+                om_price_list_detail opd
+          WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+            AND opl.price_list_id = opd.price_list_id
+            AND opd.price_type = 'PV'
+            AND opd.item_id = iib.item_id
+            AND SYSDATE >= opd.start_active_date
+            AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+            AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) pv_amt,-->
+        <!--modifed by furong.tang 将pv_amt含义改为库存可用量-->
+        COALESCE((SELECT SUM(ioq.quantity) -
+        (COALESCE((SELECT SUM(osl.QUANTITY)
+        FROM OM_SALES_ORDER oso, OM_SALES_LINE osl
+        WHERE oso.header_id = osl.header_id
+        AND osl.DEFAULT_INV_ORG_ID = ioq.organization_id
+        AND OSL.ITEM_ID = iib.item_id
+        AND OSO.ORDER_STATUS in ('CHECK','WPAY','COMP','REFUN','REFU')
+        AND NOT EXISTS(SELECT 1
+        FROM om_sales_line osl, dm_order_delivery dod, dm_order_delivery_line dodl
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND dod.ORDER_HEADER_ID = oso.HEADER_ID
+        AND osl.item_id = iib.item_id
+        AND dod.delivery_status IN ('NEW','PCKUP','SHIPP','PDDL','CANCL'))),0)
+        + COALESCE((SELECT
+        SUM(dodl.outstanding_qty)
+        FROM om_sales_line osl,
+        dm_order_delivery dod,
+        dm_order_delivery_line dodl
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND osl.item_id = itpv.item_id
+        AND dod.delivery_status IN ('PDDL','NEW')
+        AND NOT exists(SELECT 1
+                        FROM OM_SALES_ORDER oso
+                       WHERE
+                          dod.ORDER_HEADER_ID = oso.HEADER_ID
+                          AND oso.ORDER_STATUS IN ('REF'))),0))
+        FROM inv_onhand_quantity ioq
+        left join INV_ITEM_PROPERTY_V itpv
+        on itpv.count_item_id = ioq.item_id
+        and cast(itpv.organization_id as number) = ioq.organization_id
+        where
+        ioq.organization_id IN (SELECT IAS.ASSIGN_VALUE
+                                  FROM INV_ITEM_B IB
+                                LEFT OUTER JOIN INV_ITEM_ASSIGN IAS ON IAS.ITEM_ID = IB.ITEM_ID
+                                  WHERE IB.ITEM_ID = iib.item_id
+                                    AND IAS.ASSIGN_TYPE = 'INV'
+                                    AND IAS.ENABLED_FLAG = 'Y'
+                                    AND IAS.ATTRIBUTE1 = 'Y')
+        AND itpv.item_id = iib.item_id
+        GROUP BY ioq.organization_id
+        ,itpv.item_id),0) pv_amt,
+        <!--modifed by furong.tang-->
+        COALESCE((SELECT opd.unit_price
+        FROM om_price_list opl,
+        om_price_list_detail opd
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opd.price_list_id
+        AND opd.price_type = 'RP'
+        AND opd.item_id = iib.item_id
+        AND SYSDATE >= opd.start_active_date
+        AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+        AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) pv_buy
+        FROM inv_item_b iib
+        LEFT OUTER JOIN inv_item_tl iit
+        ON iib.item_id = iit.item_id
+        AND iit.lang = #{request.locale,jdbcType=VARCHAR}
+        LEFT OUTER JOIN inv_unit_of_measure_tl ium
+        ON iib.uom_code = ium.uom_code
+        AND ium.lang = #{request.locale,jdbcType=VARCHAR}
+        WHERE 1 = 1
+        AND iib.starter_aid = 'N'
+        AND EXISTS (SELECT 1
+        FROM om_price_list_detail opld, om_price_list opl
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opld.price_list_id
+        AND opld.item_id = iib.item_id
+        AND opld.price_type = #{priceType,jdbcType=VARCHAR}
+        AND opld.start_active_date &lt;= SYSDATE
+        AND (opld.end_active_date >= SYSDATE OR
+        opld.end_active_date IS NULL))
+        <if test="product.categoryId != '' and product.categoryId != null">
+            AND EXISTS (SELECT 1
+            FROM inv_item_category iic
+            WHERE iic.item_id = iib.item_id
+            and iic.category_id= #{product.categoryId,jdbcType=DECIMAL}
+            )
+        </if>
+        AND EXISTS(SELECT 1 FROM inv_item_availability iia
+        WHERE iia.item_id = iib.item_id
+        <if test="product.functionArea == 'WEB'.toString()">
+            AND iia.function_area = 'WEB'
+        </if>
+        <if test="product.functionArea == 'AUTOS'.toString()">
+            AND iia.function_area = 'AUTOS'
+        </if>
+        )
+        <if test="product.functionArea == 'WEB'.toString()">
+            AND iib.publish_status = 'Y'
+        </if>
+        <if test="product.redeemAbility == 'Y'.toString()">
+            AND iib.redeem_flag = #{product.salesAid,jdbcType=VARCHAR}
+        </if>
+        <if test="product.salesAid == 'Y'.toString()">
+            AND iib.starter_aid = #{product.redeemAbility,jdbcType=VARCHAR}
+        </if>
+        <if test="product.itemName != null and product.itemName != ''">
+            AND COALESCE(iit.item_name, iib.item_name) like concat('%',concat(#{product.itemName,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="product.itemId != null and product.itemId != ''">
+            AND iib.item_id = #{product.itemId,jdbcType=DECIMAL}
+        </if>
+
+        <if test="product.priceFrom != null and product.priceFrom != ''">
+            AND COALESCE((SELECT opd.unit_price
+            FROM om_price_list opl,
+            om_price_list_detail opd
+            WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+            AND opl.price_list_id = opd.price_list_id
+            AND opd.price_type = #{priceType,jdbcType=VARCHAR}
+            AND opd.item_id = iib.item_id
+            AND SYSDATE >= opd.start_active_date
+            AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+            AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) >= #{product.priceFrom,jdbcType=DECIMAL}
+        </if>
+        <if test="product.priceTo != null and product.priceTo != ''">
+            AND COALESCE((SELECT opd.unit_price
+            FROM om_price_list opl,
+            om_price_list_detail opd
+            WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+            AND opl.price_list_id = opd.price_list_id
+            AND opd.price_type = #{priceType,jdbcType=VARCHAR}
+            AND opd.item_id = iib.item_id
+            AND SYSDATE >= opd.start_active_date
+            AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+            AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) &lt;= #{product.priceTo,jdbcType=DECIMAL}
+        </if>
+
+        <if test="product.sortBy == null or product.sortBy == ''">
+            ORDER BY sort_num
+        </if>
+        <if test="product.sortBy == 'price-ascending'.toString()">
+            ORDER BY dis_amt ASC
+        </if>
+        <if test="product.sortBy == 'price-descending'.toString()">
+            ORDER BY dis_amt DESC
+        </if>
+        <if test="product.sortBy == 'pv-descending'.toString()">
+            ORDER BY pv_amt DESC
+        </if>
+        <if test="product.sortBy == 'pv-ascending'.toString()">
+            ORDER BY pv_amt ASC
+        </if>
+    </select>
+
+    <select id="getSimpleProductsByWhereClause2" resultMap="BaseResultMap">
+        SELECT iib.item_number,
+        COALESCE(iit.item_name, iib.item_name) ITEM_NAME,
+        COALESCE(iit.description, iib.description) DESCRIPTION,
+        iib.MIN_ORDER_QUANTITY,
+        iib.uom_code,
+        iib.publish_status,
+        iib.item_id,
+        iib.item_type,
+        iib.starter_aid,
+        ium.name uom_name,
+        iib.sort_num,
+        (SELECT
+        IAS.ASSIGN_VALUE
+        FROM INV_ITEM_B IB
+        LEFT OUTER JOIN INV_ITEM_ASSIGN IAS ON IAS.ITEM_ID = IB.ITEM_ID
+        WHERE IB.ITEM_ID = iib.item_id
+        AND IAS.ASSIGN_TYPE = 'INV'
+        AND IAS.ENABLED_FLAG = 'Y'
+        AND IAS.ATTRIBUTE1 = 'Y') INV_ORG,
+        (select COALESCE(ict.category_name, icb.category_name)
+        from inv_category_b icb, inv_category_tl ict
+        where icb.category_id = ict.category_id
+        and ict.lang = #{request.locale,jdbcType=VARCHAR}
+        and icb.category_id = #{product.categoryId,jdbcType=DECIMAL}) categoryName ,
+        COALESCE((SELECT opd.unit_price
+        FROM om_price_list opl,
+        om_price_list_detail opd
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opd.price_list_id
+        AND opd.price_type = #{priceType,jdbcType=VARCHAR}
+        AND opd.item_id = iib.item_id
+        AND SYSDATE >= opd.start_active_date
+        AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+        AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) dis_amt,
+        COALESCE((SELECT opd.attribute15
+        FROM om_price_list opl,
+        om_price_list_detail opd
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opd.price_list_id
+        AND opd.price_type = #{priceType,jdbcType=VARCHAR}
+        AND opd.item_id = iib.item_id
+        AND SYSDATE >= opd.start_active_date
+        AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+        AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),'0') dis_kg,
+
+
+        (SELECT iiat.content
+        from inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'GGCS') ggcs_content,
+        (SELECT iiat.hide
+        from inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'GGCS') hideStandardParam,
+        (SELECT sc.symbol
+        FROM spm_currency sc
+        WHERE sc.currency_code = #{product.currencyCode,jdbcType=VARCHAR}) currency_symbol,
+        <!--COALESCE((SELECT opd.unit_price
+           FROM om_price_list        opl,
+                om_price_list_detail opd
+          WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+            AND opl.price_list_id = opd.price_list_id
+            AND opd.price_type = 'PV'
+            AND opd.item_id = iib.item_id
+            AND SYSDATE >= opd.start_active_date
+            AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+            AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) pv_amt,-->
+        <!--modifed by furong.tang 将pv_amt含义改为库存可用量-->
+        COALESCE((SELECT SUM(ioq.quantity) -
+        (<!--COALESCE(
+        (SELECT SUM(osl.QUANTITY)
+        FROM OM_SALES_ORDER oso INNER JOIN OM_SALES_LINE osl
+        ON OSO.HEADER_ID = OSL.HEADER_ID
+        WHERE osl.DEFAULT_INV_ORG_ID = ioq.organization_id
+        AND OSL.ITEM_ID = iib.item_id
+        AND OSO.ORDER_STATUS IN ('WPAY')),
+        0)
+        + -->COALESCE((SELECT SUM(osl.QUANTITY)
+        FROM OM_SALES_ORDER oso, OM_SALES_LINE osl
+        WHERE oso.header_id = osl.header_id
+        AND osl.DEFAULT_INV_ORG_ID = ioq.organization_id
+        AND OSL.ITEM_ID = iib.item_id
+        AND OSO.ORDER_STATUS IN ('WPAY','COMP','REFUN','REFU')
+        AND NOT EXISTS(SELECT *
+        FROM om_sales_line osl, dm_order_delivery dod, dm_order_delivery_line dodl
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND dod.ORDER_HEADER_ID = oso.HEADER_ID
+        AND osl.item_id = iib.item_id
+        AND dod.delivery_status IN ('NEW','PCKUP','SHIPP','PDDL','CANCL'))),0)
+        + COALESCE((SELECT
+        SUM(dodl.outstanding_qty)
+        FROM om_sales_line osl,
+        dm_order_delivery dod,
+        dm_order_delivery_line dodl
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND osl.item_id = itpv.item_id
+        AND dod.delivery_status IN ('PDDL','NEW')
+        AND NOT exists(SELECT *
+                          FROM OM_SALES_ORDER oso
+                        WHERE
+                          dod.ORDER_HEADER_ID = oso.HEADER_ID
+                          AND oso.ORDER_STATUS IN ('REF'))),0))
+        FROM inv_onhand_quantity ioq
+        left join INV_ITEM_PROPERTY_V itpv
+        on itpv.count_item_id = ioq.item_id
+        and cast(itpv.organization_id as number) = ioq.organization_id
+        where
+        ioq.organization_id IN (SELECT IAS.ASSIGN_VALUE
+                                  FROM INV_ITEM_B IB
+                                  LEFT OUTER JOIN INV_ITEM_ASSIGN IAS ON IAS.ITEM_ID = IB.ITEM_ID
+                                  WHERE IB.ITEM_ID = iib.item_id
+                                    AND IAS.ASSIGN_TYPE = 'INV'
+                                    AND IAS.ENABLED_FLAG = 'Y'
+                                    AND IAS.ATTRIBUTE1 = 'Y')
+        AND itpv.item_id = iib.item_id
+        GROUP BY ioq.organization_id
+        ,itpv.item_id),0) pv_amt,
+        <!--modifed by furong.tang-->
+        COALESCE((SELECT opd.unit_price
+        FROM om_price_list opl,
+        om_price_list_detail opd
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opd.price_list_id
+        AND opd.price_type = 'RP'
+        AND opd.item_id = iib.item_id
+        AND SYSDATE >= opd.start_active_date
+        AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+        AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) pv_buy
+        FROM inv_item_b iib
+        LEFT OUTER JOIN inv_item_tl iit
+        ON iib.item_id = iit.item_id
+        AND iit.lang = #{request.locale,jdbcType=VARCHAR}
+        LEFT OUTER JOIN inv_unit_of_measure_tl ium
+        ON iib.uom_code = ium.uom_code
+        AND ium.lang = #{request.locale,jdbcType=VARCHAR}
+        WHERE 1 = 1
+        AND iib.starter_aid = 'N'
+        AND EXISTS (SELECT 1
+        FROM om_price_list_detail opld, om_price_list opl
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opld.price_list_id
+        AND opld.item_id = iib.item_id
+        AND opld.price_type = #{priceType,jdbcType=VARCHAR}
+        AND opld.start_active_date &lt;= SYSDATE
+        AND (opld.end_active_date >= SYSDATE OR
+        opld.end_active_date IS NULL))
+        <if test="product.categoryId != '' and product.categoryId != null">
+            AND EXISTS (SELECT 1
+            FROM inv_item_category iic
+            WHERE iic.item_id = iib.item_id
+            and iic.category_id= #{product.categoryId,jdbcType=DECIMAL}
+            )
+        </if>
+        AND EXISTS(SELECT 1 FROM inv_item_availability iia
+        WHERE iia.item_id = iib.item_id
+        <if test="product.functionArea == 'WEB'.toString()">
+            AND iia.function_area = 'WEB'
+        </if>
+        <if test="product.functionArea == 'AUTOS'.toString()">
+            AND iia.function_area = 'AUTOS'
+        </if>
+        )
+        <if test="product.functionArea == 'WEB'.toString()">
+            AND iib.publish_status = 'Y'
+        </if>
+        <if test="product.redeemAbility == 'Y'.toString()">
+            AND iib.redeem_flag = #{product.salesAid,jdbcType=VARCHAR}
+        </if>
+        <if test="product.salesAid == 'Y'.toString()">
+            AND iib.starter_aid = #{product.redeemAbility,jdbcType=VARCHAR}
+        </if>
+        <if test="product.itemName != null and product.itemName != ''">
+            AND COALESCE(iit.item_name, iib.item_name) like concat('%',concat(#{product.itemName,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="product.itemId != null and product.itemId != ''">
+            AND iib.item_id = #{product.itemId,jdbcType=DECIMAL}
+        </if>
+
+        <if test="product.priceFrom != null and product.priceFrom != ''">
+            AND COALESCE((SELECT opd.unit_price
+            FROM om_price_list opl,
+            om_price_list_detail opd
+            WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+            AND opl.price_list_id = opd.price_list_id
+            AND opd.price_type = #{priceType,jdbcType=VARCHAR}
+            AND opd.item_id = iib.item_id
+            AND SYSDATE >= opd.start_active_date
+            AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+            AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) >= #{product.priceFrom,jdbcType=DECIMAL}
+        </if>
+        <if test="product.priceTo != null and product.priceTo != ''">
+            AND COALESCE((SELECT opd.unit_price
+            FROM om_price_list opl,
+            om_price_list_detail opd
+            WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+            AND opl.price_list_id = opd.price_list_id
+            AND opd.price_type = #{priceType,jdbcType=VARCHAR}
+            AND opd.item_id = iib.item_id
+            AND SYSDATE >= opd.start_active_date
+            AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+            AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) &lt;= #{product.priceTo,jdbcType=DECIMAL}
+        </if>
+
+        <if test="product.sortBy == null or product.sortBy == ''">
+            ORDER BY sort_num
+        </if>
+        <if test="product.sortBy == 'price-ascending'.toString()">
+            ORDER BY dis_amt ASC
+        </if>
+        <if test="product.sortBy == 'price-descending'.toString()">
+            ORDER BY dis_amt DESC
+        </if>
+        <if test="product.sortBy == 'pv-descending'.toString()">
+            ORDER BY pv_amt DESC
+        </if>
+        <if test="product.sortBy == 'pv-ascending'.toString()">
+            ORDER BY pv_amt ASC
+        </if>
+    </select>
+
+    <select id="getDetailProductsByWhereClause" resultMap="BaseResultMap">
+        SELECT iib.item_id,
+        iib.item_number,
+        COALESCE(iit.item_name, iib.item_name) ITEM_NAME,
+        COALESCE(iit.description, iib.description) description,
+        iib.uom_code,
+        iib.publish_status,
+        ium.name uom_name,
+        COALESCE((SELECT opd.unit_price
+        FROM om_price_list opl,
+        om_price_list_detail opd
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opd.price_list_id
+        <!--AND opd.price_type = #{priceType,jdbcType=VARCHAR}-->
+        AND opd.item_id = iib.item_id
+        AND SYSDATE >= opd.start_active_date
+        AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+        AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) dis_amt,
+        (SELECT sc.symbol
+        FROM spm_currency sc
+        WHERE sc.currency_code = #{product.currencyCode,jdbcType=VARCHAR}) currency_symbol,
+        <!--COALESCE((SELECT opd.unit_price
+           FROM om_price_list        opl,
+                om_price_list_detail opd
+          WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+            AND opl.price_list_id = opd.price_list_id
+            AND opd.price_type = 'PV'
+            AND opd.item_id = iib.item_id
+            AND SYSDATE >= opd.start_active_date
+            AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+            AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) pv_amt,-->
+        <!--modifed by furong.tang 将pv_amt含义改为库存可用量-->
+        COALESCE((SELECT SUM(ioq.quantity) -
+        (COALESCE((SELECT SUM(osl.QUANTITY)
+        FROM OM_SALES_ORDER oso, OM_SALES_LINE osl
+        WHERE oso.header_id = osl.header_id
+        AND osl.DEFAULT_INV_ORG_ID = ioq.organization_id
+        AND OSL.ITEM_ID = iib.item_id
+        AND OSO.ORDER_STATUS IN ('CHECK','WPAY','COMP','REFUN','REFU')
+        AND NOT EXISTS(SELECT *
+        FROM om_sales_line osl, dm_order_delivery dod, dm_order_delivery_line dodl
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND dod.ORDER_HEADER_ID = oso.HEADER_ID
+        AND osl.item_id = iib.item_id
+        AND dod.delivery_status IN ('NEW','PCKUP','SHIPP','PDDL','CANCL'))),0)
+        + COALESCE(
+        <!--SELECT
+        SUM(dodl.outstanding_qty)
+        FROM om_sales_line          osl,
+        dm_order_delivery      dod,
+        dm_order_delivery_line dodl
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND osl.item_id = itpv.item_id
+        AND dod.delivery_status IN ('PDDL','NEW')-->
+        (SELECT SUM(dodl.outstanding_qty)
+        FROM om_sales_line osl,
+        dm_order_delivery dod,
+        dm_order_delivery_line dodl
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND osl.item_id = itpv.item_id
+        AND dod.delivery_status IN ('PDDL','NEW')
+        AND NOT exists(SELECT *
+                          FROM OM_SALES_ORDER oso
+                        WHERE
+                          dod.ORDER_HEADER_ID = oso.HEADER_ID
+                          AND oso.ORDER_STATUS IN ('REF'))),0))
+        FROM inv_onhand_quantity ioq
+        left join INV_ITEM_PROPERTY_V itpv
+        on itpv.count_item_id = ioq.item_id
+        and cast(itpv.organization_id as number) = ioq.organization_id
+        where
+        ioq.organization_id IN (SELECT IAS.ASSIGN_VALUE
+                                    FROM INV_ITEM_B IB
+                                    LEFT OUTER JOIN INV_ITEM_ASSIGN IAS ON IAS.ITEM_ID = IB.ITEM_ID
+                                    WHERE IB.ITEM_ID = iib.item_id
+                                    AND IAS.ASSIGN_TYPE = 'INV'
+                                    AND IAS.ENABLED_FLAG = 'Y'
+                                    AND IAS.ATTRIBUTE1 = 'Y')
+        AND itpv.item_id = iib.item_id
+        GROUP BY ioq.organization_id
+        ,itpv.item_id),0) pv_amt,
+        <!--modifed by furong.tang-->
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'SPJJ') SPJJ_CONTENT,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'GGCS') GGCS_CONTENT,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'SHFW') SHFW_CONTENT,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'SYSM') SYSM_CONTENT,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'ZYSX') ZYSX_CONTENT,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'DOSE') BCFS_CONTENT
+        FROM inv_item_b iib
+        LEFT OUTER JOIN inv_item_tl iit
+        ON iib.item_id = iit.item_id
+        AND iit.lang = #{request.locale,jdbcType=VARCHAR}
+        LEFT OUTER JOIN inv_unit_of_measure_tl ium
+        ON iib.uom_code = ium.uom_code
+        AND ium.lang = #{request.locale,jdbcType=VARCHAR}
+        WHERE iib.item_id = #{product.itemId,jdbcType=DECIMAL}
+        AND EXISTS (SELECT 1
+        FROM om_price_list_detail opld, om_price_list opl
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opld.price_list_id
+        AND opld.item_id = iib.item_id
+        <!--AND opld.price_type = #{priceType,jdbcType=VARCHAR}-->
+        AND opld.start_active_date &lt;= SYSDATE
+        AND (opld.end_active_date >= SYSDATE OR
+        opld.end_active_date IS NULL))
+    </select>
+
+    <select id="getDetailProductsByWhereClause2" resultMap="BaseResultMap">
+        SELECT iib.item_id,
+        iib.item_number,
+        COALESCE(iit.item_name, iib.item_name) ITEM_NAME,
+        COALESCE(iit.description, iib.description) description,
+        iib.uom_code,
+        iib.publish_status,
+        ium.name uom_name,
+        COALESCE((SELECT opd.unit_price
+        FROM om_price_list opl,
+        om_price_list_detail opd
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opd.price_list_id
+        <!--AND opd.price_type = #{priceType,jdbcType=VARCHAR}-->
+        AND opd.item_id = iib.item_id
+        AND SYSDATE >= opd.start_active_date
+        AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+        AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) dis_amt,
+        (SELECT sc.symbol
+        FROM spm_currency sc
+        WHERE sc.currency_code = #{product.currencyCode,jdbcType=VARCHAR}) currency_symbol,
+        <!--COALESCE((SELECT opd.unit_price
+           FROM om_price_list        opl,
+                om_price_list_detail opd
+          WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+            AND opl.price_list_id = opd.price_list_id
+            AND opd.price_type = 'PV'
+            AND opd.item_id = iib.item_id
+            AND SYSDATE >= opd.start_active_date
+            AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+            AND opd.currency = #{product.currencyCode,jdbcType=VARCHAR}),0) pv_amt,-->
+        <!--modifed by furong.tang 将pv_amt含义改为库存可用量-->
+        COALESCE((SELECT SUM(ioq.quantity) -
+        (COALESCE((SELECT SUM(osl.QUANTITY)
+        FROM OM_SALES_ORDER oso, OM_SALES_LINE osl
+        WHERE oso.header_id = osl.header_id
+        AND osl.DEFAULT_INV_ORG_ID = ioq.organization_id
+        AND OSL.ITEM_ID = iib.item_id
+        AND OSO.ORDER_STATUS IN ('COMP','WPAY','REFUN','REFU')
+        AND NOT EXISTS(SELECT *
+        FROM om_sales_line osl, dm_order_delivery dod, dm_order_delivery_line dodl
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND dod.ORDER_HEADER_ID = oso.HEADER_ID
+        AND osl.item_id = iib.item_id
+        AND dod.delivery_status IN ('NEW','PCKUP','SHIPP','PDDL','CANCL'))),0)
+        + COALESCE(
+        <!--SELECT
+        SUM(dodl.outstanding_qty)
+        FROM om_sales_line          osl,
+        dm_order_delivery      dod,
+        dm_order_delivery_line dodl
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND osl.item_id = itpv.item_id
+        AND dod.delivery_status IN ('PDDL','NEW')-->
+        (SELECT SUM(dodl.outstanding_qty)
+        FROM om_sales_line osl,
+        dm_order_delivery dod,
+        dm_order_delivery_line dodl
+        WHERE dod.delivery_id = dodl.delivery_id
+        AND dodl.order_line_id = osl.line_id
+        AND dod.inv_org_id = ioq.organization_id
+        AND osl.item_id = itpv.item_id
+        AND dod.delivery_status IN ('PDDL','NEW')
+        AND NOT exists(SELECT *
+                          FROM OM_SALES_ORDER oso
+                        WHERE
+                          dod.ORDER_HEADER_ID = oso.HEADER_ID
+                          AND oso.ORDER_STATUS IN ('REF'))),0))
+        FROM inv_onhand_quantity ioq
+        left join INV_ITEM_PROPERTY_V itpv
+        on itpv.count_item_id = ioq.item_id
+        and cast(itpv.organization_id as number) = ioq.organization_id
+        where
+        ioq.organization_id IN (SELECT IAS.ASSIGN_VALUE
+                                  FROM INV_ITEM_B IB
+                                LEFT OUTER JOIN INV_ITEM_ASSIGN IAS ON IAS.ITEM_ID = IB.ITEM_ID
+                                  WHERE IB.ITEM_ID = iib.item_id
+                                AND IAS.ASSIGN_TYPE = 'INV'
+                                AND IAS.ENABLED_FLAG = 'Y'
+                                AND IAS.ATTRIBUTE1 = 'Y')
+        AND itpv.item_id = iib.item_id
+        GROUP BY ioq.organization_id
+        ,itpv.item_id),0) pv_amt,
+        <!--modifed by furong.tang-->
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'SPJJ') SPJJ_CONTENT,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'GGCS') GGCS_CONTENT,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'SHFW') SHFW_CONTENT,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'SYSM') SYSM_CONTENT,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'ZYSX') ZYSX_CONTENT,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'DOSE') BCFS_CONTENT
+        FROM inv_item_b iib
+        LEFT OUTER JOIN inv_item_tl iit
+        ON iib.item_id = iit.item_id
+        AND iit.lang = #{request.locale,jdbcType=VARCHAR}
+        LEFT OUTER JOIN inv_unit_of_measure_tl ium
+        ON iib.uom_code = ium.uom_code
+        AND ium.lang = #{request.locale,jdbcType=VARCHAR}
+        WHERE iib.item_id = #{product.itemId,jdbcType=DECIMAL}
+        AND EXISTS (SELECT 1
+        FROM om_price_list_detail opld, om_price_list opl
+        WHERE opl.sales_org_id = #{product.orgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opld.price_list_id
+        AND opld.item_id = iib.item_id
+        <!--AND opld.price_type = #{priceType,jdbcType=VARCHAR}-->
+        AND opld.start_active_date &lt;= SYSDATE
+        AND (opld.end_active_date >= SYSDATE OR
+        opld.end_active_date IS NULL))
+    </select>
+
+    <select id="getProductsCategoryNamesByItemId" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.mws.dto.Product">
+SELECT coalesce(ict.category_name,
+                icb.category_name) categoryname,
+       iic.category_id,
+       icb.parent_category_id
+  FROM (inv_category_b icb LEFT JOIN inv_category_tl ict ON icb.category_id = ict.category_id AND ict.lang = #{request.locale,jdbcType=VARCHAR}),
+       inv_item_category iic
+ WHERE 1 = 1
+   AND iic.category_id = icb.category_id
+   AND EXISTS (SELECT 1
+          FROM inv_item_b iib
+         WHERE iib.item_id = #{itemId, jdbcType = DECIMAL}
+           AND iic.item_id = iib.item_id)
+
+    </select>
+
+
+    <select id="getFastProductsByWhereClause" resultMap="BaseResultMap">
+        SELECT iib.item_id,
+        COALESCE(iit.item_name, iib.item_name) item_name,
+        COALESCE((SELECT opd.unit_price
+        FROM om_price_list opl,
+        om_price_list_detail opd
+        WHERE opl.sales_org_id = #{saleOrgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opd.price_list_id
+        AND opd.price_type = #{priceType,jdbcType=VARCHAR}
+        AND opd.item_id = iib.item_id
+        AND SYSDATE >= opd.start_active_date
+        AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+        AND opd.currency = #{Code,jdbcType=VARCHAR}),0) dis_amt,
+        (SELECT iiat.content
+        FROM inv_item_attr_tl iiat
+        WHERE iiat.lang = #{request.locale,jdbcType=VARCHAR}
+        AND iiat.item_id = iib.item_id
+        AND iiat.name = 'GGCS') ggcs_content,
+        COALESCE((SELECT opd.unit_price
+        FROM om_price_list opl,
+        om_price_list_detail opd
+        WHERE opl.sales_org_id = #{saleOrgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opd.price_list_id
+        AND opd.price_type = 'PV'
+        AND opd.item_id = iib.item_id
+        AND SYSDATE >= opd.start_active_date
+        AND (SYSDATE &lt;= opd.end_active_date OR opd.end_active_date IS NULL)
+        AND opd.currency = #{Code,jdbcType=VARCHAR}),0) pv_amt
+        FROM inv_item_b iib
+        LEFT OUTER JOIN inv_item_tl iit
+        ON iib.item_id = iit.item_id
+        AND iit.lang = #{request.locale,jdbcType=VARCHAR}
+        WHERE 1 = 1
+        AND EXISTS (SELECT 1
+        FROM inv_item_category iic
+        WHERE iic.item_id = iib.item_id
+        )
+        AND EXISTS ( SELECT 1
+        FROM inv_item_availability iia
+        WHERE iia.item_id = iiB.item_id
+        AND iia.function_area = 'AUTOS'
+        )
+        AND EXISTS (SELECT 1
+        FROM om_price_list_detail opld, om_price_list opl
+        WHERE opl.sales_org_id = #{saleOrgId,jdbcType=DECIMAL}
+        AND opl.price_list_id = opld.price_list_id
+        AND opld.item_id = iib.item_id
+        AND opld.price_type = #{priceType,jdbcType=VARCHAR}
+        AND opld.start_active_date &lt;= SYSDATE
+        AND (opld.end_active_date >= SYSDATE OR
+        opld.end_active_date IS NULL))
+        <if test="itemName != null and itemName != ''">
+            AND COALESCE(iit.item_name, iib.item_name) like concat('%',concat(#{itemName,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="itemIds.size() > 0">
+            AND iib.item_id NOT IN
+            <foreach collection="itemIds" item="itemId" index="index" open="(" close=")" separator=",">
+                #{itemId,jdbcType=DECIMAL}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getXtfSum" resultType="java.lang.Integer" parameterType="java.lang.Long">
+
+        <!-- SELECT COUNT(IIB.ITEM_ID) FROM INV_ITEM_B iib
+         WHERE #{marketId} IN
+
+         SELECT COUNT(IIB.ITEM_ID) FROM INV_ITEM_B iib
+         WHERE (select b.MARKET_Id FROM INV_ITEM_B b WHERE b.ITEM_ID = #{marketId}) IN
+
+         (SELECT smb.MARKET_ID
+         FROM SPM_MARKET_B smb,SPM_COMPANY_B scb
+         WHERE smb.COMPANY_ID = SCB.COMPANY_ID
+         AND SCB.ATTRIBUTE3='Y')
+         -->
+        SELECT COUNT(IIB.ITEM_ID) FROM INV_ITEM_B iib
+        WHERE iib.MARKET_ID IN
+        (SELECT smb.MARKET_ID
+        FROM SPM_MARKET_B smb,SPM_COMPANY_B scb
+        WHERE smb.COMPANY_ID = SCB.COMPANY_ID
+        AND SCB.ATTRIBUTE3='Y')
+        AND
+        iib.MARKET_ID IN(
+        SELECT ssob.MARKET_ID
+        FROM SPM_SALES_ORGANIZATION_B ssob
+        WHERE ssob.SALES_ORG_ID = #{marketId}
+        )
+
+    </select>
+</mapper>

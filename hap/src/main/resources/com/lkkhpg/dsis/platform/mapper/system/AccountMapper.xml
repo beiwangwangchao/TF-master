@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.system.AccountMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.system.Account" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD">
+        <id column="ACCOUNT_ID" jdbcType="DECIMAL" property="accountId"/>
+        <result column="LOGIN_NAME" jdbcType="VARCHAR" property="loginName"/>
+        <result column="PASSWORD" jdbcType="VARCHAR" property="password"/>
+        <result column="STATUS" jdbcType="VARCHAR" property="status"/>
+        <!-- <result column="USER_NAME" jdbcType="VARCHAR" property="userName"/> -->
+        <result column="FIRST_LOGIN_FLAG" jdbcType="VARCHAR" property="firstLoginFlag"/>
+        <result column="PWD_EXPIRY_DATE" jdbcType="TIMESTAMP" property="pwdExpiryDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        account_id, login_name, password, status, object_version_number, request_id, program_id,
+        creation_date, created_by, last_updated_by, last_update_date, last_update_login,
+        attribute_category, attribute1, attribute2, attribute3, attribute4, attribute5, attribute6,
+        attribute7, attribute8, attribute9, attribute10, attribute11, attribute12, attribute13,
+        attribute14,
+        attribute15,FIRST_LOGIN_FLAG,PWD_EXPIRY_DATE
+    </sql>
+    <select id="selectByLoginName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select account_id, login_name, password,status,pwd_expiry_date
+        from sys_account
+        where login_name = #{loginName,jdbcType=VARCHAR}
+    </select>
+    <!-- <select id="selectByLoginName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select account_id, login_name, password,status,
+        (select u.user_name from sys_user u where u.user_id =
+            (select r.rel_party_id from sys_acc_rel r where account_type = 'USER'
+                and account_id = (select a.account_id from sys_account a 
+                    where Lower(a.login_name) = Lower(#{loginName,jdbcType=VARCHAR}) 
+                        or Initcap(a.login_name) = Initcap(#{loginName,jdbcType=VARCHAR})))) as username,PWD_EXPIRY_DATE
+        from sys_account
+        where (Lower(login_name) = Lower(#{loginName,jdbcType=VARCHAR}) or
+        Initcap(login_name) = Initcap(#{loginName,jdbcType=VARCHAR}))
+    </select> -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from SYS_ACCOUNT
+        where ACCOUNT_ID = #{accountId,jdbcType=DECIMAL}
+    </select>
+    <select id="selectAccounts" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.system.Account">
+        select
+        <include refid="Base_Column_List"/>
+        from SYS_ACCOUNT
+        <where>
+        	
+            <if test="accountId">
+                account_id = #{accountId,jdbcType=DECIMAL}
+            </if>
+            <if test="loginName">
+                AND upper(login_name) = upper(#{loginName,jdbcType=VARCHAR})
+            </if>
+            <if test="status">
+                AND status = #{status,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.Account" >
+        <selectKey keyProperty="accountId" order="BEFORE" resultType="long">
+            select sys_account_s.nextval from dual
+        </selectKey>
+        insert into SYS_ACCOUNT (ACCOUNT_ID, LOGIN_NAME, PASSWORD,PWD_EXPIRY_DATE,
+        STATUS,FIRST_LOGIN_FLAG, REQUEST_ID,
+        PROGRAM_ID, CREATION_DATE, CREATED_BY,
+        LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2,
+        ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5,
+        ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8,
+        ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11,
+        ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14,
+        ATTRIBUTE15)
+        values (#{accountId,jdbcType=DECIMAL}, #{loginName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},#{pwdExpiryDate,jdbcType=TIMESTAMP},
+        #{status,jdbcType=VARCHAR},#{firstLoginFlag,jdbcType=VARCHAR}, #{requestId,jdbcType=DECIMAL},
+        #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR},
+        #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR},
+        #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR},
+        #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR},
+        #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR},
+        #{attribute15,jdbcType=VARCHAR})
+    </insert>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from SYS_ACCOUNT
+        where ACCOUNT_ID = #{accountId,jdbcType=DECIMAL}
+    </delete>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.Account">
+        update SYS_ACCOUNT
+        set 
+            STATUS = #{status,jdbcType=VARCHAR},
+            FIRST_LOGIN_FLAG = #{firstLoginFlag,jdbcType=VARCHAR},
+            OBJECT_VERSION_NUMBER = COALESCE(OBJECT_VERSION_NUMBER,0) + 1,
+            REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+        where ACCOUNT_ID = #{accountId,jdbcType=DECIMAL}
+    </update>
+    <update id="updatePassword" parameterType="com.lkkhpg.dsis.platform.dto.system.Account">
+        update SYS_ACCOUNT
+        <set>
+            PASSWORD = #{password,jdbcType=VARCHAR},
+            PWD_EXPIRY_DATE = #{pwdExpiryDate,jdbcType=TIMESTAMP},
+            OBJECT_VERSION_NUMBER = COALESCE(OBJECT_VERSION_NUMBER,0) + 1,
+            REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            <if test="firstLoginFlag != null" >
+                FIRST_LOGIN_FLAG = #{firstLoginFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="firstLoginFlag == null" >
+                FIRST_LOGIN_FLAG = 'N'
+            </if>
+        </set>
+        where ACCOUNT_ID = #{accountId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateMemberPassword" parameterType="com.lkkhpg.dsis.platform.dto.system.Account">
+        update SYS_ACCOUNT
+        set 
+            PASSWORD = #{password,jdbcType=VARCHAR},
+            PWD_EXPIRY_DATE = #{pwdExpiryDate,jdbcType=TIMESTAMP},
+            FIRST_LOGIN_FLAG = #{firstLoginFlag,jdbcType=VARCHAR},
+            OBJECT_VERSION_NUMBER = COALESCE(OBJECT_VERSION_NUMBER,0) + 1,
+            REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+        where ACCOUNT_ID = #{accountId,jdbcType=DECIMAL}
+    </update>
+    <select id="selectByMember" resultMap="BaseResultMap" parameterType="java.util.HashMap">
+        select sa.login_name, sa.password, sa.status
+  		from sys_account sa, sys_acc_rel sar, mm_member mm, spm_market_b sm
+ 		<where> 
+ 			sa.account_id = sar.account_id
+   			and sar.account_type = 'MEM'
+   			and sar.rel_party_id = mm.member_id
+   			and mm.market_id = sm.market_id
+			and mm.member_code = #{distributorNumber,jdbcType=VARCHAR}
+			<if test="market != null">
+				and sm.code = #{market,jdbcType=VARCHAR}
+			</if>
+		</where>
+    </select>
+    
+    <select id="selectByMemberId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT <include refid="Base_Column_List"/>
+          FROM sys_account sa
+         WHERE EXISTS (SELECT 'X'
+               FROM sys_acc_rel sar
+              WHERE sa.account_id = sar.account_id
+                AND sar.account_type = 'MEM'
+                AND sar.rel_party_id = #{memberId,jdbcType=DECIMAL})
+    </select>
+</mapper>

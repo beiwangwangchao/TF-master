@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.inventory.mapper.StockTrxDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.inventory.dto.StockTrxDetail" >
+    <id column="TRX_DETAIL_ID" property="trxDetailId" jdbcType="DECIMAL" />
+    <result column="TRX_ID" property="trxId" jdbcType="DECIMAL" />
+    <result column="ORGANIZATION_ID" property="organizationId" jdbcType="DECIMAL" />
+    <result column="SUBINVENTORY_ID" property="subinventoryId" jdbcType="DECIMAL" />
+    <result column="LOCATOR_ID" property="locatorId" jdbcType="DECIMAL" />
+    <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL" />
+    <result column="OPER_TYPE" property="operType" jdbcType="VARCHAR" />
+    <result column="OPER_REASON_CODE" property="operReasonCode" jdbcType="VARCHAR" />
+    <result column="LOT_NUMBER" property="lotNumber" jdbcType="VARCHAR" />
+    <result column="EXPIRY_DATE" property="expiryDate" jdbcType="TIMESTAMP" />
+    <result column="PACKING_TYPE" property="packingType" jdbcType="VARCHAR" />
+    <result column="UNIT_OF_CARTON" property="unitOfCarton" jdbcType="DECIMAL" />
+    <result column="NUMBER_OF_CARTON" property="numberOfCarton" jdbcType="DECIMAL" />
+    <result column="NUMBER_OF_IND_CARTON" property="numberOfIndCarton" jdbcType="DECIMAL" />
+    <result column="REMAINING_IND_AFT_CAR" property="remainingIndAftCar" jdbcType="DECIMAL" />
+    <result column="QUANTITY" property="quantity" jdbcType="DECIMAL" />
+    <result column="UNIT_COST" property="unitCost" jdbcType="DECIMAL" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <!-- 自定义添加字段 -->
+    <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR" />
+    <result column="ITEM_CODE" property="itemCode" jdbcType="VARCHAR" />
+    <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+    <result column="UOM_CODE" property="uomCode" jdbcType="VARCHAR" />
+    <result column="UOM_NAME" property="uomName" jdbcType="VARCHAR" />
+    <result column="TO_UOM_NAME" property="toUomName" jdbcType="VARCHAR" />
+    <result column="UNIT_PRICE" property="unitPrice" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    TRX_DETAIL_ID, TRX_ID, ORGANIZATION_ID, SUBINVENTORY_ID, LOCATOR_ID, ITEM_ID, OPER_TYPE, 
+    OPER_REASON_CODE, LOT_NUMBER, EXPIRY_DATE, PACKING_TYPE, UNIT_OF_CARTON, NUMBER_OF_CARTON, 
+    NUMBER_OF_IND_CARTON, REMAINING_IND_AFT_CAR, QUANTITY, UNIT_COST, REMARK, OBJECT_VERSION_NUMBER, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,UNIT_PRICE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from INV_STOCK_TRX_DETAIL
+    where TRX_DETAIL_ID = #{trxDetailId,jdbcType=DECIMAL}
+  </select>
+  <!-- 根据明细ID删除明细行 -->
+  <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.inventory.dto.StockTrxDetail" >
+    delete from INV_STOCK_TRX_DETAIL
+    where TRX_DETAIL_ID = #{trxDetailId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.dto.StockTrxDetail" >
+    <selectKey resultType="java.lang.Long" keyProperty="trxDetailId" order="BEFORE" >
+      select inv_stock_trx_detail_s.nextval from dual
+    </selectKey>
+    insert into INV_STOCK_TRX_DETAIL (TRX_DETAIL_ID, TRX_ID, ORGANIZATION_ID, 
+      SUBINVENTORY_ID, LOCATOR_ID, ITEM_ID, 
+      OPER_TYPE, OPER_REASON_CODE, LOT_NUMBER, 
+      EXPIRY_DATE, PACKING_TYPE, UNIT_OF_CARTON, 
+      NUMBER_OF_CARTON, NUMBER_OF_IND_CARTON, REMAINING_IND_AFT_CAR, 
+      QUANTITY, UNIT_COST, REMARK, 
+      OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,UNIT_PRICE
+      )
+    values (#{trxDetailId,jdbcType=DECIMAL}, #{trxId,jdbcType=DECIMAL}, #{organizationId,jdbcType=DECIMAL}, 
+      #{subinventoryId,jdbcType=DECIMAL}, #{locatorId,jdbcType=DECIMAL}, #{itemId,jdbcType=DECIMAL}, 
+      #{operType,jdbcType=VARCHAR}, #{operReasonCode,jdbcType=VARCHAR}, #{lotNumber,jdbcType=VARCHAR}, 
+      #{expiryDate,jdbcType=TIMESTAMP}, #{packingType,jdbcType=VARCHAR}, #{unitOfCarton,jdbcType=DECIMAL}, 
+      #{numberOfCarton,jdbcType=DECIMAL}, #{numberOfIndCarton,jdbcType=DECIMAL}, #{remainingIndAftCar,jdbcType=DECIMAL}, 
+      #{quantity,jdbcType=DECIMAL}, #{unitCost,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
+      1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+     CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR},#{unitPrice,jdbcType=VARCHAR}
+      )
+  </insert>
+  <!-- 创建出入库事务明细行 -->
+  <insert id="insertStockTrxDetail" parameterType="com.lkkhpg.dsis.common.inventory.dto.StockTrxDetail" useGeneratedKeys="true">
+    <selectKey resultType="java.lang.Long" keyProperty="trxDetailId" order="BEFORE" >
+      select inv_stock_trx_detail_s.nextval from dual
+    </selectKey>
+    insert into INV_STOCK_TRX_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      TRX_DETAIL_ID,
+      <if test="trxId != null" >
+        TRX_ID,
+      </if>
+      <if test="organizationId != null" >
+        ORGANIZATION_ID,
+      </if>
+      <if test="subinventoryId != null" >
+        SUBINVENTORY_ID,
+      </if>
+      <if test="locatorId != null" >
+        LOCATOR_ID,
+      </if>
+      <if test="itemId != null" >
+        ITEM_ID,
+      </if>
+      <if test="operType != null" >
+        OPER_TYPE,
+      </if>
+      <if test="operReasonCode != null" >
+        OPER_REASON_CODE,
+      </if>
+      <if test="lotNumber != null" >
+        LOT_NUMBER,
+      </if>
+      <if test="expiryDate != null" >
+        EXPIRY_DATE,
+      </if>
+      <if test="packingType != null" >
+        PACKING_TYPE,
+      </if>
+      <if test="unitOfCarton != null" >
+        UNIT_OF_CARTON,
+      </if>
+      <if test="numberOfCarton != null" >
+        NUMBER_OF_CARTON,
+      </if>
+      <if test="numberOfIndCarton != null" >
+        NUMBER_OF_IND_CARTON,
+      </if>
+      <if test="remainingIndAftCar != null" >
+        REMAINING_IND_AFT_CAR,
+      </if>
+      <if test="quantity != null" >
+        QUANTITY,
+      </if>
+      <if test="unitCost != null" >
+        UNIT_COST,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="unitPrice != null" >
+        UNIT_PRICE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{trxDetailId,jdbcType=DECIMAL},
+      <if test="trxId != null" >
+        #{trxId,jdbcType=DECIMAL},
+      </if>
+      <if test="organizationId != null" >
+        #{organizationId,jdbcType=DECIMAL},
+      </if>
+      <if test="subinventoryId != null" >
+        #{subinventoryId,jdbcType=DECIMAL},
+      </if>
+      <if test="locatorId != null" >
+        #{locatorId,jdbcType=DECIMAL},
+      </if>
+      <if test="itemId != null" >
+        #{itemId,jdbcType=DECIMAL},
+      </if>
+      <if test="operType != null" >
+        #{operType,jdbcType=VARCHAR},
+      </if>
+      <if test="operReasonCode != null" >
+        #{operReasonCode,jdbcType=VARCHAR},
+      </if>
+      <if test="lotNumber != null" >
+        #{lotNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="expiryDate != null" >
+        #{expiryDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="packingType != null" >
+        #{packingType,jdbcType=VARCHAR},
+      </if>
+      <if test="unitOfCarton != null" >
+        #{unitOfCarton,jdbcType=DECIMAL},
+      </if>
+      <if test="numberOfCarton != null" >
+        #{numberOfCarton,jdbcType=DECIMAL},
+      </if>
+      <if test="numberOfIndCarton != null" >
+        #{numberOfIndCarton,jdbcType=DECIMAL},
+      </if>
+      <if test="remainingIndAftCar != null" >
+        #{remainingIndAftCar,jdbcType=DECIMAL},
+      </if>
+      <if test="quantity != null" >
+        #{quantity,jdbcType=DECIMAL},
+      </if>
+      <if test="unitCost != null" >
+        #{unitCost,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="objectVersionNumber != null" >
+        1,
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="unitPrice != null" >
+        #{unitPrice,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <!-- 根据detail id更新明细行 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.inventory.dto.StockTrxDetail" >
+    update INV_STOCK_TRX_DETAIL
+    <set >
+      <if test="subinventoryId != null" >
+        SUBINVENTORY_ID = #{subinventoryId,jdbcType=DECIMAL},
+      </if>
+      <if test="locatorId != null" >
+        LOCATOR_ID = #{locatorId,jdbcType=DECIMAL},
+      </if>
+      <if test="itemId != null" >
+        ITEM_ID = #{itemId,jdbcType=DECIMAL},
+      </if>
+      <if test="operType != null" >
+        OPER_TYPE = #{operType,jdbcType=VARCHAR},
+      </if>
+      <if test="operReasonCode != null" >
+        OPER_REASON_CODE = #{operReasonCode,jdbcType=VARCHAR},
+      </if>
+      <if test="lotNumber != null" >
+        LOT_NUMBER = #{lotNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="expiryDate != null" >
+        EXPIRY_DATE = #{expiryDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="packingType != null" >
+        PACKING_TYPE = #{packingType,jdbcType=VARCHAR},
+      </if>
+      <if test="unitOfCarton != null" >
+        UNIT_OF_CARTON = #{unitOfCarton,jdbcType=DECIMAL},
+      </if>
+      <if test="numberOfCarton != null" >
+        NUMBER_OF_CARTON = #{numberOfCarton,jdbcType=DECIMAL},
+      </if>
+      <if test="numberOfIndCarton != null" >
+        NUMBER_OF_IND_CARTON = #{numberOfIndCarton,jdbcType=DECIMAL},
+      </if>
+      <if test="remainingIndAftCar != null" >
+        REMAINING_IND_AFT_CAR = #{remainingIndAftCar,jdbcType=DECIMAL},
+      </if>
+      <if test="quantity != null" >
+        QUANTITY = #{quantity,jdbcType=DECIMAL},
+      </if>
+      <if test="unitCost != null" >
+        UNIT_COST = #{unitCost,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="unitPrice != null" >
+        UNIT_PRICE = #{unitPrice,jdbcType=VARCHAR}
+      </if>
+    </set>
+    where TRX_DETAIL_ID = #{trxDetailId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.inventory.dto.StockTrxDetail" >
+    update INV_STOCK_TRX_DETAIL
+    set TRX_ID = #{trxId,jdbcType=DECIMAL},
+      ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL},
+      SUBINVENTORY_ID = #{subinventoryId,jdbcType=DECIMAL},
+      LOCATOR_ID = #{locatorId,jdbcType=DECIMAL},
+      ITEM_ID = #{itemId,jdbcType=DECIMAL},
+      OPER_TYPE = #{operType,jdbcType=VARCHAR},
+      OPER_REASON_CODE = #{operReasonCode,jdbcType=VARCHAR},
+      LOT_NUMBER = #{lotNumber,jdbcType=VARCHAR},
+      EXPIRY_DATE = #{expiryDate,jdbcType=TIMESTAMP},
+      PACKING_TYPE = #{packingType,jdbcType=VARCHAR},
+      UNIT_OF_CARTON = #{unitOfCarton,jdbcType=DECIMAL},
+      NUMBER_OF_CARTON = #{numberOfCarton,jdbcType=DECIMAL},
+      NUMBER_OF_IND_CARTON = #{numberOfIndCarton,jdbcType=DECIMAL},
+      REMAINING_IND_AFT_CAR = #{remainingIndAftCar,jdbcType=DECIMAL},
+      QUANTITY = #{quantity,jdbcType=DECIMAL},
+      UNIT_COST = #{unitCost,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+       UNIT_PRICE = #{unitPrice,jdbcType=VARCHAR}
+    where TRX_DETAIL_ID = #{trxDetailId,jdbcType=DECIMAL}
+  </update>
+  <!-- 根据trxId查询对应明细行 -->
+  <select id="queryDetails" resultMap="BaseResultMap">
+    select     std.*              ,
+               iib.item_number as ITEM_NUMBER,
+               coalesce(iibct.item_name, iib.item_name)   as ITEM_NAME,
+               uom.UOM_CODE    as UOM_CODE,
+               coalesce(uomct.NAME, uom.NAME)      as UOM_NAME,
+               (select coalesce(uomct.NAME, uom.NAME) from 
+                INV_UNIT_OF_MEASURE_B uom LEFT OUTER JOIN INV_UNIT_OF_MEASURE_TL uomct
+                on (uom.UOM_CODE = uomct.UOM_CODE AND uomct.LANG = #{request.locale,jdbcType=VARCHAR}) 
+                where uom.UOM_CODE = std.PACKING_TYPE
+                ) as TO_UOM_NAME
+      from INV_STOCK_TRX_DETAIL std, INV_ITEM_B iib
+          LEFT OUTER JOIN INV_ITEM_TL iibct
+            on (iib.ITEM_ID = iibct.ITEM_ID AND
+                   iibct.LANG = #{request.locale,jdbcType=VARCHAR}),
+     INV_UNIT_OF_MEASURE_B uom
+          LEFT OUTER JOIN INV_UNIT_OF_MEASURE_TL uomct
+        on (uom.UOM_CODE = uomct.UOM_CODE AND uomct.LANG = #{request.locale,jdbcType=VARCHAR})
+     where std.trx_id = #{trxId, jdbcType=DECIMAL}
+     <!-- and std.organization_id = #{request.invOrgId,jdbcType=DECIMAL} -->
+     and std.organization_id = #{organizationId,jdbcType=DECIMAL}
+     and std.item_id = iib.item_id
+     and iib.uom_code = uom.uom_code
+     order by std.rowid asc
+  </select>
+  
+  <!-- 根据trx ID删除所有对应的明细行 -->
+  <delete id="deleteByTrxId" parameterType="com.lkkhpg.dsis.common.inventory.dto.StockTrx" >
+    delete from INV_STOCK_TRX_DETAIL
+    where TRX_ID = #{trxId,jdbcType=DECIMAL}
+  </delete>
+
+  <select id="getOutRefundItem" resultMap="BaseResultMap">
+    SELECT  iib.ITEM_ID AS ITEM_ID,
+            iib.item_number AS ITEM_NUMBER,
+	        COALESCE (iibct.item_name,iib.item_name) AS ITEM_NAME,
+	        osl.quantity as  quantity,
+	        osl.UNIT_ORIG_PRICE as unitPrice,
+	        uom.UOM_CODE AS UOM_CODE,
+	        uom.UOM_CODE AS PACKING_TYPE,
+	        coalesce(uomct.NAME, uom.NAME)   as UOM_NAME,
+            coalesce(uomct.NAME, uom.NAME)   as TO_UOM_NAME
+	FROM
+	        OM_SALES_LINE osl,
+	        OM_SALES_ORDER oso,
+	        TF_PAY_REFUND_REQUEST prr,
+	        INV_ITEM_B iib
+    LEFT OUTER JOIN INV_ITEM_TL iibct
+             ON (iib.ITEM_ID = iibct.ITEM_ID   AND iibct.LANG = #{request.locale,jdbcType=VARCHAR}),
+            INV_UNIT_OF_MEASURE_B uom
+    LEFT OUTER JOIN INV_UNIT_OF_MEASURE_TL uomct
+             ON (uom.UOM_CODE = uomct.UOM_CODE AND uomct.LANG = #{request.locale,jdbcType=VARCHAR})
+    WHERE   PRR.OUT_TRADE_NO = OSO.ORDER_NUMBER
+    AND OSO.HEADER_ID = OSL.HEADER_ID
+    AND OSL.ITEM_ID = iib.ITEM_ID
+    AND iib.uom_code = uom.uom_code
+    AND PRR.OUT_REFUND_NO = #{outRefundNo,jdbcType=VARCHAR}
+  </select>
+</mapper>

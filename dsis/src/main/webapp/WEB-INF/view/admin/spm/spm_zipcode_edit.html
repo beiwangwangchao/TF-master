@@ -1,0 +1,522 @@
+<#--
+        * description: 城市详情界面.
+        * version: 1.0
+        * author: hanrui.huang
+        * Copyright LKK Health Products Group Limited.
+        *
+        -->
+    <#include "../include/head.html">
+        <script src="${base.contextPath}/common/code?languageData=SPM.LANGUAGE&taxTypeData=OM.TAX_CALCULATION_TYPE&currencyCodes=SPM.CURRENCY&taxLevelData=SPM.TAX_CALCULATION_LEVEL&timezoneData=SPM.TIME_ZONE&taxLocation=SPM.TAX_LOCATION&taxOrNot=SPM.TAX_OR_NOT&itemTaxType=SPM.ITEM_TAX_TYPE&taxCategory=SPM.TAX_CATEGORY" type="text/javascript"></script>
+        <body style="padding: 10px;">
+        <form id="spm_zip_form" ></form>
+        <div id='spm_zip_grid' style="margin: 0; padding: 0"></div>
+        <script type="text/javascript">
+            <#assign isedit = (RequestParameters.isedit!'0')/>
+            var index = 0;
+            var endDate=1;
+
+            // 计税种类
+            var taxCategoriesValue = [];
+            var taxCategoriesText = [];
+            var taxCategoriesData = [];
+            var taxTypeValue = [];
+            var taxTypeText = [];
+            var taxTypes = [];
+            var spmTaxRateList = [];
+
+            jQuery.validator.addMethod("stringMaxLength", function(value, element, param) {
+                var length = value.length;
+                for(var i = 0; i < value.length; i++){
+                    if(value.charCodeAt(i) > 127){
+                        length = length + 2;
+                    }
+                }
+                return this.optional(element) || ( length <= param );
+            }, "<@spring.message "sys.hand.btn.string240"/>");
+            $(function(){
+                init();
+                spm_zip_form.setData({'taxCategory': null});
+            <#if isedit == '1'>
+                $.ajax({
+                    type : 'POST',
+                    dataType : 'json',
+                    url : '${base.contextPath}/spm/zip/queryZipCode',
+                    data : {
+                        zipCode : '${RequestParameters.zipCode!}',
+                        countryCode : '${RequestParameters.countryCode!}'
+                    },
+                    success : function (data){
+                        if(data.success){
+                            spm_zip_form.setData({'zipCode':data.rows[0].zipCode});
+                            /* spm_zip_form.setData({'language':data.rows[0].language}); */
+                            spm_zip_form.setData({'endActiveDate':data.rows[0].endActiveDate});
+                            spm_zip_form.setData({'name':data.rows[0].name});
+                            spm_zip_form.setData({'currencyCode':data.rows[0].currencyCode});
+                            spm_zip_form.setData({'timezoneCode':data.rows[0].timezoneCode});
+                            spm_zip_form.setData({'remark':data.rows[0].remark});
+                            spm_zip_form.setData({'sortNum':data.rows[0].sortNum});
+                            spm_zip_form.setData({'countryCode':data.rows[0].countryCode});
+                            spm_zip_form.setData({'taxLocation':data.rows[0].taxLocation});
+                            spm_zip_form.setData({'enableTax':data.rows[0].enableTax});
+                            spm_zip_form.setData({'adjTaxLocation':data.rows[0].adjTaxLocation});
+                            var endDates=$.ligerui.get('endActiveDate').getValue();
+                            if(endDates == null){
+                                endDate = 0;
+                            }
+                        }
+                    }
+                });
+                $.ligerui.get('zipCode').setReadonly(true);
+                $.ligerui.get('countryCode').setReadonly(true);
+                index = 1;
+            </#if>
+                loadTax();
+            });
+
+            function init(){
+                window['spm_zip_form'] = $("#spm_zip_form").ligerForm({
+                    fields: [
+                        {id:"__status",name : "__status",type : "hidden",attr:{value:"<#if isedit =='1'>update<#else>add</#if>"},newline : false},
+                        {
+                            label :'<@spring.message "type.com.lkkhpg.dsis.common.config.spmzip.zipcode"/>',
+                            name : "zipCode",type : "text",newline : false,
+                            validate : {
+                                required : true
+                            },
+                            group : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.baseInfo"/>'
+                        },
+                        /* {
+                            label : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.language"/>',
+                            name : "language",type : "select",newline : false,
+                            options : {
+                                valueField : 'value',
+                                textField : 'meaning',
+                                data : languageData
+                            },
+                            validate : {
+                                required : true
+                            }
+                        }, */
+                        {
+                            type: 'combobox',
+                            name: 'countryCode',
+                            textField : "countryCodeName",
+                            label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.country"/>',
+                            options : {
+                                valueField : 'countryCode',
+                                textField : 'name',
+                                url:"${base.contextPath}/spm/country/selectAllCountry",
+                                // onBeforeSelect:validateUnique,
+                            },
+                            newline: false,
+                            validate : {
+                                required : true
+                            }
+                        },
+                        /* {label : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmzip.name"/>',
+                            name : "name",newline : true,
+                            type: 'tl',
+                            options: {
+                                idField: 'zipCode',
+                                dto: 'com.lkkhpg.dsis.common.config.dto.SpmZip'
+                            },
+                            validate : {
+                                required : true
+                            },
+                        }, */
+                        {
+                            label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.currencycode"/>',name : "currencyCode",textField : "currencyCodeName",type : "select",newline : false,
+                            options :{
+                                valueField : 'value',
+                                textField : 'meaning',
+                                data : currencyCodes,
+                                cancelable : false
+                            },
+                            validate : {
+                                required : true
+                            }
+                        },
+                        {
+                            type: 'select',
+                            name: 'timezoneCode',
+                            textField : "timezoneCodeName",
+                            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.timezonecode"/>',
+                            options : {
+                                valueField : 'value',
+                                textField : 'meaning',
+                                data : timezoneData
+                            },
+                            newline: false,
+                            validate : {
+                                required : true
+                            }
+                        },
+                        {
+                            type: 'textarea',
+                            name: 'remark',
+                            label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.remarks"/>',
+                            validate: {
+                                stringMaxLength : 240
+                            }
+                        },
+                        {
+                            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.endactivedate"/>',
+                            name: 'endActiveDate' , type: 'date', newline:false,
+                            options : {
+                                format : 'yyyy-MM-dd',
+                                onChangeDate : function(data){
+                                    var endActiveDate = new Date(data);
+                                    var date = new Date();
+                                    if (index == 0 && endActiveDate < new Date(date.getFullYear(),date.getMonth(),date.getDate())) {
+                                        liger.get('endActiveDate').setValue("");
+                                        $.ligerDialog.warn('<@spring.message "msg.error.config.country.dateinvalid"/>');
+                                        return false;
+                                    }
+                                    if (endDate ==0 && endActiveDate < new Date(date.getFullYear(),date.getMonth(),date.getDate())) {
+                                        liger.get('endActiveDate').setValue("");
+                                        $.ligerDialog.warn('<@spring.message "msg.error.config.country.dateinvalid"/>');
+                                        return false;
+                                    }
+                                    index =0;
+                                }
+                            }
+                        },
+                        {
+                            type: 'int',
+                            name: 'sortNum',
+                            label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.sort_number"/>',
+                            newline: false
+                        },
+                        {label : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.taxlocation"/>',name : "taxLocation",type : "select",newline : true,
+                            options : {
+                                valueField : 'value',
+                                textField : 'meaning',
+                                data : taxLocation
+                            },
+                            group : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.taxsettings"/>',
+                        },
+                        {label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.orgparamvalue.enable_tax"/>',name : "enableTax",type : "select",newline : false,
+                            options : {
+                                valueField : 'value',
+                                textField : 'meaning',
+                                data : taxOrNot
+                            },
+                            group : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.taxsettings"/>',
+                        },
+                        {label : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.taxtype"/>',name : "taxType",type : "select",newline : false,
+                            options : {
+                                isShowCheckBox: true,
+                                isMultiSelect: true,
+                                valueField : 'value',
+                                textField : 'meaning',
+                                data : itemTaxType,
+                                onChangeValue : function (value,text){
+                                    // 每次都清空上次的选择
+                                    taxCategoriesData = [];
+                                    // 字符串分割
+                                    if(value != null){
+                                        taxCategoriesValue = value.split(";");
+                                        taxCategoriesText = text.split(";");
+                                    }
+                                    var o = null;
+                                    var m = null;
+                                    var object = null;
+                                    // 分割的数据存数组.
+                                    for(var i in taxCategoriesValue){
+                                        for(var j in taxCategoriesText){
+                                            if(i == j){
+                                                o = taxCategoriesValue[i];
+                                                m = taxCategoriesText[j];
+                                                object = {value : o, meaning: m};
+                                                break;
+                                            }
+                                        }
+                                        if(object.value != ""){
+                                            taxCategoriesData.push(object);
+                                        }
+                                        if(spm_zip_grid.getData().length == 0){
+                                            spm_zip_grid.addRow({
+                                                taxType : object.value,
+                                                taxCategoriesName : object.meaning
+                                            });
+                                        }
+                                    }
+                                    var spmZipGrid = spm_zip_grid.getData();
+
+                                    // 是增加行还是删除行否.
+                                    if(spmZipGrid.length > taxCategoriesData.length){
+                                        // 删除行------根据taxCategoriesData里面的数据是否存在spmZipGrid里面.
+                                        var gridArr = [];
+                                        var dataArr = [];
+                                        for (var i in spmZipGrid) {
+                                            gridArr.push(spmZipGrid[i].taxType);
+                                        }
+                                        for (var i in taxCategoriesData) {
+                                            dataArr.push(taxCategoriesData[i].value);
+                                        }
+                                        if(dataArr.length==0){
+                                            spm_zip_grid.deleteRange(spm_zip_grid.rows);
+                                            return;
+                                        }
+                                        for(var h in gridArr){
+                                            if (dataArr.indexOf(gridArr[h]) < 0) {
+                                                spm_zip_grid.deleteRow(h);
+                                                spm_zip_grid.reRender();
+                                            }
+                                        }
+                                    }else{
+                                        // 增加行.
+                                        for (var k in taxCategoriesData){
+                                            var temp = false;
+                                            for(var h in spmZipGrid){
+                                                if(spmZipGrid[h].taxType == taxCategoriesData[k].value){
+                                                    temp = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!temp) {
+                                                spm_zip_grid.addRow({
+                                                    taxType : taxCategoriesData[k].value,
+                                                    taxCategoriesName : taxCategoriesData[k].meaning
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            group : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.taxsettings"/>',
+                        },
+                        {label : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.taxcategory"/>',name : "taxCategory",type : "select",newline : false,
+                            options : {
+                                isShowCheckBox: true,
+                                isMultiSelect: true,
+                                valueField : 'value',
+                                textField : 'meaning',
+                                data : taxCategory,
+                                onChangeValue : function (value,text){
+                                    taxTypes = [];
+                                    if(value == null){
+                                    <#list taxCategory as tc>
+                                        spm_zip_grid.toggleCol('${tc.value}', false); // 隐藏列.
+                                    </#list>
+                                    }else{
+                                        // 隐藏列去掉校验,显示的加上校验.
+                                        taxTypeValue = value.split(";");
+                                        taxTypeText = text.split(";");
+                                    <#list taxCategory as tc>
+                                        if(taxTypeValue.indexOf('${tc.value}') > -1){
+                                            spm_zip_grid.toggleCol('${tc.value}', true);
+                                            spm_zip_grid.getColumnByName('${tc.value}').validate = {
+                                                required : true
+                                            }
+                                            spm_zip_grid.reRender();
+                                        }else{
+                                            for(var i in spm_zip_grid.getData()){
+                                                spm_zip_grid.updateCell('${tc.value}', "", i);
+                                            }
+                                            spm_zip_grid.toggleCol('${tc.value}', false);
+                                            spm_zip_grid.getColumnByName('${tc.value}').validate = {
+                                                required : false
+                                            }
+                                            spm_zip_grid.reRender();
+                                        }
+                                    </#list>
+                                    }
+                                }
+                            },
+                            group : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.taxsettings"/>',
+                        },
+                        {label : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.ajdtaxlocation"/>',name : "adjTaxLocation",type : "select",newline : true,
+                            options : {
+                                valueField : 'value',
+                                textField : 'meaning',
+                                data : taxLocation
+                            },
+                            group : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.taxsettings"/>',
+                        }
+                    ],
+                    buttons: [
+                        {
+                            text: '<@spring.message "sys.hand.btn.save"/>',
+                            id : 'zipSaveButton',
+                            style : 'float: right',
+                            disabled:false,
+                            width: 60,
+                            click: function(){
+                                //liger.get('zipSaveButton').setDisabled();
+                                splitGrid();
+                                if(!Hap.validateForm(spm_zip_form)){
+                                    return;
+                                }
+                                var zipGrid = spm_zip_grid.getData();
+                                var zipArray = [];
+                                var spmZipFormAndGridVal = null;
+                                spmZipFormAndGridVal = spm_zip_form.getData();
+                                spmZipFormAndGridVal.spmTaxRateList = spmTaxRateList;
+                                zipArray.push(spmZipFormAndGridVal);
+                                if(spmZipFormAndGridVal.taxType != null && spmZipFormAndGridVal.taxType != ""){
+                                    if(spmZipFormAndGridVal.taxCategory == null || spmZipFormAndGridVal.taxCategory == ""){
+                                        $.ligerDialog.warn('<@spring.message "msg.error.config.zip.pls_entry_taxrate"/>');
+                                        return;
+                                    }
+                                }
+                                if(!Hap.validateGrid(spm_zip_grid)){
+                                    return;
+                                }
+                                Hap.ajax({
+                                    data : zipArray,
+                                    url: '${base.contextPath}/spm/zip/save',
+                                    success: function(json){
+                                        spmTaxRateList = [];
+                                        $.ligerui.get('zipCode').setReadonly(true);
+                                        $.ligerui.get('countryCode').setReadonly(true);
+                                        spm_zip_form.setData({'__status':'update'});
+                                        $.ligerDialog.alert('<@spring.message "msg.infor.delivery.save_success"/>', '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.lov.placeholder"/>', 'success');
+                                        liger.get('zipSaveButton').setEnabled();
+                                    }
+                                });
+                            }
+                        }
+                    ]
+                });
+
+                window['spm_zip_grid'] = $("#spm_zip_grid").ligerGrid({
+                    columns: [
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.taxtype"/>',
+                            name: 'taxType',
+                            width: 200,
+                            render : function(item) {
+                                for (var i = 0; i < itemTaxType.length; i++) {
+                                    if (itemTaxType[i].value == item.taxType) {
+                                        return itemTaxType[i].meaning;
+                                    }
+                                }
+                            }
+                        },
+                    <#list taxCategory as tc>
+                {
+                    display: '${tc.description}',
+                    name: '${tc.value}',
+                    width: 200,
+                    editor: { type: 'float', precision: 4 },
+                    validate : {
+                        required : true
+                    }
+                },
+            </#list>
+            ],
+
+                enabledEdit: true,
+                    width: '99%',
+                    height: '98%',
+                    checkbox: true,
+                    usePager : false
+            });
+            }
+            //#PE20-214 2017-07-10 BEGIN
+            function loadTax(){
+                $.ajax({
+                    type : 'POST',
+                    url : '${base.contextPath}/spm/zip/queryTaxRate?zipCode=${RequestParameters.zipCode!}&countryCode=${RequestParameters.countryCode!}',
+                    //#PE20-214 2017-07-10 END
+                    success : function (data){
+                        if(data.success){
+                            if(data.total > 0){
+                                appendGrid(data);
+                                var repetitionData = repetitionGrid;
+                                var str = "";
+                                for(var i in repetitionData){
+                                    str += repetitionData[i].taxType +";";
+                                }
+                                if (str.length > 0) {
+                                    str = str.substr(0, str.length - 1);
+                                }
+                                spm_zip_form.setData({'taxType': str});
+                            }
+                        }
+                    }
+                });
+            }
+
+            function splitGrid(){
+                var zipGrid = spm_zip_grid.getData();
+                for (var i in zipGrid) {
+                <#list taxCategory as tc>
+                    if(zipGrid[i].${tc.value} != null){
+                        var spmTaxRateObj = {
+                            locationLevel : "ZIP",
+                            locationCode : "",
+                            taxType : "",
+                            taxCategory : "",
+                            taxRate : null
+                        };
+                        spmTaxRateObj.locationCode = liger.get('zipCode').getValue();
+                        spmTaxRateObj.taxType = zipGrid[i].taxType;
+                        spmTaxRateObj.taxCategory = '${tc.value}';
+                        spmTaxRateObj.taxRate = zipGrid[i].${tc.value};
+                        if(spmTaxRateObj.taxRate == 0 || (spmTaxRateObj.taxRate != null && "" != spmTaxRateObj.taxRate)){
+                            spmTaxRateList.push(spmTaxRateObj);
+                        }
+                    }
+                </#list>
+                }
+            }
+            var repetitionGrid = [];
+            // 拼接数据-用作显示到grid.
+            function appendGrid(data){
+                for(var i in data.rows){
+                    var zipGrids = {};
+                    var appendStr = "";
+                    for(var j in data.rows){
+                        if(data.rows[i].locationCode == data.rows[j].locationCode
+                            && data.rows[i].locationLevel ==data.rows[j].locationLevel
+                            && data.rows[i].taxType == data.rows[j].taxType){
+                        <#list taxCategory as tc>
+                            if('${tc.value}' == data.rows[j].taxCategory){
+                                zipGrids.${tc.value} = data.rows[j].taxRate;
+                                appendStr = appendStr + data.rows[j].taxCategory+";";
+                            }
+                        </#list>
+                            zipGrids.taxType = data.rows[j].taxType;
+                        }
+                    }
+                    repetitionGrid.push(zipGrids);
+                    // 去掉字符串的最后一位.
+                    if (appendStr.length > 0) {
+                        appendStr = appendStr.substr(0, appendStr.length - 1);
+                    }
+                }
+                if(repetitionGrid.length>1){
+                    for (var k=0;k<repetitionGrid.length;k++) {
+                        for (var h = repetitionGrid.length -1; h > k; h--) {
+                            if(repetitionGrid[h].taxType == repetitionGrid[k].taxType){
+                                repetitionGrid.splice(h,1);
+                            }
+                        }
+                    }
+                }
+                spm_zip_form.setData({'taxCategory' : appendStr});
+                var obj = {};
+                obj.rows = repetitionGrid;
+                spm_zip_grid.loadData(obj);
+            }
+
+            //根据邮编和国家代码验证唯一性
+            function validateUnique(value) {
+                var zipCode=$.ligerui.get('zipCode').getValue();
+                $.ajax({
+                    type:"post",
+                    dataType:"json",
+                    url:"${base.contextPath}/spm/zipcode/validateUnique",
+                    data:{zipCode:zipCode,countryCode:value},
+                    success:function(data){
+                        if(data.rows[0]>0){  //存在
+                            $.ligerDialog.error("<@spring.message 'msg.error.config.country.existszipcode' />"+zipCode);
+                        }
+                    }
+                })
+            }
+        </script>
+        </body>
+        </html>

@@ -1,0 +1,2190 @@
+<#--
+        * description: 商品,商品包详情公用页面
+        * version: 1.0
+        * author:wangc
+        * .
+        -->
+    <#include "../include/head.html">
+        <body>
+        <link href="${base.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" type="text/css" href="${base.contextPath}/resources/css/attach/webuploader.css"></link>
+        <script type="text/javascript" src="${base.contextPath}/lib/ckeditor/ckeditor.js"></script>
+        <script src="${base.contextPath}/common/code?countStockData=PM.COUNT_STOCK&packageCountStockData=PM.PACKAGE_COUNT_STOCK
+&priceTypeData=PM.PRICE_TYPE&yesno=SYS.YES_NO&packTypeData=PM.PACK_TYPE&calculatetax=INV.CALCULATE_TAX" type="text/javascript"></script>
+        <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+        <script src="${base.contextPath}/common/language?var=languageData" type="text/javascript"></script>
+        <script type="text/javascript">var _basePath = "${base.contextPath}";</script>
+        <style>
+            .panel{
+                margin:20px;
+            }
+            .panel-title {
+                font-size:16px;
+                line-height:20px;
+                padding:5px;
+                background-color:#f4f4f4;
+            }
+            .item-images .pic {
+                position:relative;
+                width: 250px;
+                height: 250px;
+                border:1px dashed #ccc;
+                background: #FFFFFF;
+                float: left;
+                color:#999;
+                margin-right: 10px;
+                margin-top: 10px;
+                text-align: center;
+
+            }
+            .item-images .pic img {
+                width:230px;
+                height:230px;
+                margin:10px;
+            }
+            .item-images .pic .toolbar {
+                position:absolute;
+                top:10px;
+                left:10px;
+                height:30px;
+                width:230px;
+                display:none;
+                background:rgba( 0, 0, 0, 0.5 );
+            }
+            .item-images .pic .toolbar .icon-remove{
+                position:absolute;
+                top:5px;
+                right:10px;
+                text-decoration:none;
+                font-size:16px;
+                color:#fff;
+            }
+            .item-images .uploading {
+                background:url('${base.contextPath}/lib/images/loading.gif') no-repeat 50% 50%
+            }
+            .item-images .pic:hover {
+                cursor: pointer;
+                color:#333;
+                border:1px solid #ccc;
+                -webkit-box-shadow:1px 1px 7px 1px rgba(128,128,128,0.3);
+                box-shadow:1px 1px 7px 1px rgba(128,128,128,0.3);
+            }
+            .item-images .pic:hover .toolbar{
+                display:block
+            }
+        </style>
+        <script type="text/javascript">
+            /*全局变量*/
+            var mode = ('0' == '${isedit}') ? 'add' : 'update',
+                itemAttrs,
+                attrs = new Array(),
+                lang,editors = new Array(),
+                itemTypeItem = "${itemType}",
+                invClickRow,
+                savePropertyFlag = 'N',
+                redeemSel = 0,
+                oldRedeemSel,
+                currencyData;
+        </script>
+        <form id="d_pm_007_product_btns" style="padding-left:10px;margin-bottom:15px;"></form>
+        <div id="d_pm_007_productInfo" class="liger-tab">
+            <div tabid="d_pm_007_tab_base_info" title='<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.baseInfo" />' lselected="true">
+                <div class="panel">
+                    <div class="panel-title"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.baseInfo" /></div>
+                    <form id="base_info_form"></form>
+                </div>
+                <#if itemType=="PACKG">
+                    <div class="panel">
+                        <div class="panel-title"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.includeItems" /></div>
+                        <div id="include_items_grid" style="margin-top:10px;"></div>
+                    </div>
+                </#if>
+                <div class="panel">
+                    <div class="panel-title"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.invOrgInfo" /></div>
+                    <div id="inv_item_assign_grid" style="margin-top:10px;"></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-title"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.priceInfo" /></div>
+                    <div id="price_list_info_grid" style="margin-top:10px;"></div>
+                </div>
+            </div>
+
+            <div tabid="d_pm_007_tab_param_info" title='<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.paramInfo" />' >
+                <div id="param_info_grid" overflow: auto;"></div>
+            <div class="panel">
+                <div class="panel-title"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.images" /></div>
+                <div class="item-images" id="item-pic-list">
+                    <#if item_pic_list??>
+                        <#list item_pic_list as file>
+                            <div class="pic" id="${file.fileId}"><div class="toolbar"><a class="icon-remove" href="javascript:delItemPic('${file.fileId}','${file._token}')"></a></div><img src="${base.contextPath}/sys/image/view?fileId=${file.fileId}&compressLevel=M"></img></div>
+                        </#list>
+                    </#if>
+                </div>
+                <div style="clear:both"></div>
+                <div style="margin-top:10px;" id="picker"><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.btn.uploadimage"/></div>
+                <script type="text/javascript" src="${base.contextPath}/resources/js/attach/webuploader.js"></script>
+                <script type="text/javascript">
+                    function delItemPic(id,token){
+                        //发布状态为Y时，不允许修改
+                        var publishStatus = $.ligerui.get('publishStatus').getValue();
+                        if(publishStatus == 'Y'){
+                            $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.publisheditem"/>');
+                            return;
+                        }
+                        $.ligerDialog.confirm('<@spring.message "sys.hand.tip.delete_confirm" />', $l('sys.hand.tip.info'),function(yes) {
+                            $.ajax({
+                                url : "${base.contextPath}/sys/image/remove",
+                                data : {
+                                    fileId:id,
+                                    token:token
+                                },
+                                type : 'post',
+                                cache : false,
+                                dataType : 'json',
+                                success : function(data) {
+                                    if (data.message == "success") {
+                                        $('#' + id).remove();
+                                    }
+                                }
+                            });
+                        })
+                    }
+                    var uploader = WebUploader.create({
+                        swf : '${base.contextPath}/js/Uploader.swf',
+                        server : '${base.contextPath}/sys/image/upload',
+                        pick : '#picker',
+                        auto : true,
+                        compress:false,
+                        accept: {
+                            title: 'Images',
+                            extensions: 'gif,jpg,jpeg,bmp,png',
+                            mimeTypes: 'image/*'
+                        },
+                        formData : {
+                            sourceType:'${source_type}',
+                            sourceKey: '${itemId}',
+                            isCompress: 'Y'
+                        },
+                        onFileQueued : function(file){
+                            $('#item-pic-list').append('<div id="'+file.id+'" class="pic uploading"></div>')
+                        },
+                        onUploadSuccess : function(file, response) {
+                            if(response.message=='UPLOAD_SUCCESS'){
+                                $('#'+file.id).append('<div class="toolbar"><a class="icon-remove" href="javascript:delItemPic(\''+response.file.fileId+'\',\''+response.file._token+'\')"></a></div><img src="${base.contextPath}/sys/image/view?fileId='+response.file.fileId+'&compressLevel=M"></img>')
+                                $('#'+file.id).attr('id',response.file.fileId)
+                            }else{
+                                //TODO:
+                                if(response.message=='UPLOAD_ERROR'){
+                                    if(response.info=='SINGLE_FILE_SIZE_MAX_ERROR'){
+                                        $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.imagesizeerror"/>');
+                                    }
+                                }
+                            }
+                        }
+                    });
+                </script>
+            </div>
+        </div>
+        </div>
+        <script type="text/javascript">
+            //把一行价格数据拆成多条价格行
+            function splitPriceData(json){
+                var map = {},list = [],datas = json.rows;
+                for(var i=0;i<datas.length;i++){
+                    var data = datas[i],l = map[data.salesOrgId+data.startActiveDate];
+                    if(!l){
+                        l = map[data.salesOrgId+data.startActiveDate] = $.extend({},data);
+                    }
+                    l[data.priceType] = data.unitPrice;
+                    l[data.priceType+'_ID'] = data.listDetailId;
+                }
+                for(var key in map) {
+                    list.push(map[key])
+                }
+                return $.extend(json,{rows:list,total:list.lenght});
+            }
+
+            //把多条价格行合并成一行价格数据
+            function processPriceData(datas){
+                var list = [];
+                for(var i=0;i<datas.length;i++){
+                    var data = datas[i];
+                    delete data['priceType'];
+                    delete data['unitPrice'];
+                <#list price_type as pt>
+                    list.push($.extend({},data,{
+                        listDetailId:data['${pt.value}_ID']||'',
+                        priceType:'${pt.value}',
+                        unitPrice:data['${pt.value}']
+                    }))
+                    </#list>
+                }
+                return list;
+            }
+            //货币数据
+            $.ajax({
+                url:"${base.contextPath}/spm/currency/query?page=-1",
+                type : "POST",
+                async: false,
+                success:function(json){
+                    if(json.success){
+                        currencyData = json.rows;
+                    }
+                }
+            });
+
+            var tab = $('#d_pm_007_productInfo').ligerTab();
+            //按钮
+            $('#d_pm_007_product_btns').ligerForm({
+                buttons: [{
+                    text: '<@spring.message "sys.hand.btn.save" />',
+                <#if accessService.access("EDITABLE") == false>
+            disabled:true,
+            </#if>
+            //disable: false,
+            width: 100,
+                click: function() {
+                var itemAll = getAllItemInfo();
+                if(!itemAll){
+                    return false;
+                }
+                Hap.ajax({
+                    url:"${base.contextPath}/inv/item/saveAll",
+                    data:itemAll,
+                    success:function(){
+                        Hap.showSuccess('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.saveSuccess"/>',
+                            function() {
+                                <#if itemType=="ITEM">
+                                <#if isedit == '0'>
+                                window.top.f_removeTab('ITEM_CREATE');
+                                window.top.f_addTab('ITEM_DETAIL','<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.data.details.page"/>','pm/pm_item_show.html?itemId='+${itemId});
+                                </#if>
+                                <#if isedit == '1'>
+                                window.location = _basePath + '/pm/pm_item_show.html?itemId='+${itemId};
+                                </#if>
+
+                                <#elseif itemType=="PACKG">
+                                <#if isedit == '0'>
+                                window.top.f_removeTab('PACKAGE_CREATE');
+                                window.top.f_addTab('PACKAGE_DETAIL','<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.package.details.page"/>','pm/pm_package_show.html?itemId='+${itemId});
+                                </#if>
+                                <#if isedit == '1'>
+                                window.location = _basePath + '/pm/pm_package_show.html?itemId='+${itemId};
+                                </#if>
+                                </#if>
+                            });
+                    }
+                })
+            }
+            },
+            {
+                id: 'publish_btn',
+                    text: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.btn.publish" />',
+            <#if accessService.access("EDITABLE") == false>
+            disabled:true,
+            </#if>
+                //disable: false,
+                width: 100,
+                    click: function() {
+                var publishStatus = $.ligerui.get('base_info_form').getData().publishStatus;
+                if ('Y' == publishStatus) {
+                    Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.itemhavebeenpublished" />');
+                    return;
+                }
+                $.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.inv.item.dto.tip.publishsure" />',function(yes){
+                    if(yes){
+                        var itemAll = getAllItemInfo();
+                        if(!itemAll){
+                            return false;
+                        }
+                        Hap.ajax({
+                            url:"${base.contextPath}/inv/item/publish",
+                            data:itemAll,
+                            success:function(){
+                                Hap.showSuccess('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.publishedsuccess"/>',
+                                    function() {
+                                        <#if itemType=="ITEM">
+                                        <#if isedit == '0'>
+                                        window.top.f_removeTab('ITEM_CREATE');
+                                        window.top.f_addTab('ITEM_DETAIL','<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.data.details.page"/>','pm/pm_item_show.html?itemId='+${itemId});
+                                        </#if>
+                                        <#if isedit == '1'>
+                                        window.location = _basePath + '/pm/pm_item_show.html?itemId='+${itemId};
+                                        </#if>
+
+                                        <#elseif itemType=="PACKG">
+                                        <#if isedit == '0'>
+                                        window.top.f_removeTab('PACKAGE_CREATE');
+                                        window.top.f_addTab('PACKAGE_DETAIL','<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.package.details.page"/>','pm/pm_package_show.html?itemId='+${itemId});
+                                        </#if>
+                                        <#if isedit == '1'>
+                                        window.location = _basePath + '/pm/pm_package_show.html?itemId='+${itemId};
+                                        </#if>
+                                        </#if>
+                                    });
+                            }
+                        })
+                    }
+                });
+            }
+            },
+            {
+                id: 'unpublish_btn',
+                    text: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.btn.unpublish" />',
+            <#if accessService.access("EDITABLE") == false>
+            disabled:true,
+            </#if>
+                //disable: false,
+                width: 100,
+                    click: function() {
+                var publishStatus = $.ligerui.get('base_info_form').getData().publishStatus;
+                if ('N' == publishStatus) {
+                    Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.havebeenunpublished" />');
+                    return;
+                }
+
+                $.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.inv.item.dto.tip.unpublishsure" />',function(yes){
+                    if(yes){
+                        $.ajax({
+                            type: "post",
+                            data: {
+                                'itemId': ${itemId}
+                            },
+                            dataType: "json",
+                            url: _basePath + "/inv/item/unPublishByItemId",
+                            error: function(data) {
+                                Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.netError" />');
+                            },
+                            success: function(data) {
+                                if (data.success) {
+                                    Hap.showSuccess("<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.unpublishedsuccess" />",
+                                        function() {
+                                            <#if itemType=="ITEM">
+                                            window.location = _basePath + '/pm/pm_item_show.html?itemId='+${itemId};
+                                            <#elseif itemType=="PACKG">
+                                            window.location = _basePath + '/pm/pm_package_show.html?itemId='+${itemId};
+                                            </#if>
+                                        });
+                                } else {
+                                    Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.unpublishedsuccessfailed" />');
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            }]
+            });
+
+            //基本信息form
+            window['tab1FormObj'] = $('#base_info_form').ligerForm({
+                labelWidth : 80,
+                fields: [{
+                    type : 'text',
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.salesmarket" />',
+                    name : 'marketName',
+                    readonly: true,
+                    validate : {
+                        required : true
+                    }
+                },
+                    {
+                        type: 'int',
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.sort_number" />',
+                        name: 'sortNum',
+                        newline: false,
+                        validate: {
+                            maxlength: 5,
+                        },
+                    },
+                    {
+                        type: 'hidden',
+                        name: 'marketId',
+                        hidden: true
+                    },{
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.publishStatus" />',
+                        type: 'select',
+                        name: 'publishStatus',
+                        textField: 'publishStatusDesc',
+                        readonly: true,
+                        validate: {
+                            required: true
+                        },
+                    },
+                    {
+                        type: 'text',
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemNumber" />',
+                        name: 'itemNumber',
+                        newline: false,
+                        validate: {
+                            required: true,
+                            maxlength: 15,
+                        }
+                    },
+                    {
+                        type: 'select',
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category" />',
+                        name: 'categoryIdList',
+                        newline: false,
+                        options: {
+                            cancelable : false,
+                            valueField: 'categoryId',
+                            textField: 'categoryName',
+                            url:'${base.contextPath}/inv/item/queryAllBottomCategory',
+                            isMultiSelect: true
+                        }
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemName" />',
+                        name: 'itemName',
+                        newline: true,
+                        type: 'tl',
+                        options: {
+                            idField: 'itemId',
+                            dto: 'com.lkkhpg.dsis.common.product.dto.InvItem'
+                        },
+                        validate: {
+                            required: true
+                        }
+                    },
+                    {
+                        type: 'date',
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateFrom" />',
+                        name: 'validateFrom',
+                        newline: false,
+                        options: {
+                            cancelable : false,
+                            format: 'yyyy-MM-dd',
+                            onChangeDate : function(v){
+                                var g = this;
+                                if(v){
+                                    var startDate = new Date(v),
+                                        endDate = liger.get("validateTo").getValue();
+                                    sysDate = new Date();
+                                    if(endDate!=null){
+                                        if(startDate.getTime() > endDate.getTime()) {
+                                            $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dateerror1"/>');
+                                            g.clear();
+                                        }
+                                    }
+                                <#if isedit == '0'>
+                                    startDate = new Date(startDate.getFullYear(),startDate.getMonth(),startDate.getDate());
+                                    sysDate = new Date(sysDate.getFullYear(),sysDate.getMonth(),sysDate.getDate());
+                                    if(startDate < sysDate){
+                                        $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.inv.item.dto.tip.datelesssystime"/>');
+                                        g.clear();
+                                    }
+                                </#if>
+                                }
+                            }
+                        },
+                        validate: {
+                            required: true,
+                            maxlength: 50,
+                        }
+                    },
+                    {
+                        type: 'date',
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateTo" />',
+                        name: 'validateTo',
+                        newline: false,
+                        options: {
+                            cancelable : false,
+                            showTime : true,
+                            format: 'yyyy-MM-dd',
+                            onChangeDate:function(v){
+                                var g = this;
+                                var fromDate = liger.get("validateFrom").getValue();
+                                //console.log(v);
+
+                                //console.log(myDate);
+                                if(fromDate){
+                                    var startDate = new Date(fromDate);
+                                    var endDate = new Date(v);
+                                    if(startDate.getTime() > endDate.getTime()) {
+                                        alert('<@spring.message "type.com.lkkhpg.dsis.platform.dateerror1"/>');
+                                        g.clear();
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        type : 'tl',
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.description" />',
+                        name : 'description',
+                        newline : true,
+                        options: {
+                            idField: 'itemId',
+                            dto: 'com.lkkhpg.dsis.common.product.dto.InvItem'
+                        },
+                        validate : {
+                            required : true
+                        }
+                    },
+                <#if itemType=="ITEM">
+            {
+                type: 'combobox',
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.countStockFlag" />',
+                name: 'countStockFlag',
+                textField : 'countStockFlagName',
+                newline: false,
+                options: {
+                    cancelable : false,
+                    valueField: 'value',
+                    textField: 'meaning',
+                    data: countStockData,
+                    onSelected: function(newvalue) {
+                        if('R' == newvalue){
+                            //数量预警不可编辑
+                            liger.get('quantityAlert').setValue('');
+                            $.ligerui.get('base_info_form').setEnabled("quantityAlert", false);
+                            $.ligerui.get('quantityAlert').setRequired(false);
+                            //失效预警不可编辑
+                            liger.get('expiryAlert').setValue('');
+                            $.ligerui.get('base_info_form').setEnabled("expiryAlert", false);
+                            $.ligerui.get('expiryAlert').setRequired(false);
+                            // 计算库存商品可编辑,必输
+                            $.ligerui.get('base_info_form').setEnabled("countItemId", true);
+                            $.ligerui.get('countItemId').setRequired(true);
+                            //批次控制＝否,不可编辑
+                            $.ligerui.get('lotCtrlFlag').setValue('N');
+                            $.ligerui.get('lotCtrlFlag').setDisabled(true);
+                        }
+                        if('N' == newvalue){
+                            //库存计算商品不可编辑
+                            $('#countItemId').val('');
+                            $.ligerui.get('countItemId').setValue('');
+                            $.ligerui.get('countItemId').setText('');
+                            $.ligerui.get('base_info_form').setEnabled("countItemId", false);
+                            //数量预警不可编辑
+                            liger.get('quantityAlert').setValue('');
+                            $.ligerui.get('base_info_form').setEnabled("quantityAlert", false);
+                            $.ligerui.get('quantityAlert').setRequired(false);
+                            //失效预警不可编辑
+                            liger.get('expiryAlert').setValue('');
+                            $.ligerui.get('base_info_form').setEnabled("expiryAlert", false);
+                            $.ligerui.get('expiryAlert').setRequired(false);
+                            //批次控制＝否,不可编辑,必输
+                            $.ligerui.get('lotCtrlFlag').setValue('N');
+                            $.ligerui.get('lotCtrlFlag').setDisabled(true);
+                        }
+                        if('O' == newvalue){
+                            //库存计算商品不可编辑
+                            $('#countItemId').val('');
+                            $.ligerui.get('countItemId').setValue('');
+                            $.ligerui.get('countItemId').setText('');
+                            $.ligerui.get('base_info_form').setEnabled("countItemId", false);
+                            //数量预警可编辑，必输
+                            $.ligerui.get('base_info_form').setEnabled("quantityAlert", true);
+                            liger.get('quantityAlert').setRequired(true);
+                            //失效预警可编辑，必输
+                            $.ligerui.get('base_info_form').setEnabled("expiryAlert", true);
+                            liger.get('expiryAlert').setRequired(true);
+                            // 批次控制可编辑
+                            $.ligerui.get('lotCtrlFlag').setEnabled(true);
+                        }
+                    }
+                },
+                validate: {
+                    required: true
+                },
+            },
+                {
+                    type: 'popup',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.countItemId" />',
+                    name: 'countItemId',
+                    textField : 'countItemNumber',
+                    options: {
+                        valueField: 'itemId',
+                        textField: 'itemNumber',
+                        title : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.countItemId" />',
+                        grid : {
+                            delayLoad : true,
+                            columns : [{
+                                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemNumber" />',
+                                name : "itemNumber", width : 150, type : "text", align : "left"
+                            }, {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemName" />',
+                                name : "itemName", width : 150, type : "text", align : "left"
+                            }, {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.description" />',
+                                name : "description", width : 150, type : "text", align : "left"
+                            }],
+                            url : '${base.contextPath}/inv/item/queryByCountStock?itemId='+${itemId}
+                        },
+                        condition : {
+                            inputWidth : 150,
+                            labelWidth : 70,
+                            fields : [{
+                                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemNumber" />',
+                                name : "itemNumber",
+                                newline : true,
+                                type : "text"
+                            }, {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemName" />',
+                                name : "itemName",
+                                newline : false,
+                                type : "text",
+                            }, {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.category" />',
+                                name : "categoryId",
+                                newline : true,
+                                type : "select",
+                                options: {
+                                    url: '${base.contextPath}/inv/item/querytype?itemType=ITEM',
+                                    valueField: "categoryId",
+                                    textField: "categoryName"
+                                }
+                            },  {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.redeemFlag" />',
+                                name : "redeemFlag", newline : false, type : "combobox",
+                                options : {
+                                    valueField : 'value',
+                                    textField : 'meaning',
+                                    data : yesno,
+                                }
+                            }, {
+                                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.starteraid" />',
+                                name : "starterAid", newline : false, type : "combobox",
+                                options : {
+                                    valueField : 'value',
+                                    textField : 'meaning',
+                                    data : packTypeData,
+                                }
+                            } ]
+                        },
+                        delayLoad : true,
+                        checkbox : true,
+                        isSingleCheck:true,
+                        validate : {
+                            required : true
+                        },
+                    },
+                    newline: false
+                },
+                <#elseif itemType=="PACKG">
+            {
+                type: 'combobox',
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.countStockFlag" />',
+                name: 'countStockFlag',
+                textField : 'countStockFlagName',
+                newline: false,
+                options: {
+                    cancelable : false,
+                    valueField: 'value',
+                    textField: 'meaning',
+                    data: yesno,
+                    onBeforeSelect: function(value){
+                        //校验商品包计算库存全为否
+                        if('N' == value){
+                            var includeItems = include_items_grid_obj.getData();
+                            if(includeItems){
+                                for(var i in includeItems){
+                                    var itemId = includeItems[i].itemId;
+                                    var countStockFlag = includeItems[i].countStockFlag;
+                                    if(itemId!=null && countStockFlag != 'N'){
+                                        $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.includecountstock" />');
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    onSelected: function(newvalue) {
+                        if ('N' == newvalue) {
+                            //计算库存方式不可编辑
+                            liger.get('quantityCountType').setValue('');
+                            liger.get('quantityCountType').setText('');
+                            liger.get('quantityCountType').setDisabled(true);
+                            $.ligerui.get('quantityCountType').setRequired(false);
+                            //数量预警为空且不可编辑
+                            liger.get('quantityAlert').setValue('');
+                            $.ligerui.get('base_info_form').setEnabled("quantityAlert", false);
+                            $.ligerui.get('quantityAlert').setRequired(false);
+                            //失效预警为空且不可编辑
+                            liger.get('expiryAlert').setValue('');
+                            $.ligerui.get('base_info_form').setEnabled("expiryAlert", false);
+                            $.ligerui.get('expiryAlert').setRequired(false);
+                            //包含商品的lov限定计算库存为否
+                            var includeEditor = include_items_grid_obj.getColumnByName('itemId').editor;
+                            includeEditor.parms = {
+                                itemType : 'ITEM',
+                                countStockFlag : 'N'
+                            };
+                        }else if('Y' == newvalue){
+                            //计算库存方式可编辑，必输
+                            liger.get('quantityCountType').setEnabled(true);
+                            $.ligerui.get('quantityCountType').setRequired(true);
+                            var quantityCountType = liger.get('quantityCountType').getValue();
+                            if('PACKG' == quantityCountType){
+                                //数量预警可编辑，必输
+                                $.ligerui.get('base_info_form').setEnabled("quantityAlert", true);
+                                $.ligerui.get('quantityAlert').setRequired(true);
+                                //失效预警可编辑，必输
+                                $.ligerui.get('base_info_form').setEnabled("expiryAlert", true);
+                                $.ligerui.get('expiryAlert').setRequired(true);
+                            }
+                            //批次控制＝否
+                            $.ligerui.get('lotCtrlFlag').setValue('N');
+                            //包含商品的lov不限定计算库存
+                            var includeEditor = include_items_grid_obj.getColumnByName('itemId').editor;
+                            includeEditor.parms = {
+                                itemType : 'ITEM'
+                            };
+                        }else{
+                            //包含商品的lov不限定计算库存
+                            var includeEditor = include_items_grid_obj.getColumnByName('itemId').editor;
+                            includeEditor.parms = {
+                                itemType : 'ITEM'
+                            };
+                        }
+                    }
+                },
+                validate: {
+                    required: true
+                },
+            },
+                {
+                    type: 'combobox',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.quantityCountType" />',
+                    name: 'quantityCountType',
+                    options: {
+                        cancelable : false,
+                        valueField: 'value',
+                        textField: 'meaning',
+                        data: packageCountStockData,
+                        onSelected: function(newvalue) {
+                            if (newvalue == 'IDV') {
+                                liger.get('quantityAlert').setValue('');
+                                $.ligerui.get('base_info_form').setEnabled("quantityAlert", false);
+                                $.ligerui.get('quantityAlert').setRequired(false);
+                                //失效预警为空且不可编辑
+                                liger.get('expiryAlert').setValue('');
+                                $.ligerui.get('base_info_form').setEnabled("expiryAlert", false);
+                                $.ligerui.get('expiryAlert').setRequired(false);
+                            } else {
+                                $.ligerui.get('base_info_form').setEnabled("quantityAlert", true);
+                                $.ligerui.get('quantityAlert').setRequired(true);
+                                //失效预警可编辑，必输
+                                $.ligerui.get('base_info_form').setEnabled("expiryAlert", true);
+                                $.ligerui.get('expiryAlert').setRequired(true);
+                            }
+                            <#if accessService.access("EDITABLE") == false>
+                            //数量预警为空且不可编辑
+                            liger.get('quantityAlert').setValue('');
+                            $.ligerui.get('base_info_form').setEnabled("quantityAlert", false);
+                            $.ligerui.get('quantityAlert').setRequired(false);
+                            //失效预警为空且不可编辑
+                            liger.get('expiryAlert').setValue('');
+                            $.ligerui.get('base_info_form').setEnabled("expiryAlert", false);
+                            $.ligerui.get('expiryAlert').setRequired(false);
+                            </#if>
+                        }
+                    },
+                    newline: false
+                },
+            </#if>
+            {
+                type: 'combobox',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.starteraid" />',
+                name: 'starterAidField',
+                textField : 'starterAidFieldName',
+                options: {
+                cancelable : false,
+                    valueField: 'value',
+                    textField: 'meaning',
+                    data: packTypeData
+            },
+                validate: {
+                    required: true,
+                }
+            },
+            {
+                type: 'combobox',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.redeemFlag" />',
+                name: 'redeemFlagField',
+                textField : 'redeemFlagFieldName',
+                newline : false,
+                options: {
+                cancelable : false,
+                    valueField: 'value',
+                    textField: 'meaning',
+                    data: yesno,
+                    onBeforeSelect: function(value){
+                    oldRedeemSel = liger.get('redeemFlagField').getValue();
+                },
+                onSelected: function(newvalue) {
+                    var grid =  $.ligerui.get('price_list_info_grid');
+                    if(grid) {
+                        $.grep(grid.columns,function(column){
+                            if(column.columnname == 'RP'){
+                                if ('N' == newvalue && redeemSel !=0) {
+                                    $.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.clearredeemprice"/>', function (yes){
+                                        if(yes){
+                                            delete column.validate;
+                                            $.each(grid.rows,function(i,row){
+                                                grid.updateRow(row,{RP:null});
+                                            })
+                                        }else{
+                                            liger.get('redeemFlagField').setValue(oldRedeemSel);
+                                        }
+                                    });
+                                }else if ('Y' == newvalue){
+                                    column.validate = {required:true}
+                                }
+                            }
+                        })
+                        if(grid.currentData) grid.reRender();
+                    }
+                    redeemSel++;
+                },
+            },
+                validate: {
+                    required: true
+                },
+            },
+            {
+                type: 'int',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.minOrderQuantity" />',
+                name: 'minOrderQuantity',
+                newline: false,
+                validate: {
+                required: true,
+                    maxlength: 5,
+            },
+            },
+            {
+                type: 'select',
+                    label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.uomcode" />',
+                name: 'uomCode',
+                textField : 'uomName',
+                newline: true,
+                options: {
+                cancelable : false,
+                    valueField: 'uomCode',
+                    textField: 'name',
+                    url:'${base.contextPath}/inv/item/queryInvUomCodeLov'
+            },
+                validate: {
+                    required: true
+                }
+            },
+            {
+                type: 'int',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.quantityAlert" />',
+                name: 'quantityAlert',
+                newline: false,
+            },
+            {
+                type: 'int',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.expiryAlert" />',
+                name: 'expiryAlert',
+                newline: false,
+            }, {
+                type: 'select',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.backorder" />',
+                    name: 'backOrder',
+                    options : {
+                    cancelable : false,
+                        valueField : 'value',
+                        textField : 'meaning',
+                        data : yesno,
+                },
+                validate : {
+                    required : true
+                }
+            },{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.lotControlFlag" />',
+                    type : 'select',
+                    name : 'lotCtrlFlag',
+                    //textField : 'lotCtrlFlagName',
+                    newline : false,
+                    options : {
+                    cancelable : false,
+                        valueField : 'value',
+                        textField : 'meaning',
+                        data : yesno,
+                },
+                validate : {
+                    required : true
+                }
+            },
+            {
+                type: 'text',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.barCode" />',
+                name: 'barCode',
+                newline: false,
+                validate: {
+                maxlength: 30
+            }
+            },
+            {
+                type: 'none',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemAvailability" />',
+                name: 'itemValiable',
+                width: 1
+            },
+            {
+                type: 'checkbox',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.availability.inStore" />',
+                name: 'inStore',
+                width: 30,
+                labelWidth: 50,
+                options: {
+                checkValue: 'Y',
+                    uncheckValue: 'N'
+            },
+                newline: false
+            },
+            {
+                type: 'checkbox',
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.availability.distributorWeb" />',
+                name: 'agencyWeb',
+                width: 30,
+                labelWidth: 90,
+                newline: false,
+                options: {
+                checkValue: 'Y',
+                    uncheckValue: 'N'
+            }
+            }
+            //            ,
+            //            {
+            //                type: 'checkbox',
+            //                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.availability.distributorApp" />',
+            //                name: 'agencyApp',
+            //                width: 30,
+            //                labelWidth: 90,
+            //                newline: false,
+            //                options: {
+            //                checkValue: 'Y',
+            //                    uncheckValue: 'N'
+            //            }
+            //            },{
+            //                type: 'checkbox',
+            //                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.availability.autoShip" />',
+            //                    name: 'autoDeliver',
+            //                    width: 30,
+            //                    labelWidth: 90,
+            //                    newline: false,
+            //                    options: {
+            //                    checkValue: 'Y',
+            //                        uncheckValue: 'N'
+            //                }
+            //            }
+            ]
+            });
+            //加载数据
+            Hap.loadForm({
+                form: $("#base_info_form").ligerForm(),
+                url: _basePath + '/inv/item/queryByItemId',
+                para: {
+                    "itemId": ${itemId},
+                    "mode": mode
+                },
+                callback:function(json){
+                    $.ligerui.get('categoryIdList').setText(json.categoryDesc);
+                    var countStockFlag = json.countStockFlag;
+                    var quantityCountType = json.quantityCountType;
+                    if(countStockFlag == 'N'){
+                        liger.get('quantityAlert').setValue('');
+                        $.ligerui.get('base_info_form').setEnabled("quantityAlert", false);
+                    }
+                    if(countStockFlag == 'Y' && quantityCountType == 'IDV'){
+                        liger.get('quantityAlert').setValue('');
+                        $.ligerui.get('base_info_form').setEnabled("quantityAlert", false);
+                    }
+                    <#if itemType=="PACKG">
+                        if(mode == 'add'){
+                            //批次控制＝否,不可编辑,必输
+                            $.ligerui.get('lotCtrlFlag').setValue('N');
+                            $.ligerui.get('lotCtrlFlag').setDisabled(true);
+                            //有效日期从默认当前日期
+                            $.ligerui.get('validateFrom').setValue(new Date());
+                        }
+                    </#if>
+                    //发布状态为Y的商品，限定可编辑字段
+                    var publishStatus = json.publishStatus;
+                    if('Y'==publishStatus){
+                        $.ligerui.get('categoryIdList').setReadonly(true);
+                        $.ligerui.get('itemName').setReadonly(true);
+                        $.ligerui.get('validateFrom').setReadonly(true);
+                        $.ligerui.get('validateTo').setReadonly(true);
+                        $.ligerui.get('description').setReadonly(true);
+                        $.ligerui.get('starterAidField').setReadonly(true);
+                        $.ligerui.get('redeemFlagField').setReadonly(true);
+                        $.ligerui.get('minOrderQuantity').setReadonly(true);
+                        $.ligerui.get('quantityAlert').setReadonly(true);
+                        $.ligerui.get('expiryAlert').setReadonly(true);
+                        $.ligerui.get('barCode').setReadonly(true);
+                        $.ligerui.get('inStore').setReadonly(true);
+                        $.ligerui.get('agencyWeb').setReadonly(true);
+                        $.ligerui.get('agencyApp').setReadonly(true);
+                        $.ligerui.get('autoDeliver').setReadonly(true);
+                        $.ligerui.get('backOrder').setReadonly(true);
+
+                        $.ligerui.get('param_grid_tool').setDisabled('param_grid_add');
+                        $.ligerui.get('param_grid_tool').setDisabled('param_grid_del');
+                        $('#picker').hide();
+
+                        //隐藏发布按钮
+                        liger.get('publish_btn').setDisabled(true);
+                    }
+                    if('N'==publishStatus){
+                        liger.get('unpublish_btn').setDisabled(true);
+                    }
+
+                    <#if isedit == '1'>
+                    //有效期从<=当前系统日期，则“有效期从”这个字段不允许编辑
+                        var validateFrom = json.validateFrom;
+                    if(validateFrom <= new Date()){
+                        $.ligerui.get('validateFrom').setReadonly(true);
+                    }
+                    </#if>
+
+                    if(mode == 'add'){
+                        $('#marketId').val(_marketId);
+                        $.ligerui.get('backOrder').setValue('Y');
+                        $.ligerui.get('marketName').setValue(_marketName);
+                        if('N'==publishStatus){
+                            $.ligerui.get('publishStatus').setValue(publishStatus);
+                            $.ligerui.get('publishStatus').setText('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.status.unpublish" />');
+                        }
+                    }
+                }
+            })
+
+            /*设置商品编码是否可编辑*/
+            function setItemNumberEdit(){
+                if(mode == 'update'){
+                    $.ligerui.get('itemNumber').setReadonly(true);
+                    $.ligerui.get('uomCode').setReadonly(true);
+
+                    /*设置库存属性不可编辑*/
+                    $.ligerui.get('countStockFlag').setReadonly(true);
+                    $.ligerui.get('lotCtrlFlag').setReadonly(true);
+                    $.ligerui.get('marketName').setReadonly(true);
+                <#if itemType="ITEM">
+                        $.ligerui.get('countItemId').setReadonly(true);
+                </#if>
+                <#if itemType="PACKG">
+                        $.ligerui.get('quantityCountType').setReadonly(true);
+                </#if>
+                }
+            }
+            setItemNumberEdit();
+
+            <#if itemType=="PACKG">
+            window['include_items_grid_obj'] = $('#include_items_grid').ligerGrid({
+                columns: [{
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.itemid"/>',
+                    name : 'itemId',
+                    textField:'itemNumber',
+                    align : 'left',
+                    width : 100,
+                    editor: $.extend(${lovService.getLov(base.contextPath, base.locale, "lov_item")},{
+                        onSelected: function(e){
+                            //var p = this.options;
+                            //p.host_grid.updateCell('itemName',datas.data[0].itemName,p.host_grid_row);
+                            var includeItemId = e.data[0].itemId;
+                            f_checkItemRepeat(e,includeClickRow);
+                            f_checkItemInclude(includeItemId,includeClickRow);
+                            includeClickRow.itemName = e.data[0].itemName;
+                            includeClickRow.uomCode = e.data[0].uomCode;
+                            includeClickRow.uomName = e.data[0].uomName;
+                            includeClickRow.itemId = e.data[0].itemId;
+                            includeClickRow.countStockFlag = e.data[0].countStockFlag;
+                            $('#include_items_grid').ligerGetGridManager().reRender(e);
+                        }
+                    }),
+                    validate : {
+                        required : true
+                    }
+                },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.itemName" />',
+                        name: 'itemName',
+                        width: 150,
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.quantity" />',
+                        name: 'quantity',
+                        width: 100,
+                        editor: {
+                            type: 'int',
+                        },
+                        validate: {
+                            required:true
+                        }
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.uomcode" />',
+                        name: 'uomCode',
+                        textField: 'uomName',
+                        width: 100,
+                    },{
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.countStockFlag" />',
+                        name: 'countStockFlag',
+                        width: 100,
+                        render: function(e){
+                            for(var i in countStockData){
+                                if(e.countStockFlag == countStockData[i].value){
+                                    return countStockData[i].meaning;
+                                }
+                            }
+                        }
+                    }],
+                toolbar: {
+                    items: [{
+                        text: '<@spring.message "sys.hand.btn.new"/>',
+                    <#if accessService.access("EDITABLE") == false>
+            disable:true,
+            </#if>
+            //disable: false,
+            click: function() {
+                if(mode=='update'){
+                    return;
+                }
+                include_items_grid_obj.addRow({})
+            },
+            icon: 'add'
+            },
+            {
+                line: true
+            },
+            {
+                text: '<@spring.message "sys.hand.btn.delete"/>',
+            <#if accessService.access("EDITABLE") == false>
+            disable:true,
+            </#if>
+                click: function() {
+                    if(mode=='update'){
+                        return;
+                    }
+                    Hap.gridDelete({
+                        grid: include_items_grid_obj
+                    })
+                },
+                icon: 'delete'
+            }]
+            },
+            onBeforeEdit: function(editParm) {
+                includeClickRow = editParm.record;
+                if(mode=='update'){
+                    return false;
+                }
+            },
+            url: _basePath + '/inv/item/queryHierarchyByItemId',
+                parms: {
+                'itemId': ${itemId}
+            },
+            rownumbers: true,
+                usePager: false,
+                enabledEdit: true,
+                width: '98%',
+                height: 300,
+                checkbox: true,
+                isChecked: function(item) {
+                return item.ischecked;
+            }
+            });
+            /*校验包含商品是否属于库存组织*/
+            function f_checkItemInclude(includeItemId,includeClickRow) {
+                var assignIds = '';
+                var assignGridData = $.ligerui.get('inv_item_assign_grid').getData();
+                if (assignGridData != null) {
+                    for (var i in assignGridData) {
+                        var enabledFlag = assignGridData[i].enabledFlag;
+                        var assignValue = assignGridData[i].assignValue;
+                        if(assignValue!= null && (enabledFlag == null || enabledFlag == '')){
+                            $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.enableflagnull" />');
+                        }
+                        if(assignGridData[i].enabledFlag=='Y'){
+                            var assignId = assignGridData[i].assignValue;
+                            if(!assignId){
+                                Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.inputinvinfoerror" />');
+                                include_items_grid_obj.endEdit();
+                                include_items_grid_obj.remove(includeClickRow);
+                                return;
+                            }
+                            assignIds = assignIds + assignId + ',';
+                        }
+                    }
+                }
+                if (assignIds != '') {
+                    $.ajax({
+                        type: "post",
+                        data: {
+                            'itemId': includeItemId,
+                            'orgIds': assignIds
+                        },
+                        dataType: "json",
+                        url: _basePath + "/inv/item/queryIncludeItemOrgs",
+                        error: function(data) {
+                            Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.netError" />');
+                        },
+                        success: function(data) {
+                            if (!data.success) {
+                                include_items_grid_obj.endEdit();
+                                include_items_grid_obj.remove(includeClickRow);
+                            }
+                        }
+                    });
+                }
+            }
+
+            /*校验包含商品是否重复*/
+            function f_checkItemRepeat(e){
+                var itemNumber = e.data[0].itemNumber;
+                var packageIncludeData = include_items_grid_obj.getData();
+                var lastEditRow = include_items_grid_obj.lastEditRow;
+                for(var i in packageIncludeData){
+                    if(itemNumber == packageIncludeData[i].itemNumber && itemNumber!= lastEditRow.itemNumber){
+                        $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.itemcoderepeat" />');
+                        include_items_grid_obj.endEdit();
+                        include_items_grid_obj.remove(lastEditRow);
+                    }
+                }
+            }
+
+            /*校验库存id是否包含商品包下的所有商品*/
+            function f_checkAssign(invOrgId,invClickRow) {
+                var includeData = include_items_grid_obj.getData();
+                if (includeData.length < 1) {
+                    Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.inputincludeitem" />');
+                    inv_item_assign_grid_obj.endEdit();
+                    inv_item_assign_grid_obj.remove(invClickRow);
+                    return;
+                }
+                var itemIds = '';
+                for (var i = 0; i < includeData.length; i++) {
+                    var itemId = includeData[i].itemId;
+                    if(itemId != null && itemId != undefined){
+                        itemIds = itemIds + itemId + ',';
+                    }else{
+                        Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.inputincludeitemright" />');
+                    }
+                }
+                $.ajax({
+                    type: "post",
+                    data: {
+                        'itemIds': itemIds,
+                        'orgId': invOrgId
+                    },
+                    dataType: "json",
+                    url: _basePath + "/inv/item/queryOrgIncludeItems",
+                    error: function(data) {
+                        Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.netError" />');
+                    },
+                    success: function(data) {
+                        if (!data.success) {
+                            inv_item_assign_grid_obj.endEdit();
+                            inv_item_assign_grid_obj.remove(invClickRow);
+                        }
+                    }
+                });
+            }
+            /*校验库存id是否重复*/
+            function f_checkAssignRepeat(e,invClickRow){
+                var invOrgId = e.data[0].invOrgId;
+                var allAssignGrid = inv_item_assign_grid_obj.getData();
+                for(var i=0;i<allAssignGrid.length;i++){
+                    if(invOrgId == allAssignGrid[i].assignValue && invOrgId != invClickRow.assignValue){
+                        $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.invidrepeat" />');
+                        inv_item_assign_grid_obj.endEdit();
+                        inv_item_assign_grid_obj.remove(invClickRow);
+                    }
+                }
+            }
+            </#if>
+
+            //初始化库存组织信息
+            var inv_item_assign_grid_obj = $('#inv_item_assign_grid').ligerGrid({
+                columns: [{
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.assignCode" />',
+                    name: 'assignCode',
+                    width: 200,
+                    textField: 'assignCode',
+                    validate: {
+                        required: true
+                    },
+                    editor: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_pm_inv_org")},{
+                        <#if itemType=="ITEM">
+            onSelected: function(e){
+                f_AssignSel(e,invClickRow);
+                f_AssignItemValidate(e,invClickRow);
+                invClickRow.assignValue = e.data[0].invOrgId;
+                invClickRow.assignCode= e.data[0].code;
+                invClickRow.assignName = e.data[0].name;
+                invClickRow.assignType = 'INV';
+                invClickRow.enabledFlag = 'Y';
+                $('#inv_item_assign_grid').ligerGetGridManager().reRender(e);
+            }
+            <#elseif itemType=="PACKG">
+            onSelected: function(e) {
+                f_checkAssign(e.data[0].invOrgId,invClickRow);
+                f_checkAssignRepeat(e,invClickRow);
+                invClickRow.assignName = e.data[0].name;
+                invClickRow.assignValue = e.data[0].invOrgId;
+                invClickRow.assignCode= e.data[0].code;
+                invClickRow.enabledFlag = e.data[0].enabledFlag;
+                invClickRow.assignType = 'INV';
+                invClickRow.enabledFlag = 'Y';
+                $('#inv_item_assign_grid').ligerGetGridManager().reRender(e);
+            }
+            </#if>
+            }),
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.assignName" />',
+                    name: 'assignName',
+                width: 300,
+                validate: {
+                required: true,
+            }
+            },{
+                display : '<@spring.message "sys.hand.common.enable" />',
+                    name : "enabledFlag",
+                    width: 100,
+                    editor:{
+                    width: 100,
+                        cancelable : false,
+                        type : "combobox",
+                        valueField : 'value',
+                        textField : 'meaning',
+                        data : yesno,
+                        onChangeValue: function(value){
+                        if('Y' == value){
+                            var editRow = inv_item_assign_grid_obj.lastEditRow;
+                            var invOrgId=editRow.assignValue;
+                            if(invOrgId != null){
+                            <#if itemType=="PACKG">
+                                f_checkAssign(invOrgId,editRow);
+                            </#if>
+                            }
+                        }
+                    },
+                    onBeforeSelect: function(value){
+                        if('N' == value){
+                            var editRow = inv_item_assign_grid_obj.lastEditRow;
+                            var invOrgId=editRow.assignValue;
+                            if(invOrgId != null){
+                                var result;
+                                $.ajax({
+                                    type: "post",
+                                    async: false,
+                                    data: {
+                                        'itemId': ${itemId},
+                                        'invOrgId': invOrgId
+                                    },
+                                    dataType: "json",
+                                    url: _basePath + "/inv/item/checkInvOrgEnable",
+                                    error: function(data) {
+                                        Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.netError" />');
+                                    },
+                                    success: function(data) {
+                                        if (data.success) {
+                                            flag = data.rows[0];
+                                            if('N' == flag){
+                                            <#if itemType=="ITEM">
+                                                $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.iteminvorgenable" />');
+                                                result = false;
+                                            </#if>
+                                            <#if itemType=="PACKG">
+                                                $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.packginvorgenable" />');
+                                                result = false;
+                                            </#if>
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                            return result;
+                        }
+                    }
+                },
+                validate: {
+                    required: true,
+                },
+                render:Hap.gridSelectRenderer()
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.btn.set" />',
+                    id : 'install',
+                name: 'assignName',
+                width : 100,
+                align : 'center',
+            <#if isedit == '1'>
+            render:function(rowdata, index, value){
+                if(rowdata.assignCode){
+                    rowdata = JSON2.stringify(rowdata);
+                    return "<a href='javascript:void(0);' onclick='openItemProperty("+ rowdata + ")'><@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.btn.set" /></a>";
+                }else{
+                    return '';
+                }
+            }
+            </#if>
+            <#if isedit == '0'>
+            render:function(rowdata, index, value){
+                return "<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.btn.set" />";
+            }
+            </#if>
+            }
+            ],
+            toolbar: {
+                items: [{
+                    text: '<@spring.message "sys.hand.btn.new"/>',
+                <#if accessService.access("EDITABLE") == false>
+                disable:true,
+            </#if>
+                //disable: false,
+                click: function() {
+                <#if itemType=='PACKG'>
+                        if(mode=='add'){
+                            //新建时必须先选择包含商品
+                            var includeRows = include_items_grid_obj.rows;
+                            if(!includeRows || includeRows.length == 0 || includeRows[0].itemNumber == null){
+                                $.ligerDialog.error('<@spring.message "sys.hand.btn.please_select_the_product_details"/>');
+                                return;
+                            }
+                        }
+                </#if>
+                    inv_item_assign_grid_obj.addRow({})
+                },
+                icon: 'add'
+            },{
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                <#if accessService.access("EDITABLE") == false>
+                    disable:true,
+                </#if>
+                    click : function() {
+                        var rows = inv_item_assign_grid_obj.getSelectedRows();
+                        $.each(rows,function(i,d){
+                            inv_item_assign_grid_obj.remove(d);
+                        });
+                    },
+                    icon : 'delete'
+                }]
+            },
+
+
+            <#if isedit == '1'>
+            url:'${base.contextPath}/inv/item/queryItemAssignsByItemId',
+                parms:{
+                itemId:${itemId}
+                    },
+            </#if>
+            usePager: false,
+                width: '98%',
+                height: 300,
+                enabledEdit: true,
+                allowHideColumn:false,
+                checkbox: true,
+                canSelect : function(item) {
+                    return true;
+            },
+            onBeforeEdit: function(p) {
+                invClickRow = p.record;
+                if(p.column.columnname == 'assignCode' && p.record.assignId) {
+                    return false;
+                }
+            }
+            });
+
+            // 当只读标识时,隐藏设置列
+            <#if accessService.access("EDITABLE") == false>
+            inv_item_assign_grid_obj.toggleCol('install', false);
+            </#if>
+
+            //----------库存信息设置窗口----------
+            var itemPropertyForm,propertyWin;
+            function openItemProperty(rowdata) {
+                var assignValue = rowdata.assignValue;
+                var invOrgCode = rowdata.assignCode;
+                inv_item_assign_grid_obj.select(rowdata.__id);
+                var tab1FormObjData = tab1FormObj.getData();
+                if(!propertyWin) {
+                    initItemPropertyForm();
+                    propertyWin = $.ligerDialog.open({
+                        isHidden:false,
+                        height: 200,
+                        width: 350,
+                        allowClose:false,
+                        isHidden:false,
+                        target: $("#d_mm_007_inv_item_property_form"),
+                        title: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.assignInfo"/>',
+                        buttons: [{
+                            text: '<@spring.message "sys.hand.btn.ok" />',
+                            onclick: function(item, dialog) {
+                                saveProperty(dialog);
+                            }
+                        },
+                            {
+                                text: '<@spring.message "sys.hand.btn.cancel" />',
+                                onclick: function(item, dialog) {
+                                    dialog.hide();
+                                }
+                            }]
+                    });
+                }
+                propertyWin.show();
+                loadItemPropertyFormData(assignValue,invOrgCode);
+            }
+
+            //加载库存属性数据
+            function loadItemPropertyFormData(assignValue,invOrgCode){
+                var tab1FormObjData = tab1FormObj.getData(),pform = $("#d_mm_007_inv_item_property_form").ligerForm();
+                itemPropertyForm.clear();
+                Hap.loadForm({
+                    form : pform,
+                    url : "${base.contextPath}/inv/property/queryPropertyType",
+                    para : {
+                        "itemId" : ${itemId},
+                        "organizationId" : assignValue
+                    },
+                    callback: function(data) {
+                        if(data.itemId == null){
+                            itemPropertyForm.setData({
+                                "invOrganizationId" : assignValue,
+                                "invOrgCode" : invOrgCode,
+                                "itemId" : ${itemId},
+                                "mode" : mode,
+                                "quantityAlert" : tab1FormObjData.quantityAlert,
+                                "expiryAlert" : tab1FormObjData.expiryAlert,
+                                "minOrderQuantity" : tab1FormObjData.minOrderQuantity,
+                            });
+                        }else {
+                            itemPropertyForm.setData({
+                                "invOrgCode" : invOrgCode
+                            });
+                        }
+                        <#if itemType=='ITEM'>
+                            var countStockFlag = $('#countStockFlag').val();
+                        if(countStockFlag == 'N' || countStockFlag == 'R'){
+                            //数量预警为空
+                            liger.get('property_formquantityAlert').setValue('');
+                            pform.setEnabled("quantityAlert", false);
+                            liger.get('property_formquantityAlert').setRequired(false);
+                            //失效预警为空
+                            liger.get('property_formexpiryAlert').setValue('');
+                            pform.setEnabled("expiryAlert", false);
+                            liger.get('property_formexpiryAlert').setRequired(false);
+                        } else {
+                            //数量预警必输
+                            pform.setEnabled("quantityAlert", true);
+                            liger.get('property_formquantityAlert').setRequired(true);
+                            //失效预警必输
+                            pform.setEnabled("expiryAlert", true);
+                            liger.get('property_formexpiryAlert').setRequired(true);
+                        }
+                        </#if>
+                        <#if itemType=='PACKG'>
+                            var countStockFlag = $('#countStockFlag').val();
+                        var quantityCountType = $('#quantityCountType').val();
+                        if(countStockFlag == 'N'){
+                            //数量预警为空
+                            liger.get('property_formquantityAlert').setValue('');
+                            pform.setEnabled("quantityAlert", false);
+                            liger.get('property_formquantityAlert').setRequired(false);
+                            //失效预警为空
+                            liger.get('property_formexpiryAlert').setValue('');
+                            pform.setEnabled("expiryAlert", false);
+                            liger.get('property_formexpiryAlert').setRequired(false);
+                        }else if(countStockFlag == 'Y'&&quantityCountType =='IDV'){
+                            liger.get('property_formquantityAlert').setValue('');
+                            liger.get('property_formquantityAlert').setRequired(false);
+                            pform.setEnabled("quantityAlert", false);
+                            //失效预警为空
+                            liger.get('property_formexpiryAlert').setValue('');
+                            pform.setEnabled("expiryAlert", false);
+                            liger.get('property_formexpiryAlert').setRequired(false);
+                        }else{
+                            pform.setEnabled("quantityAlert", true);
+                            liger.get('property_formquantityAlert').setRequired(true);
+                            pform.setEnabled("expiryAlert", true);
+                            liger.get('property_formexpiryAlert').setRequired(true);
+                        }
+                        </#if>
+                    }
+                })
+            }
+
+            //初始化库存属性form
+            function initItemPropertyForm(){
+                itemPropertyForm = $("#d_mm_007_inv_item_property_form").ligerForm({
+                    prefixID:'property_form',
+                    fields : [{
+                        type : 'hidden',
+                        name : 'invOrganizationId',
+                    },{
+                        type : 'hidden',
+                        name : 'itemId',
+                    },{
+                        display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.assignCode" />',
+                        type : 'text',
+                        name : 'invOrgCode',
+                        newline : false,
+                        readonly : true,
+                        validate : {
+                            required : true,
+                        }
+                    },{
+                        display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.quantityAlert" />',
+                        type : 'digits',
+                        name : 'quantityAlert',
+                        newline : true,
+                    }, {
+                        display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.expiryAlert" />',
+                        type : 'digits',
+                        name : 'expiryAlert',
+                        newline : false,
+                    }],
+                });
+            }
+            // 保存库存属性
+            function saveProperty(dialog){
+                var form = $.ligerui.get('d_mm_007_inv_item_property_form'),formData = form.getData();
+                if(!Hap.validateForm(form)) return;
+                if(formData.expiryAlert <= 0){
+                    $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.expiryalertgreaterzero" />');
+                    return;
+                }
+                if(formData.minOrderQuantity <= 0){
+                    $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.expiryalertgreaterzero" />');
+                    return;
+                }
+                var assignRow = inv_item_assign_grid_obj.getSelectedRow();
+                var updateData={
+                    'quantityAlert' : formData.quantityAlert,
+                    'expiryAlert' : formData.expiryAlert,
+                    'savePropertyFlag' : 'Y'
+                };
+                inv_item_assign_grid_obj.update(inv_item_assign_grid_obj.getSelectedRow(),updateData);
+                savePropertyFlag = 'Y';
+                dialog.hide();
+            }
+
+
+            //初始化价格信息
+            window['price_list_info_grid_obj'] = $('#price_list_info_grid').ligerGrid({
+                columns: [{
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.salesorgcode" />',
+                    name: 'salesOrgCode',
+                    textField: 'code',
+                    valueField: 'code',
+                    width: 120,
+                    validate: {
+                        required: true,
+                    },
+                    editor: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_sales_organization_code")},{
+                        onSelect: function(e){
+                            if(!e.data || !e.data.length) return false;
+                            //设置币种，取销售区域所属市场下的本位币
+                            var params  =   [{
+                                orgType: 'SALES',
+                                orgId: e.data[0].salesOrgId,
+                                paramNames: ['SPM.CURRENCY']
+                            }];
+                            Hap.ajax({
+                                url :  '${base.contextPath}/spm/orgParam/get',
+                                data :  params,
+                                success : function(json)  {
+                                    currency = json.rows[0].paramValues['SPM.CURRENCY'] == undefined ? null: json.rows[0].paramValues['SPM.CURRENCY'];
+                                    var currencyCode;
+                                    if(!currency[0]){
+                                        currencyCode = '';
+                                    }else{
+                                        currencyCode = currency[0];
+                                    }
+                                    var updateData = {
+                                        'salesOrgId' : e.data[0].salesOrgId,
+                                        'currency' : currencyCode,
+                                        'marketId' : e.data[0].marketId,
+                                        'salesOrgName' : e.data[0].name
+                                    };
+                                    price_list_info_grid_obj.updateRow(price_list_info_grid_obj.lastEditRow,updateData);
+                                }
+                            });
+                        }
+                    }),
+                },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.salesOrgName" />',
+                        name: 'salesOrgName',
+                        width: 120,
+                        validate: {
+                            required: true,
+                        },
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.currency" />',
+                        name: 'currency',
+                        width: 80,
+                        validate: {
+                            required: true,
+                        },
+                        render: function(item) {
+                            for (var i = 0; i < currencyData.length; i++) {
+                                if (currencyData[i].currencyCode == item.currency) {
+                                    return currencyData[i].currencyName;
+                                }
+                            }
+                        }
+                    },
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.whether.tax" />',
+                        name: 'disableTaxFlag',
+                        align: 'center',//enabledFlag
+                        width: 100,
+                        editor: {
+                            cancelable : false,
+                            type : "combobox",
+                            valueField : 'value',
+                            textField : 'meaning',
+                            data : calculatetax,
+                        },validate: {
+                        required: true,
+                    },
+                        render : Hap.gridSelectRenderer()
+                    },
+                <#list price_type as pt>
+            {
+                display: '${pt.meaning}',
+                name: '${pt.value}',
+                width: 90,
+                editor: {
+                    type: 'float',
+                },
+                align: "right"
+                <#if pt.value=='DIS'||pt.value=='RE'||pt.value=='PV'||pt.value=='STU'
+            ||pt.value=='STU2'||pt.value=='VIP'>
+                ,validate: {
+                required: true,
+            },
+            </#if>
+            <#if pt.value=='RP'>
+                ,render: function(item) {
+                if(item.RP==0){
+                    return null;
+                }else{
+                    return item.RP;
+                }
+            },
+            </#if>
+            /* <#if pt.value=='VIP'>
+             ,render: function(item) {
+             if(item.VIP==0){
+             return null;
+             }else{
+             return item.VIP;
+             }
+             },
+             </#if> */
+            },
+            </#list>
+
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateFrom" />',
+                name: 'startActiveDate',
+                width: 120,
+                format: 'yyyy-MM-dd',
+                type : 'date',
+                editor: {
+                    type: 'date',
+
+                },
+                validate: {
+                    required: true,
+                }
+            },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateTo" />',
+                    name: 'endActiveDate',
+                    width: 120,
+                    format: 'yyyy-MM-dd',
+                    type : 'date',
+                    editor: {
+                        type: 'date',
+                    }
+                }
+            ],
+            toolbar: {
+                id : 'price_grid_tool',
+                    items: [{
+                    text: '<@spring.message "sys.hand.btn.new"/>',
+                <#if accessService.access("EDITABLE") == false>
+                disable:true,
+            </#if>
+                //disable: false,
+                click: function() {
+                    price_list_info_grid_obj.addRow({})
+                },
+                icon: 'add'
+            },
+                {
+                    text: '<@spring.message "sys.hand.btn.delete"/>',
+                <#if accessService.access("EDITABLE") == false>
+                disable:true,
+                </#if>
+                    id: 'price_grid_del',
+                        click: function() {
+                    var publishStatus = liger.get('publishStatus').getValue();
+                    var selRows = price_list_info_grid_obj.getSelectedRows();
+                    if(selRows){
+                        for(var i in selRows){
+                            if('Y' == publishStatus){
+                                var status = selRows[i].__status;
+                                if('nochanged' == status){
+                                    $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.inv.item.dto.tip.publishstatusnodelete" />');
+                                    return;
+                                }
+                            }
+                        <#if isedit == '1'>
+                                var startActiveDate = selRows[i].startActiveDate;
+                            var status = selRows[i].__status;
+                            if (startActiveDate && 'add' != status) {
+                                var arr1 = startActiveDate.split(" ");
+                                var sdate = arr1[0].split('-');
+                                startActiveDate = new Date(sdate[0], sdate[1]-1, sdate[2]);
+                                date = new Date();
+                                if(startActiveDate <= new Date(date.getFullYear(),date.getMonth(),date.getDate())){
+                                    $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.inv.item.dto.tip.datenodelete" />');
+                                    return;
+                                }
+                            }
+                        </#if>
+                        }
+                    }
+
+                    Hap.gridDelete({
+                        grid: price_list_info_grid_obj
+                    })
+                },
+                    icon: 'delete'
+                }]
+            },
+            <#if isedit == '1'>
+            url:'${base.contextPath}/inv/price/queryPriceByItem',
+                parms:{
+                itemId:${itemId}
+                    },
+            </#if>
+            usePager: false,
+                enabledEdit: true,
+                width: '98%',
+                height: 300,
+                checkbox: true,
+                onSuccess:function(data){
+                data = splitPriceData(data);
+            },
+            onBeforeEdit: function(item) {
+                var columnName = item.column.name;
+                var publishStatus = $.ligerui.get('publishStatus').getValue();
+                var status = item.record.__status;
+                if(publishStatus =='N' && columnName == 'RP'){
+                    var redeemFlag = $.ligerui.get('redeemFlagField').getValue();
+                    return redeemFlag=='Y';
+                }
+
+                if(publishStatus == 'Y' && status == 'nochanged'){
+                    if(columnName == 'salesOrgCode' || columnName == 'DIS'
+                        || columnName == 'RE'|| columnName == 'PV'
+                        || columnName == 'STU'|| columnName == 'STU2'
+                        || columnName == 'VIP'|| columnName == 'startActiveDate'
+                        || columnName == 'endActiveDate'|| columnName == 'RP'){
+                        return false;
+                    }
+                }
+            <#if isedit == '1'>
+                    if(status != 'add'){
+                        var startActiveDate = item.record.startActiveDate;
+                        if (startActiveDate) {
+                            var arr1 = startActiveDate.split(" ");
+                            var sdate = arr1[0].split('-');
+                            startActiveDate = new Date(sdate[0], sdate[1]-1, sdate[2]);
+                        }
+                        date = new Date();
+                        var newDate = new Date(date.getFullYear(),date.getMonth(),date.getDate());
+                        if(startActiveDate <= newDate){
+                            if(columnName == 'salesOrgCode' || columnName == 'DIS'
+                                || columnName == 'RE'|| columnName == 'PV'
+                                || columnName == 'STU'|| columnName == 'STU2'|| columnName == 'RP'
+                                || columnName == 'VIP'|| columnName == 'startActiveDate'){
+                                return false;
+                            }
+                        }
+                    }
+            </#if>
+            }
+            });
+
+            if (!window.param_info_grid_obj) {
+                window['param_info_grid_obj'] = $('#param_info_grid').ligerGrid({
+                    columns: [{
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.lang" />',
+                        name: 'language',
+                        width: 100,
+                        editor: {
+                            type: 'combobox',
+                            valueField: 'langCode',
+                            textField: 'description',
+                            data: languageData
+                        },
+                        render: function(item) {
+                            for (var i = 0; i < languageData.length; i++) {
+                                if (languageData[i].langCode == item.language) {
+                                    return languageData[i].description;
+                                }
+                            }
+                        },
+                        validate: {
+                            required: true,
+                        }
+                    },
+                        {
+                            display: '<@spring.message "sys.hand.btn.action"/>',
+                            align: 'center',
+                            width: 100,
+                            render: function(rowdata) {
+                                rowdata = JSON2.stringify(rowdata);
+                                return "<a href='javascript:void(0);' onclick='editParam("+ rowdata + ")'><@spring.message "sys.hand.btn.action"/></a>"
+                            }
+                        }
+                    ],
+                    toolbar: {
+                        id: 'param_grid_tool',
+                        items: [{
+                            id: 'param_grid_add',
+                            text: '<@spring.message "sys.hand.btn.new"/>',
+                        <#if accessService.access("EDITABLE") == false>
+                disable:true,
+            </#if>
+                //disable: false,
+                click: function() {
+                    param_info_grid_obj.addRow({})
+                },
+                icon: 'add'
+            },
+                {
+                    id: 'param_grid_del',
+                        text: '<@spring.message "sys.hand.btn.delete"/>',
+                <#if accessService.access("EDITABLE") == false>
+                disable:true,
+                </#if>
+                    click: function() {
+                        Hap.gridDelete({
+                            grid: param_info_grid_obj
+                        });
+                    },
+                    icon: 'delete'
+                }]
+            },
+            <#if isedit == '1'>
+                url: _basePath + "/inv/item/queryItemAttrTlsByItemId",
+                    parms:{
+                    itemId:${itemId}
+                        },
+            </#if>
+                usePager: true,
+                    enabledEdit: true,
+                    allowUnSelectRow: true,
+                    width: '98%',
+                    height: 'auto',
+                    checkbox: true,
+                    isSingleCheck: true,
+                    onBeforeEdit : function(editParm){
+                    var columnname = editParm.column.columnname;
+                    if(editParm.record.__status == 'nochanged'){
+                        if(columnname=='language'){
+                            return false;
+                        }
+                    }
+                },
+            });
+            }
+
+            <#if itemType=="ITEM">
+            /*库存id选择校验*/
+            function f_AssignSel(e,invClickRow){
+                var invOrgId = e.data[0].invOrgId;
+                var allAssignGrid = inv_item_assign_grid_obj.getData();
+                for(var i=0;i<allAssignGrid.length;i++){
+                    if(invOrgId == allAssignGrid[i].assignValue && invOrgId != invClickRow.assignValue){
+                        $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.invidrepeat"/>');
+                        inv_item_assign_grid_obj.endEdit();
+                        inv_item_assign_grid_obj.remove(invClickRow);
+                    }
+                }
+            }
+
+            /*校验计算库存商品是否属于当前库存*/
+                function f_AssignItemValidate(e,invClickRow){
+                    var invOrgId = e.data[0].invOrgId;
+                    var formData = $.ligerui.get('base_info_form').getData();
+                    var countItemId = formData.countItemId;
+                    if(countItemId == '' || countItemId == null || countItemId == undefined){
+                        return;
+                    }
+                    var itemIds = '';
+                    itemIds = countItemId + ',';
+                    $.ajax({
+                        type: "post",
+                        data: {
+                            'itemIds': itemIds,
+                            'orgId': invOrgId
+                        },
+                        dataType: "json",
+                        url: _basePath + "/inv/item/queryOrgIncludeItems",
+                        error: function(data) {
+                            Hap.showError('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.netError" />');
+                        },
+                        success: function(data) {
+                            if (!data.success) {
+                                inv_item_assign_grid_obj.endEdit();
+                                inv_item_assign_grid_obj.remove(invClickRow);
+                            }
+                        }
+                    });
+                }
+            </#if>
+
+            /*编辑商品参数*/
+            function editParam(data){
+                //发布状态为Y时，不允许修改
+                var publishStatus = $.ligerui.get('publishStatus').getValue();
+                if(publishStatus == 'Y'){
+                    $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.publisheditem"/>');
+                    return;
+                }
+                if(!data.language){
+                    $.ligerDialog.error('<@spring.message "sys.hand.btn.please_choose_a_language"/>');
+                    return;
+                }
+                param_info_grid_obj.select(data.__id);
+                $.ligerDialog.open({
+                    height: 500,
+                    width: 810,
+                    data : data,
+                    title: '<@spring.message "sys.hand.btn.commodity_parameter_setting"/>',
+                    url: '${base.contextPath}/pm/pm_item_param_edit.html'
+                });
+            }
+
+            /*获取页面所有商品信息*/
+            function getAllItemInfo(){
+                var itemInfo;
+                if ($.ligerui.get('base_info_form') != undefined || $.ligerui.get('base_info_form') != null) {
+                    itemInfo = $.ligerui.get('base_info_form').getData();
+                    if(Hap.validateForm(tab1FormObj)){
+                        itemInfo = $.ligerui.get('base_info_form').getData();
+                        /* if(itemInfo.validateTo != null){
+                         var myDate = new Date(itemInfo.validateTo);
+                         myDate.setHours(23, 59, 59, 00);
+                         itemInfo.validateTo = myDate;
+                         //console.log(itemInfo);
+                         } */
+                        itemInfo.mode = mode;
+                        itemInfo.itemType = itemTypeItem;
+                        itemInfo.savePropertyFlag = savePropertyFlag;
+                    }else{
+                        return null;
+                    }
+                }
+            <#if itemType=="PACKG">
+                    var itemIncludes, itemIncludesAll;
+                if ($.ligerui.get('include_items_grid') != undefined || $.ligerui.get('include_items_grid') != null) {
+                    itemIncludes = $.ligerui.get('include_items_grid').getChanges();
+                    itemIncludesAll = $.ligerui.get('include_items_grid').getData();
+                }
+            </#if>
+
+                var attrTls,attrTlsAll;
+                if ($.ligerui.get('param_info_grid') != undefined && $.ligerui.get('param_info_grid') != null) {
+                    attrTls = $.ligerui.get('param_info_grid').getChanges();
+                    attrTlsAll = $.ligerui.get('param_info_grid').getData();
+                    if(attrTls != null){
+                        for(var i in attrTls){
+                            var packageIntroduce = attrTls[i].packageIntroduce;
+                            var language = attrTls[i].language;
+                            var langDesc = '';
+                            for (var i = 0; i < languageData.length; i++) {
+                                if (languageData[i].langCode == language) {
+                                    langDesc = languageData[i].description;
+                                }
+                            }
+//                 		if(packageIntroduce == null || '' == packageIntroduce){
+//                 			$.ligerDialog.error(langDesc+'<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.itemattrnull"/>');
+//                 			return null;
+//                 		}
+                        }
+                    }
+                }
+
+                var itemAssignsAll,itemAssigns;
+                if ($.ligerui.get('inv_item_assign_grid') != undefined || $.ligerui.get('inv_item_assign_grid') != null) {
+                    itemAssignsAll = $.ligerui.get('inv_item_assign_grid').getData();
+                    itemAssigns = $.ligerui.get('inv_item_assign_grid').getChanges();
+                }
+                var itemPriceDetailAll,itemPriceDetail,priceGrid = $.ligerui.get('price_list_info_grid');
+                if (!priceGrid || !Hap.validateGrid(priceGrid)) {
+                    return;
+                }else {
+                    itemPriceDetailAll = $.ligerui.get('price_list_info_grid').getData();
+                    /* for(var i=0;i<itemPriceDetailAll.length;i++){
+                     if(itemPriceDetailAll[i].endActiveDate != null){
+                     var myDate = new Date(itemPriceDetailAll[i].endActiveDate);
+                     myDate.setHours(23, 59, 59, 00);
+                     itemPriceDetailAll.endActiveDate = myDate;
+                     console.log(myDate);
+                     console.log(itemPriceDetailAll);
+                     }
+                     } */
+                    itemPriceDetail = $.ligerui.get('price_list_info_grid').getChanges();
+                    itemPriceDetailAllType = processPriceData(itemPriceDetailAll);
+                    itemPriceDetail = processPriceData(itemPriceDetail)
+                }
+
+                //所有信息
+                var itemAll = {
+                        "itemId": ${itemId},
+                        "itemInfo": itemInfo,
+                    <#if itemType=="PACKG">
+                "itemIncludesAll": itemIncludesAll,
+                    "itemIncludes": itemIncludes,
+            </#if>
+                "itemAttrsTlsAll" : attrTlsAll,
+                    "itemAttrsTls": attrTls,
+                    "itemAssignsAll": itemAssignsAll,
+                    "itemAssigns": itemAssigns,
+                    "itemPriceDetail": itemPriceDetail,
+                    "itemPriceDetailAll" : itemPriceDetailAll,
+                    "itemPriceDetailAllType" : itemPriceDetailAllType
+            }
+                return itemAll;
+            }
+            //新建时初始化页面grid
+            <#if isedit == '0'>
+            price_list_info_grid_obj.addRow();
+            inv_item_assign_grid_obj.addRow();
+            </#if>
+
+            <#if itemType == 'PACKG'>
+                if('add' == mode){
+                    include_items_grid_obj.addRow();
+                }
+            </#if>
+
+            <#if accessService.access("EDITABLE") == false>
+            window['tab1FormObj'].setEditable(false);
+            // window['include_items_grid_obj'].setEditable(false);
+            inv_item_assign_grid_obj.setEditable(false);
+            window['price_list_info_grid_obj'].setEditable(false);
+            liger.get('quantityAlert').setValue('');
+            liger.get('base_info_form').setEnabled("quantityAlert", false);
+            liger.get('quantityAlert').setRequired(false);
+            </#if>
+        </script>
+        <form id="d_mm_007_inv_item_property_form"></form>
+        </body>
+        <html>

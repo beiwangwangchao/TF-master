@@ -1,0 +1,257 @@
+<#-- 
+ * description: 销售类型关系维护
+ * version: 1.0 
+ * author:zhiwei.zhang@hand-china.com 
+ * [#PE20-4][ADD],2016-12-06 14:20:03.
+-->
+
+<#include "../include/head.html">
+
+<body>
+	<script src="${base.contextPath}/common/code?spmPriceType=SPM.PRICE_TYPE&productSalesType=OM.PRODUCT_SALES_TYPE&yesNo=SYS.YES_NO"
+		type="text/javascript">
+	</script>
+
+    <div id="om_sales_type_grid" style="margin: 5px;"></div>
+    
+    <script type="text/javascript">
+
+    	var salesOrgId;
+		var orderType;
+		var priceType;
+	
+    	// 获取订单类型ID
+    	var orderTypeId = ${RequestParameters.orderTypeId};
+    	
+    	var orderTypeData = frameElement.dialog.get('data');
+    	
+    	<#assign isedit = (RequestParameters.isedit)/>
+    	
+		//表单底部按钮
+		Hap.setFormDefaultBtn(f_cancel, f_save);
+		om_sales_type_grid = $("#om_sales_type_grid").ligerGrid({
+    		onBeforeSubmitEdit : function(e) {
+                var rs = om_sales_type_grid.rows;
+                //销售类型必须唯一
+                if(e.column.columnname == "salesType"){
+                    if (e.value == null || e.value == "") {
+                        return true;
+                    }
+                    for(var i=0;i<rs.length;i++){
+                    	if(i != e.rowindex){
+                    		if(rs[i].salesType == e.value){
+                            	Hap.showError('<@spring.message "type.salestype.error"/>');
+                                return false;
+                            }
+                    	}
+                    }
+                }
+            },
+    		columns:[
+				{
+				    display: '',
+				    name   : 'salesTypeId', align: 'center', width: 5, hide: true
+				},
+				{
+				    display: '',
+				    name   : 'orderTypeId', align: 'center', width: 5, hide: true
+				},
+				{
+				    display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.itemsalestype" />',
+				    name   : 'salesType', align: 'center', width: 120,
+				    editor: {
+				    	type         : 'select',
+				        textField    : 'meaning',
+				        valueField   : 'value',
+				        data         : productSalesType
+				    },
+				    render : function(item){
+						for(var i = 0; i < productSalesType.length; i++){
+							if(productSalesType[i].value == item.salesType){
+								return 	productSalesType[i].meaning;
+							}
+						}
+						return item.salesType;
+					},
+				    validate: {
+				    	required: true
+				    }
+				},
+				{
+				    display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salestype.freeflag" />',
+				    name   : 'freeFlag', align: 'center', width: 120,
+				    editor: {
+				    	type         : 'select',
+				        textField    : 'meaning',
+				        valueField   : 'value',
+				        data         : yesNo
+				    },
+				    render : function(item){
+						for(var i = 0; i < yesNo.length; i++){
+							if(yesNo[i].value == item.freeFlag){
+								return 	yesNo[i].meaning;
+							}
+						}
+						return item.freeFlag;
+					},
+				    validate: {
+				    	required: true
+				    }
+				},
+                //2018/01/22 by 15750
+                //隐藏  是否计算PV
+				/*{
+				    display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salestype.calpvflag" />',
+				    name   : 'calPvFlag', align: 'center', width: 120,
+				    editor: {
+				    	type         : 'select',
+				        textField    : 'meaning',
+				        valueField   : 'value',
+				        data         : yesNo
+				    },
+				    render : function(item){
+						for(var i = 0; i < yesNo.length; i++){
+							if(yesNo[i].value == item.calPvFlag){
+								return 	yesNo[i].meaning;
+							}
+						}
+						return item.calPvFlag;
+					},
+				    validate: {
+				    	required: true
+				    }
+				},*/
+				{
+				    display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salestype.taxprice" />',
+				    name   : 'taxPrice', align: 'center', width: 120,
+				    editor: {
+				    	type         : 'select',
+				        textField    : 'meaning',
+				        valueField   : 'value',
+				        data         : spmPriceType
+				    },
+				    render : function(item){
+						for(var i = 0; i < spmPriceType.length; i++){
+							if(spmPriceType[i].value == item.taxPrice){
+								return 	spmPriceType[i].meaning;
+							}
+						}
+						return item.taxPrice;
+					},
+				    validate: {
+				    	required: true
+				    }
+				},
+				{ /* 默认标志 */
+				    display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.defaultflag" />',
+				    name   : 'defaultFlag', align: 'center', width: 120,
+				    editor: {
+				    	type         : 'combobox',
+				        textField    : 'meaning',
+				        valueField   : 'value',
+				        data         : yesNo
+				    },
+				    render : function(item){
+						for(var i = 0; i < yesNo.length; i++){
+							if(yesNo[i].value == item.defaultFlag){
+								return 	yesNo[i].meaning;
+							}
+						}
+						return item.defaultFlag;
+					},
+				    validate: {
+				    	required: true
+				    }
+				}
+			],
+			<#if isedit == '1'>
+			url:'${base.contextPath}/order/salesType/query?orderTypeId=' + ${RequestParameters.orderTypeId},
+			</#if>
+            toolbar: {
+                items: [
+					{
+                    	text : '<@spring.message "sys.hand.btn.new"/>',
+                    	disabled : true,
+                    	click : function() {
+                    		om_sales_type_grid.addRow({
+                    			orderTypeId : ${RequestParameters.orderTypeId},
+                    			defaultFlag : "N",
+                                freeFlag : "N"
+                    		});
+                        },
+                        icon : 'add'
+					},
+					{ line: true },
+					{
+						text: '<@spring.message "sys.hand.btn.delete"/>',
+			        	click: function(e){
+		                    Hap.gridDelete({
+		                       grid: om_sales_type_grid
+		                       /* ,
+		                       url: '${base.contextPath}/order/salesType/delete' */
+		                   	})		                   
+	               		},
+	               		icon: 'delete'
+	               	}
+				]
+            },
+            enabledEdit : true,
+            checkbox: true,
+            width : '98%',
+            height : '95%'
+    	});
+    	
+    	/*关闭弹出框*/
+		function f_cancel(){
+			var dialog = frameElement.dialog;
+			dialog.close();
+		}
+		
+		/*保存弹出框*/
+		function f_save(){
+			
+			salesOrgId = orderTypeData.salesOrgId;
+			orderType = orderTypeData.orderType;
+			priceType = orderTypeData.priceType;
+			
+			var rs = om_sales_type_grid.rows;
+			var countDefaultFlag = 0;
+			//至少设置一个销售类型行
+        	if(rs.length == 0){
+        		Hap.showError('<@spring.message "type.atleastonesalestype.error"/>');
+                return false;
+        	}
+        	//销售类型的defaultFlag有且只有一个为Y
+        	for(var i=0;i<rs.length;i++){
+        		if(rs[i].defaultFlag == 'Y'){
+        			countDefaultFlag++;
+        		}
+        	}
+        	if(countDefaultFlag != 1){
+        		Hap.showError('<@spring.message "type.defaultflag.error"/>');
+                return false;
+        	}
+			Hap.gridSave({
+                grid:om_sales_type_grid,
+				url:'${base.contextPath}/order/salesType/submit?orderTypeId=' + orderTypeId
+        			+ '&salesOrgId=' + salesOrgId + '&orderType=' + orderType + '&priceType=' + priceType,
+                success:function(json,opt){
+                	//将新增记录的 订单类型ID 传回父页面
+                	var rs = parent.om_order_type_grid.rows;
+                	for(var i=0;i<rs.length;i++){
+                		if(rs[i].__index == ${RequestParameters.index}){
+                			rs[i].orderTypeId = json.rows[0].orderTypeId;
+                		}
+                	}
+                	parent.om_order_type_grid.reRender(rs);
+                	
+               		$.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+                    	//parent.om_order_type_grid.reload();
+                    	parent.getValidData();
+                    	f_cancel();
+                	});
+                }
+            });
+		}
+    </script>
+</body>

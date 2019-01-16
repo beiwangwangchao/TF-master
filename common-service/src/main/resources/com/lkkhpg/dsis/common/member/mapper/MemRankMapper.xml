@@ -1,0 +1,931 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.member.mapper.MemRankMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.member.dto.MemRank" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD" >
+    <id column="RANK_ID" property="rankId" jdbcType="DECIMAL" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="RANK" property="rank" jdbcType="DECIMAL" />
+    <result column="MONTH_TO_TERMINATE" property="monthToTerminate" jdbcType="TIMESTAMP" />
+    <result column="BONUS_LOCAL" property="bonusLocal" jdbcType="DECIMAL" />
+    <result column="BONUS_INTERNATIONAL" property="bonusInternational" jdbcType="DECIMAL" />
+    <result column="PV" property="pv" jdbcType="DECIMAL" />
+    <result column="PGV" property="pgv" jdbcType="DECIMAL" />
+    <result column="LOCAL_OV" property="localOv" jdbcType="DECIMAL" />
+    <result column="OV" property="ov" jdbcType="DECIMAL" />
+    <result column="TP" property="tp" jdbcType="DECIMAL" />
+    <result column="RECRUIT_COUNT" property="recruitCount" jdbcType="DECIMAL" />
+    <result column="MONTH" property="month" jdbcType="VARCHAR" />
+    <result column="chinese_name" property="chineseName" jdbcType="VARCHAR" />
+    <result column="joint_date" property="jointDate" jdbcType="TIMESTAMP" />
+    <result column="english_name" property="englishName" jdbcType="VARCHAR" />
+    <result column="down_line" property="downLine" jdbcType="DECIMAL" />
+    <result column="member_code" property="memberCode" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    RANK_ID, MEMBER_ID, RANK, MONTH_TO_TERMINATE, BONUS_LOCAL, BONUS_INTERNATIONAL, PV, 
+    PGV, LOCAL_OV, OV, TP, RECRUIT_COUNT, MONTH, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+    CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+    ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+    ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+    ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEM_RANK
+    where RANK_ID = #{rankId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from MM_MEM_RANK
+    where RANK_ID = #{rankId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemRank" >
+    <selectKey resultType="java.lang.Long" keyProperty="rankId" order="BEFORE" >
+      select MM_MEM_RANK_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_RANK (RANK_ID, MEMBER_ID, RANK, 
+      MONTH_TO_TERMINATE, BONUS_LOCAL, BONUS_INTERNATIONAL, 
+      PV, PGV, LOCAL_OV, OV, 
+      TP, RECRUIT_COUNT, MONTH, 
+      OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+      )
+    values (#{rankId,jdbcType=DECIMAL}, #{memberId,jdbcType=DECIMAL}, #{rank,jdbcType=DECIMAL}, 
+      #{monthToTerminate,jdbcType=TIMESTAMP}, #{bonusLocal,jdbcType=DECIMAL}, #{bonusInternational,jdbcType=DECIMAL}, 
+      #{pv,jdbcType=DECIMAL}, #{pgv,jdbcType=DECIMAL}, #{localOv,jdbcType=DECIMAL}, #{ov,jdbcType=DECIMAL}, 
+      #{tp,jdbcType=DECIMAL}, #{recruitCount,jdbcType=DECIMAL}, #{month,jdbcType=VARCHAR}, 
+      1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+     CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemRank" >
+    <selectKey resultType="java.lang.Long" keyProperty="rankId" order="BEFORE" >
+      select MM_MEM_RANK_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_RANK
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      RANK_ID,
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="rank != null" >
+        RANK,
+      </if>
+      <if test="monthToTerminate != null" >
+        MONTH_TO_TERMINATE,
+      </if>
+      <if test="bonusLocal != null" >
+        BONUS_LOCAL,
+      </if>
+      <if test="bonusInternational != null" >
+        BONUS_INTERNATIONAL,
+      </if>
+      <if test="pv != null" >
+        PV,
+      </if>
+      <if test="pgv != null" >
+        PGV,
+      </if>
+      <if test="localOv != null" >
+        LOCAL_OV,
+      </if>
+      <if test="ov != null" >
+        OV,
+      </if>
+      <if test="tp != null" >
+        TP,
+      </if>
+      <if test="recruitCount != null" >
+        RECRUIT_COUNT,
+      </if>
+      <if test="month != null" >
+        MONTH,
+      </if>
+      <!-- <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER,
+      </if> -->
+      OBJECT_VERSION_NUMBER,
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{rankId,jdbcType=DECIMAL},
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="rank != null" >
+        #{rank,jdbcType=DECIMAL},
+      </if>
+      <if test="monthToTerminate != null" >
+        #{monthToTerminate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bonusLocal != null" >
+        #{bonusLocal,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusInternational != null" >
+        #{bonusInternational,jdbcType=DECIMAL},
+      </if>
+      <if test="pv != null" >
+        #{pv,jdbcType=DECIMAL},
+      </if>
+      <if test="pgv != null" >
+        #{pgv,jdbcType=DECIMAL},
+      </if>
+      <if test="localOv != null" >
+        #{localOv,jdbcType=DECIMAL},
+      </if>
+      <if test="ov != null" >
+        #{ov,jdbcType=DECIMAL},
+      </if>
+      <if test="tp != null" >
+        #{tp,jdbcType=DECIMAL},
+      </if>
+      <if test="recruitCount != null" >
+        #{recruitCount,jdbcType=DECIMAL},
+      </if>
+      <if test="month != null" >
+        #{month,jdbcType=VARCHAR},
+      </if>
+      <!-- <if test="objectVersionNumber != null" >
+        1,
+      </if> -->
+      1,
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+       CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemRank" >
+    update MM_MEM_RANK
+    <set >
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="rank != null" >
+        RANK = #{rank,jdbcType=DECIMAL},
+      </if>
+      <if test="monthToTerminate != null" >
+        MONTH_TO_TERMINATE = #{monthToTerminate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bonusLocal != null" >
+        BONUS_LOCAL = #{bonusLocal,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusInternational != null" >
+        BONUS_INTERNATIONAL = #{bonusInternational,jdbcType=DECIMAL},
+      </if>
+      <if test="pv != null" >
+        PV = #{pv,jdbcType=DECIMAL},
+      </if>
+      <if test="pgv != null" >
+        PGV = #{pgv,jdbcType=DECIMAL},
+      </if>
+      <if test="localOv != null" >
+        LOCAL_OV = #{localOv,jdbcType=DECIMAL},
+      </if>
+      <if test="ov != null" >
+        OV = #{ov,jdbcType=DECIMAL},
+      </if>
+      <if test="tp != null" >
+        TP = #{tp,jdbcType=DECIMAL},
+      </if>
+      <if test="recruitCount != null" >
+        RECRUIT_COUNT = #{recruitCount,jdbcType=DECIMAL},
+      </if>
+      <if test="month != null" >
+        MONTH = #{month,jdbcType=VARCHAR},
+      </if>
+      <!-- <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      </if> -->
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where RANK_ID = #{rankId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.member.dto.MemRank" >
+    update MM_MEM_RANK
+    set MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      RANK = #{rank,jdbcType=DECIMAL},
+      MONTH_TO_TERMINATE = #{monthToTerminate,jdbcType=TIMESTAMP},
+      BONUS_LOCAL = #{bonusLocal,jdbcType=DECIMAL},
+      BONUS_INTERNATIONAL = #{bonusInternational,jdbcType=DECIMAL},
+      PV = #{pv,jdbcType=DECIMAL},
+      PGV = #{pgv,jdbcType=DECIMAL},
+      LOCAL_OV = #{localOv,jdbcType=DECIMAL},
+      OV = #{ov,jdbcType=DECIMAL},
+      TP = #{tp,jdbcType=DECIMAL},
+      RECRUIT_COUNT = #{recruitCount,jdbcType=DECIMAL},
+      MONTH = #{month,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where RANK_ID = #{rankId,jdbcType=DECIMAL}
+  </update>
+  
+  
+  
+  <!-- 根据会员ID查询 -->
+  <select id="selectByMemberId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEM_RANK
+    <where>
+        <if test="memberId != null">
+            member_id = #{memberId,jdbcType=DECIMAL}
+        </if>
+    </where>
+  </select>
+  
+  <!-- 根据会员ID+月份期间查询 -->
+  <select id="selectByMonthRang" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select member_id,
+           month,
+           rank,
+           bonus_international,
+           bonus_local,
+           pv,
+           pgv,
+           local_ov,
+           ov,
+           tp,
+        coalesce((SELECT COUNT(1)
+                      FROM mm_member mm
+                     WHERE mmr.member_id = mm.sponsor_id
+                       AND to_char(mm.joint_date, 'YYYY-MM') = mmr.month),
+                    0) down_line
+    from mm_mem_rank_gds_v mmr
+    <where>
+        <if test="memberId != null">
+            mmr.member_id = #{memberId,jdbcType=DECIMAL}
+        </if>
+        <if test="monthFrom != null">
+            AND mmr.month >= #{monthFrom,jdbcType=VARCHAR}
+        </if>
+        <if test="monthTo != null">
+            AND mmr.month &lt;= #{monthTo,jdbcType=VARCHAR}
+        </if>
+    </where>
+  </select>
+  
+  <!-- 根据会员ID查询近12月的PV总金额 -->
+  <select id="selectSumPVByMemberId" resultType="java.math.BigDecimal" parameterType="java.lang.Long" >
+    select coalesce(SUM(pv), 0) from MM_MEM_RANK MM
+        WHERE MM.MEMBER_ID=#{memberId,jdbcType=DECIMAL}
+        AND MONTH BETWEEN (SELECT TO_CHAR((SELECT SYSDATE - INTERVAL '1' YEAR FROM dual),'yyyy-MM') from dual)
+            AND (SELECT TO_CHAR((SELECT SYSDATE FROM dual),'yyyy-MM') from dual)
+  </select>
+  <!-- 根据会员Id和月份查询 -->
+  <select id="selectByMemberIdAndMonth" resultMap="BaseResultMap">
+      select <include refid="Base_Column_List" />
+      from MM_MEM_RANK
+      where member_id = #{memberId,jdbcType=DECIMAL} and month = #{periodName,jdbcType=VARCHAR}
+      for update
+  </select>
+  <!-- 插入会员等级信息 -->
+  <insert id="insertMemRank" parameterType="com.lkkhpg.dsis.common.member.dto.MemRank">
+      <selectKey resultType="java.lang.Long" keyProperty="rankId" order="BEFORE" >
+      select MM_MEM_RANK_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_RANK
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      RANK_ID,
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="rank != null" >
+        RANK,
+      </if>
+      <if test="monthToTerminate != null" >
+        MONTH_TO_TERMINATE,
+      </if>
+      <if test="bonusLocal != null" >
+        BONUS_LOCAL,
+      </if>
+      <if test="bonusInternational != null" >
+        BONUS_INTERNATIONAL,
+      </if>
+      <if test="pv != null" >
+        PV,
+      </if>
+      <if test="pgv != null" >
+        PGV,
+      </if>
+      <if test="localOv != null" >
+        LOCAL_OV,
+      </if>
+      <if test="ov != null" >
+        OV,
+      </if>
+      <if test="tp != null" >
+        TP,
+      </if>
+      <if test="recruitCount != null" >
+        RECRUIT_COUNT,
+      </if>
+      <if test="month != null" >
+        MONTH,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{rankId,jdbcType=DECIMAL},
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="rank != null" >
+        #{rank,jdbcType=DECIMAL},
+      </if>
+      <if test="monthToTerminate != null" >
+        #{monthToTerminate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="bonusLocal != null" >
+        #{bonusLocal,jdbcType=DECIMAL},
+      </if>
+      <if test="bonusInternational != null" >
+        #{bonusInternational,jdbcType=DECIMAL},
+      </if>
+      <if test="pv != null" >
+        #{pv,jdbcType=DECIMAL},
+      </if>
+      <if test="pgv != null" >
+        #{pgv,jdbcType=DECIMAL},
+      </if>
+      <if test="localOv != null" >
+        #{localOv,jdbcType=DECIMAL},
+      </if>
+      <if test="ov != null" >
+        #{ov,jdbcType=DECIMAL},
+      </if>
+      <if test="tp != null" >
+        #{tp,jdbcType=DECIMAL},
+      </if>
+      <if test="recruitCount != null" >
+        #{recruitCount,jdbcType=DECIMAL},
+      </if>
+      <if test="month != null" >
+        #{month,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <!-- 根据会员Id和月份更新对应PV值 -->
+  <update id="updateByMemberIdAndMonth" parameterType="com.lkkhpg.dsis.common.member.dto.MemRank">
+      update MM_MEM_RANK
+      set PV = PV + #{pv,jdbcType=DECIMAL}
+      where member_id = #{memberId,jdbcType=DECIMAL} and month = #{month,jdbcType=DECIMAL}
+  </update>
+  <!-- 我的团队-查询个人信息 -->
+  <select id="selectTeamByMemberId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    <!-- select mmr.member_id,
+       mm.chinese_name,
+       mm.english_name,
+       mm.joint_date,
+       mmr.rank,
+       mmr.month_to_terminate,
+       mmr.bonus_local,
+       mmr.bonus_international,
+       mmr.pv,
+       mmr.pgv,
+       mmr.local_ov,
+       mmr.ov
+    from mm_member mm,
+         mm_mem_rank mmr
+    where mm.member_id = mmr.member_id
+    and   mm.member_id = #{memberId,jdbcType=DECIMAL} -->
+    
+    SELECT mmr.member_id,
+       mm.member_code,
+       mm.chinese_name,
+       mm.english_name,
+       mm.joint_date,
+       mmr.rank,
+       mmr.month_to_terminate,
+       (SELECT sum(tp)
+          FROM mm_mem_rank mr
+         WHERE member_id = #{memberId,jdbcType=DECIMAL}
+           AND (mr.month like
+               CONCAT((SELECT to_char(SYSDATE, 'yyyy') FROM dual), '%'))) tp,
+               (SELECT sum(recruit_count)
+          FROM mm_mem_rank mr
+         WHERE member_id = #{memberId,jdbcType=DECIMAL}
+           AND (mr.month like
+               CONCAT((SELECT to_char(SYSDATE, 'yyyy') FROM dual), '%'))) recruitCount,
+               (SELECT mr.bonus_local
+          FROM mm_mem_rank mr
+         WHERE  mr.month =
+               (SELECT to_char(ADD_MONTHS(SYSDATE, -1), 'yyyy-MM') FROM dual)
+         AND mr.member_id = #{memberId,jdbcType=DECIMAL}) bonus_local,
+               (SELECT mr.bonus_international
+          FROM mm_mem_rank mr
+         WHERE  mr.month =
+               (SELECT to_char(ADD_MONTHS(SYSDATE, -1), 'yyyy-MM') FROM dual)
+         AND mr.member_id = #{memberId,jdbcType=DECIMAL}) bonus_international,
+               (SELECT mr.pv
+          FROM mm_mem_rank mr
+         WHERE  mr.month =
+               (SELECT to_char(ADD_MONTHS(SYSDATE, -1), 'yyyy-MM') FROM dual)
+         AND mr.member_id = #{memberId,jdbcType=DECIMAL}) pv,
+               (SELECT mr.pgv
+          FROM mm_mem_rank mr
+         WHERE  mr.month =
+               (SELECT to_char(ADD_MONTHS(SYSDATE, -1), 'yyyy-MM') FROM dual)
+         AND mr.member_id = #{memberId,jdbcType=DECIMAL}) pgv,
+               (SELECT mr.local_ov
+          FROM mm_mem_rank mr
+         WHERE  mr.month =
+               (SELECT to_char(ADD_MONTHS(SYSDATE, -1), 'yyyy-MM') FROM dual)
+         AND mr.member_id = #{memberId,jdbcType=DECIMAL}) local_ov,
+               (SELECT mr.ov
+          FROM mm_mem_rank mr
+         WHERE  mr.month =
+               (SELECT to_char(ADD_MONTHS(SYSDATE, -1), 'yyyy-MM') FROM dual)
+         AND mr.member_id = #{memberId,jdbcType=DECIMAL}) ov
+    FROM mm_member_v mm,
+        mm_mem_rank mmr
+    WHERE mm.member_id = mmr.member_id
+    AND mm.member_id =#{memberId,jdbcType=DECIMAL}
+  </select>
+  <select id="queryDatePeriod" resultMap="BaseResultMap" parameterType="java.util.Map">
+    select mm.member_id,
+       mm.member_code,
+       mm.chinese_name,
+       mm.english_name,
+       mm.joint_date,
+       mmr.rank,
+       mmr.month_to_terminate,
+       mmr.bonus_local,
+       mmr.bonus_international,
+       mmr.pv,
+       mmr.pgv,
+       mmr.local_ov,
+       mmr.ov,
+       mmr.month,
+       (SELECT sum(tp)
+          FROM mm_mem_rank mr
+         WHERE member_id = #{memberId,jdbcType=DECIMAL}
+           AND (mr.month between #{begin,jdbcType=VARCHAR} and #{end,jdbcType=VARCHAR})) tp,
+       (SELECT sum(recruit_count)
+          FROM mm_mem_rank mr
+         WHERE member_id = #{memberId,jdbcType=DECIMAL}
+           AND (mr.month between #{begin,jdbcType=VARCHAR} and #{end,jdbcType=VARCHAR})) recruitCount
+    from mm_member_v mm 
+    left join 
+         mm_mem_rank mmr
+    on mm.member_id = mmr.member_id
+    where 
+    mm.member_id = #{memberId,jdbcType=DECIMAL}
+    <if test="begin !=null and end !=null">
+    and mmr.month between #{begin,jdbcType=VARCHAR} and #{end,jdbcType=VARCHAR}
+    </if>
+  </select>
+  
+  <resultMap id="OmkRtlSalaryBalanceMap" type="com.lkkhpg.dsis.common.member.dto.MemRank" >
+    <result column="DEALER_NO" property="memberCode" jdbcType="VARCHAR" />
+    <result column="DEALER_POST_CODE" property="rank" jdbcType="DECIMAL" />
+    <result column="PS" property="pv" jdbcType="DECIMAL" />
+    <result column="GPV" property="pgv" jdbcType="DECIMAL" />
+    <result column="REF_PERIOD" property="month" jdbcType="VARCHAR" />
+    <result column="OMK_OV" property="ov" jdbcType="DECIMAL" />
+    <result column="OMK_OV_LOCAL" property="localOv" jdbcType="DECIMAL" />
+    <result column="MEMBER_CNT_NEW" property="downLine" jdbcType="DECIMAL" />
+    <result column="BONUS_LOCAL" property="bonusLocal" jdbcType="DECIMAL" />
+    <result column="BONUS_INTERNATIONAL" property="bonusInternational" jdbcType="DECIMAL" />
+    <result column="TP" property="tp" jdbcType="DECIMAL" />
+    <result column="PV" property="pv" jdbcType="DECIMAL" />
+    <result column="OMK_GV" property="pgv" jdbcType="DECIMAL" />
+    <result column="PERIOD" property="month" jdbcType="VARCHAR" />
+    <result column="LOCAL_MARKET_ID" property="localMarketId" jdbcType="DECIMAL" />
+    <result column="INTER_MARKET_ID" property="interMarketId" jdbcType="DECIMAL" />
+    <result column="LOCAL_BONUS_ID" property="localBonusId" jdbcType="DECIMAL" />
+    <result column="INTER_BONUS_ID" property="interBonusId" jdbcType="DECIMAL" />
+  </resultMap>
+  <!-- 根据会员ID+月份期间从OMK表查询 -->
+  <select id="selectByCurrentMonthRangFromOmk" resultMap="OmkRtlSalaryBalanceMap" parameterType="java.util.Map" >
+    select orsb.DEALER_NO,
+           orsb.DEALER_POST_CODE,
+           orsb.PS,
+           orsb.GPV,
+           orsb.REF_PERIOD,
+           odss.OMK_OV,
+           odss.OMK_OV_LOCAL,
+           odss.MEMBER_CNT_NEW,
+           mmr.BONUS_INTERNATIONAL,
+           mmr.BONUS_LOCAL,
+           odslt.OMK_TT TP
+    from omk.omk_rtl_salary_balance orsb
+    left outer join OMK.OMK_DE_SALARY_STAT_01 odss
+       on (orsb.dealer_no = odss.dealer_no and orsb.ref_Period = odss.period)
+    left outer join mm_member mm
+       on orsb.dealer_no = mm.member_code
+    left outer join mm_mem_rank_gds_v mmr
+       on (mmr.member_id = mm.member_id and mmr.period = orsb.ref_period)
+    left outer join omk.OMK_DE_SALARY_LCL_TT odslt
+       on (orsb.dealer_no = odslt.dealer_no and orsb.ref_Period = odslt.period)
+    <where>
+        <if test="memberCode != null">
+            orsb.DEALER_NO = #{memberCode,jdbcType=DECIMAL}
+        </if>
+        AND rownum &lt;= 1
+    </where>
+  </select>
+  <select id="selectByHistoryMonthRangFromOmk" resultMap="OmkRtlSalaryBalanceMap" parameterType="java.util.Map" >
+    select omss.DEALER_NO,
+           omss.DEALER_POST_CODE,
+           omss.PV,
+           omss.OMK_GV,
+           omss.PERIOD,
+           omss.OMK_OV,
+           omss.OMK_OV_LOCAL,
+           omss.MEMBER_CNT_NEW,
+           mmr.bonus_international,
+           mmr.bonus_local,
+           omslt.omk_tt tp
+    from OMK.OMK_ME_SALARY_STAT_01 omss
+    left outer join mm_member mm
+        on omss.dealer_no = mm.member_code
+    left outer join mm_mem_rank_gds_v mmr
+        on (mmr.member_id = mm.member_id and mmr.period = omss.period)
+    left outer join omk.OMK_ME_SALARY_LCL_TT omslt
+        on (omss.dealer_no = omslt.dealer_no and omss.period = omslt.period)
+    <where>
+        <if test="memberCode != null">
+            omss.DEALER_NO = #{memberCode,jdbcType=DECIMAL}
+        </if>
+        <if test="monthFrom != null">
+            AND omss.period &gt;= #{monthFrom,jdbcType=VARCHAR}
+        </if>
+        <if test="monthTo != null">
+            AND omss.period &lt;= #{monthTo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by omss.period desc
+  </select>
+  <select id="selectCurrentAndHistoryRank" resultMap="OmkRtlSalaryBalanceMap" parameterType="java.util.Map">
+    SELECT orsb.dealer_no,
+       orsb.DEALER_POST_CODE,
+       orsb.ps,
+       orsb.gpv,
+       odss.period,
+       odss.omk_ov,
+       odss.omk_ov_local,
+       bonus_local_info.remit_net_amt BONUS_LOCAL,
+       bonus_local_info.market_id     local_Market_Id,
+       bonus_local_info.bonus_id local_bonus_id,
+       bonus_inter_info.remit_net_amt BONUS_INTERNATIONAL,
+       bonus_inter_info.market_id     inter_Market_Id,
+       bonus_inter_info.bonus_id      inter_bonus_id,
+       odslt.OMK_TT                   TP,
+       odss.member_cnt_new,
+       mm.member_id
+  FROM mm_member mm
+  left join OMK.OMK_RTL_SALARY_BALANCE orsb
+    on orsb.dealer_no = mm.member_code
+  left join OMK.OMK_DE_SALARY_STAT_01 odss
+    on odss.dealer_no = mm.member_code
+  left outer join omk.OMK_DE_SALARY_LCL_TT odslt
+    on (odss.dealer_no = odslt.dealer_no and odss.period = odslt.period)
+  left join bm_bonus_final bonus_local_info
+    on (bonus_local_info.period_id in
+       (select sp.period_id
+           from spm_period sp
+          where sp.period_name = odss.period) and
+       bonus_local_info.remit_flag = 'Y' and
+       bonus_local_info.bonus_type = 'LOCAL' and
+       bonus_local_info.member_id = mm.member_id)
+  left join bm_bonus_final bonus_inter_info
+    on (bonus_inter_info.period_id in
+       (select sp.period_id
+           from spm_period sp
+          where sp.period_name = odss.period) and
+       bonus_inter_info.remit_flag = 'Y' and
+       bonus_inter_info.bonus_type = 'INTER' and
+       bonus_inter_info.member_id = mm.member_id)
+ where mm.member_code = #{memberCode,jdbcType=VARCHAR}
+   and odss.period = to_char(add_months(to_date((select max(period)
+                                                   from omk.OMK_ME_SALARY_STAT_01) || '01',
+                                                'YYYYMMDD'),
+                                        1),
+                             'yyyymm')
+   and odss.period between #{monthFrom,jdbcType=VARCHAR} and #{monthTo,jdbcType=VARCHAR}
+UNION
+SELECT orsb.dealer_no,
+       orsb.DEALER_POST_CODE,
+       omss.pv,
+       omss.omk_gv,
+       omss.period,
+       omss.omk_ov,
+       omss.omk_ov_local,
+       bonus_local_info.remit_net_amt BONUS_LOCAL,
+       bonus_local_info.market_id     local_Market_Id,
+       bonus_local_info.bonus_id local_bonus_id,
+       bonus_inter_info.remit_net_amt BONUS_INTERNATIONAL,
+       bonus_inter_info.market_id     inter_Market_Id,
+       bonus_inter_info.bonus_id      inter_bonus_id,
+       omslt.omk_tt                   tp,
+       omss.member_cnt_new,
+       mm.member_id
+  FROM mm_member mm
+  left join OMK.OMK_RTL_SALARY_BALANCE orsb
+    on orsb.dealer_no = mm.member_code
+  left join OMK.OMK_ME_SALARY_STAT_01 omss
+    on omss.dealer_no = mm.member_code
+  left outer join omk.OMK_ME_SALARY_LCL_TT omslt
+    on (omss.dealer_no = omslt.dealer_no and omss.period = omslt.period)
+  left join bm_bonus_final bonus_local_info
+    on (bonus_local_info.period_id in
+       (select sp.period_id
+           from spm_period sp
+          where sp.period_name = omss.period) and
+       bonus_local_info.remit_flag = 'Y' and
+       bonus_local_info.bonus_type = 'LOCAL' and
+       bonus_local_info.member_id = mm.member_id)
+  left join bm_bonus_final bonus_inter_info
+    on (bonus_inter_info.period_id in
+       (select sp.period_id
+           from spm_period sp
+          where sp.period_name = omss.period) and
+       bonus_inter_info.remit_flag = 'Y' and
+       bonus_inter_info.bonus_type = 'INTER' and
+       bonus_inter_info.member_id = mm.member_id)
+ where mm.member_code = #{memberCode,jdbcType=VARCHAR}
+   and omss.period between #{monthFrom,jdbcType=VARCHAR} and #{monthTo,jdbcType=VARCHAR}
+   and omss.period != to_char(add_months(to_date((select max(period)
+                                                    from omk.OMK_ME_SALARY_STAT_01) || '01',
+                                                 'YYYYMMDD'),
+                                         1),
+                              'yyyymm')
+ order by period desc
+  </select>
+  <select id="selectRankForChn" resultMap="OmkRtlSalaryBalanceMap" parameterType="java.util.Map">
+    SELECT orsb.dealer_no,
+       orsb.DEALER_POST_CODE,
+       orsb.ps,
+       orsb.gpv,
+       odss.period,
+       odss.omk_ov,
+       odss.omk_ov_local,
+       odslt.OMK_TT TP,
+       odss.member_cnt_new,
+       mm.dealer_no
+    FROM omk.gds_dealer_ref_chn mm
+      left join OMK.OMK_RTL_SALARY_BALANCE orsb
+        on orsb.dealer_no = mm.dealer_no
+      left join OMK.OMK_DE_SALARY_STAT_01 odss
+        on odss.dealer_no = mm.dealer_no
+      left outer join omk.OMK_DE_SALARY_LCL_TT odslt
+        on (odss.dealer_no = odslt.dealer_no and odss.period = odslt.period)
+     where mm.dealer_no = #{memberCode,jdbcType=DECIMAL}
+       and odss.period = to_char(add_months(to_date((select max(period) from omk.OMK_ME_SALARY_STAT_01) || '01','YYYYMMDD'),1),'yyyymm')
+       and odss.period between #{monthFrom,jdbcType=VARCHAR} and #{monthTo,jdbcType=VARCHAR}
+    UNION
+    SELECT orsb.dealer_no,
+           orsb.DEALER_POST_CODE,
+           omss.pv,
+           omss.omk_gv,
+           omss.period,
+           omss.omk_ov,
+           omss.omk_ov_local,
+           omslt.omk_tt tp,
+           omss.member_cnt_new,
+           mm.dealer_no
+      FROM omk.gds_dealer_ref_chn mm
+      left join OMK.OMK_RTL_SALARY_BALANCE orsb
+        on orsb.dealer_no = mm.dealer_no
+      left join OMK.OMK_ME_SALARY_STAT_01 omss
+        on omss.dealer_no = mm.dealer_no
+      left outer join omk.OMK_ME_SALARY_LCL_TT omslt
+        on (omss.dealer_no = omslt.dealer_no and omss.period = omslt.period)
+     where mm.dealer_no = #{memberCode,jdbcType=DECIMAL}
+       and omss.period between #{monthFrom,jdbcType=VARCHAR} and #{monthTo,jdbcType=VARCHAR}    
+       and omss.period != to_char(add_months(to_date((select max(period) from omk.OMK_ME_SALARY_STAT_01) || '01','YYYYMMDD'),1),'yyyymm')
+       order by period desc
+  </select>
+</mapper>

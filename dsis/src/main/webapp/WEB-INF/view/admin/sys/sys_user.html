@@ -1,0 +1,139 @@
+<#-- 
+ * description: 用户界面
+ * version: 1.0 
+ * author:xiawang.liu
+ * Copyright LKK Health Products Group Limited 
+ * 
+-->
+<#include "../include/head.html">
+<body style="padding: 3px; overflow: hidden;">
+    <form id="d_um_002_form"></form>
+    <div id="d_um_002_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function() {
+        window['d_um_002_form'] = $("#d_um_002_form").ligerForm({
+            fields : [ {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.account.loginname"/>',
+                name : 'loginName'
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.username"/>',
+                newline : false,
+                name : 'userName'
+            } ],
+            buttons : [ {
+                text : '<@spring.message "sys.hand.btn.query"/>',
+                disabled : false,
+                width : 60,
+                click : function() {
+
+                    Hap.gridQuery({
+                        form : d_um_002_form,
+                        grid : d_um_002_grid
+                    })
+                }
+            } ]
+        });
+
+        window['d_um_002_grid'] = $("#d_um_002_grid").ligerGrid({
+            unSetValidateAttr : false,
+            columns : [ {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.account.loginname"/>',
+                name : 'loginName',
+                align : 'left',
+                width : 120,
+                editor : {
+                    type : 'text'
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.username"/>',
+                name : 'userName',
+                align : 'left',
+                width : 120,
+                editor : {
+                    type : 'text'
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.email"/>',
+                name : 'email',
+                align : 'left',
+                width : 200,
+                editor : {
+                    type : 'text'
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.phone"/>',
+                name : 'phone',
+                align : 'left',
+                width : 120,
+                editor : {
+                    type : 'int'
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.allocationrole"/>',
+                name : 'userId',
+                width : 130,
+                render : function(item) {
+                    var html = "<a href='#' onClick='a_click(" + item.userId + ")'><@spring.message 'type.com.lkkhpg.dsis.platform.dto.system.user.allocationrole'/></a>";
+                    return html;
+                }
+            } ],
+            url : '${base.contextPath}/sys/user/query',
+            toolbar : {
+                items : [ {
+                    text : '<@spring.message "sys.hand.btn.new"/>',
+                    disable : false,
+                    click : function() {
+                        d_um_002_grid.addRow({})
+                    },
+                    icon : 'add'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click : function() {
+                        Hap.gridDelete({
+                            grid : d_um_002_grid,
+                            url : '${base.contextPath}/sys/user/remove'
+                        })
+
+                    },
+                    icon : 'delete'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.save"/>',
+                    click : function() {
+                        Hap.gridSave({
+                            grid : d_um_002_grid,
+                            url : '${base.contextPath}/sys/user/submit'
+                        })
+                    },
+                    icon : 'save'
+                } ]
+            },
+            enabledEdit : true,
+            width : '100%',
+            height : '99%',
+            checkbox : true
+        });
+    });
+
+    function a_click(data) {
+        // alert(data);
+        $.ligerDialog.open({
+            height : 600,
+            width : 850,
+            title : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.allocationrole"/>',
+            url : 'sys_user_role.html?userId=' + data,
+            showMax : false,
+            showToggle : true,
+            showMin : false,
+            isResize : true,
+            slide : false,
+        });
+    }                
+    </script>
+</body>
+</html>

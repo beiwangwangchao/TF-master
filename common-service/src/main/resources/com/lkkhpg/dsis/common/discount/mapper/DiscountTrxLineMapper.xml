@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.discount.mapper.DiscountTrxLineMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.discount.dto.DiscountTrxLineDto">
+        <result column="DISCOUNT_TRX_LINE_ID" property="discountTrxLineId" jdbcType="DECIMAL"/>
+        <result column="DISCOUNT_TRX_HEAD_ID" property="discountTrxHeadId" jdbcType="DECIMAL"/>
+        <result column="MEMBER_ID" property="memberId" jdbcType="VARCHAR"/>
+        <result column="DISCOUNT_ADJUST_AMT" property="discountAdjustAmt" jdbcType="DECIMAL"/>
+        <result column="REMARK" property="remark" jdbcType="VARCHAR"/>
+        <result column="membername" property="memberName" jdbcType="VARCHAR"/>
+        <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR"/>
+        <result column="discountAmt" property="discountAmt" jdbcType="DECIMAL"/>
+        <!--default column-->
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL"/>
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL"/>
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP"/>
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL"/>
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP"/>
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL"/>
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR"/>
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        DISCOUNT_TRX_LINE_ID, MEMBER_ID, DISCOUNT_TRX_HEAD_ID, DISCOUNT_ADJUST_AMT,
+        OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2,
+        ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+    </sql>
+
+
+    <insert id="baseInsert" parameterType="com.lkkhpg.dsis.common.discount.dto.DiscountTrxLineDto">
+        insert into tf_discount_trx_line(discount_trx_line_id, member_id,discount_trx_head_id,
+        discount_adjust_amt,remark,
+        OBJECT_VERSION_NUMBER,
+        REQUEST_ID, PROGRAM_ID, CREATION_DATE,
+        CREATED_BY,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10,
+        ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14, ATTRIBUTE15)
+        values (tf_discount_trx_line_s.nextval,#{memberId,jdbcType=DECIMAL}, #{discountTrxHeadId,jdbcType=DECIMAL},
+        #{discountAdjustAmt,jdbcType=VARCHAR},#{remark, jdbcType=VARCHAR}, 1,
+        #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},CURRENT_TIMESTAMP,
+         #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR},
+        #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR},
+        #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+    </insert>
+    <update id="updateSelectiveByPrimarkey" parameterType="com.lkkhpg.dsis.common.discount.dto.DiscountTrxLineDto">
+        update tf_discount_trx_line
+        <set>
+            <if test="memberId != null">
+                MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+            </if>
+            <if test="discountTrxHeadId != null">
+                DISCOUNT_TRX_HEAD_ID = #{discountTrxHeadId,jdbcType=DECIMAL},
+            </if>
+            <if test="discountAdjustAmt != null">
+                DISCOUNT_ADJUST_AMT = #{discountAdjustAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where discount_trx_line_id= #{discountTrxLineId,jdbcType=DECIMAL}
+
+    </update>
+    <select id="queryMemberIfExists" resultType="java.lang.Integer">
+        select count(*) from tf_discount_trx_line where member_id = #{memberId, jdbcType=DECIMAL}
+    </select>
+
+    <select id="queryDiscountDetail" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        l.DISCOUNT_TRX_HEAD_ID,
+        l.MEMBER_ID,
+        m.member_code, m.chinese_first_name membername, nvl(m.discount_amt,0) discountAmt,
+        l.DISCOUNT_TRX_LINE_ID,
+        l.DISCOUNT_ADJUST_AMT,
+        l.REMARK,
+        l.CREATION_DATE,
+        l.CREATED_BY,
+        l.LAST_UPDATE_DATE,
+        l.LAST_UPDATED_BY,
+        l.ATTRIBUTE1
+        FROM TF_DISCOUNT_TRX_LINE l,mm_member m
+        <where>
+            m.member_id = l.member_id
+            <if test="discountTrxHeadId != null">
+                and l.discount_trx_head_id = #{discountTrxHeadId, jdbcType=DECIMAL}
+            </if>
+        </where>
+    </select>
+
+</mapper>

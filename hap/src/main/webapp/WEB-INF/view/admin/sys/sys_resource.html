@@ -1,0 +1,204 @@
+<#-- 
+* description: 资源管理界面
+* version: 1.0 
+* author:xiawang.liu
+* Copyright LKK Health Products Group Limited
+* 
+--> 
+<#include "../include/head.html">
+<body style="padding: 10px;">
+	<script src="${base.contextPath}/common/code?resourceTypeData=SYS.RESOURCE_TYPE" type="text/javascript"></script>
+	<form id="resource_form"></form>
+	<div id="resource_grid"></div>
+	
+	<script type="text/javascript">
+	    function editResourceItem(id){
+	        $.ligerDialog.open({
+                width : 850,
+                height : 600,
+                title : '<@spring.message "type.com.lkkhpg.dsis.platform.resourceallocation"/>',
+                url : 'sys_resource_item.html?resourceId=' + id
+            });     
+	    }
+	    /* resource_form表单提交 */
+	    window['resource_form'] = $("#resource_form").ligerForm({
+	        fields : [ {
+	            type : 'text',
+	            label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.url"/>',
+	            name : 'url'
+	        }, {
+	            type : 'combobox',
+	            label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.type"/>',
+	            name : 'type',
+	            options : {
+	                valueField : 'value',
+	                textField : 'meaning',
+	                data : resourceTypeData
+	            },
+	            newline : false
+	        }, {
+	            type : 'text',
+	            label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.name"/>',
+	            name : 'name'
+	        }, {
+	            type : 'combobox',
+	            label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.login_require"/>',
+	            name : 'loginRequire',
+	            options : {
+	                valueField : 'ID',
+	                textField : 'text',
+	                data : [ {
+	                    ID : 'Y',
+	                    text : 'Y'
+	                }, {
+	                    ID : 'N',
+	                    text : 'N'
+	                } ]
+	            },
+	            newline : false
+	        } ],
+	        buttons : [ {
+	            text : '<@spring.message "sys.hand.btn.query"/>',
+	            disabled : false,
+	            width : 60,
+	            click : function() {
+	                Hap.gridQuery({
+	                    form : resource_form,
+	                    grid : resource_grid
+	                })
+	            }
+	        } ]
+	    });
+
+	    /* resource_grid表格提交 */
+	    window['resource_grid'] = $("#resource_grid").ligerGrid({
+	        unSetValidateAttr : false,
+	        columns : [ {
+	            display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.url"/>',
+	            name : 'url',
+	            align : 'left',
+	            width : 300,
+	            editor : {
+	                type : 'text'
+	            }
+	        }, {
+	            display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.type"/>',
+	            name : 'type',
+	            width : 100,
+	            align : 'center',
+	            textField : 'typeName',
+	            editor : {
+	                type : 'select',
+	                valueField : 'value',
+	                textField : 'meaning',
+	                data : resourceTypeData
+	            },
+	            render: Hap.gridCodeRenderer 
+	        }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.name"/>',
+                name : 'name',
+                width: 180,
+                align: 'left',
+                editor : {
+                    type : 'tl',
+                    idField:'resourceId',
+                    dto:'com.lkkhpg.dsis.platform.dto.system.Resource',
+                }
+            }, {
+	            display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.login_require"/>',
+	            name : 'loginRequire',
+	            width : 80,
+	            align : 'center',
+	            editor : {
+	                type : 'select',
+	                valueField : 'ID',
+	                textField : 'Name',
+	                data : [ {
+	                    ID : 'Y',
+	                    Name : 'Y'
+	                }, {
+	                    ID : 'N',
+	                    Name : 'N'
+	                } ]
+	            }
+	        }, {
+	            display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.access_checked"/>',
+	            name : 'accessChecked',
+	            width : 80,
+	            align : 'center',
+	            editor : {
+	                type : 'select',
+	                valueField : 'ID',
+	                textField : 'Name',
+	                data : [ {
+	                    ID : 'Y',
+	                    Name : 'Y'
+	                }, {
+	                    ID : 'N',
+	                    Name : 'N'
+	                } ]
+	            }
+	        },{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.description"/>',
+                name : 'description',
+                width: 180,
+                align: 'left',
+                editor : {
+                    type : 'tl',
+                    idField:'resourceId',
+                    dto:'com.lkkhpg.dsis.platform.dto.system.Resource',
+                }
+            } ,{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.resourceitem"/>',
+                width : 100,
+                align : 'center',
+                render : function(rowdata) {
+                    if (rowdata.resourceId) {
+                        return '<a href="#" onclick="editResourceItem(' + rowdata.resourceId + ')"><@spring.message "sys.hand.btn.edit"/></a>'
+                    }
+                }
+            } ],
+	        url : '${base.contextPath}/sys/resource/query',
+	        toolbar : {
+	            items : [ {
+	                text : '<@spring.message "sys.hand.btn.new"/>',
+	                disable : false,
+	                click : function() {
+	                    resource_grid.addRow({
+	                        loginRequire : 'Y',
+	                        accessChecked : 'Y'
+	                    });
+	                },
+	                icon : 'add'
+	            }, {
+	                line : true
+	            }, {
+	                text : '<@spring.message "sys.hand.btn.delete"/>',
+	                click : function() {
+	                    Hap.gridDelete({
+	                        grid : resource_grid,
+	                        url : '${base.contextPath}/sys/resource/remove'
+	                    })
+	                },
+	                icon : 'delete'
+	            }, {
+	                line : true
+	            }, {
+	                text : '<@spring.message "sys.hand.btn.save"/>',
+	                click : function() {
+	                    Hap.gridSave({
+	                        grid : resource_grid,
+	                        url : '${base.contextPath}/sys/resource/submit'
+	                    })
+	                },
+	                icon : 'save'
+	            } ]
+	        },
+	        enabledEdit : true,
+	        width : '99%',
+	        height : '98%',
+	        checkbox : true
+	    })
+	</script>
+</body>
+</html>

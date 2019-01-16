@@ -1,0 +1,145 @@
+<#--
+ * description: 功能分配界面
+ * version: 1.0 
+ * author:xiawang.liu
+ *
+ * 
+-->
+<#include "../include/head.html">
+<body style="padding: 5px">
+	<div id="functionExitResource"></div>
+
+	<script type="text/javascript">
+    	$(function (){ 
+        	var functionExitResource = window['functionExitResource']=$("#functionExitResource").ligerGrid({
+            	unSetValidateAttr:false,
+               	columns: [
+					{ 
+						display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.id"/>',
+						name: 'resourceId', 
+						align: 'left', 
+						width: 75,
+		   				editor: { type: 'text' }
+					},
+					{ 
+						display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.url"/>',
+						name: 'url', 
+						align: 'left', 
+						width: 280,
+					    editor: { type: 'text' }
+					},
+					{ 
+						display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.name"/>',
+						name: 'name', 
+						align: 'left', 
+						width: 220,
+					    editor: { type: 'text' }
+					},
+					{ 
+						display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.type"/>',
+						name: 'type', 
+						align: 'left', 
+						width: 100,
+					    editor: { type: 'text' }
+					}
+               	], 
+               	url:'${base.contextPath}/sys/function/fetchResource?functionId=' + ${RequestParameters.functionId},
+               	enabledEdit: false,
+               	width: '99%', 
+               	height: '99%', 
+               	checkbox: true,
+               	usePager:false,
+               	toolbar: { 
+               		items: [
+                    	{ 
+                    		text: '<@spring.message "sys.hand.btn.new"/>', 
+                    		click: function(){addResource();}, 
+                    		icon: 'add'
+                    	},
+						{ 
+                    		line: true 
+                    	},
+                   		{ 
+                    		text: '<@spring.message "sys.hand.btn.delete"/>', 
+                    		click: function(){functionExitResource.deleteSelectedRow();}, 
+                    		icon: 'delete'
+                    	},
+						{ 
+                    		line: true 
+                    	},
+                   		{ 
+                    		text: '<@spring.message "sys.hand.btn.save"/>', 
+                    		click: function(){saveResource();}, 
+                    		icon: 'save'
+                    	}
+              		]
+                }
+			}); 
+		});
+       
+       	/* 保存分配的资源 */
+       	function saveResource(){
+    		var requestData=new Object();
+           	requestData.functionId=${RequestParameters.functionId};
+           	var resources=new Array();
+           	var data=functionExitResource.getData();
+           	for(var i=0;i<data.length;i++){
+               	var resource=new Object();
+               	resource.resourceId=data[i].resourceId;
+               	resources.push(resource);
+           	}
+           	requestData.resources=resources;
+           	$.ajax({    
+               	url:'${base.contextPath}/sys/function/updateFunctionResource',    
+               	data:JSON.stringify(requestData),    
+               	type:'post', 
+               	contentType: "application/json;charset=utf-8",
+               	cache:false,    
+               	dataType:'json',    
+               	success:function(data) { 
+                   	if(data.success){  
+                       	Hap.showSuccess($l('sys.hand.tip.success'));  
+                   	}
+                },    
+                error : function() {    
+                    $.ligerDialog.closeWaitting();
+                }    
+           	});
+       	}
+
+       	/* 新增资源 */
+       	function addResource(){
+	    	var manager = $("#functionExitResource").ligerGetGridManager();
+	    	$.ligerDialog.open({ 
+	    		title : '<@spring.message "type.com.lkkhpg.dsis.platform.resourcechoose"/>',
+	   			url: 'sys_function_addresource.html?functionId=' + ${RequestParameters.functionId},
+	   			height: 500, 
+	   			width: 700, 
+	   			buttons: [
+	   				{ 
+	   					cls:'l-dialog-btn-highlight',
+	                	text: '<@spring.message "sys.hand.btn.ok"/>', 
+	                	onclick: function (item, dialog) {
+	                		var data = dialog.frame.$.ligerui.get("functionNotExitResource").getSelectedRows();
+	                		for(var i = 0; i < data.length;i++ ){
+	                  			manager.addRow({
+	                  			resourceId : data[i].resourceId,
+	                  			url        : data[i].url,
+	                  			name       : data[i].name,
+	                  			type       : data[i].type
+	                    		});
+	                  		}
+	                  		dialog.close();
+	                  	}
+	               	},
+	               	{ 
+	               		text: '<@spring.message "sys.hand.btn.cancel"/>', 
+	               		onclick: function (item, dialog) { dialog.close(); } 
+	               	}
+	            ], 
+	       		isResize: true 
+	       	});
+       	}
+	</script>
+</body>
+</html>

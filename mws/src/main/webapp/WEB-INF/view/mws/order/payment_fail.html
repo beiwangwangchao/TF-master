@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>天府电商</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link href="${base.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css">
+    <link rel="shortcut icon" href="${base.contextPath}/resources/img/favicon.ico"/>
+    <!-- Bootstrap -->
+    <link href="${base.contextPath}/resources/css/bootstrap${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/owl.carousel${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/owl.theme${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/owl.transitions${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/style${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/config${resource_suffix!}.css" rel="stylesheet">
+    <link href="${base.contextPath}/resources/css/dialog${resource_suffix!}.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond${resource_suffix!}.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond${resource_suffix!}.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="${base.contextPath}/resources/js/html5shiv.js"></script>
+    <![endif]-->
+    <#assign IMG_H = "_480_480"/>
+    <#assign IMG_M = "_360_360"/>
+    <#assign IMG_L = "_78_78"/>
+    <script type="text/javascript">
+        !function () {
+            var p = {};
+            $l = function (code, value) {
+                var al = arguments.length;
+                if (al == 1) {
+                    var v = p[code];
+                    return v ? v : code;
+                } else if (al == 2) {
+                    p[code] = value;
+                }
+            }
+        }();
+        $l('sys.hand.btn.cancel', '<@spring.message "sys.hand.btn.cancel"/>');
+        $l('sys.hand.btn.ok', '<@spring.message "sys.hand.btn.ok"/>');
+    </script>
+    <script src="${base.contextPath}/resources/js/jquery-1.11.3${resource_suffix!}.js"></script>
+    <script>
+        $.isEmpty = function (v, allowBlank) {
+            return v === null || v === undefined || (($.isArray(v) && !v.length)) || (!allowBlank ? v === '' : false);
+        }
+        $.isString = function (v) {
+            return typeof v === 'string';
+        }
+        $.escapeHtml = function (str) {
+            if ($.isEmpty(str) || !$.isString(str))
+                return str;
+            return String(str).replace(/&/gm, '&amp;').replace(/\'/gm, '&#39;').replace(/\(/gm, '&#40;').replace(/\)/gm, '&#41;').replace(/\+/gm, '&#43;').replace(/\%/gm, '&#37;')
+                .replace(/</gm, '&lt;').replace(/>/gm, '&gt;');
+        }
+        $.unescapeHtml = function (str) {
+            if ($.isEmpty(str) || !$.isString(str))
+                return str;
+            return String(str).replace(/&amp;/gm, '&').replace(/&#39;/gm, '\'').replace(/&quot;/gm, '"').replace(/&#40;/gm, '(').replace(/&#41;/gm, ')').replace(/&#43;/gm, '+').replace(/&#37;/gm, '%')
+                .replace(/&lt;/gm, '<').replace(/&gt;/gm, '>');
+        }
+    </script>
+    <script src="${base.contextPath}/resources/js/dialog${resource_suffix!}.js"></script>
+    <script src="${base.contextPath}/lib/json2${resource_suffix!}.js"></script>
+    <script type="text/javascript">var _basePath = "${base.contextPath}";</script>
+    <style type="text/css">
+        .hover {
+            color: #000000;
+            background: #F4EFCF;
+        }
+    </style>
+    <script type="text/javascript">
+        //登出
+        function logout() {
+            $.dialog.confirm('<@spring.message "mws.dialog.confirm"/>', '<@spring.message "sys.hand.confirm_exit"/>', function () {
+                location.href = _basePath + "/logout";
+            }, function () {
+                //取消-无操作
+            });
+        }
+        //获得店铺
+        function getOrgName() {
+            var code = "${Session._marketCode}";
+            var igiCode = "";
+            for (var i = 0; i < igiMapping.length; i++) {
+                if (code == igiMapping[i]['value']) {
+                    igiCode = igiMapping[i]['meaning']
+                    break;
+                }
+            }
+            $.ajax({
+                type: "POST",
+                url: "${base.contextPath}/account/selectByMarketName",
+                data: {igiCode: igiCode},
+                dataType: "json",
+                success: function (data) {
+                    if (data.success) {
+                        var html = [];
+                        var data = data.rows;
+                        if (data.length > 0) {
+                            //for(var i=0;i<data.length;i++){
+                            $.each(data, function (index, item) {
+                                //var item = data[i];
+                                html.push("<tr>\
+                            		   <td style='width:160px;' id='" + item.salesOrgId + "' onclick='selectShop(" + item.salesOrgId + ",\"" + item.name + "\")'><span title='" + item.name + "'>" + item.name + "</span></td>\
+                                 </tr>");
+                                //}
+                            });
+                            $("#showShopTbody").html(html.join(''));
+                        }
+                        click_span();
+                    }
+                }
+            });
+        }
+
+        function selectShop(val, name) {
+            $.ajax({
+                type: "POST",
+                url: "${base.contextPath}/account/select/shop",
+                data: {salesOrgId: val, salesOrgName: name},
+                dataType: "json",
+                success: function (data) {
+                    if (data.success == true) {
+                        //window.location.href="${base.contextPath}/";
+                        window.location.reload([true]);// 当前页面
+                    }
+                }
+            });
+        }
+
+        function click_span() {
+            $("#${Session._salesOrgId}").addClass("hover");
+            $("#showShopTbody td").hover(
+                function () {
+                    $(this).addClass("hover");
+                },
+                function () {
+                    $(this).removeClass("hover");
+                }
+            );
+            $("#showShopTbody td").on("click", function () {
+                $("td").css({"color": "", "background": ""});
+                $(this).addClass("hover");
+            });
+        }
+
+        $(function () {
+            //加载页面时获得产品下拉框
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "${base.contextPath}/product/queryInvCategorys",
+                data: {},
+                success: function (data) {
+                    initProductCombobox(data);
+                }
+            });
+
+            //加载登录会员默认市场
+            $.ajax({
+                type: "POST",
+                url: "${base.contextPath}/account/queryMarket",
+                data: {},
+                dataType: "json",
+                success: function (data) {
+                    if (data.success) {
+                        var html = [];
+                        var data = data.rows;
+                        if (data.length > 0) {
+                            for (var i = 0; i < data.length; i++) {
+                                var item = data[i];
+                                $("#market_li").text(item.name);
+                            }
+                        }
+                        getOrgName();
+                    }
+                }
+            });
+
+            $("li[name='lang']").hover(
+                function () {
+                    $(this).addClass("hover");
+                },
+                function () {
+                    $(this).removeClass("hover");
+                }
+            );
+            init();
+        });
+
+        function initProductCombobox(data) {
+            var str = null;
+            for (var i = 0; i < data.total; i++) {
+                str = "<li><a href='${base.contextPath}/product/category.html?categoryId=" + data.rows[i].categoryId + "'>" + data.rows[i].categoryName + "</a></li>";
+                $("ul[name=dropdown-menu]").append(str);
+            }
+        }
+
+        function changeLang(lang) {
+            var urlString = window.location.href;
+            var par = "lang" + "=" + lang;
+            if (getUrlParam("lang") == null) {
+                urlString = urlString + (urlString.indexOf("?") > 0 ? "&" : "?") + par;
+            } else {
+                urlString = urlString.replace(eval('/(' + "lang" + '=)([^&]*)/gi'), par);
+            }
+            window.location.href = urlString;
+        }
+
+        function init() {
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: "${base.contextPath}/account/selectLanguageAfter",
+                data: {},
+                dataType: "json",
+                success: function (data) {
+                    $("#shopName").text(data.rows[0].name);
+                }
+            });
+        }
+
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+            if (r != null) return unescape(r[2]);
+            return null; //返回参数值
+        }
+    </script>
+</head>
+<body>
+<script src="${base.contextPath}/common/code?igiMapping=SYS.IGI_MAPPING " type="text/javascript"></script>
+<header id="header">
+    <div>
+        <img src="${base.contextPath}/resources/img/top-line.jpg" style="width: 100%; height: 24px"/>
+    </div>
+    <div id="top-bar">
+        <div class="container">
+
+            <nav id="top-nav" role="navigation" class="navbar">
+                <div class="navbar-header">
+                    <button data-target=".top-nav"
+                            data-toggle="collapse" class="navbar-toggle"
+                            type="button">
+                            <span class="sr-only">Toggle
+                                navigation</span> <span class="icon-bar"></span>
+                        <span class="icon-bar"></span> <span
+                            class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse top-nav">
+                    <ul class="nav navbar-nav">
+                        <li style="font-weight: 900;"><a href="#">${Session.memberName}</a></li>
+                        <li class="dropdown"><a
+                                href="${base.contextPath}/account/account-info.html"><@spring.message
+                            "mws.menu.myaccount"/>
+                        </a></li>
+                        <!--                             <li style="cursor: pointer;">
+                                                        <a data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><@spring.message "mws.myaccount.accountinfo.language_selection"/><span class="caret"></span></a>
+                                                        <ul class="dropdown-menu" id="lang">
+                                                            <#list languages as l>
+                                                                <li name="lang" onclick="changeLang('${l.langCode}')" value="${l.langCode}" style="width: 100%;margin-left: 0;" <#if base.getLocale() == l.langCode>selected</#if> ><span style="margin-left: 15px;">${l.description}</span></li>
+                                                            </#list>
+                                                        </ul>
+                                                    </li> -->
+                        <li style="cursor: pointer;">
+                            <a data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+                               style="margin-top : -2px;"><span id="shopName">${Session._salesOrgName}</span><span
+                                    class="caret"></span></a>
+                            <!-- <a data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">切换店铺<span class="caret"></span></a> -->
+                            <table class="dropdown-menu showShopTable">
+                                <thead>
+                                <tr>
+                                    <td id="market_li" style="text-align: center;width:160px;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="height:2px;margin-top: 30px; position:absolute;width:160px;top:0;bottom:0;background:-webkit-gradient(linear, center top, center bottom, from(#fff), color-stop(0.45, #ccc),color-stop(0.55, #ccc), to(#fff));"></td>
+                                </tr>
+                                </thead>
+                                <tbody id="showShopTbody" style="text-align: center;"></tbody>
+                            </table>
+                        </li>
+                        <li><a href="javascript:logout()"><@spring.message "sys.hand.btn.logout"/></a></li>
+                        <li>
+                            <a href="${base.contextPath}/account/account-messagebox.html">
+                                <i class="glyphicon glyphicon-envelope"></i> Message
+                                <!-- <span class="fa-stack">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-stack-1x fa-inverse" id = "messageUnreadNumber">${manualMessageService.getMessageUnreadCount(Session.memberId)}</i>
+                                </span> -->
+                                <span class="fa-stack">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-stack-1x fa-inverse" id="">${manualMessageService.getMessageUnreadCount(Session.accountId)}</i>
+                                    </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${base.contextPath}/order/shopping-cart.html">
+                                <i class="fa fa-shopping-cart fa-lg"></i> Cart
+                                <span class="fa-stack">
+                       				<i class="fa fa-circle fa-stack-2x"></i>
+                       				<i class="fa fa-stack-1x fa-inverse" id="shopCartNumber">${shopCartService.getShopCartCount(Session.memberId,Session._salesOrgId)}</i>
+                    				</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </nav>
+        </div>
+    </div>
+    <!-- / #top-bar -->
+
+    <!-- ========== TOP BAR START ========== -->
+
+    <!-- ========== MENU START ========== -->
+
+    <nav id="main-nav">
+        <div class="navbar">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle"
+                            data-toggle="collapse"
+                            data-target=".main-nav">
+                        <span class="icon-bar"></span> <span
+                            class="icon-bar"></span> <span
+                            class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="${base.contextPath}/index.html"><img
+                            src="${base.contextPath}/resources/img/logo.png" alt="Infinitus"
+                            class="img-responsive"></a>
+                </div>
+                <div class="navbar-collapse collapse main-nav">
+                    <ul class="nav navbar-nav navbar-left">
+                        <li>
+                            <a href="${base.contextPath}/index.html" class="dropdown-toggle" data-toggle="dropdown">
+                                <@spring.message "mws.nav.products"/><b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu" name="dropdown-menu">
+                                <li><a href="${base.contextPath}/product/category.html?categoryId="><@spring.message
+                                    "mws.product.allproducts"/></a></li>
+                                <li class="divider"></li>
+                            </ul>
+                        </li>
+                        <li><a href="${base.contextPath}/order/fast-shopping.html"><@spring.message
+                            "mws.nav.quickbuy"/></a></li>
+                        <li><a href="${base.contextPath}/account/account-myteam.html"><@spring.message
+                            "mws.nav.myteam"/></a></li>
+                        <li><a href="${base.contextPath}/events.html"><@spring.message "mws.nav.event"/></a></li>
+                        <li><a href="${base.contextPath}/account/account-download-center.html"><@spring.message
+                            "mws.nav.download"/></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+<!-- ========== MENU END ========== -->
+<!-- ========== CONTENT START ========== -->
+<script src="${base.contextPath}/resources/js/md5.js"></script>
+<script type="text/javascript">
+
+
+    function orderPay(orderNumber, orderAmt) {
+        var orderNumber = $("#orderNumber").text();
+        var actrualPayAmt = $("#actrualPayAmt").text();
+        var sourceKey = $("#sourceKey").text();
+        var sourceType = $("#sourceType").text();
+
+        if (($("input[name='radios']:checked").val()) == "unionpay") {
+            var bankPaymentCode = "TWUNN";
+            $("#total_fee").val(actrualPayAmt * 1);
+        } else if (($("input[name='radios']:checked").val()) == "aliPay") {
+            var bankPaymentCode = "TWNON";
+            $("#total_fee").val(actrualPayAmt * 1);
+        } else if (($("input[name='radios']:checked").val()) == "wx_pay") {
+            var bankPaymentCode = "MYHOL";
+            $("#total_fee").val(actrualPayAmt * 1);
+        } else {
+            alert('<@spring.message "msg.order.payment.selectpayment"/>');
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "${base.contextPath}/order-generate-payment-trans?orderNumber=" + orderNumber,
+            dataType: "json",
+            data: {sourceKey: sourceKey, sourceType: sourceType, bankPaymentCode: bankPaymentCode},
+            success: function (data) {
+
+                var product_fee=0;var transport_fee=0;
+                // console.log("data is---"+JSON.stringify(data));
+                for(var i=0;i<data.lines.length;i++) {
+                    product_fee=product_fee+data.lines[i].pv
+                }
+                transport_fee=actrualPayAmt-product_fee;
+                var subject="";
+                for(var i=0;i<data.lines.length;i++) {
+                    subject =subject+data.lines[i].itemNumber;
+                }
+                //  console.log(subject);
+
+//                if(data.success==false) {
+//                	$.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+//                	return;
+//                }
+
+                if (bankPaymentCode == "TWUNN") {
+                    $("#setPayForm").attr("action", "${base.contextPath}/payment/pay/union");
+                    $("#trans_channel").val("b2c");
+                    $("#trans_pattern").val("0");
+                    $("#store_id").val(data.salesOrgId);
+                    $("#qr_return_type").val("0");
+                } else if (bankPaymentCode == "TWNON") {
+                    $("#setPayForm").attr("action", "${base.contextPath}/payment/pay/alipay");
+                    $("#trans_channel").val("alipay_qr_p");
+                    $("#store_id").val(data.salesOrgId);
+                    $("#trans_pattern").val("0");
+                    $("#qr_return_type").val("0");
+                } else if (bankPaymentCode == "MYHOL") {
+                    $("#setPayForm").attr("action", "${base.contextPath}/payment/pay/weixinpay");
+                    $("#trans_channel").val("wx_qr_p");
+                    $("#trans_pattern").val("0");
+                    $("#store_id").val(data.salesOrgId);
+                    $("#qr_return_type").val("0");
+                }
+
+                $("#bankcode").val("700"); //$(".batch_num").val(1);
+                $("#biz_type").val("0001");
+                $("#body").val(subject);//$(".buyer_id").val(data.rows[0].buyerId);// $(".discount").val(data.rows[0].discount);
+                $("#fee_type").val("1");$("#input_charset").val("UTF-8");
+                $("#limit_pay").val("2"); $("#mobile").val("18702809023");$("#notify_url").val("http://47.104.17.194:8080/payment/pay/notify");$("#out_trade_no").val(orderNumber);
+                $("#partner").val("12038387");
+                $("#product_fee").val(product_fee);
+                $("#return_url").val("http://47.104.17.194:8080/payment/pay/notify");$("#service").val("pay_service");
+                $("#service_version").val("1.1"); $("#show_url").val("http://47.104.17.194:8080/mws");$("#spbill_create_ip").val(data.ip);//
+                $("#subject").val(subject); $("#subpartner").val("12038698");$("#total_fee").val(actrualPayAmt);
+                $("#trade_details").val("12038698^"+actrualPayAmt+"^0.00");
+                $("#trade_mode").val("0002");
+                $("#transport_fee").val(transport_fee);
+
+                var myform = $('#setPayForm'); //得到form对象
+                var tmpInput = $("<input type='hidden' name='sign'/>");
+                var params = serializeForm('setPayForm');
+                //console.log("the string is--"+params.trim()+ "f7d16bef35c740c4884ffc4b9a89ab91");
+                //console.log("the sign is--"+hex_md5(params.trim() + "f7d16bef35c740c4884ffc4b9a89ab91"));
+                tmpInput.attr("value", hex_md5(params.trim() + "f7d16bef35c740c4884ffc4b9a89ab91"));
+                myform.append(tmpInput);
+                var tmp = $("<input type='hidden' name='sign_type' value='MD5'/>");
+                myform.append(tmp);
+                //console.log("the summary is---"+serializeForm('setPayForm'));
+                $("#payBtnDiv").hide();
+                $('#setPayForm').submit();
+            }
+        });
+    }
+
+
+    function listeningSalesOrder() {
+        $.ajax({
+            type: 'POST',
+            url: "${base.contextPath}/salesorder/listening",
+            dataType: "json",
+            success: function (data) {
+
+            }
+        });
+    }
+
+    $(function () {
+        var marketCode = $("#marketCode").text();
+        var orderStatus = $("#orderStatus").text();
+
+//    	if(marketCode == "TW"){
+//    		$("#myDisplayDiv").hide();
+//    	}else if(marketCode == "MY"){
+//    		$("#twDisplayDiv").hide();
+//    	}else{
+//    		$("#twDisplayDiv").hide();
+//    		$("#myDisplayDiv").hide();
+//    		$("#payBtnDiv").hide();
+//    	}
+
+        if (orderStatus == "PAYIN" || orderStatus == "COMP") {
+            $("#payBtnDiv").hide();
+            $("#twDisplayDiv").hide();
+            $("#myDisplayDiv").hide();
+        }
+
+//    	$("input[name='radios']").click(function(){
+//    	});
+    });
+
+
+    //获取指定form中的所有的<input>对象
+    function getElements(formId) {
+        var form = document.getElementById(formId);
+        var elements = new Array();
+        var tagElements = form.getElementsByTagName("input");
+        for (var j = 0; j < tagElements.length; j++) {
+            elements.push(tagElements[j]);
+        }
+        return elements;
+    }
+
+    //获取单个input中的【name,value】数组
+    function inputSelector(element) {
+        if (element.checked)
+            return [element.name, element.value];
+    }
+
+    function input(element) {
+        switch (element.type.toLowerCase()) {
+            case 'submit':
+            case 'hidden':
+            case 'password':
+            case 'text':
+                return [element.name, element.value];
+            case 'checkbox':
+            case 'radio':
+                return inputSelector(element);
+        }
+        return false;
+    }
+
+    //组合URL
+    function serializeElement(element) {
+        var method = element.tagName.toLowerCase();
+        var parameter = input(element);
+
+        if (parameter) {
+            var key = encodeURIComponent(parameter[0]);
+            if (key.length == 0) return;
+
+            if (parameter[1].constructor != Array)
+                parameter[1] = [parameter[1]];
+
+            var values = parameter[1];
+            var results = [];
+            for (var i = 0; i < values.length; i++) {
+                if(values[i]!="")
+                    results.push(key + '=' + values[i]);
+            }
+            return results.join('&');
+        }
+    }
+
+    //调用方法
+    function serializeForm(formId) {
+        var elements = getElements(formId);
+        var queryComponents = new Array();
+
+        for (var i = 0; i < elements.length; i++) {
+            var queryComponent = serializeElement(elements[i]);
+            if (queryComponent)
+                queryComponents.push(queryComponent);
+        }
+
+        return queryComponents.join('&');
+    }
+
+
+</script>
+<section id="content">
+    <div class="container">
+        <#if sourceType??>
+            <span style="display: none;" id="sourceType">${sourceType}</span>
+        </#if>
+        <#if sourceKey??>
+            <span style="display: none;" id="sourceKey">${sourceKey}</span>
+        </#if>
+        <#if marketCode??>
+            <span style="display: none;" id="marketCode">${marketCode}</span>
+        </#if>
+        <#if orderStatus??>
+            <span style="display: none;" id="orderStatus">${orderStatus}</span>
+        </#if>
+        <div class="row" style="margin-top: 50px">
+            <div class="col-md-2 col-sm-2" style="margin-top: 30px">
+                <div class="col-md-offset-6"><img src="${base.contextPath}/resources/img/ting.jpg"></div>
+            </div>
+            <div class="col-md-6 col-sm-6" style="margin-top: 35px">
+                <div class="row">
+                    <div class="col-sm-6 form-group" style="font-weight: bolder;font-size:20px;color: black">
+                        支付失败
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+                        <label><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>:</label>
+                        <#if orderNumber??>
+                            <span id="orderNumber">${orderNumber}</span>
+                        </#if>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+                        <label>收货地址:</label>
+                        <#if actrualPayAmt??>
+                            <span style="color: red;" id="actrualPayAmt">${actrualPayAmt?string('0.00')}</span>
+                        </#if>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+                        <label>待付款:</label>
+                        <#if actrualPayAmt??>
+                            <span style="color: red;" id="actrualPayAmt">${actrualPayAmt?string('0.00')}</span>
+                        </#if>
+                    </div>
+                </div>
+
+
+                <div class="row" >
+                    <div class="col-sm-2 form-group" style="font-weight: bolder;font-size:20px;color: black">
+                        你可以
+                    </div>
+
+                    <div class="col-sm-10 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+                        <div style='font-size: 20px;' class="col-md-6"><a href='${base.contextPath}/index.html'> 返回继续购物 </a></div>
+                        <div style='font-size: 20px;' class="col-md-6"><a href='${base.contextPath}/account/account-order-list.html'> 查看我的订单重新支付 </a></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</section>
+<!-- ========== CONTENT END ========== -->
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

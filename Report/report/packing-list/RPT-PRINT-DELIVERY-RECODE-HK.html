@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style type="text/css" >
+        /*竖向*/
+        @page  {
+            size: A4 portrait;
+            mso-page-orientation:portrait;
+			mso-header-margin:0pt;
+			mso-footer-margin:0pt;
+			mso-paper-source:0;
+			margin-top: -30px;
+			margin-bottom : -30px;
+			width : 210mm;
+			height : 297mm;
+        }
+
+        /*页码*/
+        @bottom-right {
+            content:"Page "counter(page)" of "counter(pages);
+            padding-right: 10mm;
+            padding-bottom: 10mm;
+            font-size: 14pt;
+        }
+        body{
+            font-family:'Arial Unicode MS';
+			font-size:10pt;
+        }
+		table{
+			font-size:10pt;
+			border-spacing : 0pt;
+		}
+        td{
+            padding: 1pt;
+            height: 4.572mm;
+        }
+		tr{
+			border-bottom: 0px;
+			border-top : 0px;
+		}
+        .bottom_line {
+            border-bottom: 1px solid #000000;
+        }
+        .top_line {
+            border-top: 1px solid #000000;
+        }
+        .font_bold {
+            font-weight: bold;
+        }
+.border_all {
+  border: 1px solid black;
+}
+    </style>
+</head>
+<body class="">
+
+   <#list lines as line> 
+		<#list line as ln>
+        <#if line_index != lines?size -1>
+			<#if ln_index != line?size -1>
+				<div style="width:100%;page-break-after:always;">
+			<#else>
+				<div style="width:100%;page-break-after:always;">
+			</#if>	
+         <#else>
+			<#if ln_index != line?size -1>
+				<div style="width:100%;page-break-after:always;">
+			<#else>
+				<div style="width:100%;page-break-after:avoid;margin-top:8px;">
+			</#if>
+         </#if>
+		 
+
+        <div style="width: 100%;height: 120mm;margin-top: 30mm">
+            <div style="float:left;width: 100%;text-align: center;height:12mm"><h2>Packing    List</h2></div>
+            <div style="float:left;width: 100%;margin-left: auto;margin-right: auto;height:13mm;">
+                <table width="100%;line-height:15px;">
+                	<#list ln as h>
+                	<#if h_index == ln?size-1> 
+                      <tr>
+                        <td style="text-align: right;width: 17%" >Inventory:</td>
+                        <td style="width: 25%">${h.inventory!}</td>
+                        <td style="width: 15%"></td>
+                        <td style="width: 20%"></td>
+                        <td style="width: 13%"></td>
+                        <td style="width: 10%;text-align: right"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right;width: 17%" >Distributor Name:</td>
+                        <td style="width: 25%">${h.distributorName!}</td>
+                        <td style="width: 15%;text-align: right">Receipt No:</td>
+                        <td style="width: 20%">${h.ReceiptNo!}</td>
+                        <td style="width: 13%;text-align: right">Shipment No:</td>
+                        <td style="width: 10%;text-align: right">${h.shipmentNo!}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right;width: 17%" >Distributor No.:</td>
+                        <td style="width: 25%">${h.distributorNo!}</td>
+                        <td style="width: 15%;text-align: right">Date:</td>
+                        <td style="width: 20%">${h.deliveryDate!}</td>
+                        <td style="width: 13%"></td>
+                        <td style="width: 10%;text-align: right"></td>
+                    </tr>
+                    </#if>
+                    </#list>
+                </table>
+            </div>
+            <div style="float:left;width: 100%;margin-left: auto;margin-right: auto;height: 80mm">
+                <table width="100%" style="border-collapse: collapse;table-layout: fixed;min-height: 75mm; line-height:14px;">
+                    <tr>
+                    	<td class="bottom_line" style="text-align: left;width: 10%">Pack Code</td>
+                        <td class="bottom_line" style="text-align: left;width: 12%">Product Code</td>
+                        <td class="bottom_line" style="text-align: left;width: 35%">Description</td>
+                        <td class="bottom_line" style="text-align: right;width: 5%">Qty</td>
+                        <td class="bottom_line" style="text-align: center;width:10%">Lot Number</td>
+                        <td class="bottom_line" style="text-align: center;width: 10%">Expiry Date</td>
+                        <td class="bottom_line" style="text-align: right;width: 7%">Shipped</td>
+                        <td class="bottom_line" style="text-align: right;width: 6%">Unship</td>
+                    </tr>
+                    <#list ln as l>					
+                    <tr>
+                    	<td style="text-align: left;width: 10%">${l.packageCode!}</td>
+                        <td style="text-align: left;width: 12%">${l.productCode!}</td>
+                        <td style="text-align: left;width: 25%; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${l.desctiption!}</td>
+                        <td style="text-align: right;width: 5%">${l.qty!}</td>
+                        <td style="text-align: center;width: 10%">${l.lotNumber!}</td>
+                        <td style="text-align: center;width: 10%">${l.expiryDate!}</td>
+                        <td style="text-align: right;width: 10%">${l.shipmentQty!}</td>
+                        <td style="text-align: right;width: 13%">${l.notShippedQty!}</td>
+                    </tr>
+                    <#if l_index == ln?size-1> 
+					</table>
+					<table width="100%" style="border-collapse: collapse;table-layout: fixed;min-height: 5mm;line-height:14px;">
+                    <tr>
+                    	<td class="top_line" style="text-align: left;width: 10%"></td>
+                        <td class="top_line" style="text-align: left;width: 12%"></td>
+                        <td class="top_line" style="text-align: left;width: 25%"></td>
+                        <td class="top_line" style="text-align: right;width: 5%"></td>
+                        <td class="top_line" style="text-align: left;width: 10%"></td>
+                        <td class="top_line" style="text-align: center;width: 10%">Total</td>
+                        <td class="top_line" style="text-align: right;width: 10%">${l.totalShipmentQty!}</td>
+                        <td class="top_line" style="text-align: right;width: 13%">${l.totalNotShippedQty!}</td>
+                    </tr>
+                    
+                </table>
+            </div>
+            <div style="float:left;display:block;margin-left:auto;margin-right:auto;width:100%;margin-top:5pt;padding-left:1mm;height: 10mm">
+                <table width="100%;line-height:15px;">
+                    <tr>
+                        <td colspan="2">The above products are received in good condition.</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td width="25%">Warehouse Signature :</td>
+                        <td width="25%"> ______________________________</td>
+                        <td width="30%"></td>
+                        <td width="5%">Page</td>
+                        <td width="5%">${l.page!}</td>
+                        <td width="5%">of</td>
+                        <td width="5%">${l.pages!}</td>
+                    </tr>
+                </table>
+            </div>
+            </#if>
+            </#list>
+        </div>
+		<!--不同签名-->
+		<div style="float:left;width: 100%;margin-top:30mm;height: 120mm">
+            <div style="float:left;width: 100%;text-align: center;height:12mm"><h2>Packing    List</h2></div>
+            <div style="float:left;width: 100%;margin-left: auto;margin-right: auto;height:13mm;">
+                <table width="100%;line-height:15px;">
+                	<#list ln as h>
+                	<#if h_index == ln?size-1>
+                      <tr>
+                        <td style="text-align: right;width: 17%" >Inventory:</td>
+                        <td style="width: 25%">${h.inventory!}</td>
+                        <td style="width: 15%"></td>
+                        <td style="width: 20%"></td>
+                        <td style="width: 13%"></td>
+                        <td style="width: 10%;text-align: right"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right;width: 17%" >Distributor Name:</td>
+                        <td style="width: 25%">${h.distributorName!}</td>
+                        <td style="width: 15%;text-align: right">Receipt No:</td>
+                        <td style="width: 20%">${h.ReceiptNo!}</td>
+                        <td style="width: 13%;text-align: right">Shipment No:</td>
+                        <td style="width: 10%;text-align: right">${h.shipmentNo!}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right;width: 17%" >Distributor No.:</td>
+                        <td style="width: 25%">${h.distributorNo!}</td>
+                        <td style="width: 15%;text-align: right">Date:</td>
+                        <td style="width: 20%">${h.deliveryDate!}</td>
+                        <td style="width: 13%"></td>
+                        <td style="width: 10%;text-align: right"></td>
+                    </tr>
+                    </#if>
+                    </#list>
+                </table>
+            </div>
+            <div style="float:left;width: 100%;margin-left: auto;margin-right: auto;height: 80mm">
+                <table width="100%" style="border-collapse: collapse;table-layout: fixed;min-height: 75mm; line-height:14px;">
+                    <tr>
+                    	<td class="bottom_line" style="text-align: left;width: 10%">Pack Code</td>
+                        <td class="bottom_line" style="text-align: left;width: 12%">Product Code</td>
+                        <td class="bottom_line" style="text-align: left;width: 35%">Description</td>
+                        <td class="bottom_line" style="text-align: right;width: 5%">Qty</td>
+                        <td class="bottom_line" style="text-align: center;width: 10%">Lot Number</td>
+                        <td class="bottom_line" style="text-align: center;width: 10%">Expiry Date</td>
+                        <td class="bottom_line" style="text-align: right;width: 7%">Shipped</td>
+                        <td class="bottom_line" style="text-align: right;width: 6%">Unship</td>
+                    </tr>
+                    <#list ln as l>					
+                    <tr>
+                    	<td style="text-align: left;width: 10%">${l.packageCode!}</td>
+                        <td style="text-align: left;width: 12%">${l.productCode!}</td>
+                        <td style="text-align: left;width: 25%; white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${l.desctiption!}</td>
+                        <td style="text-align: right;width: 5%">${l.qty!}</td>
+                        <td style="text-align: center;width: 10%">${l.lotNumber!}</td>
+                        <td style="text-align: center;width: 10%">${l.expiryDate!}</td>
+                        <td style="text-align: right;width: 10%">${l.shipmentQty!}</td>
+                        <td style="text-align: right;width: 13%">${l.notShippedQty!}</td>
+                    </tr>
+                  <#if l_index == ln?size-1> 
+					</table>
+					<table width="100%" style="border-collapse: collapse;table-layout: fixed;min-height: 5mm;line-height:14px;">
+                    <tr>
+                    	<td class="top_line" style="text-align: left;width: 10%"></td>
+                        <td class="top_line" style="text-align: left;width: 12%"></td>
+                        <td class="top_line" style="text-align: left;width: 25%"></td>
+                        <td class="top_line" style="text-align: right;width: 5%"></td>
+                        <td class="top_line" style="text-align: left;width: 10%"></td>
+                        <td class="top_line" style="text-align: center;width: 10%">Total</td>
+                        <td class="top_line" style="text-align: right;width: 10%">${l.totalShipmentQty!}</td>
+                        <td class="top_line" style="text-align: right;width: 13%">${l.totalNotShippedQty!}</td>
+                    </tr>
+                    
+                </table>
+            </div>
+            <div style="float:left;margin-left:auto;margin-right:auto;width:100%;margin-top:5pt;padding-left:1mm;height: 5mm">
+                <table width="100%;line-height:15px;">
+                    <tr>
+                        <td colspan="2">The above products are received in good condition.</td>
+                        <td></td>
+                    </tr>
+					<tr>
+                        <td width="22%">Distributor Signature :</td>
+                        <td width="25%"> ______________________________</td>
+                        <td width="33%"></td>
+                        <td width="5%">Page</td>
+                        <td width="5%">${l.page!}</td>
+                        <td width="5%">of</td>
+                        <td width="5%">${l.pages!}</td>
+                    </tr>
+                </table>
+            </div>
+			</#if>		
+            </#list>
+        </div> 
+    </div>
+    </#list>
+</#list>
+</body>
+</html>

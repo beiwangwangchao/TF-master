@@ -1,0 +1,87 @@
+<#--
+ * description: 城市查询界面.
+ * version: 1.0
+ * author: huanghanrui
+ * .
+ *
+-->
+<#include "../include/head.html">
+
+<body style="padding: 10px;">
+	<form id="spm_city_form" ></form>  
+	
+    <div id="spm_city_grid"></div>
+    <script type="text/javascript">
+    <#assign isedit = (RequestParameters.isedit!'0')/> 
+    $(function(){
+    		window['spm_city_form'] = $("#spm_city_form").ligerForm({
+                fields: [
+                    {name : "__status",type : "hidden",options:{value:"<#if isedit =='1'>update<#else>add</#if>"},newline : false},
+					{
+                    	type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.citycode"/>', newline:false, name: 'cityCode',
+                    	group : "<@spring.message 'type.com.lkkhpg.dsis.common.config.spmcity.query.city'/>"
+					},
+					{ 
+						
+						label: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.name"/>',
+						newline:false, 
+						name: 'name',
+						type: 'text'
+					}
+                ], 
+                buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                    	var datas = spm_city_form.getData();
+                    	var is_empty = true;
+                    	
+                        Hap.gridQuery({
+                            form:spm_city_form,
+                            grid:spm_city_grid
+                        })
+                       
+                    }}
+                ]
+            });
+        
+            window['spm_city_grid'] = $("#spm_city_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [ { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.citycode"/>',
+                	name: 'cityCode', align: 'left', width: '150',
+                	render : function (data) 
+                    {
+                        var html = "<a href='#' onClick='cityClick(\"" + data.cityCode + "\")'>" + data.cityCode + "</a>";
+                        return html;
+                    }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.name"/>',
+                	name: 'name', align: 'left', width: '150'
+                  }
+                ], 
+                url:'${base.contextPath}/spm/city/query',
+                toolbar: { 
+                	items: [
+                	        { 
+                	        	text: '<@spring.message "sys.hand.btn.new"/>',
+                	        	disable:false, 
+                	        	click: function(){
+                	        		window.top.f_removeTab('spm_city_edit');
+                	        		parent.f_addTab("spm_city_edit","<@spring.message 'type.com.lkkhpg.dsis.common.config.spmcity.city.details'/>","${base.contextPath}/spm/spm_city_edit.html");
+                	            }, icon: 'add' 
+                	        }
+                     ]
+                     },
+                enabledEdit: true,
+                width: '99%', 
+                height: '98%', 
+                rownumbers: true
+            }); 
+    });
+    function cityClick(data) 
+    {
+    	window.top.f_removeTab("spm_city_"+data);
+    	parent.f_addTab("spm_city_"+data,"<@spring.message 'type.com.lkkhpg.dsis.common.config.spmcity.city.details'/>","${base.contextPath}/spm/spm_city_edit.html?isedit=1&cityCode="+data);
+    };
+    </script>
+</body>
+</html>

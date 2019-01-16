@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+       
+    <bean id="cookieHttpSessionStrategy" class="org.springframework.session.web.http.CookieHttpSessionStrategy">
+        <property name="cookieName" value="SESSIONID_DSIS"/>
+    </bean>
+    
+    <bean class="com.lkkhpg.dsis.platform.security.captcha.impl.DefaultCaptchaManager">
+        <property name="captchaKeyName" value="dsis_captcha_key"></property>
+        <property name="validateFlag" value="true"></property>
+    </bean>
+    
+    <!-- <bean id="menuWrapper" class="com.lkkhpg.dsis.admin.wrapper.MenuWrapper"/> -->
+    <bean id="loginAdaptor" class="com.lkkhpg.dsis.admin.adaptor.LoginAdaptor"/>
+
+    <bean class="com.lkkhpg.dsis.platform.core.impl.RequestHelper">
+        <property name="requestListener">
+            <bean class="com.lkkhpg.dsis.admin.system.DsisRequestListener"/>
+        </property>
+    </bean>
+
+    <bean id="defaultPageManager" class="com.lkkhpg.dsis.platform.security.DefaultConfiguration">
+        <property name="pageLogin" value="/timeout.html"/>
+        <property name="page403" value="/403.html"/>
+        <property name="page404" value="/404.html"/>
+        <property name="page500" value="/500.html"/>
+        <property name="defaultViewPath" value="admin"/>
+    </bean>
+
+    <bean id="messageAddressService" class="com.lkkhpg.dsis.admin.system.service.impl.MessageAddressService">
+        <property name="typeServices">
+            <map>
+                <entry key="user" value-ref="userMessageAddressServiceImpl" ></entry>
+                <entry key="member" value-ref="memberMessageAddressServiceImpl"></entry>
+                <entry key="role" value-ref="roleMessageAddressServiceImpl"></entry>
+                <entry key="phone" value-ref="simpleMessageAddressServiceImpl"></entry>
+                <entry key="mail" value-ref="simpleMessageAddressServiceImpl"></entry>
+            </map>
+        </property>
+
+    </bean>
+
+    <bean id="userMessageAddressServiceImpl" class="com.lkkhpg.dsis.admin.system.service.impl.UserMessageAddressServiceImpl">
+    </bean>
+    <bean id="memberMessageAddressServiceImpl" class="com.lkkhpg.dsis.admin.system.service.impl.MemberMessageAddressServiceImpl">
+    </bean>
+    <bean id="roleMessageAddressServiceImpl" class="com.lkkhpg.dsis.admin.system.service.impl.RoleMessageAddressServiceImpl">
+    </bean>
+    <bean id="simpleMessageAddressServiceImpl" class="com.lkkhpg.dsis.admin.system.service.impl.SimpleMessageAddressServiceImpl">
+    </bean>
+    <!-- gds接口控制开关，默认true为启动，仅对主动调用接口生效 -->
+    <bean id="gdsSwitch" class="com.lkkhpg.dsis.integration.gds.service.impl.GdsSwitch">
+        <property name="switchFlag" value="true"></property>
+    </bean>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding">
+            <value>UTF-8</value>
+        </property>
+        <property name="maxUploadSize">
+            <value>32505856</value>
+        </property>
+        <property name="maxInMemorySize">
+            <value>4096</value>
+        </property>
+    </bean>
+    <!-- <bean id="multipartresolver" class="org.springframework.web.multipart.commons.commonsmultipartresolver"></bean> -->
+
+    <!-- Ipoint Center和Service Center奖金计算Bean(关闭奖金期间后) -->
+    <bean id="ipointCenterBonusQueueConsumer" class="com.lkkhpg.dsis.admin.config.service.impl.IpointCenterBonusQueueConsumer"></bean>
+    <bean id="serviceCenterBonusQueueConsumer" class="com.lkkhpg.dsis.admin.config.service.impl.ServiceCenterBonusQueueConsumer"></bean>
+
+
+</beans>

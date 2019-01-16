@@ -1,0 +1,615 @@
+<#-- 
+ * description: 会员变更市场审核界面 
+ * version: 1.0 
+ * author:qiubin.shen
+ * .
+ * 
+--> 
+<#include "../include/head.html">
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?marketChangeApprovalStatus=SYS.REVIEW_STATUS&marketName=ISG.GDS_ORG_CODE_MAPPING" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?marketChangeApproveDate=mm.market_change_approve_date" type="text/javascript"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+<body style="padding: 10px;">
+
+	<form id="member_query_form"  action="#" method="post" class="liger-form" data-validate="{errorPlacement:validTextTip}"></form>
+
+	<div id="newGrid" style="margin-left: 8px;display:none">
+	<div id="member_grid" ></div>
+	</div>
+	<div id="oldGrid" style="margin-left: 8px;">
+	<div id="market_grid_history"></div>
+	</div>
+	<script type="text/javascript">
+	var markets = [];
+    function queryMarkets(){
+    	$.ajax({
+ 			url: '${base.contextPath}/spm/market/queryMarketsByRole',
+ 			type:"POST",
+ 			dataType:"json",
+ 			contentType : "application/json",
+             data : '',
+             async: false,
+             success : function(json) {
+                 if(json.success){
+                	 $(json.rows).each(function(i,o){
+                		 markets.push({"id":o.marketId,"text":o.name})
+                	 })
+                 }
+             },
+             error : function() {
+             }
+ 		})
+    	 
+    }
+    queryMarkets();
+    var openTime = 1;
+    <#assign marketId = (RequestParameters._marketId ! ) />
+    <#if marketId != ''>
+	currentMarket = ${RequestParameters._marketId};
+	</#if>
+	<#if marketId == ''>
+	currentMarket = _marketId;
+	</#if>
+    
+		/* 变更市场审核form */
+		window['member_query_form'] = $("#member_query_form").ligerForm({
+			fields : [ 
+				{ type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>', newline:false, name: 'marketId',valueField : 'text',labelwidth:80,
+			options : {		
+		    	value: currentMarket,
+				data:markets,
+				onSelected:function(o){
+					if(openTime == 1){
+						$.ligerDialog.confirm('<@spring.message "dsis.lkkhpg.tip.refresh_page"/>',$l('sys.hand.tip.info'),
+		                          function(yes) {
+		                              if(yes){
+		                            	  	var tabid = window.top.tab.selectedTabId;
+			              			    	var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+			              			    	window.top.f_removeTab(tabid);
+			              					window.top.f_addTab(tabid, tabname, "mm/mm_marketchange_approve.html?_marketId="+o);
+		                              }else{
+		                            	  	openTime = openTime + 1;
+		                            		liger.get('marketId').setValue(currentMarket);
+		                              }
+		                          });
+					}else{
+						openTime = 1;
+					}
+					
+				}
+		    },
+		    validate : {
+		    	required: true
+				}
+		},
+			{
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+	            name: "memberCode",
+	            type: "popup",
+	            labelwidth:80,
+	            newline: false,
+	            rightToken : ' ',
+	            validate: {
+	                digits: true,
+	                maxlength: 10
+	            },
+	            textField: 'memberCode',
+	            options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+	                 onLoadData: function(){
+	                    this.setParm('marketId', liger.get('marketId').selectedValue)
+	                } ,
+	                  onChangeValue: function(){
+	                    this.setParm('marketId', liger.get('marketId').selectedValue)
+	                }  
+	            })
+	        }, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.membername"/>',
+				name : "memberName",
+				type : "popup",
+				textField:"memberName",
+				labelwidth:80,
+				newline : false,
+				rightToken : ' ',
+				
+				options: ${lovService.getLov(base.contextPath,base.locale, "lov_member_name")}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.phonenumber"/>',
+				name : "phoneNumber",
+				type : "text",
+				labelwidth:80,
+				newline : true,
+				rightToken : ' ',
+				
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.registercode"/>',
+				name : "registerCode",
+				type : "text",
+				labelwidth:80,
+				newline : false,
+				rightToken : ' ',
+				
+			}
+			] , buttons: [
+							{ text: '<@spring.message "sys.hand.btn.queryApprovaling"/>', disabled:false, width: 60,
+						    <#if accessService.access("GET_PENDING_EDITABLE") == false>
+					        disabled:true, 
+					        </#if>
+								click: function(){
+								//member_grid.options.url = '${base.contextPath}/mm/marketChange/queryNewMarketChangeFromGds';
+								
+								$('#newGrid').show();
+								$('#oldGrid').hide();
+							     member_query_form.setData({
+									subOrg:''
+								})  
+									Hap.gridQuery({
+			                            form:member_query_form,
+			                            grid:member_grid
+			                        })
+			                        
+			                        liger.get('approve_btn').setEnabled();
+			                        liger.get('reject_btn').setEnabled();
+							}
+								
+							},
+		                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+		                    	
+		                    	var datas = member_query_form.getData();
+		                    	
+		                    	member_query_form.setData({
+									approvalStatus:''
+								})
+								//member_grid.options.url = '${base.contextPath}/mm/marketChange/queryApproving';
+								$('#newGrid').hide();
+								$('#oldGrid').show();
+		                        Hap.gridQuery({
+		                            form:member_query_form,
+		                            grid:market_grid_history
+		                        })
+		                        liger.get('approve_btn').setDisabled();
+		                        liger.get('reject_btn').setDisabled();
+		                        $('.l-grid-row-cell-btn-checkbox').hide();
+		                    	
+		                    }
+		                    	
+		                    },
+		                    { text: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchangeexamine.approve"/>',
+		                    <#if accessService.access("APPROVAL_EDITABLE") == false>
+		                    disabled:true, 
+		                    </#if> 
+		                    id:'approve_btn',/*  disabled:true, */ width: 60, click: approval
+		                    	
+		                    },
+		                    { text: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchangeexamine.reject"/>',
+		                    <#if accessService.access("REFUSE_EDITABLE") == false>
+		                    disabled:true, 
+		                    </#if> 
+		                    id:'reject_btn', width: 60, click: reject
+		                    	
+		                    }
+		                    
+		                ] 
+		});
+		$.extend(liger.get('memberCode').options,{parms:{"marketId":liger.get('marketId').selectedValue}})
+		
+		/* 变更组织树查询按钮事件 */
+		function market_change_record_query() {
+			var forms = liger.get("member_query_form");
+		    if (forms.valid()) {
+		    	Hap.gridQuery({
+                    form:member_query_form,
+                    grid:member_grid
+                })
+        	}
+		}
+		
+		function toDetailsHtml(data){
+	    	//window.parent.f_addTab(null,'<@spring.message "type.com.lkkhpg.dsis.common.member.memberdetail"/>',"mm/mm_member_edit.html?isedit=1&memberId="+data);
+			window.top.f_removeTab("MEMBER_DETAIL");
+			window.top.f_addTab("MEMBER_DETAIL", '<@spring.message "type.com.lkkhpg.dsis.common.member.memberdetail"/>', "mm/mm_member_edit.html?isedit=1&memberId="+data);
+	    }
+		
+		function compare(){
+			var selected_datas = liger.get("member_grid").getSelectedRows();
+			var flag = 0;
+			var selected_status = false;
+			var mydate = new Date();
+			var currency_date = mydate.getDate();
+			//var currency_date = 5;
+			var is_approval_date = true;
+			for(var i = 0;i<marketChangeApproveDate.length;i++){
+				if(currency_date == marketChangeApproveDate[i].value){
+					is_approval_date = true;
+				}
+			}
+			for(var i=0;i<selected_datas.length;i++){
+				if(selected_datas[i].approvalStatus=='P'){
+					flag++;
+				}
+			}
+			if(flag == selected_datas.length){
+				selected_status = true;
+			}
+			if(selected_datas!=null&&selected_datas.length>0&&selected_status&&is_approval_date){
+				$(".l-button").eq(1).removeClass("l-button-disabled");
+			}
+		}
+		
+		/* 待审批市场记录grid */
+		window['member_grid'] = $("#member_grid").ligerGrid({
+			/* pageSizeOptions : [15,20,30,40,50], */
+			columns : [ {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.changeid"/>',
+				name : 'gdsId',
+				align : 'middle',
+				width : 130,
+				editor : {
+					type : 'int'
+				},
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+				name : 'memberCode',
+				align : 'middle',
+				width : 130,
+				isAllowHide: false,
+                render: function (item)
+                {
+                	var data = item.memberId;
+                    var html = '<a href="javascript:toDetailsHtml('+data+')">'+ item.memberCode +'</a>';
+                    return html;
+                },
+				editor : {
+					type : 'text'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.membername"/>',
+				name : 'memberName',
+				align : 'left',
+				width : 130,
+				editor : {
+					type : 'text'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.frommarketid"/>',
+				name : 'fromMarketName',
+				align : 'left',
+				width : 130,
+				editor : {
+					type : 'text'
+				},
+				/* render: function(item) {
+					for (var i in marketName) {
+				        if (marketName[i].meaning == item.fromMarketName) {
+				            return marketName[i].description;
+				        }
+				    }
+				    return '';
+		        } */
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.tomarketid"/>',
+				name : 'toMarketName',
+				align : 'left',
+				width : 130,
+				editor : {
+					type : 'text'
+				},
+				/* render: function(item) {
+					for (var i in marketName) {
+                        if (marketName[i].meaning == item.toMarketName) {
+                            return marketName[i].description;
+                        }
+                    }
+                    return '';
+		        } */
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.applydate"/>',
+				name : 'applyDate',
+				align : 'middle',
+				width : 130,
+				format: "MM/dd/yyyy",
+				editor : {
+					type : 'date'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvalstatus"/>',
+				name : 'approvalStatus',
+				align : 'middle',
+				width : 130,
+				editor : {
+					type : 'text'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvaldate"/>',
+				name : 'approvalDate',
+				align : 'middle',
+				width : 130,
+				format: "MM/dd/yyyy",
+				editor : {
+					type : 'date'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.remark"/>',
+				name : 'remark',
+				align : 'left',
+				width : 130,
+				format: "MM/dd/yyyy",
+				editor : {
+					type : 'date'
+				}
+			}],
+			url:'${base.contextPath}/mm/marketChange/queryNewMarketChangeFromGds',
+			width : '99%',
+			height : '98%',
+			delayLoad:true,
+			checkbox:true,
+			enabledSort:true,
+			isSingleCheck : true,
+			/* isScroll : true, */
+			/* checkbox : true, */ 
+			onCheckRow:compare,
+			onSuccess:function(){
+			},
+            toolbar: { 
+                items: [
+                    { 
+                        text: '<@spring.message "type.com.lkkhpg.dsis.common.member.change.market.records.to.be.approved"/>',
+                        type:'text'
+                    },
+                    { line: true },
+                    {                   
+                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                        icon: 'save',
+                        menu:{ width: 120, items:
+                                [
+                                    {                   
+                                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                        click:   function (){exportSelected("member_query_form","member_grid",{},_basePath);}
+                                    },
+                                    { line: true },
+                                    {                   
+                                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                        click: function (){exportAll("member_query_form","member_grid",{},_basePath);}
+                                        
+                                    }
+                              ]
+                        }                        
+                    }
+                ]
+            }
+		});
+		
+		/* 变更市场记录grid */
+		window['market_grid_history'] = $("#market_grid_history").ligerGrid({
+			/* pageSizeOptions : [15,20,30,40,50], */
+			columns : [ {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.changeid"/>',
+				name : 'gdsId',
+				align : 'middle',
+				width : 130,
+				editor : {
+					type : 'int'
+				},
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+				name : 'memberCode',
+				align : 'middle',
+				width : 130,
+				isAllowHide: false,
+                render: function (item)
+                {
+                	var data = item.memberId;
+                    var html = '<a href="javascript:toDetailsHtml('+data+')">'+ item.memberCode +'</a>';
+                    return html;
+                },
+				editor : {
+					type : 'text'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.membername"/>',
+				name : 'memberName',
+				align : 'left',
+				width : 130,
+				editor : {
+					type : 'text'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.frommarketid"/>',
+				name : 'fromMarketName',
+				align : 'left',
+				width : 130,
+				editor : {
+					type : 'text'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.tomarketid"/>',
+				name : 'toMarketName',
+				align : 'left',
+				width : 130,
+				editor : {
+					type : 'text'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.applydate"/>',
+				name : 'applyDate',
+				align : 'middle',
+				width : 130,
+				format: "MM/dd/yyyy",
+				editor : {
+					type : 'date'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvalstatus"/>',
+				name : 'approvalStatus',
+				align : 'middle',
+				width : 130,
+				editor : {
+					type : 'text'
+				},
+				render:function(item){
+            		var data = item.approvalStatus;
+            		for(var i = 0;i<marketChangeApprovalStatus.length;i++){
+            			if(data == marketChangeApprovalStatus[i].value){
+            				data =  marketChangeApprovalStatus[i].meaning;
+            					break;
+            			}
+            		}
+            		return data;
+            	}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvaldate"/>',
+				name : 'approvalDate',
+				align : 'middle',
+				width : 130,
+				format: "MM/dd/yyyy",
+				editor : {
+					type : 'date'
+				}
+			}, {
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.remark"/>',
+				name : 'remark',
+				align : 'left',
+				width : 130,
+				format: "MM/dd/yyyy",
+				editor : {
+					type : 'date'
+				}
+			}],
+			url:'${base.contextPath}/mm/marketChange/queryApproving',
+			width : '99%',
+			height : '98%',
+			delayLoad:true,
+			checkbox:false,
+			enabledSort:true,
+			rownumbers:true,
+			checkbox:true,
+			/* checkbox : true, */ 
+			onCheckRow:compare,
+            toolbar: { 
+                items: [
+                    {
+                        text: '<@spring.message "type.com.lkkhpg.dsis.common.member.already.change.market.records.to.be.approved"/>',
+                        type:'text'
+                    },
+                    { line: true },
+                    {                   
+                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                        icon: 'save',
+                        menu:{ width: 120, items:
+                                [
+                                    {                   
+                                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                        click:   function (){exportSelected("member_query_form","market_grid_history",{"approvalStatus":marketChangeApprovalStatus},_basePath);}
+                                    },
+                                    { line: true },
+                                    {                   
+                                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                        click: function (){exportAll("member_query_form","market_grid_history",{"approvalStatus":marketChangeApprovalStatus},_basePath);}
+                                        
+                                    }
+                              ]
+                        }                        
+                    }
+                ]
+            }
+			
+		});
+		
+	function approval(){
+		var selected_datas = liger.get("member_grid").getSelectedRows();
+		var flag = 0;
+		var selected_status = true;
+		var mydate = new Date();
+		var currency_date = mydate.getDate();
+		//var currency_date = 5;
+		var is_approval_date = true;
+		for(var i = 0;i<marketChangeApproveDate.length;i++){
+			if(currency_date == marketChangeApproveDate[i].value){
+				is_approval_date = true;
+			}
+		}
+		/* for(var i=0;i<selected_datas.length;i++){
+			if(selected_datas[i].approvalStatus=='P'){
+				flag++;
+			}
+		}
+		if(flag == selected_datas.length){
+			selected_status = true;
+		} */
+		if(selected_datas!=null&&selected_datas.length==1&&selected_status&&is_approval_date){
+		$.ligerDialog.confirm('<@spring.message "msg.warning.member.confirm_approve"/>', function (yes){
+			  if(yes){
+				submit_approve({
+					grid:liger.get("member_grid"),
+					url:"${base.contextPath}/mm/marketChange/submitApprove",
+				});
+			  }else{
+				 
+			  }
+         });
+		}else{
+			$.ligerDialog.warn('<@spring.message "msg.info.member.choose_approvaing_item"/>');
+		}
+	}
+	
+	function reject(){
+		var selected_datas = liger.get("member_grid").getSelectedRows();
+		var flag = 0;
+		var selected_status = true;
+		for(var i=0;i<selected_datas.length;i++){
+			if(selected_datas[i].approvalStatus=='P'){
+				flag++;
+			}
+		}
+		if(flag == selected_datas.length){
+			selected_status = true;
+		}
+		if(selected_datas!=null&&selected_datas.length==1&&selected_status){
+		$.ligerDialog.confirm('<@spring.message "msg.warning.member.confirm_reject"/>', function (yes){
+			  if(yes){
+				submit_approve({
+					grid:liger.get("member_grid"),
+					url:"${base.contextPath}/mm/marketChange/rejectApprove",
+				});
+			  }else{
+				 
+			  }
+         });
+		}
+	}
+		
+	function submit_approve(options){
+		var datas = options.grid.getSelectedRows();
+		$.ajax({
+			url: options.url,
+			type:"POST",
+			dataType:"json",
+			contentType : "application/json",
+            data : JSON2.stringify(datas),
+            success : function(json) {
+                options.json = json;
+                options.successTip = json.message;
+                Hap.defaultSuccessHandler(options)
+                if(json.success){
+                	
+					$('#newGrid').hide();
+					$('#oldGrid').show();
+					Hap.gridQuery({
+                        form:member_query_form,
+                        grid:market_grid_history
+                    })
+                    liger.get('approve_btn').setDisabled();
+		            liger.get('reject_btn').setDisabled();
+                	member_grid.reload();
+                	$(".l-bar-button.l-bar-btnload",window.parent.document).click();  
+                }
+            },
+            error : function() {
+                $.ligerDialog.closeWaitting();
+            }
+		})
+	}
+	</script>
+</body>
+</html>

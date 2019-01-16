@@ -1,0 +1,168 @@
+<!--[if lt IE 9]>
+        <script src="${base.contextPath}/resources/css/attach/html5shiv.js"></script>
+        <script src="${base.contextPath}/resources/css/attach/respond.min.js"></script>
+            <![endif]-->
+<!--引入CSS-->
+<html>
+ <head>
+  <link rel="stylesheet" type="text/css" href="${base.contextPath}/resources/css/attach/webuploader.css" /> 
+  <link rel="stylesheet" type="text/css" href="${base.contextPath}/resources/css/font-awesome.min.css" />
+  <!-- 引入uploader所需js --> 
+  <script type="text/javascript" src="${base.contextPath}/resources/js/attach/global.js"></script> 
+  <script type="text/javascript" src="${base.contextPath}/resources/js/attach/webuploader.js"></script> 
+  <script type="text/javascript" src="${base.contextPath}/resources/js/attach/jquery-webuploader.js"></script> 
+ </head>
+ <body>
+  <input type="hidden" id="contextPath" name="contextPath" value="${base.contextPath}" /> 
+  <!-- 上传容器 --> 
+  <div id="uploader"> 
+   <!-- 上传按钮 --> 
+   <div class="btns"> 
+    <div id="picker">
+     <i class="icon-cloud-upload"></i><@spring.message "msg.hand.upload.btn.choose_file"/>
+    </div> 
+   </div> 
+   <div id="attach_view_list">
+   </div>
+   <div id="info" style="color: red; display: none"></div>
+  </div> 
+  <!-- 进度条 --> 
+  <script type="text/javascript">
+    jQuery(function() {
+        window['attach_view_list'] = $("#attach_view_list").ligerGrid({
+             columns: [{
+                 display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.images.attachname"/>',
+                 name : 'fileName'
+             },{
+                 display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.sysfile.filesize"/>',
+                 name : 'fileSize'
+             },{
+                 display : '<@spring.message "sys.hand.btn.action"/>',
+                 name : 'op',
+                 render:function(file){
+                     if(file.fileId){
+                         return '<a  target="_blank"  href="${base.contextPath}/sys/attach/file/view?fileId='+ file.fileId + '"><@spring.message "msg.hand.btn.view"/></a>'
+                         + '<a id="del" style="padding-left:20px;" href="javascript:void(0)" onclick="rmfile(\'' + file.fileId + '\',\''+file._token+'\')"> <@spring.message "sys.hand.btn.delete"/></a>'
+                
+                      }
+                }
+             }],
+             enabledEdit: false,
+             height:100,
+             width:500,
+             enabledSort:false,
+             usePager:false
+        });
+        
+        //设置文件上传参数
+        var opts = {
+            contextPath : "${base.contextPath}",//项目上下文 默认
+            uploadPath : '/sys/attach/upload',//上传路径 默认
+            accepts : [ {//可接受的文件
+                title : '<@spring.message "type.com.lkkhpg.dsis.common.config.supply.selecttemplate"/>',
+                extensions : 'html,rptdesign',
+                mimeTypes : 'text/html,application/octet-stream'
+            } ],
+            fileNumlimit : 1,// 队列中文件个数
+            picker : 'picker',//上传按钮,默认就是这个，可以不加
+            uploadSuccess : function(file, response) {//上传完成，情况：可能会错误，可能会成功
+                var isDelete = false;
+                if (file.getStatus() == 'complete') {//上传完成
+                    if (response.message == 'UPLOAD_SUCCESS') {//上传成功
+                        file.setStatus('success');
+                        isDelete = uploadComplete(response.message, file,
+                                response);
+                    } else {//上传失败，服务端返回错误信息
+                        file.setStatus(response.info);
+                        isDelete = uploadComplete(response.message, file,
+                                response);
+                    }
+                } else {
+                    isDelete = uploadComplete(file.getStatus(), file, null);//服务端没有数据
+                }
+                //isDelete为true，则从uploader队列中删除，可以再次点击上传相同的文件
+                return true;
+            },
+            //验证出错
+            validateError : function(status) {
+                validateError(status);
+            },
+            uploadError : function(file) {
+                uploadComplete(file.getStatus(), file, null);
+            }
+        };
+        //创建上传对象
+        var uploader = $.createUploader(opts);
+        //向服务器提交字段
+        uploader.option('formData', {
+            sourceType : $("#file_upload_sourceType").val(),
+            sourceKey : $("#file_upload_sourceKey").val()
+        });
+
+    });
+
+    function addFileToViewList(file) {//添加到html
+        attach_view_list.addRow(file);
+    }
+
+    /*
+    当添加文件validate不通过时，会以派送错误事件的形式通知调用者。
+     目前有以下错误会在特定的情况下派送错来。
+     Q_EXCEED_NUM_LIMIT 在设置了fileNumLimit且尝试给uploader添加的文件数量超出这个值时派送。
+     Q_EXCEED_SIZE_LIMIT 在设置了Q_EXCEED_SIZE_LIMIT且尝试给uploader添加的文件总大小超出这个值时派送。
+     Q_TYPE_DENIED 当文件类型不满足时触发。。
+     */
+    function validateError(code) {
+        var info = $("#info");
+        if (code == 'Q_EXCEED_NUM_LIMIT') {
+            info.text('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.image.tip.onlyonefile"/>');
+        } else if (code == 'Q_EXCEED_SIZE_LIMIT') {
+            info.text('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.image.tip.onlysixteen"/>');
+        } else if (code == 'Q_TYPE_DENIED') {
+            info.text('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.image.tip.errorFileType"/>');
+        } else if (code == 'F_DUPLICATE') {
+            info.text('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.image.tip.repeatFile"/>');
+        }
+        info.css("display", "block");
+    }
+    
+    function uploadComplete(status, file, response) {
+        var info = $("#info");
+        if (status == 'UPLOAD_SUCCESS') {
+            addFileToViewList(response.file);
+            if (onUploadSuccess) {
+                onUploadSuccess(response.file);
+            }
+            //不删除
+            return false;
+        }
+        info.text(status);
+        info.css("display", "block");
+        //删除
+        return true;
+    }
+    //从附件列表中删除此附件
+    function rmfile(id,token) {
+    	var status = liger.get('enabledFlag').getValue();
+    	if(status == 'N'){
+    		return;
+    	}
+    	$.ligerDialog.confirm('<@spring.message "msg.warning.system.delete_or_not_attachment"/>', function (isyes) {
+            if(isyes){
+            	if (onRmSuccess) {
+                    onRmSuccess(id,token);
+                }
+                var list = attach_view_list.rows;
+                for (var i = 0; i < list.length; i++) {
+                    attach_view_list.deleteRow(list[i])
+                }
+                $('#picker').css({'display':'block'});
+            }else{
+                return;
+            }
+        })
+    }
+
+</script> 
+ </body>
+</html>

@@ -1,0 +1,463 @@
+<#--
+        * description: 退款查询界面.
+        * version: 1.0
+        * author:liuxuan
+        * .
+        *
+        -->
+    <#include "../include/head.html">
+        <script src="${base.contextPath}/common/code?isrefundStatus=OM.SALES_STATUS&redundReasonStatus=RM.RETURN_REASON&refundFailStatus=OM.REFUND_FAIL_STATUS"
+                type="text/javascript"></script>
+        <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+        <script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+        <body style="padding: 10px; overflow: hidden;">
+        <form id="d_query_form"></form>
+        <div id="d_query_grid" style="margin: 0; padding: 0"></div>
+        <script type="text/javascript">
+            $(function() {
+                initForm();
+                initGrid();
+                query_return(true);
+                function initForm() {
+                    window['d_query_form'] = $("#d_query_form").ligerForm({
+                        fields : [
+//                            {
+//                                display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.salesOrg"/>',
+//                                name : "salesOrgId",
+//                                newline : false,
+//                                type : "combobox",
+//                                textField: 'name',
+//                                options : {
+//                                    valueField : 'salesOrgId',
+//                                    textField : 'name',
+//                                    url : '${base.contextPath}/sys/salesOrg/queryOrg',
+//                                    isShowCheckBox: false,
+//                                    isMultiSelect: false,
+//                                    cancelable : false,
+//                                    onChangeValue :function (value,text){
+//                                        if (d_query_grid.currentData != null && d_query_grid.currentData.rows.length > 0) {
+//                                            var rows = d_query_grid.currentData.rows;
+//                                            rows.splice(0, rows.length);
+//                                            d_query_grid.reRender();
+//                                        }
+//                                    }
+//                                },
+//                                validate : {
+//                                    required : true
+//                                }
+//                                /* readonly:true */
+//                            },
+                            {
+                                type : 'combobox',
+                                display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.salesorgid"/>',
+                                name: 'salesOrgId',
+                                textField : 'name',
+                                newline : false,
+                                options : {
+                                    value : _salesOrgId,
+                                    valueField : 'salesOrgId',
+                                    textField : 'name',
+                                    url : _basePath + "/sys/salesOrg/queryOrg",
+                                    isMultiSelect : false,
+                                    isShowCheckBox : false,
+                                    onSuccess : function(data) {
+                                        salesOrgMarket = data.rows;
+                                        this.setValue(_salesOrgId);
+                                    },
+                                    onBeforeSelect : function(value,text) {
+                                        if (value != this.getValue()) {
+                                            f_clearForm();
+                                        }
+                                    },
+                                    onSelected : function(value,text) {
+                                        if (!value)
+                                            return false;
+                                        for (var i=0;i<salesOrgMarket.length;i++) {
+                                            if (value == salesOrgMarket[i].salesOrgId) {
+                                                marketId = salesOrgMarket[i].market.marketId;
+                                                break;
+                                            }
+                                        }
+                                        query_return(false);
+                                    }
+                                },
+                                validate : {
+                                    required : true
+                                }
+                            },
+                             {
+                            type :"text",
+                            label :'商品订单号',
+                            name:'outTradeNo',
+                            newline : false
+                            },
+                            { name : 'redundReason', type : 'select', label : '退款原因', newline : false,
+                                options: {
+                                    valueField: 'value',
+                                    textField: 'meaning',
+                                    data: redundReasonStatus
+                                }
+                            },
+                            {
+                                type : 'date',
+                                label : '退货日期从',
+                                name : 'returnDateFrom',
+                                format : "yyyy-MM-dd",
+                                newline : true
+                            },
+                            {
+                                type : 'date',
+                                label : '退货日期至',
+                                name : 'returnDateTo',
+                                format : "yyyy-MM-dd",
+                                newline : false
+                            }],
+                        buttons : [ {
+                            text : '<@spring.message "sys.hand.btn.query"/>',
+                            disabled : false,
+                            width : 60,
+                            click : function() {
+                                query_return(false);
+                            }
+                        },
+                            {
+                                text : '同意退款',
+                                disabled : false,
+                                width : 60,
+                                click : function() {
+                                    var grid = $("#d_query_grid").ligerGrid();
+                                    var selectGrid=grid.getSelectedRows();
+                                    var num = 0;
+                                    for(var i = 0; i < selectGrid.length; i++ ){
+                                        if (selectGrid[i].isrefund == "REFUN" || selectGrid[i].isrefund =="REFU") {
+                                            num = parseInt(num) + 1;
+                                        }
+                                    }
+                                    if(selectGrid.length==0){
+                                        Hap.showSuccess("请选择一行数据进行操作!")
+                                    }else if (parseInt(num) !=selectGrid.length){
+                                        Hap.showSuccess("请选择【退款中】或【拒绝退款】的退款")
+                                    }else if(selectGrid.length!=1){
+                                        Hap.showSuccess("退款每次只能选择一条数据进行操作！")
+                                    }else {
+                                        Hap.showSuccess("请确保货物已经退回收到!")
+                                    $.ajax({
+                                        type: 'POST',
+                                        data:JSON.stringify(selectGrid) ,
+                                        url:_basePath + '/tf/pay/refund/request/submit',
+                                        contentType: "application/json; charset=utf-8",
+                                        success: function (datas) {
+//                                            console.log(datas.rows)
+//                                            for(var i=0;i<datas.rows.size;i++){
+//                                                console.log(datas.rows[i].text)
+//                                            }
+//                                          Hap.showSuccess("退款成功")
+//                                            window['d_query_grid'].reload();
+
+                                            if(datas.code=='true'){
+                                                Hap.showSuccess("退款成功");
+                                                window['d_query_grid'].reload();
+                                            }else {
+                                                Hap.showError("退款失败");
+                                            }
+                                        }
+                                    })
+                                    }
+                                }
+                            },{
+                                text : '拒绝退款',
+                                disabled : false,
+                                width : 60,
+                                click : function() {
+                                    var grid = $("#d_query_grid").ligerGrid();
+                                    var selectGrid=grid.getSelectedRows();
+                                    //var arrNo=[];
+                                    var num = 0;
+                                    for(var i = 0; i < selectGrid.length; i++ ){
+                                        if (selectGrid[i].isrefund == "REFUN") {
+                                            num = parseInt(num) + 1;
+                                        }
+//                                        arrNo.push(selectGrid[i].outTradeNo)
+//                                        console.log("-----------------------")
+//                                        console.log(arrNo)
+                                    }
+                                    if(selectGrid.length==0){
+                                        Hap.showSuccess("请选择一行数据进行操作!")
+                                    }else if (parseInt(num) !=selectGrid.length
+                                    ){
+                                        Hap.showSuccess("请选择退款中的退款")
+                                    }else {
+                                        //console.log("+++++++++++");
+//                                        console.log({arr :arrNo});
+                                        $.ajax({
+                                            type: 'POST',
+                                            data:JSON.stringify(selectGrid) ,
+                                            url:_basePath+'/tf/pay/refund/refuse',
+                                            contentType:'application/json; charset=utf-8',
+                                            success: function (data) {
+                                                   if(data.code=='true'){
+                                                       Hap.showSuccess("拒绝退款成功")
+                                                       window['d_query_grid'].reload();
+                                                   }else {
+                                                    Hap.showError("拒绝退款失败")
+                                                   }
+                                            }
+                                        })
+                                    }
+                                }
+                            }]
+                    });
+                }
+
+                function initGrid(){
+                    window['d_query_grid'] = $("#d_query_grid").ligerGrid({
+                        columns: [
+                            {
+                                name: "outTradeNo",
+                                display: '商品订单号',
+                                width: 140,
+                                type : "text",
+                                isSort:true,
+                                render : function(item) {
+
+                                    //console.log(item.outTradeNo);
+                                    //console.log(item.isrefund);
+//                                    return "<a href='#' onclick='orderInfo("+item.headerId+",\""+item.orderStatus +"\",\""+item.channel+"\")'>"+item.orderNumber+"</a>";
+                                    return "<a href='#' onclick='orderInfo(\""+item.outTradeNo+"\")'>"+item.outTradeNo+"</a>";
+
+                                }
+                            },
+                            {
+                                name: "outRefundNo",
+                                display: '商户退货单号',
+                                width: 140,
+                                type : "text",
+                                isSort:false
+                            },
+//                            {
+//                                name: "transactionId",
+//                                display: '平台交易单号',
+//                                width: 140,
+//                                type : "text",
+//                                isSort:false
+//                            },
+
+//                            {
+//                                name: "partner",
+//                                display: '商户号',
+//                                width: 120,
+//                                type : "text",
+//                                isSort:false
+//                            },
+                            {
+                                name:"creationDate",
+                                display:'退货时间',
+                                width: 100,
+                                type : "date",
+                                isSort:true
+                            },
+                            {
+                                name: "refundFee",
+                                display: '退款金额',
+                                width: 100,
+                                type : "text",
+                                isSort:false
+                            },
+                            {
+                                name: "totalFee",
+                                display: '原订单支付金额',
+                                width: 100,
+                                type : "text",
+                                isSort:false
+                            },
+                            {
+                                name: "oldTotalFee",
+                                display: '订单商品总金额',
+                                width: 100,
+                                type : "text",
+                                isSort:false
+                            },
+                            {
+                                name: "transportFee",
+                                display: '物流费',
+                                width: 100,
+                                type : "text",
+                                isSort:false
+                            },
+                            {
+                              name:"discountAmt",
+                                display: '使用信用额度',
+                              width:100,
+                              type:"text",
+                              isSort: false
+                            },
+                            {
+                                name: "redundReason",
+                                display: '退款原因',
+                                width: 100,
+                                type : "text",
+                                isSort:false,
+                                render : function(item) {
+                                    for (var i = 0; i < redundReasonStatus.length; i++) {
+                                        if (redundReasonStatus[i]['value'] == item.redundReason)
+                                            return redundReasonStatus[i]['meaning']
+                                    }
+   //                                 return item.publishChannel;
+                                }
+                            },
+                            {
+                                name: "serviceType",
+                                display: '服务类型',
+                                width: 100,
+                                type : "text",
+                                isSort:false
+                            },
+                            {
+                                name: "refundExplain",
+                                display: '退款说明',
+                                width: 100,
+                                type : "text",
+                                isSort:false
+                            },
+                            {
+                                name: "isrefund",
+                                display: '是否退款',
+                                width: 100,
+                                type : "text",
+                                isSort:false,
+                                render : function(item) {
+                                    for (var i = 0; i < isrefundStatus.length; i++) {
+                                        if (isrefundStatus[i]['value'] == item.isrefund)
+                                            return isrefundStatus[i]['meaning']
+                                    }
+                                    //                                 return item.publishChannel;
+                                }
+                            },
+                            {
+                                name: "attribute15",
+                                display: '退款失败原由',
+                                width: 120,
+                                type : "text",
+                                isSort:false,
+                                render:function (item) {
+                                    for (var i = 0; i < refundFailStatus.length; i++) {
+                                        if (refundFailStatus[i]['value'] == item.isrefund)
+                                            return refundFailStatus[i]['meaning']
+                                    }
+                                }
+
+                            }
+
+//                            ,
+//                            {
+//                                name: "subpartner",
+//                                display: '二级商户号',
+//                                width: 120,
+//                                type : "text",
+//                                isSort:false
+//                            },
+
+                        ],
+                        toolbar : {
+                            items : [
+//                                {
+//                                    text : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.addorder"/>',
+//                                    click : function() {
+//                                        var path = "${base.contextPath}/om/om_salesreturn_create.html";
+////                                        window.open(path);
+//                                        window.parent.f_addTab("UPDATE_RETURN", '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.update"/>',path);
+//                                        //window.top.f_addTab("ORDER_CREATE",'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.createorder"/>', '${base.contextPath}/om/om_order_create.html');
+//                                    },
+//                                    icon : 'add'
+//                                },
+//                                { line: true },
+                                {
+                                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                                    menu:{ width: 120, items:
+                                        [
+                                            {
+                                                text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                                click:   function (){exportSelected("d_query_form","d_query_grid",{"redundReason":redundReasonStatus ,"isrefund":isrefundStatus},_basePath);}
+                                            },
+                                            { line: true },
+                                            {
+                                                text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                                click: function (){exportDirectAll("d_query_form","d_query_grid",{"redundReason":redundReasonStatus,"isrefund":isrefundStatus},_basePath);}
+
+                                            }
+                                        ]
+                                    }
+                                }]
+                        },
+                        width : '99%',
+                        height : '98%',
+                        url : '${base.contextPath}/tf/pay/refund/request/query',
+                        delayLoad: true,
+                        enabledEdit : true,
+                        checkbox : true,
+                        sortName: 'outTradeNo',
+                        sortOrder: 'desc'
+                });
+                }
+
+            });
+
+
+
+            /*清空Form*/
+            function f_clearForm() {
+                liger.get("outTradeNo").setValue('');
+                liger.get("redundReason").setValue('');
+            }
+
+            /*查询 flag-true 表示页面初始化加载*/
+            function query_return(flag) {
+                if (!flag) {
+                    if(!Hap.validateForm(d_query_form)) {
+                        return false;
+                    }
+                }
+                Hap.gridQuery({
+                    form : d_query_form,
+                    grid : d_query_grid
+                });
+            }
+            /*退款明细*/
+
+            function orderInfo(outTradeNo){
+                var headerId='';
+                $.ajax({
+                    url: "${base.contextPath}/om/orderInfo/headerId",
+                    data:{ orderNumber:outTradeNo},
+                    type:"POST",
+                    success : function(data) {
+                        headerId=data.rows[0].headerId;
+                        window.top.f_removeTab('ORDER_INFO');
+                        debugger;
+                        window.top.f_addTab('ORDER_INFO', '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.orderinfo"/>', '${base.contextPath}/om/om_order_detail.html?orderId=' + headerId);
+//                        $.ajax({
+//                            url: "${base.contextPath}/om/om_order_info?orderId=" + headerId,
+//                          //  url: "${base.contextPath}/om/om_order_info_refund?orderId=" + headerId,
+//                            type:"POST",
+//                            success : function(data) {
+//                                if(data){
+////                            if ("ORDER_CREATE" == data.tabId && window.top.tab.isTabItemExist('ORDER_CREATE')) {
+////                                $.ligerDialog.warn('<@spring.message "msg.warn.om.order_tab_exists"/>',function(){
+////                                    window.top.tab.selectTabItem('ORDER_CREATE');
+////                                });
+////                                return;
+////                            } else if ("ORDER_INFO" == data.tabId){
+////                                window.top.f_removeTab('ORDER_INFO');
+////                            }
+//                                    window.top.f_addTab(data.tabId, data.title, '${base.contextPath}' + data.url);
+//                                }
+//                            }
+//                        });
+                    }
+                });
+            }
+
+        </script>
+
+        </body>
+        </html>

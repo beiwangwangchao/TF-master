@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- ~ Copyright LKK Health Products Group Limited -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.job.mapper.JobDetailMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.job.dto.JobDetailDto">
+        <id column="SCHED_NAME" property="schedName" jdbcType="VARCHAR"/>
+        <id column="JOB_NAME" property="jobName" jdbcType="VARCHAR"/>
+        <id column="JOB_GROUP" property="jobGroup" jdbcType="VARCHAR"/>
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR"/>
+        <result column="JOB_CLASS_NAME" property="jobClassName"
+                jdbcType="VARCHAR"/>
+        <result column="IS_DURABLE" property="isDurable" jdbcType="VARCHAR"/>
+        <result column="IS_NONCONCURRENT" property="isNonconcurrent"
+                jdbcType="VARCHAR"/>
+        <result column="IS_UPDATE_DATA" property="isUpdateData"
+                jdbcType="VARCHAR"/>
+        <result column="REQUESTS_RECOVERY" property="requestsRecovery"
+                jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="InfoResultMap" extends="BaseResultMap"
+               type="com.lkkhpg.dsis.platform.job.dto.JobInfoDetailDto">
+        <result column="JOB_RESULT" property="jobResult" jdbcType="VARCHAR"/>
+        <result column="JOB_STATUS" property="jobStatus" jdbcType="VARCHAR"/>
+        <result column="JOB_STATUS_MESSAGE" property="jobStatusMessage"
+                jdbcType="VARCHAR"/>
+        <result column="TRIGGER_NAME" property="triggerName" jdbcType="VARCHAR"/>
+        <result column="TRIGGER_GROUP" property="triggerGroup"
+                jdbcType="VARCHAR"/>
+        <result column="PREVIOUS_FIRE_TIME" property="previousFireTime"
+                jdbcType="TIMESTAMP"/>
+        <result column="FIRE_TIME" property="fireTime" jdbcType="TIMESTAMP"/>
+        <result column="NEXT_FIRE_TIME" property="nextFireTime"
+                jdbcType="TIMESTAMP"/>
+        <result column="REFIRE_COUNT" property="refireCount" jdbcType="DECIMAL"/>
+        <result column="FIRE_INSTANCE_ID" property="fireInstanceId"
+                jdbcType="VARCHAR"/>
+        <result column="SCHEDULER_INSTANCE_ID" property="schedulerInstanceId"
+                jdbcType="VARCHAR"/>
+        <result column="SCHEDULED_FIRE_TIME" property="scheduledFireTime"
+                jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        SCHED_NAME, JOB_NAME, JOB_GROUP, DESCRIPTION, JOB_CLASS_NAME, IS_DURABLE,
+        IS_NONCONCURRENT,
+        IS_UPDATE_DATA, REQUESTS_RECOVERY
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.platform.job.dto.JobDetailDto">
+        select
+        <include refid="Base_Column_List"/>
+        from qrtz_job_details
+        where SCHED_NAME = #{schedName,jdbcType=VARCHAR}
+        and JOB_NAME = #{jobName,jdbcType=VARCHAR}
+        and JOB_GROUP = #{jobGroup,jdbcType=VARCHAR}
+    </select>
+    <select id="selectJobDetails" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.platform.job.dto.JobDetailDto">
+        select
+        <include refid="Base_Column_List"/>
+        from qrtz_job_details
+        <where>
+            <if test="schedName != null">
+                sched_name = #{schedName,jdbcType=VARCHAR}
+            </if>
+            <if test="jobName != null">
+                AND job_name = #{jobName,jdbcType=VARCHAR}
+            </if>
+            <if test="jobGroup != null">
+                AND job_group = #{jobGroup,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    <select id="selectJobInfoDetails" resultMap="InfoResultMap"
+            parameterType="com.lkkhpg.dsis.platform.job.dto.JobDetailDto">
+        SELECT
+        i.scheduled_fire_time,
+        i.FIRE_TIME,
+        i.NEXT_FIRE_TIME,
+        i.PREVIOUS_FIRE_TIME,
+        i.TRIGGER_NAME,
+        i.TRIGGER_Group,
+        i.JOB_STATUS,
+        i.JOB_STATUS_MESSAGE,
+        i.JOB_RESULT,
+        j.JOB_NAME,
+        j.JOB_GROUP,
+        j.DESCRIPTION,
+        JOB_CLASS_NAME
+        FROM
+        (
+        SELECT
+        q.JOB_NAME,
+        max(s.SCHEDULED_FIRE_TIME) scheduled_fire_time
+        FROM QRTZ_JOB_DETAILS q, SYS_JOB_RUNNING_INFO s
+        WHERE s.JOB_NAME (+) = q.JOB_NAME AND s.JOB_GROUP (+) = q.JOB_GROUP
+        GROUP BY q.JOB_NAME, q.JOB_GROUP, q.DESCRIPTION) w, QRTZ_JOB_DETAILS j, SYS_JOB_RUNNING_INFO i
+        <where>
+            w.JOB_NAME = j.JOB_NAME
+            AND w.JOB_NAME = i.JOB_NAME (+)
+            AND w.scheduled_fire_time = i.SCHEDULED_FIRE_TIME (+)
+            <if test="schedName != null">
+                j.sched_name = #{schedName,jdbcType=VARCHAR}
+            </if>
+            <if test="jobName != null">
+                AND j.job_name = #{jobName,jdbcType=VARCHAR}
+            </if>
+            <if test="jobGroup != null">
+                AND j.job_group = #{jobGroup,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by j.job_name asc
+    </select>
+</mapper>

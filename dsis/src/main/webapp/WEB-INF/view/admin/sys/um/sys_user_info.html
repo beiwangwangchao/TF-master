@@ -1,0 +1,452 @@
+<#--
+ * description: 用户资料详情界面
+ * version: 1.0 
+ * author:guanghui.liu
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../../include/head.html">
+<style>
+    #form_title {
+        margin: 0;
+        padding: 0;
+        width:99%;
+        height:29px;
+        background-color:#F0F0F0;
+        border:1px solid #D6D6D6;
+    }
+    #form_title p {
+        padding-left: 25px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+     #d_um_001_form {
+         border-bottom: 1px solid #D6D6D6;
+         padding: 7px;
+     }
+</style>
+<body style="padding: 10px;">
+    <script src="${base.contextPath}/common/code?userTypeData=SYS.USER_TYPE&userStatusData=SYS.USER_STATUS&memberInquiryData=SYS.MEMBER_INQUIRY&telCountryCode=SYS.TEL_COUNTRY_CODE&allAdminData=SYS.ADMIN_MANAGEMENT" type="text/javascript"></script>
+    <div id="form_title">
+        <p><@spring.message 'type.com.lkkhpg.dsis.common.user.userdetail'/></p>
+    </div>
+    <form id="d_um_001_form" autocomplete="off"></form>
+    <script type="text/javascript">
+        //选取用户类型时候
+        function selectUserType(newKey, newValue) {
+            var memberId = $.ligerui.get("memberId");
+            var chineseName = $.ligerui.get("chineseName");
+            var englishName = $.ligerui.get("englishName");
+            var email = $.ligerui.get("emailInMainPage");//这两个字段通过ligeruiid获取,因为popup里有同名的
+            var phoneNo = $.ligerui.get("phoneNoInMainPage");//这两个字段通过ligeruiid获取,因为popup里有同名的
+            var areaCode = $.ligerui.get("areaCode");
+            if ("INNER" == newKey) {
+                chineseName.setValue("");
+                englishName.setValue("");
+                email.setValue("");
+                phoneNo.setValue("");
+                areaCode.setValue("");
+                memberId.setValue("");
+                memberId.setText("");
+                
+                <#if accessService.access("EDITABLE") != false>
+	                email.setEnabled(true);
+	                phoneNo.setEnabled(true);
+	                areaCode.setEnabled(true);
+	                phoneNo.setEnabled(true);
+	                memberId.setDisabled(true);
+	                chineseName.setDisabled(true);
+	                englishName.setDisabled(true);
+	                //动态验证-移除必填验证
+	                d_um_001_form.setFieldValidate("memberId", {required : false});
+	                //添加邮箱的必填验证
+	                d_um_001_form.setFieldValidate("emailInMainPage", {required : true});
+                </#if> 
+                
+            } else if ("IPONT" == newKey) {
+                memberId.setValue("");
+                memberId.setText("");
+                chineseName.setValue("");
+                englishName.setValue("");
+                email.setValue("");
+                phoneNo.setValue("");
+                areaCode.setValue("");
+                
+                <#if accessService.access("EDITABLE") != false>
+                //这4条自动填充--start
+                chineseName.setDisabled(true);
+                englishName.setDisabled(true);
+                email.setDisabled(true);
+                phoneNo.setDisabled(true);
+                areaCode.setDisabled(true);
+                //这4条自动填充--end
+                chineseName.setDisabled(true);
+                englishName.setDisabled(true);
+                memberId.setEnabled(true);
+                //动态验证-添加必填验证
+                d_um_001_form.setFieldValidate("memberId", {required : true});//可接第三个参数message
+                </#if> 
+                
+//                 //移除邮箱的必填验证
+//                 d_um_001_form.setFieldValidate("emailInMainPage");
+                <#if RequestParameters.status ?exists>
+                    <#if !_marketId ??>
+                        $.ligerDialog.error("<@spring.message 'msg.error.um.user_have_no_marketid'/>", $l("sys.hand.tip.info"),
+                                function(){
+                                    //设置下拉框的默认值为内部用户,从快速编码中获取
+                                    for (var i = 0; i < userTypeData.length; i++) {
+                                        if ("INNER" == userTypeData[i].value) {
+                                            $.ligerui.get("userType").setValue(userTypeData[i].value);
+                                            break;
+                                        }
+                                    }
+                                }
+                        );
+                        return;
+                    </#if>
+                </#if>
+            }
+        }
+
+        //选取会员时候，对用户信息赋值
+        function selectMember(newValue) {
+            var newValueObj = {
+                chineseName : newValue.data[0].chineseName == null ? "" : newValue.data[0].chineseName,
+                englishName : newValue.data[0].englishName == null ? "" : newValue.data[0].englishName,
+                email : newValue.data[0].email == null ? "" : newValue.data[0].email
+            };
+            newValueObj.areaCode = newValue.data[0].areaCode == null ? "" : newValue.data[0].areaCode;
+            newValueObj.phoneNo = newValue.data[0].phoneNo == null ? "" : newValue.data[0].phoneNo;
+            d_um_001_form.setData(newValueObj);
+        }
+        
+        //点击提交按钮事件处理方法
+        function save(){
+            //提交前校验-------------------start
+            var form = new liger.get("d_um_001_form");
+            var data = form.getData();
+            //所有校验之前，先做一个特殊校验
+            if(data.userType == "IPONT" && (data.email == null || data.email == "")){
+                $.ligerDialog.error("<@spring.message 'msg.error.um.ipoint_member_email_not_null'/>", $l("sys.hand.tip.info"));
+                return;
+            }
+            if(!Hap.validateForm(form)) return;
+            var nameReg = /^[A-Za-z0-9]{4,20}$/;
+            var emailReg = /^([\s\S]*)+@([\S\s]*)+(\.([\S\s]*)+)+$/;
+            var phoneReg = /^[0-9]{1,14}$/;
+            var passwordReg = /^[0-9]{8}$/;
+            //userType/memberId/status来自于选择，无需校验
+            if (nameReg.test(data.loginName) == false) {
+                $.ligerDialog.error("<@spring.message 'msg.error.system.user.loginname.format.not.correct'/>", $l("sys.hand.tip.info"));
+                return;
+            }
+            if(data.userName == ""){
+                $.ligerDialog.error("<@spring.message 'msg.error.system.username.is.empty'/>", $l("sys.hand.tip.info"));
+                return;
+            }
+            if (phoneReg.test(data.phoneNo) == false) {
+                $.ligerDialog.error("<@spring.message 'msg.error.system.user.phone.format.not.correct'/>", $l("sys.hand.tip.info"));
+                return;
+            }
+            if (data.areaCode == "") {
+                $.ligerDialog.error("<@spring.message 'msg.error.system.user.areacode.is.empty'/>", $l("sys.hand.tip.info"));
+                return;
+            }
+            //管理员修改资料时,检测是否修改了密码
+            if (condition == 3 && $.ligerui.get("password").getValue() != "" && $.ligerui.get("password").getValue() != null) {
+                if (passwordReg.test(data.password) == false) {
+                    $.ligerDialog.error("<@spring.message 'msg.error.system.user.tmppassword.format.not.correct'/>", $l("sys.hand.tip.info"));
+                    return;
+                }
+            }
+            //提交前校验-------------------end
+            //特别的,会员ID字段的验证在用户类型是ipoint用户时是必输的,而在其他情况是要置为空的
+            if ("IPONT" == data.userType) {
+                if (data.memberId == "" || data.memberId == null) {
+                    $.ligerDialog.error("IPOINT用户必须关联会员ID,请先关联会员ID.", $l("sys.hand.tip.info"));
+                    return;
+                }
+            } else if(data.userType == "INNER"){//另外，ipoint用户无需验证邮箱
+                if (emailReg.test(data.email) == false) {
+                    $.ligerDialog.error("<@spring.message 'msg.error.system.user.email.format.not.correct'/>", $l("sys.hand.tip.info"));
+                    return;
+                }
+            }
+            var ajaxUrl = "";
+            if (2 == condition) {//管理员创建
+                ajaxUrl = "${base.contextPath}/sys/um/insertIpointUser";//insert
+            } else if (1 == condition || 3 == condition) {//普通用户或管理员修改
+                ajaxUrl = "${base.contextPath}/sys/um/updateUserInfo";//update
+            }
+            //防止狂点发多次请求
+            if(conn && conn.readyState != 4) return;
+            //提交ajax
+            conn = $.ajax({
+                type : "POST",
+                url : ajaxUrl,
+                contentType : "application/json",
+                data : JSON2.stringify(data),
+                dataType : "json",
+                success : function(data) {
+                    if(data.success){
+                        if(condition == 2){
+                            var userId = data.rows[0].userId,
+                                userType = data.rows[0].userType;
+                            $.ligerDialog.success("<@spring.message 'msg.infor.dm.save_success'/>", $l("sys.hand.tip.info"), function() {
+                                parent.f_addTab("sys_user_"+userId,"<@spring.message 'type.com.lkkhpg.dsis.common.user.userdetail'/>","${base.contextPath}/sys/um/sys_user_info.html?userId="+userId+"&userType="+userType);
+                                window.top.f_removeTab("sys_user_create");
+                            });
+                            return;
+                        }
+                        $.ligerDialog.success("<@spring.message 'msg.infor.dm.save_success'/>", $l("sys.hand.tip.info"), function() {
+                            location.reload();  
+                        });
+                    }
+                }
+            });
+        }
+        
+        //初始化页面-填充数据变更dom元素状态
+        function initPage(){
+            //取得url中的status参数,如果没有,方法自动将status赋值为""
+            status = "${RequestParameters.status!''}";
+            //如果页面跳转带来userId，则请求数据并页面填值
+            var userId = "${RequestParameters.userId!''}";
+            var userType = "${RequestParameters.userType!''}";
+            var initData = {};
+            initData.password = "";//初始值设为空，如果要修改就需要重新填
+            if (userId != "" && userId != null) {
+                $.ajax({
+                    type : "POST",
+                    url : "${base.contextPath}/sys/um/getSingleUser",
+                    data : {
+                        userId : userId,
+                        userType : userType
+                    },
+                    dataType : "json",
+                    success : function(data) {
+                        initData = data.rows[0];
+                        //填充数据
+                        var form = new liger.get("d_um_001_form");
+                        initData.password = "";
+                        form.setData(initData);
+                        if ("IPONT" == userType) {//ipoint用户额外显示这个popup的值
+                            initData.memberId = data.rows[0].memberId;
+                            $.ligerui.get("memberId").setText(data.rows[0].memberNumber);
+                        }
+                        $.ligerui.get("userType").setDisabled(true);//编辑资料时无法修改用户类型
+                    }
+                });
+            }
+            //判断三种状态
+            if ($.inArray(roleCode, allAdmin) < 0) {//普通用户修改资料
+                condition = 1;
+                $.ligerui.get("userType").setDisabled(true);
+                $.ligerui.get("memberId").setDisabled(true);
+                $.ligerui.get("loginName").setDisabled(true);
+                if ("IPONT" == userType) {//如果是ipoint用户将不能修改中文名和英文名
+                    //此处很容易出错,判断条件不能有值来自于ajax,因为异步数据此时很可能在这儿为空
+                    $.ligerui.get("memberId").setText("memberId");
+                    $.ligerui.get("chineseName").setDisabled(true);
+                    $.ligerui.get("englishName").setDisabled(true);
+                }
+            } else { //说明当前用户的roleCode是admin的一种
+                if ("create" == status) {//2.管理员创建新用户
+                    condition = 2;
+                    //设置下拉框的默认值为内部用户,从快速编码中获取
+                    for (var i = 0; i < userTypeData.length; i++) {
+                        if ("INNER" == userTypeData[i].value) {
+                            $.ligerui.get("userType").setValue(userTypeData[i].value);
+                            break;
+                        }
+                    }
+                    $.ligerui.get("status").setValue("ACTV");
+                    $.ligerui.get("status").setText('<@spring.message "sys.hand.btn.new"/>');
+                    $.ligerui.get("status").setDisabled(true);
+                    //新建用户时,临时口令不可编辑
+                    if($.ligerui.get("password")){
+                        $.ligerui.get("password").setDisabled(true);
+                    }
+                } else {//3.管理员修改资料--此时用户状态只能选有效和失效
+                    condition = 3;
+                    $.ligerui.get("loginName").setDisabled(true);
+                }
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        //全局变量==========================================================start
+        //此处应先获取当前用户的角色信息和动作,因角色信息和动作有三种不同处理,包括:
+        //--1.普通用户修改资料
+        //--2.管理员创建新用户
+        //--3.管理员修改资料
+        var roleCode = null;//当前用户的角色code
+        var status = "";//动作,包括新建和修改,页面跳转时传值
+        //标记是哪种情况
+        var condition = "0";
+        var conn = null;
+        var allAdmin = [];//所有管理员权限的code
+        
+        //js初始化页面
+        $(function() {
+            window['d_um_001_form'] = $("#d_um_001_form").ligerForm({
+                fields : [
+                    {
+                        name : 'userType',
+                        type : 'select',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.usertype"/>',
+                        options : {
+                            cancelable: false,
+                            valueField : "value",
+                            textField : "meaning",
+                            data : userTypeData,
+                            onSelected : selectUserType
+                        },
+                        validate : { required : true }
+                    },
+                    {
+                        name : 'memberId',
+                        type : "popup",
+                        label : '<@spring.message "type.com.lkkhpg.dsis.common.user.dto.userinfo.memberid"/>',
+                        newline : false,
+                        textField:'memberNumber',
+                        options: (function(){
+                            var options = ${lovService.getLov(base.contextPath, base.locale, "lov_member")};
+                            options.onSelected = selectMember;
+                            options.onLoadData = function(){
+                                this.setParm('status', "ACTV");
+                                <#if RequestParameters.status ?exists>
+                                    <#if _marketId ??>
+                                        this.setParm('marketId', "${_marketId}");
+                                    </#if>
+                                </#if>
+                            };
+                            return options;
+                        })()
+                    },
+                    {
+                        name : 'status',
+                        type : 'select',
+                        <#if accessService.access("STATUS_EDITABLE") == false>
+                        readonly: true,
+                        </#if>
+                        label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.status"/>',
+                        options : {
+                            autocomplete: false,
+                            cancelable: false,
+                            valueField : "value",
+                            textField : "meaning",
+                            data : userStatusData
+                        }
+                    },
+                    {
+                        name : 'loginName',
+                        type : 'text',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.account.loginname"/>',
+                        newline : false,
+                        attr : { placeHolder : '<@spring.message "type.com.lkkhpg.dsis.common.user.loginname_format_prompt"/>' },
+                        validate : { required : true }
+                    },
+                    {
+                        name : 'userName',
+                        type : 'text',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.username"/>',
+                        validate : { required : true }
+                    },
+                    {
+                        name : 'chineseName',
+                        type : 'text',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.common.user.dto.userinfo.chname"/>',
+                        newline : false
+                    },
+                    {
+                        name : 'englishName',
+                        type : 'text',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.common.user.dto.userinfo.enname"/>'
+                    },
+                    {
+                        name : 'email',
+                        id : 'emailInMainPage',
+                        type : 'text',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.email"/>',
+                        newline : false
+                    },
+                    {
+                        name : 'areaCode',
+                        type : 'select',
+                        label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.phone"/>',
+                        attr : { placeHolder : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.countrycode"/>' },
+                        width : 50,
+                        space : 3,
+                        options: {
+                            valueField: "value",
+                            textField: "meaning",
+                            data: telCountryCode
+                        },
+                        validate: { required: true }
+                    },
+                    {
+                        name : 'phoneNo',
+                        id : 'phoneNoInMainPage',
+                        type : 'text',
+                        label : '-',
+                        labelWidth: 3,
+                        width : 119,
+                        newline : false,
+                        afterContent : '<input name="avoidAuto" autocomplete="off" style="display:none"/><input type="password" style="display:none"/>',
+                        validate : { required : true }
+                    },
+                    { name : 'userId', type : 'hidden' },
+                    { name : 'condition', type : 'hidden' },
+                    {
+                        name : 'password',                        
+                        <#if accessService.access("TEMP_PASSWORD_VISIBLE")>
+                        type : 'password',
+                        <#else>
+                        type : 'hidden',
+                        </#if>
+                        newline : false,
+                        label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.tmppassword"/>',
+                        afterContent : '<input name="avoidAuto" autocomplete="off" style="display:none"/><input type="password" style="display:none"/>'
+                    }
+                    
+                ], buttons : [ 
+                    {
+                        id:'saveInfo', text : '<@spring.message "sys.hand.btn.submit"/>', disabled : false, width : 60,
+                        click : function() {
+                            save();
+                        }
+                    }
+                ]
+            });
+            
+            //处理得到更合适匹配的allAdmin
+            for (var i = 0; i < allAdminData.length; i++) {
+                /*将取到的value值小写 容易造成用户操作的混乱  修改为直接取查到的值*/
+                /*allAdmin.push(allAdminData[i].value.toLowerCase());*/
+                allAdmin.push(allAdminData[i].value);
+            }
+            //使用session中的roleId获取到roleCode
+            $.ajax({
+                type : "POST",
+                url : "${base.contextPath}/sys/role/query",
+                data : {
+                    roleId : ${roleId}
+                },
+                dataType : "json",
+                success : function(data) {
+                    if(data.success){
+                        roleCode = data.rows[0].roleCode;
+	                    //初始化页面-填充数据变更dom元素状态
+	                    initPage();
+                    }
+                }
+            });            
+            
+            <#if accessService.access("EDITABLE") == false>
+            	window['d_um_001_form'].setEditable(false);
+            </#if>
+        });
+    </script>
+</body>
+</html>

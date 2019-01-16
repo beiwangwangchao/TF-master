@@ -1,0 +1,195 @@
+<#-- 
+ * description: 税管理月度查询（台湾）. 
+ * version: 1.0 
+ * author: lin.gu@hand-china.com 
+ * CopyrightLKK Health Products Group Limited. 
+ * 
+--> 
+<#include "../include/head.html">
+<script
+	src="${base.contextPath}/common/code?releaseType=BM.REALEASE_STATUS&bonusType=BM.RE_BONUS_TYPE&monthTaxType=BM.MONTH_TAX_TYPE&monthTaxStatus=BM.MONTH_TAX_STATUS"
+	type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<body>
+	<form id="tax_month_form"></form>
+	<div id="tax_month_grid"></div>
+	
+	<script type="text/javascript">
+		$(function(){
+			intiForm();
+			liger.get("tax_month_formmarketId").setValue(_marketId);
+	        liger.get("tax_month_formmarketId").setText(_marketName);
+			initGrid(initColums());
+		});
+		
+		function intiForm(){
+			window['tax_month_form'] = $("#tax_month_form").ligerForm({
+				prefixID:'tax_month_form',
+				fields : [{
+			    	display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+			    	name : "marketId",
+			    	newline : false,
+			    	type : "combobox",
+			    	textField: 'name',
+		            readonly:true
+			    }, 
+				{
+		            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.memberid"/>',
+		            name : "memberCode",
+		            newline: true,
+		            type : "popup",
+		            textField:'memberCode',
+		            options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+		             	onLoadData: function(){
+		                this.setParm('marketId', _marketId)
+		            } ,
+		              	onChangeValue: function(){
+		                this.setParm('marketId', _marketId)
+		            }  
+		        	},{parms:{"marketId" : _marketId}})
+		        },
+		        {
+		            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.tax.query.month"/>',
+		            name : "periodName",
+		            newline: false,
+		            type : 'select',
+		            options : {
+		                valueField : 'periodName',
+		                textField : 'periodName',
+		                url : '${base.contextPath}/bm/bonusfinal/getPeriod?marketId=' + _marketId
+		            }
+		        }/* ,
+		        {
+		            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonustype"/>',
+		            name : "bonusType",
+		            newline: false,
+		            type : "select",
+		            options : {
+		                valueField : 'value',
+		                textField : 'meaning',
+		                data : bonusType
+		            }
+		        } */],
+		        buttons : [ {
+		        	text : '<@spring.message "sys.hand.btn.query"/>',
+		            width : 60,
+		            click : function() {
+		                 Hap.gridQuery({
+		                     form : tax_month_form,
+		                     grid : tax_month_grid
+		                 })
+		            }
+		        }]
+			});
+		}
+		
+		function initColums(){
+			var columns =[
+				{
+					display:'<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.tax.month_type"/>',
+		            name:"monthTaxType",
+		            width : 120,
+		            render: function(item) {
+					    for (var i = 0; i < monthTaxType.length; i++) {
+					        if (monthTaxType[i].value == item.monthTaxType) {
+					            return monthTaxType[i].meaning;
+					        }
+					    }
+					}
+				},
+				{
+					display:'<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.memberid"/>',
+		            name:"memberCode",
+		            width : 120,
+				},
+				{
+		            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.membername"/>',
+		            name : 'memberName',
+		            width : 120,
+		        },
+		        {
+		        	display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.crc"/>',
+		        	name : 'idNumber',
+		        	width : 120
+		        },
+		        {
+		        	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonusperiod"/>',
+		            name : 'periodName',
+		            width : 120
+		        },
+		        {
+		        	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonustype"/>',
+					name : 'bonusType',
+					width : 120,
+					render: function(item) {
+					    for (var i = 0; i < bonusType.length; i++) {
+					        if (bonusType[i].value == item.bonusType) {
+					            return bonusType[i].meaning;
+					        }
+					    }
+					}
+		        },
+		        {
+		        	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.amount"/>',
+					name : 'preTaxAmt',
+					width : 120
+		        },
+		        {
+		        	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.nhi"/>',
+		            name : 'clearTaxAmt03',
+		            width : 100
+		        },
+		        {
+		        	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.status"/>',
+					name : 'monthTaxStatus',
+					width : 80,
+					render: function(item) {
+					    for (var i = 0; i < monthTaxStatus.length; i++) {
+					        if (monthTaxStatus[i].value == item.monthTaxStatus) {
+					            return monthTaxStatus[i].meaning;
+					        }
+					    }
+					}
+		        }
+			];
+			return columns;
+		}
+		
+		function initGrid(columns){
+			window['tax_month_grid'] = $("#tax_month_grid").ligerGrid({
+				columns : columns,
+				url:"${base.contextPath}/bm/tax/query/month",
+	            enabledEdit :false,
+	            resizable: false,  
+	            delayLoad :true,
+	            width : '99%',
+	            height : '98%',
+	            pageSize :20,
+	            toolbar:{
+	            	items : [
+	            		{
+	            			text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.report_download"/>',
+	            			icon: 'save',
+	            			click : function() {
+	            				$.ligerDialog.open({
+	            					id : 'dialog1',
+	            					height : 350,
+	            					width : 450,
+	            					title : '<@spring.message "sys.hand.btn.query"/>',
+	            					url : 'bm_tax_query_month_rpt.html',
+	            					showMax : false,
+	            					showToggle : true,
+	            					showMin : false,
+	            					isResize : true,
+	            					slide : false,
+	            					center : 0
+	            				});
+	            			}
+	            		}
+	            	]
+	            }
+			});
+		}
+	</script>
+</body>
+</html>

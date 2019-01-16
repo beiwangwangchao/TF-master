@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.user.mapper.UserRelationMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.user.dto.UserRelation"
+        extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD">
+        <id column="USER_ID" property="userId" jdbcType="DECIMAL" />
+        <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+        <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.user.dto.UserRelation">
+        insert into sys_user_add
+        (USER_ID, MEMBER_ID, COMPANY_ID,
+        OBJECT_VERSION_NUMBER, REQUEST_ID,
+        PROGRAM_ID,
+        CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3,
+        ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+        )
+        values
+        (#{userId,jdbcType=DECIMAL}, #{memberId,jdbcType=DECIMAL},
+        #{companyId,jdbcType=DECIMAL},
+        1, #{requestId,jdbcType=DECIMAL},
+        #{programId,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP,
+        #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP,
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR},
+        #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR},
+        #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR},
+        #{attribute6,jdbcType=VARCHAR},
+        #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR},
+        #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR},
+        #{attribute12,jdbcType=VARCHAR},
+        #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="update" parameterType="com.lkkhpg.dsis.common.user.dto.UserRelation">
+        update sys_user_add
+        set USER_ID
+        = #{userId,jdbcType=DECIMAL},
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+        COMPANY_ID = #{companyId,jdbcType=DECIMAL},
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+        REQUEST_ID =
+        #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID =
+        #{programId,jdbcType=DECIMAL},
+        CREATION_DATE = CURRENT_TIMESTAMP,
+        CREATED_BY =
+        #{createdBy,jdbcType=DECIMAL},
+        LAST_UPDATED_BY =
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        LAST_UPDATE_LOGIN =
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        ATTRIBUTE_CATEGORY =
+        #{attributeCategory,jdbcType=VARCHAR},
+        ATTRIBUTE1 =
+        #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 =
+        #{attribute2,jdbcType=VARCHAR},
+        ATTRIBUTE3 =
+        #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 =
+        #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 =
+        #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 =
+        #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 =
+        #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 =
+        #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 =
+        #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 =
+        #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 =
+        #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 =
+        #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 =
+        #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 =
+        #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 =
+        #{attribute15,jdbcType=VARCHAR}
+        where USER_ID =
+        #{userId,jdbcType=DECIMAL}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM
+        SYS_USER_ADD
+        WHERE USER_ID = #{userId,jdbcType=DECIMAL}
+    </delete>
+
+    <select id="selectUserRelation" resultMap="BaseResultMap"
+        parameterType="java.lang.Long">
+        select user_id,member_id,company_id from sys_user_add
+        where 1=1
+        <if test="userId != null">
+            and user_id = #{userId,jdbcType=VARCHAR}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.mws.mapper.MyTeamMapper" >
+  <resultMap type="com.lkkhpg.dsis.mws.dto.MyTeam" id="BaseResultMap">
+      <result column="period" property="period" jdbcType="VARCHAR" />
+      <result column="dealer_no" property="dealerNo" jdbcType="VARCHAR" />
+      <result column="sponsor_no" property="sponsorNo" jdbcType="VARCHAR" />
+      <result column="sale_org_code" property="saleOrgCode" jdbcType="VARCHAR" />
+      <result column="lever_no" property="leverNo" jdbcType="DECIMAL" />
+      <result column="pv" property="pv" jdbcType="DECIMAL" />
+      <result column="gv" property="gv" jdbcType="DECIMAL" />
+      <result column="ref_card_cnt" property="refCardCnt" jdbcType="DECIMAL" />
+      <result column="total_ref_card_cnt" property="totalRefCardCnt" jdbcType="DECIMAL" />
+      <result column="acc_tt" property="accTt" jdbcType="DECIMAL" />
+      <result column="tt" property="tt" jdbcType="DECIMAL" />
+      <result column="tt_local_lbcnt" property="ttLocalLbcnt" jdbcType="DECIMAL" />
+      <result column="tt_local_lbgv" property="ttLocalLbgv" jdbcType="DECIMAL" />
+      <result column="tt_basic" property="ttBasic" jdbcType="DECIMAL" />
+      <result column="tt_ref_card" property="ttRefCard" jdbcType="DECIMAL" />
+      <result column="tt_qualifiedleg" property="ttQualifiedleg" jdbcType="DECIMAL" />
+      <result column="calc_sponsor_no" property="calcSponsorNo" jdbcType="VARCHAR" />
+      <result column="calc_level_no" property="calcLevelNo" jdbcType="DECIMAL" />
+      <result column="comments" property="comments" jdbcType="VARCHAR" />
+      <result column="last_updated_time" property="lastUpdatedTime" jdbcType="TIMESTAMP" />
+      <result column="last_updated_by" property="lastUpdatedBy" jdbcType="VARCHAR" />
+      
+      <result column="english_last_name" property="englishLastName" jdbcType="VARCHAR" />
+      <result column="english_first_name" property="englishFirstName" jdbcType="VARCHAR" />
+      <result column="chinese_last_name" property="chineseLastName" jdbcType="VARCHAR" />
+      <result column="chinese_first_name" property="chineseFirstName" jdbcType="VARCHAR" />
+      <result column="member_code" property="memberCode" jdbcType="VARCHAR" />
+      <result column="joint_date" property="jointDate" jdbcType="TIMESTAMP" />
+      <result column="termination_date" property="terminationDate" jdbcType="TIMESTAMP" />
+      <result column="member_id" property="memberId" jdbcType="DECIMAL" />
+      <result column="chinese_name" property="chineseName" jdbcType="VARCHAR" />
+      <result column="english_name" property="englishName" jdbcType="VARCHAR" />
+      <result column="dealer_post_code" property="dealerPostCode" jdbcType="DECIMAL"/>
+      <result column="local_gv" property="localGv" jdbcType="DECIMAL"/>
+      <result column="local_bonus" property="localBonus" jdbcType="DECIMAL"/>
+      <result column="inter_bonus" property="interBonus" jdbcType="DECIMAL"/>
+      <result column="type_effective_date" property="typeEffectiveDate" jdbcType="TIMESTAMP"/>
+      <result column="member_cnt_new" property="memberCntNew" jdbcType="DECIMAL"/>
+      <result column="ps" property="ps" jdbcType="DECIMAL"/>
+      <result column="gpv" property="gpv" jdbcType="DECIMAL"/>
+      <result column="omk_ov_local" property="omkOvLocal" jdbcType="DECIMAL"/>
+      <result column="omk_ov" property="omkOv" jdbcType="DECIMAL"/>
+      <result column="ref_period" property="refPeriod" jdbcType="VARCHAR"/>
+      <result column="omk_gv" property="omkGv" jdbcType="DECIMAL"/>
+      
+      <result column="omk_pgv" property="omkPgv" jdbcType="DECIMAL"/>
+      <result column="OMK_RECRUIT_CNT" property="omkRecruitCnt" jdbcType="DECIMAL"/>
+      <result column="OMK_QUALIFIED_LEG" property="omkQualifiedLeg" jdbcType="DECIMAL"/>
+      <result column="OMK_TT" property="omkTt" jdbcType="DECIMAL"/>
+      <result column="flag" property="flag" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <select id="selectByMemberCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+    SELECT 
+       gdr.type_effective_date,
+       decode(mm.member_id, NULL, gdr.dealer_no, mm.member_code) member_code,
+       decode(mm.member_id, NULL, gdr.sponsor_no, mm.sponsor_no) sponsor_no,
+       decode(mm.member_id, NULL, gdr.dealer_name, mm.chinese_name) chinese_name,
+       decode(mm.member_id, NULL, gdr.dealer_name, mm.english_name) english_name,
+       decode(mm.member_id, NULL, gdr.dealer_name, mm.member_name) member_name
+    FROM omk.gds_dealer_ref_chn gdr 
+    left join  mm_member_v mm
+    on mm.member_code = gdr.dealer_no
+    where 
+        gdr.dealer_no = #{memberCode,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectNotMemberIdData" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select t.ps,
+       t.gpv,
+       t.omk_ov,
+       t.omk_ov_local,
+       t.period
+  from (SELECT orsb.ps,
+               orsb.gpv,
+               odss.omk_ov,
+               odss.omk_ov_local,
+               odss.period,
+               orsb.dealer_no
+          FROM omk.gds_dealer_ref_chn gdr
+          left join OMK.OMK_RTL_SALARY_BALANCE orsb
+            on orsb.dealer_no = gdr.dealer_no
+          left join OMK.OMK_DE_SALARY_STAT_01 odss
+            on odss.dealer_no = gdr.dealer_no
+         where gdr.dealer_no = #{memberCode,jdbcType=VARCHAR}
+           and odss.period = to_char(add_months(to_date((select max(period)
+                                                           from omk.OMK_ME_SALARY_STAT_01) || '01',
+                                                        'YYYYMMDD'),
+                                                1),
+                                     'yyyymm')
+        UNION
+        SELECT omss.pv,
+               omss.omk_gv,
+               omss.omk_ov,
+               omss.omk_ov_local,
+               omss.period,
+               orsb.dealer_no
+          FROM omk.gds_dealer_ref_chn gdr
+          left join OMK.OMK_RTL_SALARY_BALANCE orsb
+            on orsb.dealer_no = gdr.dealer_no
+          left join OMK.OMK_ME_SALARY_STAT_01 omss
+            on omss.dealer_no = gdr.dealer_no
+         where gdr.dealer_no = #{memberCode,jdbcType=VARCHAR}
+         order by period desc) t
+ where rownum &lt; 5
+    
+  </select>
+  
+  <select id="selectTeamByMemberId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+     SELECT 
+       mm.chinese_last_name || mm.chinese_first_name chinese_name,
+       mm.english_last_name || mm.english_first_name english_name,
+       mm.member_code,
+       mm.joint_date,
+       mm.termination_date,
+       mm.member_id,
+       orsb.dealer_post_code,
+       (SELECT SUM(ott.omk_tt) omkTt
+          FROM omk.OMK_ME_SALARY_LCL_TT ott
+         WHERE ott.period LIKE (to_char(SYSDATE,
+                                        'YYYY') || '%')
+           AND ott.dealer_no = mm.member_code) omkTt,
+       (select 
+           SUM(odss.member_cnt_new) member_cnt_new
+       from OMK.OMK_ME_SALARY_STAT_01 odss
+       where odss.period like  (to_char(SYSDATE,
+                                        'YYYY') || '%')
+           and odss.dealer_no = mm.member_code) member_cnt_new
+     FROM mm_member mm
+     LEFT JOIN OMK.OMK_RTL_SALARY_BALANCE orsb
+     ON mm.member_code = orsb.dealer_no
+     WHERE
+         mm.member_id =#{memberId,jdbcType=DECIMAL}
+  </select>
+  
+  <select id="queryDatePeriod" resultMap="BaseResultMap" parameterType="java.util.Map">
+  select t.ps,
+       t.gpv,
+       t.omk_ov,
+       t.omk_ov_local,
+       t.omk_pgv,
+       t.omk_recruit_cnt,
+       t.omk_qualified_leg,
+       t.omk_tt,
+       t.local_bonus,
+       t.inter_bonus,
+       t.member_cnt_new,
+       t.period,
+       t.member_id,
+       t.flag
+  from (SELECT orsb.ps,
+               orsb.gpv,
+               odss.omk_ov,
+               odss.omk_ov_local,
+               0 omk_pgv,
+               0 OMK_RECRUIT_CNT,
+               0 OMK_QUALIFIED_LEG,
+               ott.omk_tt,
+               (SELECT bbr.after_tax_amt
+                  FROM bm_bonus_release bbr, spm_period sp
+                 WHERE bbr.period_id = sp.period_id
+                   AND sp.period_name = ott.period
+                   AND bbr.bonus_type = 'LOCAL'
+                   AND mm.market_id = sp.org_id
+                   and mm.member_id = bbr.member_id) local_bonus,
+               (SELECT bbr.after_tax_amt
+                  FROM bm_bonus_release bbr, spm_period sp
+                 WHERE bbr.period_id = sp.period_id
+                   AND sp.period_name = ott.period
+                   AND bbr.bonus_type = 'INTER'
+                   AND mm.market_id = sp.org_id
+                   and mm.member_id = bbr.member_id) inter_bonus,
+               odss.member_cnt_new,
+               odss.period,
+               orsb.dealer_no,
+               mm.member_id,
+               'N' flag
+          FROM mm_member mm
+          left join OMK.OMK_RTL_SALARY_BALANCE orsb
+            on orsb.dealer_no = mm.member_code
+          left join OMK.OMK_DE_SALARY_STAT_01 odss
+            on odss.dealer_no = mm.member_code
+          left join omk.OMK_DE_SALARY_LCL_TT ott
+            on ott.dealer_no = odss.dealer_no
+           and ott.period = odss.period
+         where mm.member_code = #{memberCode,jdbcType=VARCHAR}
+           and odss.period = to_char(add_months(to_date((select max(period)
+                                                           from omk.OMK_ME_SALARY_STAT_01) || '01',
+                                                        'YYYYMMDD'),
+                                                1),
+                                     'yyyymm')
+        UNION
+        SELECT omss.pv,
+               omss.omk_gv,
+               omss.omk_ov,
+               omss.omk_ov_local,
+               ott.omk_pgv,
+               ott.OMK_RECRUIT_CNT,
+               ott.OMK_QUALIFIED_LEG,
+               ott.omk_tt,
+               (SELECT bbr.after_tax_amt
+                  FROM bm_bonus_release bbr, spm_period sp
+                 WHERE bbr.period_id = sp.period_id
+                   AND sp.period_name = ott.period
+                   AND bbr.bonus_type = 'LOCAL'
+                   AND mm.market_id = sp.org_id
+                   and mm.member_id = bbr.member_id) local_bonus,
+               (SELECT bbr.after_tax_amt
+                  FROM bm_bonus_release bbr, spm_period sp
+                 WHERE bbr.period_id = sp.period_id
+                   AND sp.period_name = ott.period
+                   AND bbr.bonus_type = 'INTER'
+                   AND mm.market_id = sp.org_id
+                   and mm.member_id = bbr.member_id) inter_bonus,
+               omss.member_cnt_new,
+               omss.period,
+               orsb.dealer_no,
+               mm.member_id,
+               'Y' flag
+          FROM mm_member mm
+          left join OMK.OMK_RTL_SALARY_BALANCE orsb
+            on orsb.dealer_no = mm.member_code
+          left join OMK.OMK_ME_SALARY_STAT_01 omss
+            on omss.dealer_no = mm.member_code
+          left join omk.OMK_ME_SALARY_LCL_TT ott
+            on ott.dealer_no = omss.dealer_no
+           and ott.period = omss.period
+         where mm.member_code = #{memberCode,jdbcType=VARCHAR}
+         order by period desc) t 
+ where rownum &lt; 5
+  </select>
+</mapper>

@@ -1,0 +1,144 @@
+<#--
+ * description: 模板查询.
+ * version: 1.0
+ * author: hanrui.huang
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../../include/head.html">
+<body style="padding: 10px;">
+    <!-- 模板表单 -->
+    <form id="template_form"></form>
+    <!-- 模板表格 -->
+    <div id="template_grid"></div>
+    <script type="text/javascript">
+    <#assign isedit = (RequestParameters.isedit!'0')/>
+    $(function(){
+    	window['template_form'] = $("#template_form").ligerForm({
+    		 fields: [
+    		          {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.messagetype.templatecode"/>',
+                         newline:false, 
+                         name: 'templateCode',
+                         type : "text",
+                     },
+                     {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate"/>',
+                         newline:false, 
+                         name: 'templateName',
+                         type : "text",
+                     },
+                     {
+                         label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.messagetype.description"/>',
+                         newline:false, 
+                         name: 'templateDescription',
+                         type : "text",
+                     }
+    		          ],
+            buttons: [
+                      {
+                    	  text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                    		  Hap.gridQuery({
+                                  form:template_form,
+                                  grid:template_grid
+                              })
+                    	  }
+                      }
+                      ]
+    	});
+    	window['template_grid'] = $("#template_grid").ligerGrid({
+    		columns: [
+    		          {
+    		        	  display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.messagetype.templatecode"/>',
+    	                  name: 'templateCode', align: 'left', width: '150',
+    	                  render : function (data) 
+    	                  {
+    	                      var html = "<a href='#' onClick='editClick(\"" + data.templateCode + "\")'>" + data.templateCode + "</a>";
+    	                      return html;
+    	                  }
+    		          },
+    		          {
+    		        	  display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate"/>',
+    		        	  name: 'templateName', align: 'left', width: '150'
+    		          },
+    		          {
+    		        	  display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.remark"/>',
+                          name: 'remark', align: 'left', width: '150'
+    		          },
+    		          {
+    		        	  display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.path"/>',
+                          name: 'fileName', align: 'left', width: '150',
+                          render : function (data) 
+                          {
+                        	  var html ="<a  target='_blank'  href='${base.contextPath}/sys/attach/file/view?fileId="+ data.fileId + "'>" + data.fileName + "</a>"
+                              return html;
+                          }
+    		          },
+    		          {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.status"/>',
+                          name: 'enabledFlag', align: 'left', width: '150',
+                          render : function (data){
+                        	  if(data.enabledFlag =='Y'){
+                        		  var html ='<p><@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.effective"/></p>'
+                        	  }else{
+                        		  var html ='<p><@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.fail"/></p>'
+                        	  }
+                        	  return html;
+                          }
+                      }
+    		          ],
+    		url:'${base.contextPath}/sys/reportTemplate/query',
+    		toolbar: {
+    			items: [
+    			        {
+    			        	text: '<@spring.message "sys.hand.btn.new"/>',
+    	                    disable: false,
+    	                    click: function() {
+    	                    	window.top.f_removeTab('report_template_edit');
+                                parent.f_addTab("report_template_edit","<@spring.message 'type.com.lkkhpg.dsis.common.system.dto.reporttemplate.create'/>","${base.contextPath}/sys/template/sys_report_template_edit.html");
+    	                    },
+    	                    icon: 'add'
+    			        },
+    			        {
+    	                    line: true
+    	                },
+    	                {
+    	                    text: '<@spring.message "sys.hand.btn.delete"/>',
+    	                    click: function() {
+    	                    	if (template_grid.getSelecteds().length == 0 && template_grid.getData().length != 0) {
+//     	                    		$.ligerDialog.alert('<@spring.message "msg.warn.system.no_row_choose"/>', $l('sys.hand.tip.info'), 'warn');
+    	                            return;
+    	                    	}
+    	                    	var rows = template_grid.getSelectedRows();
+    	                    	if(rows!=null && rows.length > 0){
+    	                    		if(template_grid.getSelecteds()[0].enabledFlag =='Y'){
+    	                    			Hap.gridDelete({
+                                            url: '${base.contextPath}/sys/reportTemplate/save',
+                                            grid: template_grid,
+                                            success: function(json){
+                                                Hap.showSuccess($l('sys.hand.tip.success'),function() {location.reload();});
+                                            }
+                                        });
+    	                    		}
+    	                    	}
+    	                    },
+    	                    icon: 'delete'
+    	                }
+    			        ]
+    		},
+    		enabledEdit : true, 
+            delayLoad : false, 
+            isSingleCheck : true, 
+            checkbox : true,
+            width: '99%', 
+            height: '98%', 
+            rownumbers: true
+    	});
+    });
+    function editClick(data) 
+    {
+        window.top.f_removeTab("report_template");
+        parent.f_addTab("report_template","<@spring.message 'type.com.lkkhpg.dsis.common.system.dto.reporttemplate.details'/>","${base.contextPath}/sys/template/sys_report_template_edit.html?isedit=1&templateCode="+data);
+    }
+    </script>
+</body>

@@ -1,0 +1,200 @@
+<#include "/mws/include/header.html">
+<!-- ========== MENU END ========== -->
+
+<!-- ========== CONTENT START ========== -->
+<script src="${base.contextPath}/common/code?voucherCategory=PDM.VOUCHER_CATEGORY&voucherType=PDM.VOUCHER_TYPE&voucherTypeFilter=PDM.VOUCHER_TYPE_FILTER&usageMode=PDM.USAGE_MODE&voucherClassify=PDM.VOUCHER_CLASSIFY&applyCriteria=PDM.APPLY_CRITERIA"
+        type="text/javascript"></script>
+<script type="text/javascript">
+	var isUsed = 'UNUSE';
+	var scope = 'ALL';
+	
+	$(function(){
+		queryVoucher();
+	});
+	
+	function queryVoucher(){
+		$.ajax({
+			url: "${base.contextPath}/mm/voucher/query",
+			type:"POST",
+			dataType:"json",
+			data : {
+				"isUsed" : isUsed,
+				"scope" : scope
+			},
+	        success : function(data) {
+	        	if(data.success){
+	        		shwoVouchers(data.rows[0]);
+	        	}
+	        },
+	        error : function() {
+	            alert("error");
+	        }
+		});
+	}
+	
+	function shwoVouchers(data){
+		for (var i = 0; i < data.length; i++) {
+			$("#vouchers").prepend(createVoucher(data[i]));
+		}
+	}
+	
+	function createVoucher(data){
+		var voucher = $("#voucherModel").clone();
+		var category = voucher.find('.part1')[0];
+		$(category).text(showCode(data.category, voucherCategory));
+		var discount = voucher.find('.part1')[1];
+		if ("FIX" == data.discountType) {
+			$(discount).text(data.discountValue)
+		} else if ("PERCE" == data.discountType) {
+			$(discount).text((data.discountValue / 10) + ' '+'<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.discount" />');
+		} else if ("GIFT" == data.discountType) {
+			$(discount).text('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.gift" />');
+		}
+		var description = voucher.find('.part1')[2];
+		if (null != data.description) {
+			if (data.description.length >= 25) {
+				$(description).text(data.description.substring(0,25) + "...");
+			} else {
+				$(description).text(data.description);				
+			}
+		}
+		var activeTime = voucher.find('.part1')[3];
+		$(activeTime).text(data.startActiveDate+"~"+data.endActiveDate);
+		var voucherCode = voucher.find('.part2')[0];
+		$(voucherCode).text(data.voucherCode);
+		var useScope = voucher.find('.part2')[1];
+		$(useScope).text(showCode(data.applyCriteria, applyCriteria));
+		var Mode = voucher.find('.part2')[2];
+		$(Mode).text(showCode(data.usageMode, usageMode));
+		var couponType = voucher.find('.part2')[3];
+		$(couponType).text(showCode(data.type, voucherType));
+		return voucher.html();
+	}
+	
+	//显示快码对应值
+	function showCode(value,lookCode){
+		for(var i = 0 ; i < lookCode.length ; i++){
+			if(lookCode[i].value == value){
+				return lookCode[i].meaning;
+			}
+		}
+	}
+	
+	function changeUsed(value){
+		$("#isUsedSelect").html(showCode(value,voucherClassify)+'<span class="caret"></span>');
+		isUsed = value;
+		$("#vouchers").empty();
+		queryVoucher();
+	}
+	
+	function changeScope(value){
+		$("#scopeSelect").html(showCode(value,voucherTypeFilter)+'<span class="caret"></span>');
+		scope = value;
+		$("#vouchers").empty();
+		queryVoucher();
+	}
+</script>
+<section id="content">
+	<div class="container">
+		<ol class="breadcrumb">
+			<li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+			<li><@spring.message "mws.menu.mycoupon"/></li>
+		</ol>
+
+		<div class="row">
+			<!-- Sidebar Start -->
+	        <#include "../include/account-menu.html">
+			<!-- Sidebar End -->
+
+
+            <!-- Posts Start -->
+            <div class="col-sm-8 col-md-9">
+                <article class="account-details-wrap">
+                    <h2 class="entry-title"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.coupons" /></h2>
+                    
+                    <!-- 查询条件 -->
+					<div class="row" style="padding: 10px 0px 0px 40px">
+						<!-- Single button -->
+						<div class="btn-group col-md-2 col-sm-4 col-xs-5">
+							<button id="isUsedSelect" type="button"
+								class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+								aria-haspopup="true" aria-expanded="false">
+								<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.unuse" /><span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu">
+								<li><a href="#" onclick="changeUsed('UNUSE')"><@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.unuse" /></a></li>
+								<li><a href="#" onclick="changeUsed('USED')"><@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.used" /></a></li>
+								<li><a href="#" onclick="changeUsed('EXPRI')"><@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.expri" /></a></li>
+							</ul>
+						</div>
+						<div class="btn-group col-md-2 col-sm-4 col-xs-5">
+							<button id="scopeSelect" type="button"
+								class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+								aria-haspopup="true" aria-expanded="false">
+								<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.couponstype" /> <span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu">
+								<li><a href="#" onclick="changeScope('ALL')"><@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.allscope" /></a></li>
+								<li><a href="#" onclick="changeScope('PRODU')"><@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.product" /></a></li>
+								<li><a href="#" onclick="changeScope('INVOI')"><@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.ordercoupons" /></a></li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="row" style="padding: 10px 0px 0px 40px" id="vouchers">
+
+					</div>
+
+					<div style = "display : none" id = "voucherModel">
+                    	<div class ="col-lg-4 col-md-6 col-sm-8 col-xs-12 "  style="position:relative">
+                    		<div class = "portlet">
+	                    		<a href="#"><img src="${base.contextPath}/resources/img/coupon/coupon.png" class="carousel-inner img-responsive img-rounded" >
+	                    			<!-- 添加图片上的内容 -->
+	                    			<div style="position:absolute;top: 1%;left:6%;color: white;">
+	                    				<label class = "part1"></label>
+	                    			</div>
+	                    			<div style="position:absolute;top: 10%; color: white;">
+	                    				<div class = "col-md-10 col-sm-10 col-xs-10 col-md-offset-2 col-sm-offset-2 col-xs-offset-2">
+	                    					<label style = "font-size : 25px" class = "part1"></label>
+	                    				</div>
+	                    				<div class = "col-md-10 col-sm-10 col-xs-10 col-md-offset-2 col-sm-offset-2 col-xs-offset-2">
+	                    					<label class = "part1"></label>
+	                    				</div>
+	                    				<div class = "col-md-10 col-sm-10 col-xs-10 col-md-offset-2 col-sm-offset-2 col-xs-offset-2">
+	                    					<label class = "part1"></label>
+	                    				</div>
+	                    			</div>
+	                    		</a>
+	                    		<div style = "background-color : #F8F9F9; height : 200px;">
+		                    		<div class ="col-md-12 col-sm-12 col-xs-12" style="position:absolute;top: 60%;">
+		                    			<div class = "col-md-10 col-sm-10 col-xs-10 col-md-offset-1 col-sm-offset-1 col-xs-offset-1">
+			                    			<label class = "col-md-6 col-sm-6 col-xs-6" style = "color : black"><@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.mws_vouchercode" /></label>
+											<span class="col-md-6 col-sm-6 col-xs-6 part2"></span>
+			                    		</div>
+			                    		<div class = "col-md-10 col-sm-10 col-xs-10 col-md-offset-1 col-sm-offset-1 col-xs-offset-1">
+			                    			<label class = "col-md-6 col-sm-6 col-xs-6" style = "color : black"><@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.mws_usescope" /></label>
+											<span class="col-md-6 col-sm-6 col-xs-6 part2"></span>
+			                    		</div>
+			                    		<div class = "col-md-10 col-sm-10 col-xs-10 col-md-offset-1 col-sm-offset-1 col-xs-offset-1">
+			                    			<label class = "col-md-6 col-sm-6 col-xs-6" style = "color : black"><@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.mws_usagemode" /></label>
+											<span class="col-md-6 col-sm-6 col-xs-6 part2"></span>
+			                    		</div>
+			                    		<div class = "col-md-10 col-sm-10 col-xs-10 col-md-offset-1 col-sm-offset-1 col-xs-offset-1">
+			                    			<label class = "col-md-6 col-sm-6 col-xs-6" style = "color : black"><@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.mws_type" /></label>
+											<span class="col-md-6 col-sm-6 col-xs-6 part2"></span>
+			                    		</div>
+		                    		</div>
+	                    		</div>
+                    		</div>
+                    	</div>
+                    </div>
+                </article>
+            </div>
+		</div>
+	</div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

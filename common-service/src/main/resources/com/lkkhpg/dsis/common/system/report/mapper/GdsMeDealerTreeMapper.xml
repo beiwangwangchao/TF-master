@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.system.report.mapper.GdsMeDealerTreeMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.system.report.dto.GdsMeDealerTree" >
+    <result column="PERIOD" property="period" jdbcType="VARCHAR" />
+    <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+    <result column="SPONSOR_NO" property="sponsorNo" jdbcType="VARCHAR" />
+    <result column="DEALER_TYPE" property="dealerType" jdbcType="VARCHAR" />
+    <result column="DEALER_ORG_CODE" property="dealerOrgCode" jdbcType="VARCHAR" />
+    <result column="LEVEL_NO" property="levelNo" jdbcType="DECIMAL" />
+    <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+    <result column="LAST_UPDATED_TIME" property="lastUpdatedTime" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="VARCHAR" />
+    <result column="DEALER_POST_CODE" property="dealerPostCode" jdbcType="DECIMAL" />
+    <result column="DEALER_APP_PERIOD" property="dealerAppPeriod" jdbcType="VARCHAR" />
+    
+    
+    <result column="ISLEAF" property="isleaf" jdbcType="DECIMAL" />
+    <result column="LEVELQ" property="levelq" jdbcType="DECIMAL" />
+    <result column="DEALERNO" property="dealerNo" jdbcType="VARCHAR" />
+    <result column="SPONSORNO" property="sponsorNo" jdbcType="VARCHAR" />
+    <result column="POSTCODE" property="dealerPostCode" jdbcType="DECIMAL" />
+    <result column="DEALERNAME" property="dealername" jdbcType="VARCHAR" />
+    <result column="TYPEEFFECTIVEDATE" property="typeeffectivedate" jdbcType="VARCHAR" />
+    <result column="ISNEW" property="isnew" jdbcType="DECIMAL" />
+    <result column="PS" property="ps" jdbcType="DECIMAL" />
+    <result column="GPV" property="gpv" jdbcType="DECIMAL" />
+    <result column="LASTGV" property="lastgv" jdbcType="DECIMAL" />
+    <result column="CODE" property="salesOrgCode" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.system.report.dto.GdsMeDealerTree" >
+    insert into GDS_ME_DEALER_TREE (PERIOD, DEALER_NO, SPONSOR_NO, 
+      DEALER_TYPE, DEALER_ORG_CODE, LEVEL_NO, 
+      COMMENTS, LAST_UPDATED_TIME, LAST_UPDATED_BY, 
+      DEALER_POST_CODE, DEALER_APP_PERIOD)
+    values (#{period,jdbcType=VARCHAR}, #{dealerNo,jdbcType=VARCHAR}, #{sponsorNo,jdbcType=VARCHAR}, 
+      #{dealerType,jdbcType=VARCHAR}, #{dealerOrgCode,jdbcType=VARCHAR}, #{levelNo,jdbcType=DECIMAL}, 
+      #{comments,jdbcType=VARCHAR}, #{lastUpdatedTime,jdbcType=TIMESTAMP}, #{lastUpdatedBy,jdbcType=VARCHAR}, 
+      #{dealerPostCode,jdbcType=DECIMAL}, #{dealerAppPeriod,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.system.report.dto.GdsMeDealerTree" >
+    insert into GDS_ME_DEALER_TREE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="period != null" >
+        PERIOD,
+      </if>
+      <if test="dealerNo != null" >
+        DEALER_NO,
+      </if>
+      <if test="sponsorNo != null" >
+        SPONSOR_NO,
+      </if>
+      <if test="dealerType != null" >
+        DEALER_TYPE,
+      </if>
+      <if test="dealerOrgCode != null" >
+        DEALER_ORG_CODE,
+      </if>
+      <if test="levelNo != null" >
+        LEVEL_NO,
+      </if>
+      <if test="comments != null" >
+        COMMENTS,
+      </if>
+      <if test="lastUpdatedTime != null" >
+        LAST_UPDATED_TIME,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="dealerPostCode != null" >
+        DEALER_POST_CODE,
+      </if>
+      <if test="dealerAppPeriod != null" >
+        DEALER_APP_PERIOD,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="period != null" >
+        #{period,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerNo != null" >
+        #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="sponsorNo != null" >
+        #{sponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerType != null" >
+        #{dealerType,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerOrgCode != null" >
+        #{dealerOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="levelNo != null" >
+        #{levelNo,jdbcType=DECIMAL},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="lastUpdatedTime != null" >
+        #{lastUpdatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerPostCode != null" >
+        #{dealerPostCode,jdbcType=DECIMAL},
+      </if>
+      <if test="dealerAppPeriod != null" >
+        #{dealerAppPeriod,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <select id="queryGdsMealerTree" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.system.report.dto.GdsMeDealerTree" >
+SELECT T.CONNECT_BY_ISLEAF AS ISLEAF,
+       T.DL                AS LEVELQ,
+       T.DEALER_NO         AS DEALERNO,
+       T.SPONSOR_NO        AS SPONSORNO,
+       T.DEALER_POST_CODE  AS POSTCODE,
+       (CASE
+          WHEN G.SALE_ORG_CODE = 'HKG' THEN
+           NVL(G.DEALER_NAME || ' ' || G.ENGLISH_NAME, ' ')
+          WHEN G.SALE_ORG_CODE = 'CHN' AND G.DEALER_TYPE = '1' THEN
+           NVL(G.DEALER_NAME || '*', ' ')
+          ELSE
+           NVL(G.DEALER_NAME, ' ')
+        END
+        || 
+        <![CDATA[
+        CASE
+          WHEN G.SALE_ORG_CODE = 'CHN' AND 'CHN' <> #{salesOrgCode,jdbcType=VARCHAR} AND 'CHN' <> #{marketCode,jdbcType=VARCHAR} THEN 
+           '(MK1)'
+          WHEN G.SALE_ORG_CODE = 'HKG' AND 'HKG' <> #{salesOrgCode,jdbcType=VARCHAR} AND 'HKG' <> #{marketCode,jdbcType=VARCHAR} THEN 
+           '(MK2)'
+          WHEN G.SALE_ORG_CODE = 'TPE' AND 'TPE' <> #{salesOrgCode,jdbcType=VARCHAR} AND 'TPE' <> #{marketCode,jdbcType=VARCHAR} THEN
+           '(MK3)'
+          WHEN G.SALE_ORG_CODE = 'MAS' AND 'MAS' <> #{salesOrgCode,jdbcType=VARCHAR} AND 'MAS' <> #{marketCode,jdbcType=VARCHAR} THEN 
+           '(MK4)'
+          WHEN G.SALE_ORG_CODE = 'SIN' AND 'SIN' <> #{salesOrgCode,jdbcType=VARCHAR} AND 'SIN' <> #{marketCode,jdbcType=VARCHAR} THEN 
+           '(MK5)'
+          WHEN G.SALE_ORG_CODE = 'CAN' AND 'CAN' <> #{salesOrgCode,jdbcType=VARCHAR} AND 'CAN' <> #{marketCode,jdbcType=VARCHAR} THEN 
+           '(MK6)'
+          ELSE
+           ''
+         ]]>
+        
+        END
+        ) AS DEALERNAME,
+        NVL(G.DEALER_APP_PERIOD, '') AS TYPEEFFECTIVEDATE,
+        0 AS ISNEW,
+        NVL(B.PV, 0) AS PS,
+        NVL(B.omk_ov, 0) AS GPV,
+        NVL(B.omk_ov, 0) AS LASTGV
+   FROM (SELECT CONNECT_BY_ISLEAF,
+                LEVEL AS DL,
+                A.DEALER_NO,
+                A.PERIOD,
+                A.SPONSOR_NO,
+                A.DEALER_POST_CODE
+           FROM (SELECT * FROM omk.omk_ME_DEALER_TREE WHERE PERIOD = 
+           <if test="bonusPeriod != null">
+                #{bonusPeriod,jdbcType=VARCHAR}
+           </if>
+           ) A
+           <if test="memberNo != null">
+                START WITH A.DEALER_NO = #{memberNo,jdbcType=VARCHAR}
+           </if>
+          <!-- START WITH A.DEALER_NO = '980010530' -->
+         CONNECT BY NOCYCLE PRIOR A.DEALER_NO = SPONSOR_NO
+
+          ORDER SIBLINGS BY A.DEALER_POST_CODE DESC) T
+   LEFT JOIN omk.omk_me_salary_stat_01 B
+     ON T.DEALER_NO = B.DEALER_NO
+    AND T.PERIOD = B.PERIOD
+   JOIN omk.OMK_DEALER_INFO G
+     ON T.DEALER_NO = G.DEALER_NO
+     <if test="sponsorNo != null">
+            and T.SPONSOR_NO = #{sponsorNo,jdbcType=VARCHAR}
+        </if>
+  </select>
+
+<select id="querySalesOrgCode" resultType="java.lang.String">
+    select CODE from SPM_SALES_ORGANIZATION_B where sales_org_id = #{request.salesOrgId,jdbcType=DECIMAL}
+</select>
+<select id="queryByDealerNo" resultType="java.lang.String">
+    select SALE_ORG_CODE from omk.OMK_DEALER_INFO  where dealer_no = #{memberNo,jdbcType=VARCHAR}
+</select>
+</mapper>

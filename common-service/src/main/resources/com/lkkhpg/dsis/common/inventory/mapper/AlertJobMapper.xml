@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.inventory.mapper.AlertJobMapper">
+    <resultMap type="com.lkkhpg.dsis.common.inventory.dto.ItemAlert" id="BaseResultMap">
+        <result column="ORGANIZATION_ID" property="orgId" jdbcType="DECIMAL" />
+        <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL" />
+        <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR" />
+        <result column="EXPIRY_DATE" property="expiryDate" jdbcType="TIMESTAMP" />
+        <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+        <result column="QUANTITY_ALERT" property="quantityAlert" jdbcType="DECIMAL" />
+        <result column="EXPIRY_ALERT" property="expiryAlert" jdbcType="VARCHAR" />
+        <result column="LOT_NUMBER" property="lotNumber" jdbcType="VARCHAR" />
+        <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+        <result column="QUANTITY" property="quantity" jdbcType="DECIMAL" />
+    </resultMap>
+	<!-- 批次预警job -->
+    <select id="queryLotAlert" resultMap="BaseResultMap">
+        SELECT
+	        il.ORGANIZATION_ID,
+	        il.ITEM_ID,
+	        ii.ITEM_NAME,
+	        ii.ITEM_NUMBER,
+	        ii.ITEM_TYPE,
+	        il.EXPIRY_DATE,
+	        il.ENABLED_FLAG,
+	        il.LOT_NUMBER,
+	        ii.EXPIRY_ALERT,
+	        ii.COUNT_STOCK_FLAG,
+	        ii.QUANTITY_ALERT,
+	        ii.EXPIRY_ALERT,
+	        ii.COUNT_TYPE
+		FROM inv_lot il
+		    LEFT JOIN inv_item_property_v ii ON (ii.ORGANIZATION_ID = il.ORGANIZATION_ID AND ii.ITEM_ID = il.ITEM_ID )
+		WHERE ii.COUNT_STOCK_FLAG = 'O' AND ii.ITEM_TYPE = 'ITEM'
+		UNION
+		SELECT
+	        il.ORGANIZATION_ID,
+	        il.ITEM_ID,
+	        ii.ITEM_NAME,
+	        ii.ITEM_NUMBER,
+	        ii.ITEM_TYPE,
+	        il.EXPIRY_DATE,
+	        il.ENABLED_FLAG,
+	        il.LOT_NUMBER,
+	        ii.EXPIRY_ALERT,
+	        ii.COUNT_STOCK_FLAG,
+	        ii.QUANTITY_ALERT,
+	        ii.EXPIRY_ALERT,
+	        ii.COUNT_TYPE
+	   	FROM inv_lot il
+		  	LEFT JOIN inv_item_property_v ii ON (ii.ORGANIZATION_ID = il.ORGANIZATION_ID AND ii.ITEM_ID = il.ITEM_ID )
+		WHERE ii.ITEM_TYPE = 'PACKG' AND ii.COUNT_STOCK_FLAG = 'Y' AND ii.COUNT_TYPE = 'PACKG'
+    </select>
+    <!-- 库存量预警job -->
+    <select id="queryQuantityAlert" resultMap="BaseResultMap">
+        SELECT 
+			ii.ORGANIZATION_ID,
+			ii.ITEM_ID,
+			ii.ITEM_NUMBER,
+			ii.ENABLED_FLAG,
+			ii.ITEM_NAME,
+			ii.QUANTITY_ALERT,
+			io.QUANTITY
+		FROM inv_item_property_v ii
+			 LEFT JOIN inv_onhand_quantity_v io ON (ii.ORGANIZATION_ID = io.ORGANIZATION_ID AND ii.ITEM_ID = io.ITEM_ID)     
+		WHERE ii.COUNT_STOCK_FLAG = 'O' AND ii.ITEM_TYPE = 'ITEM' 
+		UNION 
+		SELECT
+			ii.ORGANIZATION_ID,
+			ii.ITEM_ID,
+			ii.ITEM_NUMBER,
+			ii.ENABLED_FLAG,
+			ii.ITEM_NAME,
+			ii.QUANTITY_ALERT,
+			io.QUANTITY
+		FROM inv_item_property_v ii
+	 		LEFT JOIN inv_onhand_quantity_v io ON (ii.ORGANIZATION_ID = io.ORGANIZATION_ID AND ii.ITEM_ID = io.ITEM_ID) 
+		WHERE ii.ITEM_TYPE = 'PACKG' AND ii.COUNT_STOCK_FLAG = 'Y' AND ii.COUNT_TYPE = 'PACKG'
+    </select>
+</mapper>

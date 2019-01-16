@@ -1,0 +1,345 @@
+<#--
+ * description: 收货地址编辑界面
+ * version: 1.0
+ * author: shenqiubin
+ * .
+ *
+-->
+<#include "../include/head.html">
+<body>
+<script src="${base.contextPath}/common/code?telAreaCodeData=SYS.TEL_COUNTRY_CODE" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?locationType=SPM.ADDRESS_FORMAT" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?hideState=SPM.HIDE_STATE" type="text/javascript"></script>
+<style>
+.l-form .l-fieldcontainer {
+padding-top:10px;
+}
+</style>
+  
+  <form id="om_location_form" ></form>  
+         <script type="text/javascript">
+    /* var locationId = ''; */
+    $l('sys.hand.title.addressinfo','<@spring.message "sys.hand.title.addressinfo"/>');
+    var locationObj = frameElement.dialog.get('data');
+    var contactlocations = [];
+    
+    function updateStateList(callback){
+        $.ajax({
+            url: '${base.contextPath}/spm/state/queryforlocation',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+            data : {countryCode:liger.get('countryCode').selectedValue},
+            success : function(json) {
+                if(json.success){
+                    liger.get('stateCode').setData(json.rows)                   
+                }
+                if(callback){
+                    callback();
+                }
+            },
+            error : function() {
+                $.ligerDialog.closeWaitting();
+            }
+        })
+    }
+    
+    function updateCityList(callback){
+        $.ajax({
+            url: '${base.contextPath}/spm/city/queryforlocation',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+               data : {stateCode:liger.get('stateCode').selectedValue},
+               success : function(json) {
+                   if(json.success){
+                    liger.get('cityCode').setData(json.rows)
+                   }
+                   if(callback) callback();
+               },
+               error : function() {
+                   $.ligerDialog.closeWaitting();
+               }
+        })
+    }
+    
+    function queryContactLocation(id) {
+    	var memberCode = spm_location_form_o.getData().memberCode;
+    	$.ajax({
+            url: '${base.contextPath}/mm/memSites/query',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+               data : {memberCode:memberCode},
+               success : function(json) {
+                   if(json.success){
+                    contactlocations = json.rows;
+                    if(contactlocations.length == 0){
+                    	liger.get('contactLocation').clear();
+                    	liger.get('contactLocation').setData({});
+                    }else{
+                    	liger.get('contactLocation').setData(get_contactlocation(contactlocations));
+                        //选中第一条地址显示
+                        liger.get('contactLocation').setValue(get_contactlocation(contactlocations)[0].id)
+                    }
+                    
+                   }
+               },
+               error : function() {
+                   $.ligerDialog.closeWaitting();
+               }
+        })
+    }
+    
+    function get_contactlocation(){
+    	var datas = [];
+        for(var i = 0;i<contactlocations.length;i++){
+            var o = {};
+            o.id = contactlocations[i].siteId;
+            o.text = contactlocations[i].address;
+            datas.push(o);
+        }
+        return datas;
+    }
+    
+    function copyContactLocation(){
+    	for(var i=0;i<contactlocations.length;i++){
+    		if(contactlocations[i].siteId == liger.get('contactLocation').selectedValue){
+    			//先清空，再填值
+    			liger.get('memberName').setValue('');
+    			liger.get('areaCode').setValue('');
+    			liger.get('phoneNumber').setValue('');
+    			liger.get('countryCode').setValue('');
+				liger.get('stateCode').setValue('');
+        		liger.get('cityCode').setValue('');
+    			liger.get('addressLine1').setValue('');
+    			liger.get('addressLine2').setValue('');
+    			liger.get('addressLine3').setValue('');
+    			liger.get('zipCode').setValue('');
+    			
+    			liger.get('memberName').setValue(contactlocations[i].name);
+    			liger.get('areaCode').setValue(contactlocations[i].areaCode);
+    			liger.get('phoneNumber').setValue(contactlocations[i].phone);
+    			liger.get('countryCode').setValue(contactlocations[i].spmLocation.countryCode);
+    			sf.updateStateList(function(){
+    				for(var i=0;i<contactlocations.length;i++){
+    					if(contactlocations[i].siteId == liger.get('contactLocation').selectedValue){
+    						$.ligerui.get('stateCode').setValue(contactlocations[i].spmLocation.stateCode);
+    					}
+    				}
+                    sf.updateCityList(function(){
+                    	for(var i=0;i<contactlocations.length;i++){
+        					if(contactlocations[i].siteId == liger.get('contactLocation').selectedValue){
+        						$.ligerui.get('cityCode').setValue(contactlocations[i].spmLocation.cityCode);
+        					}
+        				}
+                    })
+                });
+    			/* liger.get('stateCode').setValue(contactlocations[i].spmLocation.stateCode);
+    			updateCityList();
+    			liger.get('cityCode').setValue(contactlocations[i].spmLocation.cityCode); */
+    			liger.get('addressLine1').setValue(contactlocations[i].spmLocation.addressLine1);
+    			liger.get('addressLine2').setValue(contactlocations[i].spmLocation.addressLine2);
+    			liger.get('addressLine3').setValue(contactlocations[i].spmLocation.addressLine3);
+    			liger.get('zipCode').setValue(contactlocations[i].spmLocation.zipCode);
+    		}
+    	}
+    }
+    
+           function init_return_data(){
+                var d = spm_location_form_o.getData();
+             
+                $.each(hideState,function(i,o){
+                	if(o.meaning=='Y' && o.value == d.countryCode)
+                		d.stateName = '';
+                	})
+                d['address'] = d.countryName+d.stateName+d.cityName+d.addressLine1+d.addressLine2+d.addressLine3;
+                
+                $.ajax({
+                    url: '${base.contextPath}/spm/country/getLocale',
+                    type:"GET",
+                    dataType:"json",
+                    contentType : "application/json",
+                       data : '',
+                       async:false,
+                       success : function(json) {
+                           if(json.success){
+                            var locale=json.rows[0];
+                            if(locale == 'en_GB'){
+                            	d['address'] = (d.addressLine1 == ''?'':d.addressLine1+',') + (d.addressLine2 == ''?'':d.addressLine2+',') + (d.addressLine3 == ''?'':d.addressLine3+',')
+                            					+ d.cityName + ',' + (d.stateName == ''?'':d.stateName+',') + d.countryName;
+                            }
+                           }
+                       },
+                       error : function() {
+                           $.ligerDialog.closeWaitting();
+                       }
+                })
+                return d;
+            }  
+            var sf = this;
+            window['spm_location_form_o'] = $("#om_location_form").ligerForm({
+                space:5,
+                fields: [
+                   
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.receiver"/>', newline:true, name: 'memberName',width:70,
+                        validate: {
+                            required: true
+                        }   
+                    },
+                    { type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.countrycode"/>', newline:false, name: 'areaCode',width:60,labelWidth:40,
+                    	options : {
+                            valueField :'value',
+                            textField:'meaning',
+                            data:telAreaCodeData
+                            },
+                            validate: {
+                            	validatePhoneNo : true
+                            }  
+                    },
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.phone"/>', newline:false, name: 'phoneNumber',width:140,labelWidth:40,
+                        validate: {
+                        	validatePhoneNo : true,
+                            digits:true
+                        }   
+                    },
+            
+                    { type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.country"/>', newline:true, name: 'countryCode', textField:'countryName', width:90,
+                        validate: {
+                            required: true
+                        },
+                        options : {
+                            valueField : 'countryCode',
+                            textField:'name',
+                            url:'${base.contextPath}/spm/country/queryforlocation',
+                            onSelected:function(){
+                                liger.get('stateCode').clear();
+                                liger.get('cityCode').clear();
+                            },
+                            onSuccess:function(d){
+                                if(locationObj){
+                                    this.setValue(locationObj.countryCode);
+                                    sf.updateStateList(function(){
+                                        $.ligerui.get('stateCode').setValue(locationObj.stateCode);
+                                        sf.updateCityList(function(){
+                                            $.ligerui.get('cityCode').setValue(locationObj.cityCode);
+                                        })
+                                    })
+                                }
+                            }
+                        }   
+                    },
+                    { type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtlseg.statecode"/>', newline:false, name: 'stateCode',textField:'stateName',width:90,labelWidth:40,
+                        validate: {
+                            required: true
+                        },
+                        options : {
+                            valueField : 'stateCode',
+                            textField:'name',
+                            onBeforeOpen:updateStateList,
+                            onSelected:function(){
+                                liger.get('cityCode').clear();
+                            }
+                        }
+                    },
+                    { type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtlseg.citycode"/>', newline:false, name: 'cityCode',textField:'cityName',width:90,labelWidth:40,
+                        validate: {
+                            required: true
+                        },
+                        options : {
+                            valueField : 'cityCode',
+                            textField:'name',
+                            onBeforeOpen:updateCityList
+                        }   
+                    },
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.location.address1"/>', newline:true, name: 'addressLine1', width:370,
+                        validate: {
+                            required: true
+                        }   
+                    },
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.location.address2"/>', newline:true, name: 'addressLine2', width:370 },
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.location.address3"/>', newline:true, name: 'addressLine3', width:370 },
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.membersite.spmlocation.zipcode"/>', newline:true, name: 'zipCode', width:150 },
+                    { type: 'checkbox', label: '<@spring.message "msg.info.member.membersite.set_default_location"/>', newline:false, name: 'save', width:145, labelWidth:100},
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>', newline:true, name: 'memberCode',width:150,
+                    	options : {
+                            onBlur:queryContactLocation
+                        }	
+                    },
+                    { //复制联系地址按钮
+                        display : '',
+                        name : "copy_contact_location_btn",
+                        type : "html",
+                        width : 100,
+                        newline : false,
+                        labelWidth:0,
+                        render:function(item){
+                            
+                                return '<input type="button" value="' + '<@spring.message "type.com.lkkhpg.dsis.common.order.btn.orderconfirm.copycontactlocation"/>' + '" onclick="copyContactLocation(\'' + item.__id+ '\')"/>';
+                            
+                        }
+                    },
+                     { type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderconfirm.contactaddress"/>', newline:true, name: 'contactLocation',valueField : 'text',rightToken : ' ',width:370,
+                        options : {
+                                data : get_contactlocation(contactlocations)
+                        }
+                    } 
+                ]
+            });
+            
+             if(locationObj){
+                   liger.get('addressLine1').setValue(locationObj.addressLine1);
+                   liger.get('addressLine2').setValue(locationObj.addressLine2);
+                   liger.get('addressLine3').setValue(locationObj.addressLine3);
+                   liger.get('zipCode').setValue(locationObj.zipCode);
+                   if(locationObj.phoneNumber){
+                      liger.get('phoneNumber').setValue(locationObj.phoneNumber);
+                   }
+                   if(locationObj.memberName){
+                      liger.get('memberName').setValue(locationObj.memberName);
+                   }
+                  if(locationObj.memberName){
+                      liger.get('memberName').setValue(locationObj.memberName);
+                   }
+                  if(locationObj.areaCode){
+                     liger.get('areaCode').setValue(locationObj.areaCode);
+                  }
+                  if(locationObj.save){
+                      liger.get('save').setValue(locationObj.save);
+                   }
+                  if(locationObj.memberId&&!locationObj.memberName&&!locationObj.phoneNumber){
+                   $.ajax({
+                        url: '${base.contextPath}/mm/member/query',
+                        type:"GET",
+                        dataType:"json",
+                        contentType : "application/json",
+                           data : {memberId:locationObj.memberId},
+                           success : function(json) {
+                               if(json.success){
+                                var member=json.rows[0];
+                                liger.get('memberName').setValue(member.memberName);
+                                liger.get('phoneNumber').setValue(member.phoneNo);
+                               }
+                           },
+                           error : function() {
+                               $.ligerDialog.closeWaitting();
+                           }
+                    })
+               }
+               }
+             jQuery.validator.addMethod("validatePhoneNo", function(value, element) {
+                     var phoneNo = liger.get('phoneNumber').getValue()||'';
+                     var areaCode = liger.get('areaCode').getValue()||'';
+                     
+                     //联系号码和区号需全
+                     if (phoneNo != '' && areaCode == '' ||
+                         phoneNo == '' && areaCode != '') {
+                         return false;
+                     }
+                 return true;
+             }, '<@spring.message "msg.error.member.member_areacode_and_phoneno_required"/>');
+        
+        
+    </script>
+</body>
+</html>

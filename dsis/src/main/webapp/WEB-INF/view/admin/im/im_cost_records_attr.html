@@ -1,0 +1,149 @@
+<#--
+ * description: 成本明细查询页面
+ * version: 1.0 
+ * author: houmin
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?costAttributeData=INV.COST_RECORD_DETAILS" type="text/javascript"></script>
+<body style="padding: 10px;">
+
+<script type="text/javascript">
+	var costRecordId = ${RequestParameters.costRecordId};
+	//保存或更新成本属性
+	function f_save() {
+		if (!Hap.validateGrid(cost_attribute_input_grid)) {
+			return false;
+		}
+		var unitCost = ${RequestParameters.unitCost};
+		var costValueSum = 0;
+		var gridData = cost_attribute_input_grid.getData();
+		for (var i=0; i<gridData.length; i++) {
+			costValueSum += gridData[i].costValue;
+		}
+		if (Number(unitCost) != Number(costValueSum)) {
+			Hap.showError('<@spring.message "msg.error.inv.cost_value_validator_error" />');
+			return false;
+		}		
+		Hap.ajax({
+			url : "${base.contextPath}/inv/costAttr/save",
+			data : cost_attribute_input_grid.currentData.rows,
+			success : function(data) {
+				if (data.success) {
+					Hap.showSuccess(function() {
+						f_cancel();
+					});
+				}
+			}
+		});
+	}
+	
+	//取消
+	function f_cancel() {
+		var dialog = frameElement.dialog;
+        dialog.close();
+	}
+	
+    $(function() {
+    	/*初始化按钮*/
+    	Hap.setFormDefaultBtn(f_cancel ,f_save);
+    	/*成本录入Grid*/
+    	window['cost_attribute_input_grid'] = $('#cost_attribute_input_grid').ligerGrid({
+    		height : 270,
+			width : '98%',
+			usePager : false,
+			enabledEdit : true,
+			checkbox : true,
+    		columns : [{
+    			display : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.costattributes.costattribute" />',
+    			name : 'costAttribute',
+    			align : 'left',
+    			width : 120,
+    			editor : {
+					type : 'select',
+					data : costAttributeData,
+					valueField : 'value',
+					textField : 'meaning'
+				},
+				render: function (item) {
+					if (!item) {
+						return;
+					}
+					for (var i = 0; i < costAttributeData.length; i++)
+					{
+						if (costAttributeData[i].value == item.costAttribute)
+							  	return costAttributeData[i].meaning;
+					}
+				},
+    			validate : {
+					required : true
+				}
+    		},{
+    			display : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.costattributes.costvalue" />',
+    			name : 'costValue',
+    			type : 'text',
+    			align : 'left',
+    			width : 120,
+    			editor :  { 
+    				type: 'float' 
+    			},
+    			option : {
+    				sign : false
+    			},
+    			validate : {
+					required : true
+				}
+    		},{
+    			display : '<@spring.message "sys.hand.common.comment" />',
+    			name : 'remark',
+    			type : 'text',
+    			align : "left",
+    			width : 120,
+    			editor : {
+    				type : 'text'
+    			},
+    		}],
+    		url : "${base.contextPath}/inv/costAttr/query?costRecordId=${RequestParameters.costRecordId}",
+    		onBeforeSubmitEdit : function(rowData) {
+    			if ("costAttribute" == rowData.column.columnname) {
+    				if (!rowData.value) {
+        				return;
+        			}
+	    			var gridData = cost_attribute_input_grid.getData();
+	    			for (var i=0; i<gridData.length; i++) {
+	    				if (rowData.value != gridData[rowData.rowindex].costAttribute
+	    						&& rowData.value == gridData[i].costAttribute) {
+	    					Hap.showError('<@spring.message "msg.error.inv.cost_attribute.repeat_error" />');
+	    					return false;
+	    				}
+	    			}
+    			}
+    		},
+    		toolbar : {
+				items : [{
+					text : '<@spring.message "sys.hand.btn.create"/>',
+					click : function() {
+						cost_attribute_input_grid.addRow({
+							costRecordId : costRecordId
+						});
+					},
+					icon : 'add'
+				},
+				{ line: true },
+				{
+					text : '<@spring.message "sys.hand.btn.delete"/>',
+					click : function() {
+						cost_attribute_input_grid.deleteSelectedRow();
+					},
+					icon : 'delete'
+				}]
+			}
+    	});
+    });
+    
+</script>
+    <!-- 成本属性值录入grid -->
+	<div id="cost_attribute_input_grid"></div>
+</body>
+</html>

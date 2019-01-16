@@ -1,0 +1,149 @@
+<#-- 
+* description: 附件目录分配权限界面
+* version: 1.0 
+* author: liang.rao 
+* Copyright LKK Health Products Group Limited.
+* --> 
+<#include "../include/head.html">
+<body style="padding: 15px">
+    <script
+        src="${base.contextPath}/common/code?categoryassignData=SYS.CATEGORY_ASSIGN"
+        type="text/javascript"></script>
+    <form id="mainform" method="post"
+        enctype="application/json;charset=UTF-8">
+        <input type="hidden" name="categoryassign" id="categoryassign"
+            value="" />
+    </form>
+    <div id="categoryassignGrid"
+        style="margin-left: 2px; margin-top: 2px;"></div>
+    <script type="text/javascript">
+        var flag = '${RequestParameters.flag!}';
+        var Id = ${RequestParameters.Id!};
+        Hap.setFormDefaultBtn(f_cancel, f_save);
+        var mktEditor = ${lovService.getLov(base.contextPath,base.locale, "lov_market")};
+        /* var memEditor = ${lovService.getLov(base.contextPath,base.locale, "category_member")}; */
+        
+        categoryassignGrid = $("#categoryassignGrid").ligerGrid({
+            columns : [
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.attachcategory.assigntype"/>',
+                name : 'assignType',
+                width : 150,
+                validate : {
+                    required : true
+                },
+                editor : {
+                    type : 'select',
+                    data : categoryassignData,
+                    valueField : 'value',
+                    textField : 'meaning',
+                    onChange : function (v, t) {
+                        var curRow = this.options.host_grid_row;
+                        categoryassignGrid.updateRow(curRow,{assignId : null});
+                    }
+                },
+                render : function(item) {
+                    for (var i = 0; i < categoryassignData.length; i++) {
+                        if (categoryassignData[i]['value'] == item.assignType)
+                            return categoryassignData[i]['meaning']
+                    }
+                    return item.assignType;
+                }
+            },   
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.attachcategory.assignvalue"/>',
+                name : 'assignId',
+                width : 250,
+                textField : 'assignMeaning',
+                validate : {
+                    required : true
+                },
+                editor  : mktEditor
+            }],
+            showToggleColBtn : false,
+            width : '100%',
+            height : '99%',
+            rowHeight : 24,
+            columnWidth : 100,
+            root: 'rows',
+            record: 'total',
+            usePager : false,
+            mouseoverRowCssClass : null,
+            enabledEdit : true,
+            checkbox : true,
+            onBeforeEdit: f_onBeforeEdit,
+            url: '${base.contextPath}/sys/categoryassign/query?objectType=FILE&objectId=${RequestParameters.categoryId!}',
+            toolbar : {
+                items : [ {
+                    text : '<@spring.message "sys.hand.btn.new"/>',
+                    disable : false,
+                    click : function() {
+                        categoryassignGrid.addRow({})
+                    },
+                    icon : 'add'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click : function() {
+                        Hap.gridDelete({
+                            grid : categoryassignGrid,
+                            url : '${base.contextPath}/sys/categoryassign/delete'
+                        })
+                    },
+                    icon : 'delete'
+                } ]
+            }
+        });
+        
+        
+        function f_onBeforeEdit(rowdata){
+            //如果在分配值上点击，则根据分配类型更改LOV
+            if(rowdata.column.name == "assignId"){
+                var assignType = rowdata.record.assignType;
+                if(assignType == null || assignType == ""){
+                    return false;
+                } 
+                //市场
+                if(rowdata.record.assignType == 'MKT'){
+                    rowdata.column.editor = mktEditor;
+                }
+                /* //会员
+                else if(rowdata.record.assignType == 'MEM'){
+                    rowdata.column.editor = memEditor;
+                } */
+            }
+            return true;
+        }
+        
+        function f_cancel() {
+            var dialog = frameElement.dialog;
+            dialog.close();      
+        }
+        
+        function f_save() {
+            var data = categoryassignGrid.rows;
+            var assign = new Array();
+            if (flag == "CATEG") {
+                for (var i = 0; i < data.length; i++) {
+                    categoryassignGrid.updateRow(categoryassignGrid.getRow(i),{objectId : Id,objectType : 'CATEG'});
+                }
+            }else if (flag == "FILE") {
+                for (var i = 0; i < data.length; i++) {
+                    categoryassignGrid.updateRow(categoryassignGrid.getRow(i),{objectId : Id,objectType : 'FILE'});
+                }
+            }
+            Hap.gridSave({
+                grid:categoryassignGrid,
+                url:"${base.contextPath}/sys/categoryassign/save",
+                success:function(returndata) {
+                    if (returndata.success) {
+                        Hap.showSuccess($l('sys.hand.tip.success'));
+                        categoryassignGrid.reload();
+                    }
+                }
+            }); 
+        }
+    </script>
+</body>
+</html>

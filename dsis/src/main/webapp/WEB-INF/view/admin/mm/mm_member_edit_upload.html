@@ -1,0 +1,40 @@
+<#--
+ * description: 会员详情页弹出上传签名
+ * version: 1.0
+ * author: frank.li
+ * .
+ *
+-->
+
+<#include "../include/head.html">
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/resources/js/attach/jquery-1.js"></script>
+</head>
+<body style="padding: 3px; overflow: hidden;">
+
+<div id="uploader_content">
+<!-- 一个页面中只能包含一次 -->
+<div style="width: 200px; height: 50px;" >
+<!-- 添加uploader所需的隐藏表单 -->
+        <input type="hidden" id="file_upload_sourceType" name="file_upload_sourceType" value="MEMBER_SIGNATURE">
+        <input type="hidden" id="file_upload_sourceKey" name="file_upload_sourceKey" value="${RequestParameters.memberId!}">
+        <#include "../attach/include/include_upload.html">
+</div>
+</div>
+
+    <script type="text/javascript">
+        function uploadComplete(status, file, response) {
+            if (status == 'UPLOAD_SUCCESS') {
+                $(window.parent.document.getElementById("signatureImg")).attr('src', '${base.contextPath}/sys/attach/file/view?fileId=' + response.file.fileId + '&_r=' + Math.random());
+            } else {
+                Hap.showError(status);
+            }
+        return true;
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,580 @@
+<#--
+ * description: 报表程序维护界面
+ * version: 1.0 
+ * author: wangc
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../../include/head.html">
+<body style="padding: 10px;">
+<script src="${base.contextPath}/common/code?yesno=SYS.YES_NO&lovTypes=SYS.REPORT_PARAM_EDITOR
+&templateType=SYS_REPORT_TEMPLATE_CATEOGRY&paramEvent=SYS.REPORT_PARAM_EVENT" type="text/javascript"></script>
+<div id="report_btn"></div> 
+<form id="report_form"></form>
+<div class="panel">
+<div id="report_grid" style="margin: 0; padding: 0"></div>
+</div>
+<form id="paramsEditor" style="display:none"></form>
+<script type="text/javascript">
+<#assign isedit = (RequestParameters.isedit!'0')/> 
+if(lovTypes){
+	$.each(lovTypes, function(i,n){
+		n.value = n.value.toLowerCase();
+	})
+}
+
+//按钮组
+window['report_btn'] = $("#report_btn").ligerForm({
+	buttons: [{
+        text: '<@spring.message "sys.hand.btn.save"/>',
+        id: 'btn_save',
+        align: 'right',
+        width: 60,
+        click: f_save
+    },{
+        text: '<@spring.message "sys.hand.btn.delete"/>',
+        id: 'btn_delete',
+        align: 'right',
+        width: 60,
+        click: f_delete
+    }]
+});
+
+window['report_form'] = $('#report_form').ligerForm({
+    fields: [{
+        name : "reportProgramId",
+        type : 'hidden'
+    },{
+        label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.programname"/>',
+        name: "programName",
+        type: "text",
+        validate : {
+            required : true
+        }
+    },
+    {
+        label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.programcode"/>',
+        type: 'text',
+        name: 'programCode',
+        newline: false,
+        validate : {
+            required : true
+        }
+    },
+    {
+        label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.dataservicename"/>',
+        type: 'text',
+        name: 'dataServiceName',
+        newline: false
+    }, 
+    {
+        label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.templatecode"/>',
+        type: 'popup',
+        name: 'templateCode',
+        textField: 'templateCode',
+        options : ${lovService.getLov(base.contextPath, base.locale, 'report_template')},
+        newline: true,
+        validate : {
+            required : true
+        },
+       
+    },
+    {
+        label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.categories"/>',
+        newline:false, 
+        name: 'entityCode',
+        type:'select',
+        options : {
+            valueField : 'value',
+            textField : 'meaning',
+            type : 'select',
+            data:templateType
+        }
+    },
+    {
+        label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.eventmarket"/>',
+        newline:false, 
+        isSort : false,
+        name: 'entityKey',
+        textField: 'entityKeyDesc',
+        type:'select',
+        options : {
+            type : 'select',
+            textField    : 'name',
+            valueField   : 'marketId',
+            url : "${base.contextPath}/spm/period/queryByMarket"
+        }
+    },
+    {
+        label: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.remark"/>',
+        type: 'textarea',
+        name: 'remark',
+        newline:true 
+    }],
+})
+
+window['report_grid'] = $('#report_grid').ligerGrid({
+    columns: [{
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.paramname"/>',
+        name: 'paramName',
+        width: 200,
+        editor: {
+        	type: 'text',
+        },
+        validate : {
+            required : true
+        }
+    },
+    {
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.display"/>',
+        name: 'display',
+        width: 200,
+        editor: {
+        	type: 'text',
+        },
+        validate : {
+            required : true
+        }
+    },
+    {
+        display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.paramconf"/>',
+        width: 100,
+        render:function(rowdata, index, value){
+            return '<a href="javascript:openEditor('+index+')"><@spring.message "sys.hand.btn.action"/></a>';
+        }
+    },
+    {
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.requireflag"/>',
+        name: 'requireFlag',
+        width: 100,
+        editor: {
+        	type: 'select',
+        	valueField : 'value',
+            textField : 'meaning', 
+            data : yesno
+        },
+        render:Hap.gridCodeRenderer,
+        validate : {
+            required : true
+        }
+    }],
+    toolbar: {
+        items: [{
+            text: '<@spring.message "sys.hand.btn.new"/>',
+            disable: false,
+            click: function() {
+            	report_grid.addRow({});
+            },
+            icon: 'add'
+        },
+        {
+            text: '<@spring.message "sys.hand.btn.delete"/>',
+            click: function() {
+            	Hap.gridDelete({
+                    grid: report_grid,
+                    url:'${base.contextPath}/sys/reportProgram/deleteParams'
+                })
+            },
+            icon: 'delete'
+        }]
+    },
+    <#if isedit=='1'>
+    url : '${base.contextPath}/sys/reportParams/get',
+    parms : {
+    	reportProgramId: '${RequestParameters.reportProgramId}'
+    },
+	</#if>
+    enabledEdit: true,
+    width: '99%',
+    height: '95%',
+    checkbox: true,
+    isSingleCheck: true
+});
+
+<#if isedit == '1'>
+Hap.loadForm({
+        form: report_form,
+        url: '${base.contextPath}/sys/reportProgram/get',
+        para: {
+        	reportProgramId: '${RequestParameters.reportProgramId}'
+        },
+        callback: function(data) {
+        	$('#reportProgramId').val(data.reportProgramId);
+        }
+});
+$.ligerui.get('programName').setReadonly(true);
+$.ligerui.get('programCode').setReadonly(true);
+</#if>
+
+//清除lov编辑器配置数据
+function clearForm(){
+    $.each([].concat(comboList).concat(dateFormatList).concat(lovList),function(i,v){
+        $.ligerui.get(v).setValue('');
+    })
+}
+
+//加载lov编辑器配置数据
+function initForm(currentIndex){
+	report_grid.select(currentIndex);
+	var selGrid = report_grid.getSelectedRow();
+	var paramName = selGrid.paramName;
+	var fieldType = selGrid.fieldType;
+	var fieldSequence = selGrid.fieldSequence;
+	$.ligerui.get('paramNameLov').setValue(paramName);
+	$.ligerui.get('fieldType').setValue(fieldType);
+	$.ligerui.get('fieldSequence').setValue(fieldSequence);
+	
+	//默认值
+	var fieldDefaultValue = selGrid.fieldDefaultValue;
+	if(fieldDefaultValue !=null && fieldDefaultValue !=''){
+		$.ligerui.get('isDefault').setValue('Y');
+		$.ligerui.get('fieldDefaultValue').setValue(fieldDefaultValue);
+	}else{
+		$.ligerui.get('isDefault').setValue('N');
+	}
+	
+	//联动
+	var fieldLinkEvent = selGrid.fieldLinkEvent;
+	var fieldLinkRule = selGrid.fieldLinkRule;
+	if(fieldLinkEvent !=null && fieldLinkEvent !='' && fieldLinkRule !=null && fieldLinkRule !=''){
+		$.ligerui.get('isLink').setValue('Y');
+		$.ligerui.get('fieldLinkEvent').setValue(fieldLinkEvent);
+		$.ligerui.get('fieldLinkRule').setValue(fieldLinkRule);
+	}else{
+		$.ligerui.get('isLink').setValue('N');
+	}
+	
+	if(fieldType == 'popup'){
+		var fieldSelectMulti = selGrid.fieldSelectMulti;
+		var fieldTextfield = selGrid.fieldTextfield;
+		var fieldLovCode = selGrid.fieldLovCode;
+		$.ligerui.get('fieldTextfield').setValue(fieldTextfield);
+		$.ligerui.get('fieldLovCode').setValue(fieldLovCode);
+		$.ligerui.get('fieldSelectMulti').setValue(fieldSelectMulti);
+	}else if(fieldType == 'select'){
+    	var fieldSelectSource = selGrid.fieldSelectSource;
+    	var fieldSelectMulti = selGrid.fieldSelectMulti;
+    	$.ligerui.get('fieldSelectSource').setValue(fieldSelectSource);
+    	$.ligerui.get('fieldSelectMulti').setValue(fieldSelectMulti);
+    	if(fieldSelectSource == 'url'){
+    		var fieldSelectUrl = selGrid.fieldSelectUrl;
+    		var fieldSelectVf = selGrid.fieldSelectVf;
+    		var fieldSelectTf = selGrid.fieldSelectTf;
+        	$.ligerui.get('fieldSelectUrl').setValue(fieldSelectUrl);
+        	$.ligerui.get('fieldSelectVf').setValue(fieldSelectVf);
+        	$.ligerui.get('fieldSelectTf').setValue(fieldSelectTf);
+    	}else if(fieldSelectSource == 'code'){
+    		var fieldSelectCode = selGrid.fieldSelectCode;
+    		$.ligerui.get('fieldSelectCode').setValue(fieldSelectCode);
+    	}
+	}else if(fieldType == 'date'){
+		var fieldDateFormat = selGrid.fieldDateFormat;
+		$.ligerui.get('fieldDateFormat').setValue(fieldDateFormat);
+	}
+}
+
+//编辑参数配置
+var lovEditorWin,editorForm,
+comboURLList = ['fieldSelectUrl','fieldSelectTf','fieldSelectVf'],
+comboCodeList = ['fieldSelectCode'],
+comboTypeList = ['fieldSelectSource','fieldSelectMulti'],
+dateFormatList = ['fieldDateFormat'];
+comboList = [].concat(comboTypeList).concat(comboURLList).concat(comboCodeList),
+lovList = ['fieldSelectMulti', 'fieldTextfield','fieldLovCode'], 
+allList = ['fieldType','paramNameLov','fieldSequence'].concat(comboList).concat(lovList);
+defaultList = ['isDefault'];
+linkList = ['fieldLinkEvent','fieldLinkRule'];
+function openEditor(index){
+	if(!lovEditorWin){
+		editorForm = $("#paramsEditor").ligerForm({
+			fields : [{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.lovitem.field_type"/>',
+                name : "fieldType",
+                newline:true,
+                type:'select',
+                options : {
+                    valueField : 'value',
+                    textField : 'meaning',
+                    cancelable :false,
+                    data : lovTypes,
+                    onSelected:function(v,t){
+                        clearForm();
+                        editorForm.setVisible([].concat(comboList).concat(dateFormatList).concat(lovList),false);
+                        switch(v) {
+                            case 'select':
+                                editorForm.setVisible(comboTypeList,true); 
+                                editorForm.setVisible(defaultList,true);
+                                $.ligerui.get('fieldSelectMulti').setValue('N');
+                                break;
+                            case 'popup':
+                                editorForm.setVisible(lovList,true);
+                                editorForm.setVisible(defaultList,false);
+                                $.ligerui.get('fieldSelectMulti').setValue('N');
+                                break;
+                            case 'date':
+                            	editorForm.setVisible(dateFormatList,true);
+                            	editorForm.setVisible(defaultList,true);
+                                break;
+                            default:
+                                editorForm.setVisible(defaultList,true);
+                        } 
+                    }
+                },
+                validate : {
+                    required : true
+                }
+			},{
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.paramname"/>',
+                name : "paramNameLov",
+                newline:true,
+                type:'text',
+                readonly: true
+            },{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.lovitem.conditionfieldsequence"/>',
+                name : "fieldSequence",
+                newline:true,
+                type:'int',
+                validate : {
+                    required : true
+                },
+                options:{
+                    sign:false
+                }
+            },{
+            	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.isdefault"/>',
+            	name: 'isDefault',
+            	newline: true,
+            	type: 'select',
+            	validate : {
+                    required : true
+                },
+            	options: {
+            		 valueField : 'value',
+                     textField : 'meaning',
+                     data:yesno,
+                     onSelected:function(v){
+                    	 if('Y' == v){
+                    		 editorForm.setVisible(['fieldDefaultValue'],true);
+                    		 $.ligerui.get('fieldDefaultValue').setRequired(true);
+                    	 }else{
+                    		 $.ligerui.get('fieldDefaultValue').setValue('');
+                    		 editorForm.setVisible(['fieldDefaultValue'],false);
+                    		 $.ligerui.get('fieldDefaultValue').setRequired(false);
+                    	 }
+                     }
+	            }
+            },{
+            	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.defaultvalue"/>',
+            	name: 'fieldDefaultValue',
+            	newline: true,
+            	style: 'display:none',
+            	type: 'text'
+            },{
+            	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.islink"/>',
+            	name: 'isLink',
+            	newline: true,
+            	type: 'select',
+            	validate : {
+                    required : true
+                },
+            	options: {
+            		 valueField : 'value',
+                     textField : 'meaning',
+                     data:yesno,
+                     onSelected:function(v){
+                    	 if('Y' == v){
+                    		 editorForm.setVisible([].concat(linkList),true);
+                    		 $.ligerui.get('fieldLinkEvent').setRequired(true);
+                    		 $.ligerui.get('fieldLinkRule').setRequired(true);
+                    	 }else{
+                    		 $.ligerui.get('fieldLinkEvent').setValue('');
+                    		 $.ligerui.get('fieldLinkRule').setValue('');
+                    		 editorForm.setVisible([].concat(linkList),false);
+                    		 $.ligerui.get('fieldLinkEvent').setRequired(false);
+                    		 $.ligerui.get('fieldLinkRule').setRequired(false);
+                    	 }
+                     }
+	            }
+            },{
+            	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.linkevent"/>',
+            	name: 'fieldLinkEvent',
+            	newline: true,
+            	style: 'display:none',
+            	type: 'select',
+            	options: {
+            		 valueField : 'meaning',
+                     textField : 'meaning',
+                     data: paramEvent
+            	}
+            },{
+            	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.linkrule"/>',
+            	name: 'fieldLinkRule',
+            	newline: true,
+            	style: 'display:none',
+            	type: 'textarea'
+            },{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.lovitem.ds_type"/>',
+                name : "fieldSelectSource",
+                style:'display:none',
+                newline:true,
+                type:'select',
+                options : {
+                    valueField : 'value',
+                    textField : 'text',
+                    cancelable :false,
+                    data : [{value:'url',text:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.lovitem.ds_type.url"/>'},
+                            {value:'code',text:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.lovitem.ds_type.code"/>'}],
+                    onSelected:function(v,t){
+                        var l = [].concat(comboURLList).concat(comboCodeList)
+                        $.each(l,function(i,v){
+                            $.ligerui.get(v).setValue('');
+                        })
+                        editorForm.setVisible(l,false);
+                        switch(v) {
+                            case 'url':
+                                editorForm.setVisible(comboURLList,true);
+                                break;
+                            case 'code':
+                                editorForm.setVisible(comboCodeList,true);
+                                break;
+                        } 
+                    }
+                }
+            },{
+            	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportparams.fieldselectmulti"/>',
+            	name: 'fieldSelectMulti',
+            	newline: true,
+            	style:'display:none',
+            	type: 'checkbox',
+            	options: {
+	                checkValue: 'Y',
+	                uncheckValue: 'N'
+	            }
+            },{
+                display : '<@spring.message "Url"/>',
+                name : "fieldSelectUrl",
+                style:'display:none',
+                newline:true,
+                type:'text'
+            },{
+                display : '<@spring.message "valueField"/>',
+                name : "fieldSelectVf",
+                style:'display:none',
+                newline:true,
+                type:'text'
+            },{
+                display : '<@spring.message "textField"/>',
+                name : "fieldSelectTf",
+                style:'display:none',
+                newline:true,
+                type:'text'
+            },{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.lovitem.conditionfieldselectcode"/>',
+                name : "fieldSelectCode",
+                style:'display:none',
+                newline:true,
+                type:'text'
+            },{
+            	display : '<@spring.message "sys.hand.preferences.dateformat"/>',
+            	name : 'fieldDateFormat',
+            	style : 'display:none',
+            	newline:true,
+            	type:'text',
+            	validate : {
+                    required : true
+                }
+            },{
+                display : '<@spring.message "textField"/>',
+                name : "fieldTextfield",
+                style:'display:none',
+                newline:true,
+                type:'text'
+            },{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.lovitem.conditionfieldlovcode"/>',
+                name : "fieldLovCode",
+                style:'display:none',
+                newline:true,
+                type:'text'
+            }]
+		})
+	}
+	
+	lovEditorWin = $.ligerDialog.open({
+        height: 400,
+        allowClose:false, 
+        width: 400, 
+        isHidden:false,
+        buttons: [{
+            text: '<@spring.message "sys.hand.btn.ok"/>',
+            onclick: function(item, dialog) {
+            		var paramsData = editorForm.getData();
+                	var reportSelGrid = report_grid.getSelectedRow();
+                    reportSelGrid.fieldType = paramsData.fieldType;
+                    reportSelGrid.fieldSequence = paramsData.fieldSequence;
+                    reportSelGrid.fieldSelectSource = paramsData.fieldSelectSource;
+                    reportSelGrid.fieldSelectUrl = paramsData.fieldSelectUrl;
+                    reportSelGrid.fieldSelectVf = paramsData.fieldSelectVf;
+                    reportSelGrid.fieldSelectTf = paramsData.fieldSelectTf;
+                    reportSelGrid.fieldSelectCode = paramsData.fieldSelectCode;
+                    reportSelGrid.fieldTextfield = paramsData.fieldTextfield;
+                    reportSelGrid.fieldLovCode = paramsData.fieldLovCode;
+                    reportSelGrid.fieldSelectMulti = paramsData.fieldSelectMulti;
+                    reportSelGrid.fieldDateFormat = paramsData.fieldDateFormat;
+                    reportSelGrid.fieldDefaultValue = paramsData.fieldDefaultValue;
+                    reportSelGrid.fieldLinkEvent = paramsData.fieldLinkEvent;
+                    reportSelGrid.fieldLinkRule = paramsData.fieldLinkRule;
+                    if(reportSelGrid.__status == 'nochanged'){
+                    	reportSelGrid.__status = 'update';
+                    }
+                    dialog.hide();
+            }
+        },
+        {
+            text: '<@spring.message "sys.hand.btn.cancel"/>',
+            onclick: function(item, dialog) {
+                dialog.hide();
+            }
+        }],
+        title: 'sys_lov',
+        target: $("#paramsEditor")
+    });
+	initForm(index);
+    lovEditorWin.show();
+}
+
+function f_save(){
+	Hap.submitForm({
+		form: report_form,
+        grid: report_grid,
+        gridName:'reportParams',
+        url:'${base.contextPath}/sys/reportProgram/save',
+        success:function(json){
+        	if(json.success){
+        		var reportProgramId = json.rows[0].reportProgramId;
+        		$.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+        			window.location = '${base.contextPath}/sys/report/sys_report_edit.html?isedit=1&reportProgramId='+reportProgramId;
+	            }); 
+        	}
+        }
+	});
+}
+
+function f_delete(){
+	$.ajax({
+		url : '${base.contextPath}/sys/reportProgram/delete',
+		data : {
+			reportProgramId : $('#reportProgramId').val()
+		},
+		success : function(json){
+			if(json.success){
+        		$.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+        			window.top.f_removeTab('REPORT_QUERY');
+        			window.top.f_addTab('REPORT_QUERY','<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.queryreport"/>','sys/report/sys_report_query.html');
+	            }); 
+        	}
+		}
+	});
+}
+</script>
+</body>
+</html>

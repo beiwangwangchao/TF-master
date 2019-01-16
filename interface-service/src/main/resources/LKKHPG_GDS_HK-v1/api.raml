@@ -1,0 +1,509 @@
+#%RAML 0.8
+title: LKKHPG_GDS
+version: 1.0
+baseUri: http://mocksvc.mulesoft.com/mocks/4249d80a-8fce-48fb-bd2f-b25260bc7358/api
+mediaType: application/json
+
+traits:
+  - batched:
+      description: 這個操作是批操作，需要傳遞adviseNo。GDS使用這個號碼來區分每次的操作
+      queryParameters:
+        adviseNo:
+          type: string
+          required: true
+          description: GDS調度時傳遞的號碼
+  - market:
+      description: Pass the org code into the url query string
+      queryParameters:
+        orgCode:
+          type: string
+          required: true
+          description: 調用GDS传递的OrgCode
+  - secured:
+      headers:
+        app_key:
+          description: app_key
+          type: string
+          required: true
+        timestamp:
+          description: timestamp
+          type: string
+          required: true
+        sign:
+          description: sign
+          type: string
+          required: true
+  - errorReporter:
+      responses:
+        400:
+         body:
+          application/json:
+            example: |
+              { "message" : "DESCRIPTIVE_SLUG" }
+        401:
+         body:
+          application/json:
+            example: |
+              { "message" : "DESCRIPTIVE_SLUG" }
+        500:
+         body:
+          application/json:
+            example: |
+              { "message" : "DESCRIPTIVE_SLUG" }
+/checkResults:
+  is: [secured, market, errorReporter]
+  displayName: (queryCheckResult) 日/月 差異結果查詢
+  get:
+    is: [batched]
+    description: (queryCheckResult) 日/月 差異結果查詢 - 在查詢異常處理結果時調用該方法,根據組織代碼從 UPL_CHECK_RESULT 中查詢出最近 3 天前 1000 條差異讀取狀態為"N"的差異結果集,並且將 UPL_CHECK_RESULT 的"讀取標誌"設為"Y"
+    responses:
+      200:
+        body: 
+          schema: !include queryCheckResultList.json
+          example: !include x-queryCheckResults.json
+          
+                    
+/periods:
+  is: [secured, market, errorReporter]
+  /close:
+    is: [secured, market, errorReporter]
+    displayName: (closePeriod) 關閉機構月份.
+    post:
+      description: (closePeriod) 關閉機構月份 - 根據月份和機構代號從 PERIOD_CTL_DETAIL 查詢出月份區間控制明細資訊記錄,如果該記錄為空,則返回包含失敗資訊的 GdsReturnMessage,否則繼續設置該記錄物件的機構關閉標誌為Y,保存該記錄物件
+      body:
+        application/json: 
+          schema: !include period.json
+          example: !include x-period.json
+      responses:
+        200:
+          body:
+            application/json: 
+              schema: !include period.json
+              example: !include x-period.json
+/dealers:
+  is: [secured, market, errorReporter]
+  displayName: (saveDealer) 即時會員資料保存
+  post:
+    description: (saveDealer) 即時會員資料保存 - POS 新增會員、更改重要資料、移線、資格狀態變更(非中止資格)等操作,引起資料變化時調用該介面即時自動更新 GDS系統的會員資料庫。GDS 將DS/POS上傳的會員資料 gDealer 更新到資料表 GDEALER、 GDEALER_PERSONAL_INFO 及 GDEALER_FAMILY_INFO 中,同時判斷身份狀態是否有改變,有改變則根據規則生 成 GDEALER_TYPE_STATUS 記錄。如果資料變化是從非普通消費者變到普通消費者(如資格中止),則通過資格中 止介面處理。
+    body:
+      schema: !include Gdealer.json
+      example: !include x-Gdealer.json
+    responses:
+      200:
+        body:
+          schema: |
+            {
+              "type": "object",
+              "$schema": "http://json-schema.org/schema",
+              "properties": {
+                  "dealerNo": {
+                      "type": "string",
+                      "description": "卡号"
+                  }
+               }
+             }
+          example: !include x-GdealerNo.json
+  /batchSave:
+    is: [secured, market, errorReporter]
+    displayName: (batchSaveDealer) 小批量同步會員資料 
+    post:
+      is: [batched]
+      description: (batchSaveDealer) 小批量同步會員資料 - 對於會員的新增、修改、刪除,可支援通過後臺批量同步的方式上傳到 GDS
+      body:
+        schema: !include Gdealers.json
+        example: !include x-Gdealers.json
+      responses:
+        200:
+          body:
+            schema: !include batchSaveDealer.json
+            example: !include x-batchSaveDealerResponse.json
+  /batchDelete:
+    is: [secured, market, errorReporter]
+    displayName: (deleteDealer) 刪除會員資料
+    post:
+      is: [batched]
+      description: (deleteDealer) 刪除會員資料 - GDS每晚HealthCheck將GDS比DS/POS多出的會員資料記錄，保存在UPL_CHECK_RESULT表中，GDS定時發起刪除批令，DS調用，GDS做刪除處理，刪除確認的會員在SGDEALER、GDEALER_PERSONAL_INFO、GDEALER_FAMILY_INFO及GDEALER_TYPE_STATUS中對應的記錄
+      body:
+        schema: !include deleteDealer.json
+        example: !include x-deleteDealer.json
+      responses:
+        200:
+          body:
+            schema: !include deleteDealerResponse.json
+            example: !include x-deleteDealerResponse.json
+  /foreignSponsors:
+    is: [secured, market, errorReporter]
+    displayName: (findForeignSponsors) 小批量下載海外推薦人資料
+    get:
+      is: [batched]
+      description: (findForeignSponsors) 小批量下載海外推薦人資料 - 在查詢海外推薦人時調用該介面方法 從 Gdealer 查詢出所屬機構代號為參數的全部會員號集合,從中排除一般會員即為海外推薦人
+      responses:
+        200:
+          body:
+            schema: !include foreignSponsors.json
+            example: !include x-foreignSponsors.json
+  /{dealerNo}:
+    is: [secured, market, errorReporter]
+    displayName: (saveDealer) 即時會員資料保存
+    put:
+      description: (saveDealer) 即時會員資料保存 - 當POS系統成功新增會員後，把會員資料即時上傳到GDS系統。
+      body:
+        schema: !include Gdealer.json
+        example: !include x-Gdealer.json
+      responses:
+        200:
+          body:
+            schema: |
+              {
+                "type": "object",
+                "$schema": "http://json-schema.org/schema",
+                "properties": {
+                    "dealerNo": {
+                        "type": "string",
+                        "description": "卡号"
+                    }
+                 }
+               }
+            example: !include x-GdealerNo.json
+    /sponsorVerify:
+      is: [secured, market, errorReporter]
+      displayName: (sponsorVerify) 推薦人即時鑒別
+      post:
+        description: (sponsorVerify) 推薦人即時鑒別 - 推薦人即時鑒別 (由 POS 系統的會員申請介面發起介面查詢請求,連接到 GDS 即時查詢推薦人資料。)
+        responses:
+          200:
+            body:
+              application/json:
+                schema: !include Gdealer.json
+                example: !include x-Gdealer.json
+      
+/gtreeAlters:
+  is: [secured, market, errorReporter]
+  /moveLine:
+    /results:
+      is: [secured, market, errorReporter]
+      displayName: (findMoveSponsor) 下載移線會員資料
+      get:
+        is: [batched]
+        description: (findMoveSponsor) 下載移線會員資料
+        responses:
+          200:
+            body:
+              schema: !include findMoveSponsorList.json
+              example: !include x-findMoveSponsor.json
+    /notify:
+      is: [secured, market, errorReporter] 
+      displayName: (treeAlterPrecess) 移線處理通知
+      post:
+        is: [batched]
+        description: (treeAlterPrecess) 移線處理通知 GDS
+        body:
+          example: |
+            {
+              "alterNo": "62783",
+              "tranDealerNo": "63523"
+            }
+        responses:
+          200:
+            body:
+              example: !include x-treeAlterPrecess.json
+    /applications:
+      /{appNo}:
+        is: [secured, market, errorReporter]
+        displayName: (applyMoveLine) 會員移線申請
+        put:
+          description: (applyMoveLine) 會員移線申請 - POS 系統處理會員移線資料後,即時自動更新 GDS 系統的會員資料庫。同時也須具備有批次整批傳送的功能介面, 可過濾特定會員編號起迄區間的資料再上傳
+          body:
+            schema: !include applyMoveLineParm.json
+            example: !include x-applyMoveLineParmRequest.json
+          responses:
+            200:
+              body:
+                schema: !include applyMoveLine.json
+                example: !include x-applyMoveLineResponse.json
+  /terminate:
+    /results:
+      is: [secured, market, errorReporter]
+      displayName: (findExpelDealer) 下載批刪會員資料
+      get:
+        is: [batched]
+        description: (findExpelDealer) 下載批刪會員資料
+        responses:
+          200:
+            body:
+              schema: !include findExpelDealerList.json
+              example: !include x-findExpelDealer.json
+    /notify:
+      is: [secured, market, errorReporter]
+      displayName: (treeAlterPrecess) 批刪處理通知
+      post:
+        is: [batched]
+        description: (treeAlterPrecess) 批刪處理通知 GDS
+        body:
+          example: |
+            {
+              "alterNo": "62783",
+              "tranDealerNo": "63523"
+            }
+        responses:
+          200:
+            body:
+              example: !include x-treeAlterPrecess.json
+    /applications:
+      /{appNo}:
+        is: [secured, market, errorReporter]
+        displayName: (appEligibleSuspend) 會員申請資格中止
+        put:
+          description: (appEligibleSuspend) 會員申請資格中止
+          body:
+            application/json:
+              schema: !include appEligibleSuspend.json
+              example: !include x-appEligibleSuspend.json
+          responses:
+            200:
+              body:
+                schema: !include appEligibleSuspendResponse.json
+                example: !include x-appEligibleSuspendResponse.json
+  /applications:
+    /{appNo}/status:
+      is: [secured, market, errorReporter]
+      displayName: (applyStatusQuery) 會員移線、停權申請狀態查詢
+      get:
+        description: (applyStatusQuery) 會員移線、停權申請狀態查詢
+        responses:
+          200:
+            body:
+              schema: !include applyStatusQuery.json
+              example: !include x-applyStatusQuery.json
+/orders:
+  /batchSave:
+    is: [secured, market, errorReporter]
+    displayName: (batchSaveSo) 小批量同步銷售資料
+    post:
+      is: [batched]
+      description: (batchSaveSo) 小批量同步銷售資料 - 在批量同步銷售資料時調用該介面方法在每天固定時間 GDS 向 DS/POS 發出指令,通知 DS/POS 將需要未同步的銷售資料(包括新增、修改、刪除[寫刪除標 誌]的銷售單)上傳到 GDS,DS/POS 接指令後掃描未同步的銷售資料,調用 GDS 的該介面上傳資料,並根據返回的結 果更新同步標誌,如果有物理刪除的記錄,晚上健康檢查出來後,找出多出的會員記錄,DS/POS 根據 GDS 的調度指 令,從 GDS 獲取差異結果,對於 GDS 多出記錄的差異結果,DS/POS 自動檢索在本系統中是否存在該記錄,沒有則向 GDS 確認,GDS 從庫中刪除相應記錄。
+      body:
+        schema: !include gsoMasterList.json
+        example: !include x-batchSaveSoRequest.json
+      responses:
+        200:
+          body:
+            schema: !include orderBatchSave.json
+            example: !include x-orderBatchSave.json
+/orgList:
+  is: [secured, market, errorReporter]
+  displayName: (findSaleOrgInfoList) 獲取銷售組織列表
+  get:
+    description: (findSaleOrgInfoList) 獲取銷售組織列表.
+    queryParameters:
+      saleOrgCode:
+        type: string
+        required: true
+      languageCode:
+        type: string
+        required: true
+    responses:
+      200:
+        body:
+          schema: !include findSaleOrgInfoList.json
+          example: !include x-findSaleOrgInfoList.json
+/marketChanges:
+  is: [secured, market, errorReporter]
+  /transferOut:
+    /results:
+      is: [secured, market, errorReporter]
+      displayName: (findTransOutList) 下載轉出會員清單
+      get:
+        is: [batched]
+        description: (findTransOutList) 下載轉出會員清單
+        responses:
+          200:
+            body:
+              schema: !include findTrans.json
+              example: !include x-findTrans.json
+    /notify:
+      is: [secured, market, errorReporter]
+      displayName: (transOut) 上傳轉出會員處理清單
+      post:
+        is: [batched]
+        description: (transOut) 上傳轉出會員處理清單
+        body:
+          schema: |
+              {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$schema": "http://json-schema.org/schema",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "description": "id"
+                        }
+                    }
+                  }
+              }
+          example: |
+              [
+                {
+                  "id": ""
+                }
+              ]
+        responses:
+          200:
+            body:
+              schema: !include transOut.json
+              example: !include x-transOut.json
+    /applications:
+      is: [secured, market, errorReporter]
+      displayName: 操作本市場（源市場）轉出申請的列表
+      get:
+        description: (findGdealerChgOrgAppList) 獲取本市場（源市場）轉出申請的列表
+        queryParameters:
+          subOrg:
+            type: string
+            required: false
+        responses:
+          200:
+            body:
+              schema: !include GdealerChgOrgCodeList.json
+              example: !include x-GdealerChgOrgCode.json
+      post:
+        description: (saveGdealerChgOrgApp) 保存轉出本市場（源市場）的申請
+        body:
+          schema: !include GdealerChgOrgCode.json
+          example: !include x-saveGdealerChgOrgApp.json
+        responses:
+          200:
+            body:
+              schema: !include saveGdealerChgOrgAppResponse.json
+              example: !include x-saveGdealerChgOrgAppResponse.json
+      /{appID}:
+        is: [secured, market, errorReporter]
+        displayName: (deleteGdealerChgOrgApp) 刪除轉出本市場（源市場）的申請
+        delete:
+          description: (deleteGdealerChgOrgApp) 刪除轉出本市場（源市場）的申請
+          body:
+            schema: !include GdealerChgOrgCode.json
+            example: !include x-saveGdealerChgOrgApp.json
+          responses:
+            200:
+              body:
+                example: |
+                    {
+                      "dealerNo": "960011062",
+                      "success": true,
+                      "message": ""
+                    }
+  /transferIn:
+    /results:
+      is: [secured, market, errorReporter]
+      displayName: (findTransInList) 下載轉入會員清單
+      get:
+        is: [batched]
+        description: (findTransInList) 下載轉入會員清單
+        responses:
+          200:
+            body:
+              schema: !include findTransIn.json
+              example: !include x-findTransIn.json
+    /notify:
+      is: [secured, market, errorReporter]
+      displayName: (transIn) 上傳轉入會員處理清單
+      post:
+        is: [batched]
+        description: (transIn) 上傳轉入會員處理清單
+        body:
+          schema: |
+              {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$schema": "http://json-schema.org/schema",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "description": "id"
+                        }
+                    }
+                  }
+              }
+          example: |
+              [
+                {
+                  "id": ""
+                }
+              ]
+        responses:
+          200:
+            body:
+              schema: |
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                      "$schema": "http://json-schema.org/schema",
+                      "properties": {
+                          "success": {
+                              "type": "boolean",
+                              "description": "介面調用是否成功標誌"
+                          },
+                          "id": {
+                              "type": "string",
+                              "description": "id"
+                          },
+                          "message": {
+                              "type": "string",
+                              "description": "message"
+                          }
+                      }
+                    }
+                }
+              example: |
+                [
+                  {
+                    "id": "",
+                    "success": true,
+                    "message": ""
+                  }
+                ]
+    /applications:
+      is: [secured, market, errorReporter]
+      displayName: (findGdealerChgOrgAppAuditList) 獲取其他市場轉入本市場（目標市場）申請的待審批列表
+      get:
+        description: (findGdealerChgOrgAppAuditList) 獲取其他市場轉入本市場（目標市場）申請的待審批列表
+        queryParameters:
+          subOrg:
+            type: string
+            required: false
+        responses:
+          200:
+            body:
+              schema: !include GdealerChgOrgCodeList.json
+              example: !include x-GdealerChgOrgCode.json
+      /{appID}:
+        /audit:
+          is: [secured, market, errorReporter]
+          displayName: (saveGdealerChgOrgAppAudit) 保存其他市場轉入本市場（目標市場）申請的審核結果
+          post:
+            description: (saveGdealerChgOrgAppAudit) 保存其他市場轉入本市場（目標市場）申請的審核結果
+            body:
+              schema: !include GdealerChgOrgCode.json
+              example: !include x-saveGdealerChgOrgApp.json
+            responses:
+              200:
+                body:
+                  schema: |
+                    {
+                        "type": "object",
+                          "$schema": "http://json-schema.org/schema",
+                          "properties": {
+                              "id": {
+                                  "type": "integer",
+                                  "description": "id"
+                              }
+                          }
+                    }
+                  example: |
+                    {
+                      "id": 10086
+                    }

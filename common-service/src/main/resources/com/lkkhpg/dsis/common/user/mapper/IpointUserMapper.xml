@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.user.mapper.IpointUserMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.user.dto.IpointUser" extends="com.lkkhpg.dsis.platform.mapper.system.AccountMapper.BaseResultMap" >
+    <id column="USER_ID" property="userId" jdbcType="DECIMAL" />
+    <result column="LOGIN_NAME" property="loginName" jdbcType="VARCHAR" />
+    <result column="USER_NAME" property="userName" jdbcType="VARCHAR" />
+    <result column="USER_TYPE" property="userType" jdbcType="VARCHAR" />
+    <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+    <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR" />
+    <result column="PHONE_NO" property="phoneNo" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="VARCHAR" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="ENGLISH_NAME" property="englishName" jdbcType="VARCHAR" />
+    <result column="CHINESE_NAME" property="chineseName" jdbcType="VARCHAR" />
+    <result column="MEMBER_NUMBER" property="memberNumber" jdbcType="VARCHAR" />
+    <result column="ACCOUNT_ID" jdbcType="DECIMAL" property="accountId"/>
+  </resultMap>
+  
+    <select id="selectIpointUsers" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.user.dto.IpointUser">
+        SELECT sa.account_id,
+            sa.login_name,
+            su.user_id,
+            su.user_name,
+            su.user_type,
+            su.email,
+            su.area_code,
+            su.phone_no,
+            su.status,
+            mm.member_code member_number,
+            mm.english_name,
+            MM.chinese_name,
+            MM.member_id
+        FROM (sys_user su
+        LEFT OUTER JOIN SYS_USER_ADD SUA
+        ON (sU.USER_ID=SUA.USER_ID ))
+        LEFT OUTER JOIN MM_MEMBER_V MM
+        ON (MM.MEMBER_ID=SUA.MEMBER_ID ),
+            sys_acc_rel sar,
+            sys_account sa
+        WHERE su.user_id   = sar.rel_party_id
+        AND sar.account_id = sa.account_id
+        AND sar.account_type   = 'USER'
+            <if test="userName != null">
+               and Upper(su.user_name) like concat('%',concat(Upper(#{userName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="email != null">
+               and Upper(su.email) like concat('%',concat(Upper(#{email,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="phoneNo != null">
+               and Upper(su.phone_no) like concat('%',concat(Upper(#{phoneNo,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="status != null">
+               and su.status = #{status,jdbcType=VARCHAR}
+            </if>
+            <if test="userType != null">
+               and su.user_Type = #{userType,jdbcType=VARCHAR}
+            </if>
+            <if test="loginName != null">
+               and Upper(sa.login_name) like concat('%',concat(Upper(#{loginName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="userId != null">
+               and (su.user_id = #{userId,jdbcType=DECIMAL}
+                   or su.CREATED_BY=(
+                     SELECT SAR.ACCOUNT_ID from SYS_ACC_REL sar where sar.REL_PARTY_ID=#{userId,jdbcType=DECIMAL} and sar.account_type   = 'USER'))
+            </if>
+            <if test="areaCode !=null">
+                and su.area_code = #{areaCode,jdbcType=VARCHAR}
+            </if>
+			<if test="accountId !=null">
+                and sa.account_id = #{accountId,jdbcType=DECIMAL}
+            </if>
+            <!-- TODO:排序 -->
+    </select>
+    
+    <select id="checkIpointUsers" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.user.dto.IpointUser">
+        SELECT sa.account_id,
+            sa.login_name,
+            su.user_id,
+            su.user_name,
+            su.user_type,
+            su.email,
+            su.area_code,
+            su.phone_no,
+            su.status,
+            mm.member_code member_number,
+            mm.english_name,
+            MM.chinese_name,
+            MM.member_id
+        FROM (sys_user su
+        LEFT OUTER JOIN SYS_USER_ADD SUA
+        ON (sU.USER_ID=SUA.USER_ID ))
+        LEFT OUTER JOIN MM_MEMBER_V MM
+        ON (MM.MEMBER_ID=SUA.MEMBER_ID ),
+            sys_acc_rel sar,
+            sys_account sa
+        WHERE su.user_id   = sar.rel_party_id
+        AND sar.account_id = sa.account_id
+        AND sar.account_type   = 'USER'
+            <if test="userName != null">
+               and Upper(su.user_name) = Upper(#{userName,jdbcType=VARCHAR})
+            </if>
+            <if test="email != null">
+               and Upper(su.email) = Upper(#{email,jdbcType=VARCHAR})
+            </if>
+            <if test="phoneNo != null">
+               and Upper(su.phone_no) = Upper(#{phoneNo,jdbcType=VARCHAR})
+            </if>
+            <if test="loginName != null">
+               and Upper(sa.login_name) = Upper(#{loginName,jdbcType=VARCHAR})
+            </if>
+            <if test="areaCode !=null">
+                and su.area_code = #{areaCode,jdbcType=VARCHAR}
+            </if>
+    </select>
+
+    <!-- 列表页面自动完成 -->
+    <select id="selectIpointUsersAuto" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.user.dto.IpointUser">
+        SELECT sa.account_id,
+            sa.login_name,
+            su.user_id,
+            su.user_name,
+            su.user_type,
+            su.email,
+            su.area_code,
+            su.phone_no,
+            su.status,
+            mm.member_code member_number,
+            mm.english_name,
+            MM.chinese_name,
+            MM.member_id
+        FROM (sys_user su
+        LEFT OUTER JOIN SYS_USER_ADD SUA
+        ON (sU.USER_ID=SUA.USER_ID ))
+        LEFT OUTER JOIN MM_MEMBER_V MM
+        ON (MM.MEMBER_ID=SUA.MEMBER_ID ),
+            sys_acc_rel sar,
+            sys_account sa
+        WHERE su.user_id   = sar.rel_party_id
+        AND sar.account_id = sa.account_id
+        AND sar.account_type   = 'USER'
+            <if test="userName != null">
+               and lower(su.user_name) like concat(lower(#{userName,jdbcType=VARCHAR}),'%')
+            </if>
+            <if test="email != null">
+               and lower(su.email) like concat(lower(#{email,jdbcType=VARCHAR}),'%')
+            </if>
+             <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+            
+    </select>
+
+    <select id="queryCountByEmail" resultType="java.lang.Integer" parameterType="java.lang.String">
+        select count(1)
+  from sys_user su, sys_acc_rel sar, sys_account sa
+ where su.user_id = sar.rel_party_id
+   and sar.account_id = sa.account_id
+   and sar.account_type='USER'
+   and su.email=#{email,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="queryCountByPhone" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.user.dto.IpointUser">
+        select count(1)
+  from sys_user su, sys_acc_rel sar, sys_account sa
+ where su.user_id = sar.rel_party_id
+   and sar.account_id = sa.account_id
+   and sar.account_type='USER'
+   and su.phone_no=#{phoneNo,jdbcType=VARCHAR}
+   and su.area_code = #{areaCode,jdbcType=VARCHAR}
+    </select>
+</mapper>

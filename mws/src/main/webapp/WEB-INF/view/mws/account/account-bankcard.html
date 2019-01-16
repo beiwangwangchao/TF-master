@@ -1,0 +1,117 @@
+<#include "/mws/include/header.html">
+
+<!-- ========== CONTENT START ========== -->
+
+<script src="${base.contextPath}/common/code?bankCode=MM.BANK_CODE&creditCardType=MM.CREDIT_CARD_TYPE"
+        type="text/javascript"></script>
+<script type="text/javascript">
+	$(function(){
+		$.ajax({
+			url: "${base.contextPath}/mm/bankcard/query",
+			type:"POST",
+			dataType:"json",
+			contentType : "application/json",
+            success : function(data) {
+            	if(data.success){
+            		showCredits(data);  
+            	}
+            },
+            error : function() {
+                alert("error");
+            }
+		});
+	});
+	
+	function showCredits(data){
+		for (var i = 0; i < data.total; i++) {
+			$("#creditCard").prepend(createCard(data.rows[i]));
+		}
+	}
+	
+	function createCard(card){
+		var credit = $("#creditModel").clone();
+		var creditType = credit.find('.p')[0];
+		var cardType = credit.find('.p')[3];
+		if ('CREDT' == card.cardType) {
+			$(cardType).text('<@spring.message "type.com.lkkhpg.dsis.common.member.bankcard.credit" />');
+		} else if ('DEBIT' == card.cardType){
+			$(cardType).text('<@spring.message "type.com.lkkhpg.dsis.common.member.bankcard.debit" />');
+		}
+		var temp = credit.find('.p_credit')[0];
+		$(temp).css('visibility','hidden');
+		var code = showCode(card.cardSubType, cardType);
+		$(creditType).text(showCode(card.cardSubType, creditCardType));
+		/* var creditBank = credit.find('.p')[1];
+		$(creditBank).text(showCode(card.bankCode, bankCode)); */
+		var creditTailNumber = credit.find('.p')[2];
+		$(creditTailNumber).text(card.maskedCardNumber.substring(card.maskedCardNumber.length - 4));
+		return credit.html();
+	}
+	
+	//显示快码对应值
+	function showCode(value,lookCode){
+		for(var i = 0 ; i < lookCode.length ; i++){
+			if(lookCode[i].value == value){
+				return lookCode[i].meaning;
+			}
+		}
+	}
+</script>
+<section id="content">
+    <div class="container">
+
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+			<li><@spring.message "mws.menu.mybankcard"/></li>
+        </ol>
+
+        <div class="row">
+
+            <!-- Sidebar Start -->
+            <#include "../include/account-menu.html">
+            <!-- Sidebar End -->
+
+
+            <!-- Posts Start -->
+            <div class="col-sm-8 col-md-9">
+                <article class="account-details-wrap">
+                    <h2 class="entry-title"><@spring.message "mws.menu.mybankcard" /></h2>
+                    <div class="row" style="padding: 10px 0px 0px 40px" id = "creditCard">
+	                    
+                    </div>
+                </article>
+            </div>
+            <!-- Posts End -->
+			
+			<div style=" display:none" id = "creditModel">
+				<div class ="col-lg-6 col-md-8 col-sm-10 col-xs-12" style="position:relative">
+					<div class = "portlet">
+						<a href="#">
+							<img src="${base.contextPath}/resources/img/creditCard.png" class="carousel-inner img-responsive img-rounded" >
+							<div style="position:absolute;top: 20%;right: 5%;color: white;">
+								<div class = "col-md-6 col-sm-6 col-xs-6 col-md-offset-6 col-sm-offset-6 col-xs-offset-6">
+									<label class = "col-md-5 col-sm-5 col-xs-5"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.creditCardType" /></label>
+									<span class="p col-md-7 col-sm-7 col-xs-7"></span>
+								</div>
+								<div class = "col-md-6 col-sm-6 col-xs-6 col-md-offset-6 col-sm-offset-6 col-xs-offset-6 p_credit">
+									<label class = "col-md-5 col-sm-5 col-xs-5"><@spring.message "type.com.lkkhpg.dsis.common.order.orderinvalid.bank"/></label>
+									<span class="p col-md-7 col-sm-7 col-xs-7"></span>
+								</div>
+								<div class = "col-md-6 col-sm-6 col-xs-6 col-md-offset-6 col-sm-offset-6 col-xs-offset-6">
+									<label class = "col-md-5 col-sm-5 col-xs-5"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.creditcard.maskedcreditcardnum"/></label>
+									<span class="p col-md-7 col-sm-7 col-xs-7"></span>
+								</div>
+							</div>
+							<div class = "col-md-3 col-sm-3 col-xs-3 col-md-offset-8 col-sm-offset-8 col-xs-offset-8" style="position:absolute;top:80%;color: white;">
+								<span class="p"></span>
+							</div>
+						</a>
+					</div>					
+				</div>
+			</div>	
+		</div>
+	</div>
+</section>
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

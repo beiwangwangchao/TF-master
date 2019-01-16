@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.system.CodeValueMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.system.CodeValue" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD">
+        <id column="CODE_VALUE_ID" property="codeValueId" jdbcType="DECIMAL"/>
+        <result column="CODE_ID" property="codeId" jdbcType="DECIMAL"/>
+        <result column="VALUE" property="value" jdbcType="VARCHAR"/>
+        <result column="MEANING" property="meaning" jdbcType="VARCHAR"/>
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR"/>
+        <result column="SORT_NUM" property="sortNum" jdbcType="DECIMAL"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        CODE_VALUE_ID,CODE_ID, VALUE, MEANING, DESCRIPTION,
+        OBJECT_VERSION_NUMBER, REQUEST_ID,
+        PROGRAM_ID,
+        CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12,
+        ATTRIBUTE13,
+        ATTRIBUTE14,
+        ATTRIBUTE15,
+        SORT_NUM,
+        discount
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.platform.dto.system.CodeValue">
+        select
+        <include refid="Base_Column_List"/>
+        from SYS_CODE_VALUE_B
+        where CODE_VALUE_ID = #{codeValueId,jdbcType=DECIMAL}
+    </select>
+    <select id="selectCodeValues" resultMap="BaseResultMap"
+            parameterType="com.lkkhpg.dsis.platform.dto.system.CodeValue">
+
+        SELECT scb.code_value_id,scb.code_id ,scb.value ,COALESCE(sct.meaning, scb.meaning) meaning ,sct.description
+        ,scb.OBJECT_VERSION_NUMBER, scb.REQUEST_ID, scb.PROGRAM_ID, scb.SORT_NUM,
+        scb.CREATION_DATE, scb.CREATED_BY, scb.LAST_UPDATED_BY,
+        scb.LAST_UPDATE_DATE, scb.LAST_UPDATE_LOGIN, scb.ATTRIBUTE_CATEGORY,
+        scb.ATTRIBUTE1, scb.ATTRIBUTE2, scb.ATTRIBUTE3, scb.ATTRIBUTE4,
+        scb.ATTRIBUTE5, scb.ATTRIBUTE6, scb.ATTRIBUTE7, scb.ATTRIBUTE8,
+        scb.ATTRIBUTE9, scb.ATTRIBUTE10, scb.ATTRIBUTE11, scb.ATTRIBUTE12,
+        scb.ATTRIBUTE13, scb.ATTRIBUTE14, scb.ATTRIBUTE15
+        FROM sys_code_value_b scb
+        LEFT OUTER JOIN sys_code_value_tl sct
+        ON (scb.code_value_id = sct.code_value_id
+        AND sct.lang =#{request.locale,jdbcType=VARCHAR})
+        <where>
+            <if test="codeValueId != null">
+                scb.code_value_id = #{codeValueId,jdbcType=DECIMAL}
+            </if>
+            <if test="codeId != null">
+                scb.code_id = #{codeId,jdbcType=DECIMAL}
+            </if>
+            <if test="value != null">
+                AND scb.value = #{value,jdbcType=VARCHAR}
+            </if>
+            <if test="meaning != null">
+                AND scb.meaning = #{meaning,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by scb.SORT_NUM
+    </select>
+    
+    
+    
+    <select id="selectCodeValuesByCodeName" resultMap="BaseResultMap" parameterType="string">
+        SELECT scvb.code_id, scvb.value, sct.meaning, sct.sort_num
+          FROM sys_code_value_b scvb
+          LEFT OUTER JOIN sys_code_value_tl sct
+            ON (scvb.code_value_id = sct.code_value_id AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+         INNER JOIN sys_code_b scb
+            ON (scb.code_id = scvb.code_id)
+         WHERE scb.code = #{codeName}
+    </select>
+
+ <select id="selectCodeValuesByCode" resultMap="BaseResultMap" >
+        SELECT scvb.code_id, scvb.value, sct.meaning ,scvb.CODE_VALUE_ID
+          FROM l scvb
+          LEFT OUTER JOIN sys_code_value_tl sct
+            ON (scvb.code_value_id = sct.code_value_id AND sct.lang = #{langCode})
+         INNER JOIN sys_code_b scb
+            ON (scb.code_id = scvb.code_id)
+         WHERE scb.code = #{codeName}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.CodeValue">
+        delete from
+        SYS_CODE_VALUE_B
+        where CODE_VALUE_ID = #{codeValueId,jdbcType=DECIMAL}
+        
+    </delete>
+
+    <delete id="deleteByCodeValueId" parameterType="com.lkkhpg.dsis.platform.dto.system.CodeValue">
+        delete from
+        SYS_CODE_VALUE_B
+        where CODE_VALUE_ID = #{codeValueId,jdbcType=DECIMAL}
+    </delete>
+
+    <delete id="deleteByCodeId" parameterType="com.lkkhpg.dsis.platform.dto.system.CodeValue">
+        delete from
+        SYS_CODE_VALUE_B
+        where CODE_ID = #{codeId,jdbcType=DECIMAL}
+    </delete>
+    <delete id="deleteTlByCodeId" parameterType="com.lkkhpg.dsis.platform.dto.system.CodeValue">
+        delete from
+        SYS_CODE_VALUE_TL
+        where CODE_VALUE_ID in (
+                  select code_value_id
+                  from sys_code_value_b cvb
+                  where cvb.code_id = #{codeId,jdbcType=DECIMAL})
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.CodeValue" useGeneratedKeys="false"
+            keyProperty="codeValueId">
+        <selectKey resultType="long" keyProperty="codeValueId" order="BEFORE">
+            select sys_code_value_b_s.nextVal as codeValueId from dual
+        </selectKey>
+        insert into SYS_CODE_VALUE_B
+        (CODE_VALUE_ID,CODE_ID, VALUE, MEANING,
+        DESCRIPTION, 
+        REQUEST_ID,
+        PROGRAM_ID, CREATION_DATE, CREATED_BY,
+        LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY, ATTRIBUTE1,
+        ATTRIBUTE2,
+        ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5,
+        ATTRIBUTE6, ATTRIBUTE7,
+        ATTRIBUTE8,
+        ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11,
+        ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14,
+        ATTRIBUTE15, SORT_NUM)
+        values
+        (#{codeValueId,jdbcType=DECIMAL},#{codeId,jdbcType=DECIMAL}, #{value,jdbcType=VARCHAR},
+        #{meaning,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR},
+        #{requestId,jdbcType=DECIMAL},
+        #{programId,jdbcType=DECIMAL},
+        current_timestamp,
+        #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        current_timestamp,
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR},
+        #{attribute2,jdbcType=VARCHAR},
+        #{attribute3,jdbcType=VARCHAR},
+        #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR},
+        #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR},
+        #{attribute9,jdbcType=VARCHAR},
+        #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR},
+        #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR},
+        #{attribute15,jdbcType=VARCHAR}, #{sortNum,jdbcType=DECIMAL})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.CodeValue">
+        update
+        SYS_CODE_VALUE_B
+        set
+        value = #{value,jdbcType=VARCHAR},
+        MEANING = #{meaning,jdbcType=VARCHAR},
+        DESCRIPTION
+        = #{description,jdbcType=VARCHAR},
+        OBJECT_VERSION_NUMBER =OBJECT_VERSION_NUMBER+1,
+        REQUEST_ID =
+        #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID =
+        #{programId,jdbcType=DECIMAL},
+        LAST_UPDATED_BY =
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE =
+        current_timestamp,
+        LAST_UPDATE_LOGIN =
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        ATTRIBUTE_CATEGORY =
+        #{attributeCategory,jdbcType=VARCHAR},
+        ATTRIBUTE1 =
+        #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 =
+        #{attribute2,jdbcType=VARCHAR},
+        ATTRIBUTE3 =
+        #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 =
+        #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 =
+        #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 =
+        #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 =
+        #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 =
+        #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 =
+        #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 =
+        #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 =
+        #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 =
+        #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 =
+        #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 =
+        #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 =
+        #{attribute15,jdbcType=VARCHAR},
+        SORT_NUM = 
+        #{sortNum,jdbcType=DECIMAL}
+        where CODE_value_ID =
+        #{codeValueId,jdbcType=DECIMAL}
+        
+    </update>
+    <!-- Mclin添加， 查询消息模版编码LOV -->
+    <select id="queryMsgTemCodeLov" resultMap="BaseResultMap">
+    select scvb.value, coalesce(scvt.meaning, scvb.meaning) meaning
+      from sys_code_b scb, sys_code_value_b scvb
+      left outer join sys_code_value_tl scvt
+        ON (scvb.code_value_id = scvt.code_value_id AND scvt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+     <where>
+     	scb.code = 'SYS.MES_TEM_TYPE'
+        and scb.code_id = scvb.code_id
+        <if	test="value != null">
+        	and 
+        	(
+        		lower(scvb.value) like concat('%', concat(#{value, jdbcType=VARCHAR}, '%'))
+        		or
+        		upper(scvb.value) like concat('%', concat(#{value, jdbcType=VARCHAR}, '%'))
+        	)
+        </if>
+        <if	test="meaning != null">
+        	and 
+        	(
+        		scvt.meaning like concat('%', concat(#{meaning, jdbcType=VARCHAR}, '%'))
+        		or
+        		scvb.meaning like concat('%', concat(#{meaning, jdbcType=VARCHAR}, '%'))
+        	)
+        </if>
+     </where> 
+     <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+    
+    </select>
+    
+    <!-- Mclin添加， 查询邮箱帐号编码LOV -->
+    <select id="queryEmlAccountCodeLov" resultMap="BaseResultMap">
+    select scvb.value, coalesce(scvt.meaning, scvb.meaning) meaning
+      from sys_code_b scb, sys_code_value_b scvb
+      left outer join sys_code_value_tl scvt
+        ON (scvb.code_value_id = scvt.code_value_id AND scvt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+     <where>
+     	scb.code = 'SYS.EMAIL_ACCOUNT_CODE'
+        and scb.code_id = scvb.code_id
+        <if	test="value != null">
+        	and 
+        	(
+        		lower(scvb.value) like concat('%', concat(#{value, jdbcType=VARCHAR}, '%'))
+        		or
+        		upper(scvb.value) like concat('%', concat(#{value, jdbcType=VARCHAR}, '%'))
+        	)
+        </if>
+        <if	test="meaning != null">
+        	and 
+        	(
+        		scvt.meaning like concat('%', concat(#{meaning, jdbcType=VARCHAR}, '%'))
+        		or
+        		scvb.meaning like concat('%', concat(#{meaning, jdbcType=VARCHAR}, '%'))
+        	)
+        </if>
+     </where> 
+      <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+     
+    </select>
+    
+    <!-- Mclin添加， 根据description获取对应会员角色Code -->
+    <select id="getMemberRoleCodeByDescription" resultType="java.lang.String">
+    select scvb.value
+  from sys_code_b scb, sys_code_value_b scvb
+  left outer join sys_code_value_tl scvt
+    ON (scvb.code_value_id = scvt.code_value_id AND scvt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+ where scb.code = 'MM.MEMBER_ROLE'
+   and scb.code_id = scvb.code_id
+   and scvb.description = #{description, jdbcType=VARCHAR}
+    </select>
+    
+    <!-- Mclin添加， 根据description获取对应会员类型Code -->
+    <select id="queryMemberTypeCodeByDescription" resultMap="BaseResultMap">
+    select scvb.value
+  from sys_code_b scb, sys_code_value_b scvb
+ where scb.code = 'MM.MEMBER_TYPE'
+   and scb.code_id = scvb.code_id
+   and scvb.description = #{description, jdbcType=VARCHAR}
+    </select>
+    
+    <!-- Mclin添加， 根据市场获取对应默认的国家Code -->
+    <select id="getDefaultCountryByMarketCode" resultType="java.lang.String">
+select scvb.meaning
+  from sys_code_b scb, sys_code_value_b scvb
+ where scb.code = 'MM.MEMBER_DEFAULT_COUNTRY'
+   and scb.code_id = scvb.code_id
+   and scvb.value = #{marketCode, jdbcType=VARCHAR}
+   </select>
+
+    <!-- ADD BY XinJia.Yao,根据快速编码名称获取对应的用户名 -->
+    <select id="getUserNameByCode" resultMap = 'BaseResultMap'>
+        SELECT scvb.meaning
+        FROM sys_code_b       scb,
+        sys_code_value_b scvb
+        WHERE scb.code = 'OM.E-INVOICE_JOB_EMAIL'
+        AND scvb.code_id = scb.code_id
+    </select>
+
+    <!-- 20180508添加， 根据银行名称获取银行编码 -->
+    <select id="getBankCodeByBankName" resultMap="BaseResultMap">
+        SELECT SCV.VALUE, SCV.MEANING, SCV.DESCRIPTION
+          FROM SYS_CODE_B SC, SYS_CODE_VALUE_B SCV
+         WHERE SC.CODE_ID = SCV.CODE_ID
+           AND SC.CODE = 'SPM.BANK_CODE'
+           AND SCV.MEANING =#{bankName, jdbcType=VARCHAR}
+
+    </select>
+
+</mapper>

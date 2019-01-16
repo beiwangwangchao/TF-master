@@ -1,0 +1,125 @@
+<#--
+ * description: 附件查询
+ * version: 1.0 
+ * author:njq.niu@hand-china.com
+ *
+ * 
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+    <form id="attForm"></form>
+    <div id="attGrid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function() {
+        window['attForm'] = $("#attForm").ligerForm({
+            fields : [ { 
+                display:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.attachcategory.categoryname"/>',
+                type:'select',
+                name:'categoryId',
+                textField:'categoryName',
+                newline : false,
+                options : {
+                    valueField : 'id',
+                    textField : 'name',
+                    data : [
+                    <#if markets??>
+                        <#list markets as market>
+                        {
+                            'id' : '${market.categoryId}',
+                            'name' : '${market.categoryName}'
+                        }
+                        <#if market_has_next>,</#if>
+                        </#list>
+                    </#if>
+                   ]
+                } 
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.attachment.sysfile.filename"/>', 
+                name : 'fileName',
+                newline : false
+            }],
+            buttons : [ {
+                text : '<@spring.message "sys.hand.btn.query"/>',
+                disabled : false,
+                width : 60,
+                click : function() {
+                    Hap.gridQuery({
+                        form : attForm,
+                        grid : attGrid
+                    })
+                }
+            } ]
+        });
+
+        window['attGrid'] = $("#attGrid").ligerGrid({
+            columns : [ {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.attachcategory.categoryname"/>',
+                name : 'categoryName',
+                align : 'left',
+                width : 200
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.attachment.sysfile.filename"/>', 
+                name : 'fileName',
+                align : 'left',
+                width : 250
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.attachment.sysfile.download"/>',
+                name : 'fileId',
+                width : 120,
+                render : function(item){
+                    return '<a target="_blank"  href="${base.contextPath}/sys/attach/file/view?fileId='+item.fileId+'"><@spring.message "type.com.lkkhpg.dsis.platform.dto.attachment.sysfile.download"/></a>';
+                }
+            }/* , {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.attachment.sysfile.assign"/>',
+                name : 'fileId',
+                width : 120,
+                render : function(item){
+                    return "<a href='#' onClick='assgin(" + item.fileId + ")'><@spring.message "type.com.lkkhpg.dsis.platform.dto.attachment.sysfile.assign"/></a>";
+                }
+            } */],
+            url : '${base.contextPath}/sys/attachment/query',
+            toolbar : {
+                items : [ {
+                    text : '<@spring.message "sys.hand.btn.new"/>',
+                    disable : false,
+                    click : function() {
+                        $.ligerDialog.open({
+                            height: 300, 
+                            width: 400,
+                            url:'sys_attachment_create.html'
+                        });
+                    },
+                    icon : 'add'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click : function() {
+                        Hap.gridDelete({
+                            url: '${base.contextPath}/sys/attachment/batchDelete',
+                            grid : attGrid
+                        })
+
+                    },
+                    icon : 'delete'
+                }]
+            },
+            //delayLoad:true,
+            width : '99%',
+            height : '98%',
+            checkbox : true
+        });
+    });
+    var flag = 'FILE';
+    window.assgin = function(fileId) {
+        window.popWin = $.ligerDialog.open({
+            load : false,
+            width : 700,
+            height : 550,
+            url : 'sys_attach_assgin.html?flag='+flag+'&Id=' + fileId
+        });
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<#--
+ * description: 报表查询界面.
+ * version: 1.0
+ * author: wangc
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../../include/head.html">
+<body style="padding: 10px;">
+<form id="report_query_form"></form>
+<div id="report_query_grid"></div>
+<script type="text/javascript">
+window['report_query_form'] = $("#report_query_form").ligerForm({
+	fields : [{
+		name : 'programCode',
+		type : 'text',
+		label : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.programcode"/>',
+	},{
+		name : 'programName',
+		type : 'text',
+		label : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.programname"/>',
+		newline : false,
+	},{
+		name : 'remark',
+		type : 'text',
+		label : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.remark"/>',
+		newline : true,
+	}],
+buttons : [
+            {
+                text : '<@spring.message "sys.hand.btn.query"/>',
+                disabled : false,
+                width : 60,
+                click : function() {
+                	Hap.gridQuery({
+                        form: report_query_form,
+                        grid: report_query_grid
+                    })
+                }
+            },
+            {
+                text : '<@spring.message "sys.hand.btn.create"/>',
+                disabled : false,
+                width : 60,
+                click : function() {
+                	window.top.f_addTab('REPORT_ADD','<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.editreport"/>','sys/report/sys_report_edit.html?isedit=0');
+                }
+            }
+        ]
+});		
+
+window['report_query_grid'] = $("#report_query_grid").ligerGrid({
+    columns: [{
+        display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.programcode"/>',
+        name: 'programCode',
+        width: '150'
+    },
+    {
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.programname"/>',
+        name: 'programName',
+        width: '150'
+    },
+    {
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.remark"/>',
+        name : 'remark',
+        width: '200'
+    },
+    {
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.dataservicename"/>',
+        name: 'dataServiceName',
+        width: '200'
+    },
+    {
+    	display: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.templatecode"/>',
+        name: 'templateCode',
+        width: '100'
+    },
+    {
+        display: '<@spring.message "msg.hand.btn.run"/>',
+        align: 'center',
+        width: '100',
+        render: function(rowdata) {
+        	return "<a href='javascript:void(0);' onclick='runReport(\"" + rowdata.programCode + "\")'><@spring.message "msg.hand.btn.run"/></a>"
+        }
+    },
+    {
+        display: '<@spring.message "sys.hand.btn.action"/>',
+        align: 'center',
+        width: '100',
+        render: function(rowdata) {
+        		return "<a href='javascript:void(0);' onclick='editReport(" + rowdata.reportProgramId + ")'><@spring.message "sys.hand.btn.action"/></a>"
+        }
+    }],
+    url: '${base.contextPath}/sys/reportProgram/query',
+    rownumbers: true,
+    width: '99%',
+    height: '98%',
+});
+
+//运行
+function runReport(programCode){
+	window.top.f_removeTab('REPORT_RUN');
+	window.top.f_addTab('REPORT_RUN','<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.runreport"/>','sys/report/sys_report_run.html?programCode='+programCode);
+}
+
+//操作
+function editReport(reportProgramId){
+	window.top.f_removeTab('REPORT_EDIT');
+	window.top.f_addTab('REPORT_EDIT','<@spring.message "type.com.lkkhpg.dsis.common.system.dto.sysreportprogram.editreport"/>','sys/report/sys_report_edit.html?isedit=1&reportProgramId='+reportProgramId);
+}
+</script>
+</body>
+</html>

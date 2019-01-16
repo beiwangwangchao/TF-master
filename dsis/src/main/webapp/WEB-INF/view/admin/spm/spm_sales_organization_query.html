@@ -1,0 +1,109 @@
+<#--
+ * description: 销售区域查询界面
+ * version: 1.0
+ * author: shenqiubin
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+
+<body>
+	<form id="spm_salesOrganization_form" ></form>  
+	
+    <div id="spm_salesOrganization_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function(){
+    		window['spm_salesOrganization_form'] = $("#spm_salesOrganization_form").ligerForm({
+                fields: [
+{     display : "salesOrgId",     name : "salesOrgId",     type : "popup",     newline : false,     textField:'name', 
+		group : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcountry.baseinfo"/>',
+    options:${lovService.getLov(base.contextPath,base.locale, "lov_sales_organization")} },
+                    { type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.salesorg.code"/>', newline:false, name: 'code',valueField : 'text'},
+					{ type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.name"/>', newline:false, name: 'name' },
+					{ type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.description"/>', newline:true, name: 'description' }
+                ], 
+                buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                    	var datas = spm_salesOrganization_form.getData();
+                    	var is_empty = true;
+                    	
+                        Hap.gridQuery({
+                            form:spm_salesOrganization_form,
+                            grid:spm_salesOrganization_grid
+                        })
+                       
+                    }}
+                ]
+            });
+        
+            window['spm_salesOrganization_grid'] = $("#spm_salesOrganization_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [ { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.salesorg.code"/>', 
+                	name: 'code', align: 'left', width: '9%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.name"/>', 
+                	name: 'name', align: 'left', width: '9%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.resource.description"/>', 
+                	name: 'description', align: 'left', width: '9%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.superior.sales.area"/>', 
+                	name: 'parentOrgId', align: 'left', width: '9%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spminvnumbering.marketid"/>', 
+                	name: 'marketId', align: 'left', width: '9%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.locationname"/>', 
+                	name: 'locationId', align: 'left', width: '9%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.sales.mark"/>', 
+                	name: 'salesFlag', align: 'left', width: '9%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.default.flag"/>', 
+                	name: 'defaultFlag', align: 'left', width: '9%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "sys.hand.common.enable"/>', 
+                	name: 'enabledFlag', align: 'left', width: '9%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.startactivedate"/>', 
+                	name: 'startDate', align: 'left', width: '9%', editor: { type: 'text' }
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.endactivedate"/>', 
+                	name: 'endDate', align: 'left', width: '9%', editor: { type: 'text' }
+                  }
+                ], 
+                url:'${base.contextPath}/spm/salesOrganization/query',
+                toolbar: { items: [
+                                   { text: '<@spring.message "sys.hand.btn.new"/>',disable:false, click: function(){spm_salesOrganization_grid.addRow({})}, icon: 'add' },
+                                   { line: true },
+                                   { text: '<@spring.message "sys.hand.btn.delete"/>', click: function(){
+                                        Hap.gridDelete({
+                                           grid:spm_salesOrganization_grid
+                                       }) 
+                                       
+                                   }, icon: 'delete'},
+                                   { line: true },
+                                   { text: '<@spring.message "sys.hand.btn.save"/>', click: function(){
+                                       Hap.gridSave({
+                                           grid:spm_salesOrganization_grid,
+                                           url:'${base.contextPath}/spm/salesOrganization/save'
+                                       })
+                                   }, icon: 'save'}
+                     ]
+                     },
+                enabledEdit: true,
+                //usePager:true,
+                width: '100%', 
+                height: '99%', 
+                checkbox: true,
+                rownumbers: true,
+                pageSizeOptions:[10,20],
+                pageSize:'10' 
+            }); 
+    	
+           
+    	});//$function
+    </script>
+</body>
+</html>

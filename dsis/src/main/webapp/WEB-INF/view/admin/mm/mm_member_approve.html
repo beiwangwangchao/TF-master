@@ -1,0 +1,350 @@
+<#--
+ * description: 新会员审核界面
+ * version: 1.0
+ * author: mclin
+ * .
+ *
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+	<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+	<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+	<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+	<script src="${base.contextPath}/common/code?memberStatus=MM.MEMBER_STATUS" type="text/javascript"></script>
+	<form id="query_form" method="post"></form>  
+    <div id="member_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    var markets = [];
+    function queryMarkets(){
+    	$.ajax({
+ 			url: '${base.contextPath}/spm/market/queryMarketsByRole',
+ 			type:"POST",
+ 			dataType:"json",
+ 			contentType : "application/json",
+             data : '',
+             async: false,
+             success : function(json) {
+                 if(json.success){
+                	 $(json.rows).each(function(i,o){
+                		 markets.push({"id":o.marketId,"text":o.name})
+                	 })
+                 }
+             },
+             error : function() {
+             }
+ 		})
+    	 
+    }
+    queryMarkets();
+    var openTime = 1;
+    <#assign marketId = (RequestParameters._marketId ! ) />
+    <#if marketId != ''>
+	currentMarket = ${RequestParameters._marketId};
+	</#if>
+	<#if marketId == ''>
+	currentMarket = _marketId;
+	</#if>
+    
+    	$(function(){
+    		window['query_form'] = $("#query_form").ligerForm({
+                fields: [
+				{ type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>', newline:false, name: 'marketId',valueField : 'text',
+			options : {		
+		    	value: currentMarket,
+				data:markets,
+				onSelected:function(o){
+					if(openTime == 1){
+						$.ligerDialog.confirm('<@spring.message "dsis.lkkhpg.tip.refresh_page"/>',$l('sys.hand.tip.info'),
+		                          function(yes) {
+		                              if(yes){
+		                            	  	var tabid = window.top.tab.selectedTabId;
+			              			    	var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+			              			    	window.top.f_removeTab(tabid);
+			              					window.top.f_addTab(tabid, tabname, "mm/mm_member_approve.html?_marketId="+o);
+		                              }else{
+		                            	  	openTime = openTime + 1;
+		                            		liger.get('marketId').setValue(currentMarket);
+		                              }
+		                          });
+					}else{
+						openTime = 1;
+					}
+					
+				}
+		    },
+		    validate : {
+		    	required: true
+				}
+		},   
+		{
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+            name: "memberCode",
+            type: "popup",
+            newline: false,
+            validate: {
+                digits: true,
+                maxlength: 10
+            },
+            textField: 'memberCode',
+            options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+                 onLoadData: function(){
+                    this.setParm('marketId', liger.get('marketId').selectedValue)
+                } ,
+                  onChangeValue: function(){
+                    this.setParm('marketId', liger.get('marketId').selectedValue)
+                }  
+            })
+        }, { 
+                	label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername"/>',
+                	type: 'text', newline:false, name: 'memberName'
+                }, { 
+                	label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phonenumber"/>',
+                	type: 'text', newline:true, name: 'phoneNo' 
+                }, { 
+                	label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.registnumber"/>',
+                	type: 'text', newline:false, name: 'registNumber' 
+                } ], 
+                buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){                       
+                        Hap.gridQuery({
+                            form:query_form,
+                            grid:member_grid
+                        })
+                    }}, {
+                    	text: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.approve"/>', id:'approveBtn', disabled:true, width: 60,
+                    	<#if accessService.access("APPROVE_ENABLE") == false>
+                            disabled:true,
+                        </#if>
+                    	click: function(){ 
+                    		if (member_grid.getSelected().length <= 0) {
+                    			$.ligerui.get('approveBtn').set('disabled', true);
+                        		$.ligerui.get('rejectBtn').set('disabled', true);
+                        		return;
+                    		}
+                    		gridSubmit({
+                    			grid: member_grid,
+                       		  	url: '${base.contextPath}/mm/member/active',
+                       		 	confirmTip: '<@spring.message "msg.warning.member.confirm_approve"/>',
+                       		 	successTip: '<@spring.message "msg.info.member.approved"/>'
+                    		});
+                    }}, {
+                    	text: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.reject"/>', id: 'rejectBtn', disabled:true, width: 60,
+                    	<#if accessService.access("REJECT_ENABLE") == false>
+                            disabled:true,
+                        </#if>
+                    	click: function(){  
+                    		if (member_grid.getSelected().length <= 0) {
+                    			$.ligerui.get('approveBtn').set('disabled', true);
+                        		$.ligerui.get('rejectBtn').set('disabled', true);
+                        		return;
+                    		}
+                    		gridSubmit({
+                    			grid: member_grid,
+                       		  	url: '${base.contextPath}/mm/member/reject',
+                       		 	confirmTip: '<@spring.message "msg.warning.member.confirm_reject"/>',
+                       		 	successTip: '<@spring.message "msg.info.member.rejected"/>'
+                    		});
+                    	}
+                    } ]
+            });
+            $.extend(liger.get('memberCode').options,{parms:{"marketId":liger.get('marketId').selectedValue}})
+        
+            window['member_grid'] = $("#member_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [
+					/* 会员ID */
+					{ 
+						display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+						hide: true,
+						name: 'memberId', align: 'left', width: 100
+					},
+                   /* 会员Code */
+                   { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+	                	name: 'memberCode', align: 'center', width: 100,
+	                	isSort: true,
+	                	render:function(rowData){
+	                        return "<a href='javascript:void(0)' onclick=link("+ rowData.memberId +")>" +  rowData.memberCode + "</a>";
+	                    }
+                  },
+                  /* 会员姓名 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername"/>',
+	                	name: 'memberName', align: 'center', width: 140
+                  },
+                  /* 所属市场 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+	                	name: 'marketName', align: 'center', width: 160
+                  },
+                  /* 加入渠道 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.joinchannel"/>',
+	                	name: 'jointSiteCode', align: 'center', width: 180
+                  },
+                  /* 电子邮箱 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.email"/>',
+	                	name: 'email', align: 'center', width: 180,
+	                	isSort: false
+                  }, 
+                  /* 联系号码 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phonenumber"/>',
+	                	name: 'phoneNo', align: 'center', width: 140
+                  }, 
+                  /* 会员状态 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberstatus"/>',
+	                	name: 'status', align: 'center', width: 120,
+	                	editor:{
+	                		type: 'select',
+	                		valueField: 'codeValueId',
+	                		textField: 'meaning',
+	                		data: memberStatus
+	                	},
+	                	render: function (item) {
+	                        return getCodeDesc(memberStatus, item.status);
+	                    }
+                  }, 
+                  /* 加入日期 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.joindate"/>',
+	                	name: 'jointDate', align: 'center', width: 140,
+	                	isSort: true
+                  }
+                ], 
+                url:'${base.contextPath}/mm/member/examineQuery',
+                toolbar: { items: [
+									{ line: true },
+                                   {                	
+                                       text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                                       menu:{ width: 120, items:
+               	                            [
+               		                 			{                	
+               		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+               		                 			    click:   function (){exportSelected("query_form","member_grid",{'status':memberStatus},_basePath);}
+               		                 			},
+               		                 			{ line: true },
+               		                 			{                	
+               		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+               		                 			    click: function (){exportDirectAll("query_form","member_grid",{'status':memberStatus},_basePath);}
+               		                 			    
+               		                 			}
+               	                          ]
+                                    	}                        
+                                   }
+                         
+                ] },
+                enabledEdit: false,
+                width: '100%', 
+                height: '99%', 
+                checkbox: true,
+                delayLoad: true,
+                pageSize: 20,
+                onSelectRow: function(){
+                	if(this.getSelectedRows().length == 0){
+                		$.ligerui.get('approveBtn').set('disabled', true);
+                		$.ligerui.get('rejectBtn').set('disabled', true);
+                	}else{
+                		$.ligerui.get('approveBtn').set('disabled', false);
+                		$.ligerui.get('rejectBtn').set('disabled', false);
+                	}
+                },
+                onUnSelectRow: function(){
+                	if(this.getSelectedRows().length == 0){
+                		$.ligerui.get('approveBtn').set('disabled', true);
+                		$.ligerui.get('rejectBtn').set('disabled', true);
+                	}else{
+                		$.ligerui.get('approveBtn').set('disabled', false);
+                		$.ligerui.get('rejectBtn').set('disabled', false);
+                	}
+                },
+            }); 
+            /**
+             * 表格提交函数代理.
+             * 
+             * <ul>
+             * <li>options.grid: grid对象</li>
+             * <li>options.confirmTip: 是否操作提示信息</li>
+             * <li>options.url: 提交操作的url</li>
+             * <li>options.waitingTip: 等待提示信息</li>
+             * <li>options.successTip: 操作成功提示信息</li>
+             * <li>options.infoTip:提示标题信息</li>
+             * </ul>
+             * @param options
+             * 
+             */
+            gridSubmit = function(options) {
+                var grid = options.grid;
+                if (!grid)$.ligerDialog.alert('"grid" not found in options!', $l('sys.hand.tip.info'), 'error');
+                grid.endEdit();
+                var rows = grid.getSelectedRows(),exms = [];            
+                //TODO:给个提示比较好
+                if(rows.length>0)
+                $.ligerDialog.confirm(options.confirmTip || $l('<@spring.message "msg.warning.member.confirm_tip"/>'), $l('sys.hand.tip.info'),function(yes) {
+                    if (yes) {
+                        if(options.url){                        
+                            var adds = [];
+                            $.each(rows,function(i,d){
+                                if(d['__status'] == 'add'){
+                                    adds.push(d);
+                                    grid.remove(d);
+                                }
+                            });
+                            
+                            exms = $.grep(rows,function(item){
+                                var isL = false;
+                                $.each(adds,function(i,data){
+                                    if(item['__id'] == data['__id']){
+                                        isL = true;
+                                        return false;
+                                    }
+                                })
+                                return !isL;
+                            })
+                            
+                            if (exms.length == 0) return;
+                            $.ligerDialog.waitting(options.waitingTip || $l('sys.hand.tip.processing'));
+                            $.ajax({
+                                url : options.url || '',
+                                type : "POST",
+                                dataType : "json",
+                                contentType : "application/json",
+                                data : JSON2.stringify(exms),
+                                success : function(json) {
+                                    options = $.extend(options,{
+                                        json:json,
+                                        grid:grid,
+                                        callback:function(json){
+                                            $.each(exms,function(i,n){
+                                                grid.remove(grid.records[n['__id']]);
+                                            })
+                                        }
+                                    })
+                                    Hap.defaultSuccessHandler(options);
+                                },
+                                error : function() {
+                                    $.ligerDialog.closeWaitting();
+                                }
+                            });
+                        }else{
+                            grid.deleteSelectedRow();
+                        }
+                    }
+                });
+            }
+    	});//$function
+    	function link(memberId){
+        	var path = "${base.contextPath}/mm/mm_member_edit.html?isedit=1&memberId=" + memberId;
+        	if (window.parent.f_addTab != undefined) {
+        		window.top.f_removeTab("MEMBER_DETAIL");
+        		window.top.f_addTab("MEMBER_DETAIL", 
+        				'<@spring.message "type.com.lkkhpg.dsis.common.member.memberdetail"/>', path);
+            } else {
+            	window.open(path)
+            }
+        }
+    </script>
+</body>
+</html>

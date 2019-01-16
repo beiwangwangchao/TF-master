@@ -1,0 +1,1040 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmLocationMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.config.dto.SpmLocation" >
+    <id column="LOCATION_ID" property="locationId" jdbcType="DECIMAL" />
+    <result column="CITY_CODE" property="cityCode" jdbcType="VARCHAR" />
+    <result column="CITY_NAME" property="cityName" jdbcType="VARCHAR" />
+    <result column="STATE_CODE" property="stateCode" jdbcType="VARCHAR" />
+    <result column="STATE_NAME" property="stateName" jdbcType="VARCHAR" />
+    <result column="COUNTRY_CODE" property="countryCode" jdbcType="VARCHAR" />
+    <result column="COUNTRY_NAME" property="countryName" jdbcType="VARCHAR" />
+    <result column="LOCATION_CODE" property="locationCode" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="ADDRESS_LINE1" property="addressLine1" jdbcType="VARCHAR" />
+    <result column="ADDRESS_LINE2" property="addressLine2" jdbcType="VARCHAR" />
+    <result column="ADDRESS_LINE3" property="addressLine3" jdbcType="VARCHAR" />
+    <result column="ADDRESS_LINE4" property="addressLine4" jdbcType="VARCHAR" />
+    <result column="ADDRESS_LINE5" property="addressLine5" jdbcType="VARCHAR" />
+    <result column="ZIP_CODE" property="zipCode" jdbcType="VARCHAR" />
+    <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+    <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="ADDRESS_RETURN" property="addressReturn" jdbcType="VARCHAR" />
+
+    <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    LOCATION_ID, CITY_CODE, STATE_CODE, COUNTRY_CODE, LOCATION_CODE, NAME, DESCRIPTION,
+    ADDRESS_LINE1, ADDRESS_LINE2, ADDRESS_LINE3, ADDRESS_LINE4, ADDRESS_LINE5, ZIP_CODE,
+    ENABLED_FLAG, START_ACTIVE_DATE, END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID,
+    CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+    ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+    ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+    ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" >
+    select
+    sl.LOCATION_ID, sl.CITY_CODE, sct.NAME CITY_NAME, ss.NAME STATE_NAME, sc.NAME COUNTRY_NAME, sl.STATE_CODE,
+    sl.COUNTRY_CODE, sl.LOCATION_CODE, sl.NAME, sl.DESCRIPTION,
+    sl.ADDRESS_LINE1, sl.ADDRESS_LINE2, sl.ADDRESS_LINE3, sl.ADDRESS_LINE4, sl.ADDRESS_LINE5, sl.ZIP_CODE,
+    sl.ENABLED_FLAG, sl.START_ACTIVE_DATE, sl.END_ACTIVE_DATE, sl.OBJECT_VERSION_NUMBER, sl.REQUEST_ID, sl.PROGRAM_ID,
+    sl.CREATION_DATE, sl.CREATED_BY, sl.LAST_UPDATED_BY, sl.LAST_UPDATE_DATE, sl.LAST_UPDATE_LOGIN,
+    sl.ATTRIBUTE_CATEGORY, sl.ATTRIBUTE1, sl.ATTRIBUTE2, sl.ATTRIBUTE3, sl.ATTRIBUTE4, sl.ATTRIBUTE5, sl.ATTRIBUTE6,
+    sl.ATTRIBUTE7, sl.ATTRIBUTE8, sl.ATTRIBUTE9, sl.ATTRIBUTE10, sl.ATTRIBUTE11, sl.ATTRIBUTE12, sl.ATTRIBUTE13,
+    sl.ATTRIBUTE14, sl.ATTRIBUTE15
+    from SPM_LOCATION sl
+    LEFT JOIN SPM_COUNTRY_TL sc ON (sc.COUNTRY_CODE = sl.COUNTRY_CODE AND sc.lang = #{request.locale,jdbcType=VARCHAR})
+    LEFT JOIN SPM_STATE_TL ss ON (ss.STATE_CODE = sl.STATE_CODE AND ss.lang = #{request.locale,jdbcType=VARCHAR})
+    LEFT JOIN SPM_CITY_TL sct ON (sct.CITY_CODE = sl.CITY_CODE AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+    where LOCATION_ID = #{locationId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLocation"  >
+    delete from SPM_LOCATION
+    where LOCATION_ID = #{locationId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLocation" >
+    <selectKey resultType="java.lang.Long" keyProperty="locationId" order="BEFORE" >
+      select SPM_LOCATION_S.nextval from dual
+    </selectKey>
+    insert into SPM_LOCATION (LOCATION_ID, CITY_CODE, STATE_CODE,
+    COUNTRY_CODE, LOCATION_CODE, NAME,
+    DESCRIPTION, ADDRESS_LINE1, ADDRESS_LINE2,
+    ADDRESS_LINE3, ADDRESS_LINE4, ADDRESS_LINE5,
+    ZIP_CODE, ENABLED_FLAG, START_ACTIVE_DATE,
+    END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID,
+    PROGRAM_ID, CREATION_DATE, CREATED_BY,
+    LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+    ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2,
+    ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5,
+    ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8,
+    ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11,
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14,
+    ATTRIBUTE15)
+    values (#{locationId,jdbcType=DECIMAL}, #{cityCode,jdbcType=VARCHAR}, #{stateCode,jdbcType=VARCHAR},
+    #{countryCode,jdbcType=VARCHAR},
+    <!-- 自动填充为主键
+    #{locationCode,jdbcType=VARCHAR},
+    #{name,jdbcType=VARCHAR},
+     -->
+    <if test="locationCode == null" >
+      #{locationId,jdbcType=DECIMAL},
+    </if>
+    <if test="locationCode != null" >
+      #{locationCode,jdbcType=DECIMAL},
+    </if>
+    <if test="name == null" >
+      #{locationId,jdbcType=DECIMAL},
+    </if>
+    <if test="name != null" >
+      #{name,jdbcType=DECIMAL},
+    </if>
+    #{description,jdbcType=VARCHAR}, #{addressLine1,jdbcType=VARCHAR}, #{addressLine2,jdbcType=VARCHAR},
+    #{addressLine3,jdbcType=VARCHAR}, #{addressLine4,jdbcType=VARCHAR}, #{addressLine5,jdbcType=VARCHAR},
+    #{zipCode,jdbcType=VARCHAR},
+    <if test="enabledFlag == null" >
+      'Y',
+    </if>
+    <if test="enabledFlag != null" >
+      #{enabledFlag,jdbcType=DECIMAL},
+    </if>
+    current_date,
+    #{endActiveDate,jdbcType=TIMESTAMP}, 1, #{requestId,jdbcType=DECIMAL},
+    #{programId,jdbcType=DECIMAL}, sysdate, -1,
+    -1, sysdate, #{lastUpdateLogin,jdbcType=DECIMAL},
+    #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR},
+    #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR},
+    #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR},
+    #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR},
+    #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR},
+    #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLocation" >
+    <selectKey resultType="java.lang.Long" keyProperty="locationId" order="BEFORE" >
+      select SPM_LOCATION_S.nextval from dual
+    </selectKey>
+    insert into SPM_LOCATION
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      LOCATION_ID,
+      <if test="cityCode != null" >
+        CITY_CODE,
+      </if>
+      <if test="stateCode != null" >
+        STATE_CODE,
+      </if>
+      <if test="countryCode != null" >
+        COUNTRY_CODE,
+      </if>
+      <if test="locationCode == null" >
+        LOCATION_CODE,
+      </if>
+      <if test="locationCode != null" >
+        LOCATION_CODE,
+      </if>
+      <if test="name == null" >
+        NAME,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="description != null" >
+        DESCRIPTION,
+      </if>
+      <if test="addressLine1 != null" >
+        ADDRESS_LINE1,
+      </if>
+      <if test="addressLine2 != null" >
+        ADDRESS_LINE2,
+      </if>
+      <if test="addressLine3 != null" >
+        ADDRESS_LINE3,
+      </if>
+      <if test="addressLine4 != null" >
+        ADDRESS_LINE4,
+      </if>
+      <if test="addressLine5 != null" >
+        ADDRESS_LINE5,
+      </if>
+      <if test="zipCode != null" >
+        ZIP_CODE,
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG,
+      </if>
+      START_ACTIVE_DATE,
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{locationId,jdbcType=DECIMAL},
+      <if test="cityCode != null" >
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateCode != null" >
+        #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="countryCode != null" >
+        #{countryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="locationCode == null" >
+        #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="locationCode != null" >
+        #{locationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name == null" >
+        #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="addressLine1 != null" >
+        #{addressLine1,jdbcType=VARCHAR},
+      </if>
+      <if test="addressLine2 != null" >
+        #{addressLine2,jdbcType=VARCHAR},
+      </if>
+      <if test="addressLine3 != null" >
+        #{addressLine3,jdbcType=VARCHAR},
+      </if>
+      <if test="addressLine4 != null" >
+        #{addressLine4,jdbcType=VARCHAR},
+      </if>
+      <if test="addressLine5 != null" >
+        #{addressLine5,jdbcType=VARCHAR},
+      </if>
+      <if test="zipCode != null" >
+        #{zipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledFlag != null" >
+        #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="endActiveDate != null" >
+        #{endActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLocation" >
+    update SPM_LOCATION
+    <set >
+      <if test="cityCode != null" >
+        CITY_CODE = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="stateCode != null" >
+        STATE_CODE = #{stateCode,jdbcType=VARCHAR},
+      </if>
+      <if test="countryCode != null" >
+        COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="locationCode != null" >
+        LOCATION_CODE = #{locationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="addressLine1 != null" >
+        ADDRESS_LINE1 = #{addressLine1,jdbcType=VARCHAR},
+      </if>
+      <if test="addressLine2 != null" >
+        ADDRESS_LINE2 = #{addressLine2,jdbcType=VARCHAR},
+      </if>
+      <if test="addressLine3 != null" >
+        ADDRESS_LINE3 = #{addressLine3,jdbcType=VARCHAR},
+      </if>
+      <if test="addressLine4 != null" >
+        ADDRESS_LINE4 = #{addressLine4,jdbcType=VARCHAR},
+      </if>
+      <if test="addressLine5 != null" >
+        ADDRESS_LINE5 = #{addressLine5,jdbcType=VARCHAR},
+      </if>
+      <if test="zipCode != null" >
+        ZIP_CODE = #{zipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = CURRENT_TIMESTAMP,
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where LOCATION_ID = #{locationId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLocation" >
+    update SPM_LOCATION
+    set CITY_CODE = #{cityCode,jdbcType=VARCHAR},
+    STATE_CODE = #{stateCode,jdbcType=VARCHAR},
+    COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR},
+    LOCATION_CODE = #{locationCode,jdbcType=VARCHAR},
+    NAME = #{name,jdbcType=VARCHAR},
+    DESCRIPTION = #{description,jdbcType=VARCHAR},
+    ADDRESS_LINE1 = #{addressLine1,jdbcType=VARCHAR},
+    ADDRESS_LINE2 = #{addressLine2,jdbcType=VARCHAR},
+    ADDRESS_LINE3 = #{addressLine3,jdbcType=VARCHAR},
+    ADDRESS_LINE4 = #{addressLine4,jdbcType=VARCHAR},
+    ADDRESS_LINE5 = #{addressLine5,jdbcType=VARCHAR},
+    ZIP_CODE = #{zipCode,jdbcType=VARCHAR},
+    ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+    START_ACTIVE_DATE = CURRENT_TIMESTAMP,
+    END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+    OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+    REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+    PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+
+    CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+    LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+    LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+    LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+    ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+    ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+    ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+    ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+    ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+    ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+    ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+    ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+    ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+    ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+    ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+    ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+    ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+    ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+    ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+    ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where LOCATION_ID = #{locationId,jdbcType=DECIMAL}
+  </update>
+
+  <select id="queryByLocation" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLocation" >
+    SELECT sl.location_id,
+    sl.city_code,
+    sl.state_code,
+    sl.country_code,
+    sl.location_code,
+    sl.name,
+    sl.description,
+    sl.address_line1,
+    sl.address_line2,
+    sl.address_line3,
+    sl.address_line4,
+    sl.address_line5,
+    sl.zip_code,
+    sl.enabled_flag,
+    sl.start_active_date,
+    sl.end_active_date,
+    sl.object_version_number,
+    sl.request_id,
+    sl.program_id,
+    sl.creation_date,
+    sl.created_by,
+    sl.last_updated_by,
+    sl.last_update_date,
+    sl.last_update_login,
+    sl.attribute_category,
+    sl.attribute1,
+    sl.attribute2,
+    sl.attribute3,
+    sl.attribute4,
+    sl.attribute5,
+    sl.attribute6,
+    sl.attribute7,
+    sl.attribute8,
+    sl.attribute9,
+    sl.attribute10,
+    sl.attribute11,
+    sl.attribute12,
+    sl.attribute13,
+    sl.attribute14,
+    sl.attribute15,
+    (SELECT sc.name
+    FROM spm_country_tl sc
+    WHERE sc.country_code = sl.country_code
+    AND sc.lang = #{request.locale,jdbcType=VARCHAR}) country_name,
+    (SELECT sc.name
+    FROM spm_city_tl sc
+    WHERE sc.city_code = sl.city_code
+    AND sc.lang = #{request.locale,jdbcType=VARCHAR}) city_name,
+    (SELECT sc.name
+    FROM spm_state_tl sc
+    WHERE sc.state_code = sl.state_code
+    AND sc.lang = #{request.locale,jdbcType=VARCHAR}) state_name
+    FROM spm_location sl
+
+    <where>
+      <if test="locationId != null" >
+        LOCATION_ID = #{locationId,jdbcType=DECIMAL}
+      </if>
+      <if test="cityCode != null" >
+        AND CITY_CODE = #{cityCode,jdbcType=VARCHAR}
+      </if>
+      <if test="stateCode != null" >
+        AND STATE_CODE = #{stateCode,jdbcType=VARCHAR}
+      </if>
+      <if test="countryCode != null" >
+        AND COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR}
+      </if>
+      <if test="locationCode != null" >
+        AND LOCATION_CODE = #{locationCode,jdbcType=VARCHAR}
+      </if>
+      <if test="name != null">
+        AND NAME like concat('%',concat(#{name,jdbcType=VARCHAR},'%'))
+      </if>
+      <if test="description != null">
+        and DESCRIPTION like concat('%',concat(#{description,jdbcType=VARCHAR},'%'))
+      </if>
+      <if test="addressLine1 != null" >
+        AND ADDRESS_LINE1 = #{addressLine1,jdbcType=VARCHAR}
+      </if>
+      <if test="addressLine2 != null" >
+        AND ADDRESS_LINE2 = #{addressLine2,jdbcType=VARCHAR}
+      </if>
+      <if test="addressLine3 != null" >
+        AND ADDRESS_LINE3 = #{addressLine3,jdbcType=VARCHAR}
+      </if>
+      <if test="addressLine4 != null" >
+        AND ADDRESS_LINE4 = #{addressLine4,jdbcType=VARCHAR}
+      </if>
+      <if test="addressLine5 != null" >
+        AND ADDRESS_LINE5 = #{addressLine5,jdbcType=VARCHAR}
+      </if>
+      <if test="zipCode != null" >
+        AND ZIP_CODE = #{zipCode,jdbcType=VARCHAR}
+      </if>
+      <if test="enabledFlag != null" >
+        AND ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR}
+      </if>
+      <if test="startActiveDate != null" >
+        AND START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP}
+      </if>
+      <if test="endActiveDate != null" >
+        AND END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP}
+      </if>
+    </where>
+    <if test="sortname != null">
+      <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+      <bind name = '_sortorder' value='@com.lkkhpg.dsis.platform.util.CommonUtils@filterString(sortorder)'/>
+      ORDER BY ${_colName} ${sortorder}
+    </if>
+
+  </select>
+
+  <update id="updateAddressLastUpdateDate" parameterType="com.lkkhpg.dsis.common.config.dto.SpmLocation">
+    update SPM_LOCATION t set t.last_update_date = sysdate where t.location_id = #{locationId,jdbcType=DECIMAL}
+  </update>
+  <!-- 根据当前市场地址获取 -->
+  <select id="selectLocationById" resultMap="BaseResultMap" >
+    select
+    sl.LOCATION_ID,
+    sl.CITY_CODE,
+    sl.STATE_CODE,
+    sl.COUNTRY_CODE,
+    sl.LOCATION_CODE,
+    sl.NAME,
+    sl.DESCRIPTION,
+    sl.ADDRESS_LINE1,
+    sl.ADDRESS_LINE2,
+    sl.ADDRESS_LINE3,
+    sl.ADDRESS_LINE4,
+    sl.ADDRESS_LINE5,
+    sl.ZIP_CODE,
+    sl.LANG,
+    case (select scv.meaning
+    from sys_code_b sc, sys_code_value_b scv
+    where sc.code_id = scv.code_id
+    and code = 'SPM.HIDE_STATE'
+    and value = sl.country_code
+    ) when 'Y' then(case sl.LANG when 'en_GB'
+    Then (
+    sl.address_line1 ||','|| decode(sl.address_line2,null,'',sl.address_line2||',') || decode(sl.address_line3,null,'',sl.address_line3||',')|| scy.name||','|| sc.name
+    )else (
+    sc.name || scy.name || sl.address_line1 || sl.address_line2 || sl.address_line3 || sl.address_line4 || sl.address_line5)
+    end) else(
+    case sl.LANG when 'en_GB'
+    Then (
+    sl.address_line1 ||','|| decode(sl.address_line2,null,'',sl.address_line2||',') || decode(sl.address_line3,null,'',sl.address_line3||',')|| scy.name||','|| ss.name||','|| sc.name
+    )else (sl.address) end) end ADDRESS_RETURN
+    from spm_location_v sl
+    left outer join spm_country_tl sc
+    on sc.lang = sl.lang and sc.country_code = sl.country_code
+    left outer join spm_state_tl ss
+    on ss.lang = sl.lang and ss.state_code = sl.state_code
+    left outer join spm_city_tl scy
+    on scy.lang = sl.lang and scy.city_code = sl.city_code
+    where sl.LOCATION_ID = #{locationId,jdbcType=DECIMAL}
+    and sl.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+  </select>
+  <!--   根据提前期查询会员(html报表) -->
+  <select id="selectTerminationMemberForReport" resultMap="BaseResultMap" parameterType="java.util.Map">
+    select * from(
+    select mmv.member_code member_code,
+    mmv.member_id member_id,
+    CASE
+    WHEN mmv.english_name is NULL THEN
+    mmv.chinese_name
+    ELSE
+    mmv.english_name
+    END member_name,
+    sl.address_line1,
+    sl.address_line2,
+    sl.address_line3,
+    sl.zip_code,
+    (select sct.name
+    from spm_city_tl sct
+    where sl.city_code = sct.city_code
+    AND sct.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}) city_name,
+    (select sst.name
+    from spm_state_tl sst
+    where sl.state_code = sst.state_code
+    AND sst.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}) state_name,
+    (select sctt.name
+    from spm_country_tl sctt
+    where sl.country_code = sctt.country_code
+    AND sctt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}) country_name
+    from mm_member_v mmv
+    left outer join mm_sponsor_v msv
+    on mmv.sponsor_no = msv.sponsor_no
+    left outer join mm_mem_site mms
+    on mmv.member_id = mms.member_id
+    and mms.site_use_code = 'CTACT'
+    left outer join spm_location sl
+    on mms.location_id = sl.location_id
+    where mmv.market_id in
+    <foreach collection="marketIdList" open="(" separator="," close=")" item="marketId" index="index">
+      #{marketId,jdbcType=DECIMAL}
+    </foreach>
+    <!--   #POS2SUPT-513 2016-12-19 09:40 BEGIN -->
+    <!--    and mmv.member_code in -->
+    <!--        (select dealer_no -->
+    <!--           from (WITH temp AS -->
+    <!--                 (SELECT orsb.dealer_no, -->
+    <!--                         orsb.ps, -->
+    <!--                         odss.period, -->
+    <!--                         odss.member_cnt_new, -->
+    <!--                         mm.member_id -->
+    <!--                    FROM mm_member mm -->
+    <!--                    LEFT JOIN omk.omk_rtl_salary_balance orsb -->
+    <!--                      ON orsb.dealer_no = mm.member_code -->
+    <!--                    LEFT JOIN omk.omk_de_salary_stat_01 odss -->
+    <!--                      ON odss.dealer_no = mm.member_code -->
+    <!--                    LEFT OUTER JOIN omk.omk_de_salary_lcl_tt odslt -->
+    <!--                      ON (odss.dealer_no = odslt.dealer_no AND -->
+    <!--                         odss.period = odslt.period) -->
+    <!--                   WHERE odss.period = to_char(add_months(to_date((SELECT MAX(period) -->
+    <!--                                                                     FROM omk.omk_me_salary_stat_01) || '01', -->
+    <!--                                                                  'YYYYMMDD'), -->
+    <!--                                                          1), -->
+    <!--                                               'yyyymm') -->
+    <!--                     AND odss.period BETWEEN -->
+    <!--                         to_char(add_months(sysdate, -11), 'yyyymm') and -->
+    <!--                         to_char(sysdate, 'yyyymm') -->
+    <!--                  UNION -->
+    <!--                  SELECT orsb.dealer_no, -->
+    <!--                         omss.pv, -->
+    <!--                         omss.period, -->
+    <!--                         omss.member_cnt_new, -->
+    <!--                         mm.member_id -->
+    <!--                    FROM mm_member mm -->
+    <!--                    LEFT JOIN omk.omk_rtl_salary_balance orsb -->
+    <!--                      ON orsb.dealer_no = mm.member_code -->
+    <!--                    LEFT JOIN omk.omk_me_salary_stat_01 omss -->
+    <!--                      ON omss.dealer_no = mm.member_code -->
+    <!--                    LEFT OUTER JOIN omk.omk_me_salary_lcl_tt omslt -->
+    <!--                      ON (omss.dealer_no = omslt.dealer_no AND -->
+    <!--                         omss.period = omslt.period) -->
+    <!--                   WHERE omss.period BETWEEN -->
+    <!--                         to_char(add_months(sysdate, -11), 'yyyymm') and -->
+    <!--                         to_char(sysdate, 'yyyymm') -->
+    <!--                     AND omss.period != to_char(add_months(to_date((SELECT MAX(period) -->
+    <!--                                                                      FROM omk.omk_me_salary_stat_01) || '01', -->
+    <!--                                                                   'YYYYMMDD'), -->
+    <!--                                                           1), -->
+    <!--                                                'yyyymm') -->
+    <!--                   ORDER BY period DESC) -->
+    <!--                 (select 12 - -->
+    <!--                         (months_between(to_date(max(t1.period), 'yyyymm'), -->
+    <!--                                        to_date(min(t1.period), 'yyyymm'))+1) pre_date, -->
+    <!--                         t1.dealer_no -->
+    <!--                    from temp t1 -->
+    <!--                    left outer join (select count(dealer_no) count1, dealer_no -->
+    <!--                                      from temp -->
+    <!--                                     where ps &lt;&gt; 0 -->
+    <!--                                        OR member_cnt_new &lt;&gt; 0 -->
+    <!--                                     group by dealer_no) t2 -->
+    <!--                      on t1.dealer_no = t2.dealer_no -->
+    <!--                   where count1 is null -->
+    <!--                   group by t1.dealer_no) union -->
+    <!--                 (select 12 - -->
+    <!--                         months_between(to_date(max(t1.period), 'yyyymm'), -->
+    <!--                                        to_date(max(t2.period), 'yyyymm')) pre_date, -->
+    <!--                         t1.dealer_no -->
+    <!--                    from temp t1, -->
+    <!--                         (select max(period) period, dealer_no -->
+    <!--                            from temp -->
+    <!--                           where ps &lt;&gt; 0 -->
+    <!--                              OR member_cnt_new &lt;&gt; 0 -->
+    <!--                           group by dealer_no) t2 -->
+    <!--                   where t1.dealer_no = t2.dealer_no -->
+    <!--                   group by t1.dealer_no) union -->
+    <!--                 (select 12 pre_date, member_code dealer_no -->
+    <!--                    from mm_member -->
+    <!--                   where 12 = #{preDate,jdbcType=VARCHAR} -->
+    <!--                     and market_id in  -->
+    <!--                     <foreach collection="marketIdList" open="(" separator="," close=")" item="marketId" index="index"> -->
+    <!--                         #{marketId,jdbcType=DECIMAL} -->
+    <!--                     </foreach> -->
+    <!--                     and status != 'TERM' -->
+    <!--                     AND member_code not in -->
+    <!--                         (select member_code -->
+    <!--                            from mm_member mm, -->
+    <!--                                 (select dealer_no -->
+    <!--                                    from temp -->
+    <!--                                   group by dealer_no) t1 -->
+    <!--                           where mm.member_code = t1.dealer_no)) -->
+    <!--                ) -->
+    <!--          where pre_date = #{preDate,jdbcType=VARCHAR}) ) order by member_code asc -->
+    and mmv.member_id in (
+    select member_id
+    from (select oso.member_id,max(oso.order_date) order_date from om_sales_order oso where oso.order_status = 'COMP' group by oso.member_id)
+    where to_char(order_date, 'yyyyMM') =
+    to_char(add_months(sysdate, - (12 - #{preDate,jdbcType=VARCHAR})), 'yyyyMM')
+    group by member_id)
+    ) order by member_code
+    <!--   #POS2SUPT-513 2016-12-19 09:40 END -->
+  </select>
+
+  <!--   根据年份、会员编号范围、奖金总额范围 查询会员CTACT地址(html报表) -->
+  <select id="selectAddressLabelForReport" resultMap="BaseResultMap" parameterType="java.util.Map">
+    select temp.member_id member_id,
+    upper(mm.member_code) member_code,
+    decode(mm.member_type,
+    'COMP',
+    decode(mm.ref_company_en,
+    NULL,
+    upper(mm.ref_company),
+    upper(mm.ref_company_en)),
+    decode(mm.english_first_name,
+    NULL,
+    upper(mm.chinese_first_name),
+    upper(mm.english_first_name))) member_name,
+    temp.bonus_amt + temp1.tran_amt bonus_amt,
+    upper(sl.address_line1) address_line1,
+    upper(sl.address_line2) address_line2,
+    upper(sl.address_line3) address_line3,
+    upper(sl.zip_code) zip_code,
+    upper(scitl.name) city_name,
+    upper(scotl.name) country_name
+    from (select bbr.member_id member_id,
+    mm.member_code member_code,
+    sum(bbr.pre_tax_amt) bonus_amt
+    from bm_bonus_release bbr
+    left outer join spm_period sp
+    on sp.period_id = bbr.period_id
+    left outer join mm_member mm
+    on mm.member_id = bbr.member_id
+    where substr(sp.period_name, 0, 4) = #{year,jdbcType=VARCHAR}
+    and sp.org_id = (select smb.market_id
+    from spm_market_b smb
+    where smb.code = 'MY')
+    group by bbr.member_id, mm.member_code) temp
+    left outer join (SELECT bat.dealer_no dealer_no, abs(SUM(bat.tran_amt)) tran_amt
+    FROM bm_adj_tran bat
+    WHERE bat.org_code = 'MAS'
+    AND substr(bat.period, 0, 4) = #{year,jdbcType=VARCHAR}
+    <![CDATA[ AND bat.tran_amt < 0 ]]>
+    GROUP BY bat.dealer_no) temp1 on (temp1.dealer_no = temp.member_code)
+    left outer join mm_member mm
+    on mm.member_id = temp.member_id
+    left outer join mm_mem_site mms
+    on (mms.member_id = temp.member_id and site_use_code = 'CTACT')
+    left outer join spm_location sl
+    on sl.location_id = mms.location_id
+    left outer join spm_city_tl scitl
+    on (sl.city_code = scitl.city_code and scitl.lang = 'en_GB')
+    left outer join spm_country_tl scotl
+    on (sl.country_code = scotl.country_code and scotl.lang = 'en_GB')
+    where
+    1=1
+    <if test="memberCodeFrom != null" >
+      AND temp.member_code >= #{memberCodeFrom,jdbcType=VARCHAR}
+    </if>
+    <if test="memberCodeTo != null" >
+      <![CDATA[ AND temp.member_code <= #{memberCodeTo,jdbcType=VARCHAR} ]]>
+    </if>
+    <if test="bonusAmtFrom != null" >
+      AND (temp.bonus_amt + temp1.tran_amt) >= #{bonusAmtFrom,jdbcType=DECIMAL}
+    </if>
+    <if test="bonusAmtTo != null" >
+      <![CDATA[ AND (temp.bonus_amt + temp1.tran_amt) <= #{bonusAmtTo,jdbcType=DECIMAL} ]]>
+    </if>
+    order by temp.member_code asc
+  </select>
+  <!-- 根据年份、会员类型、会员编号范围、奖金总额范围 查询会员HOME地址(html报表) -->
+
+  <select id="selectMailingLabelForReport" resultMap="BaseResultMap" parameterType="java.util.Map">
+    select lpad(lpad(row_number() OVER(ORDER BY
+    <if test="sortCondition == 'ENGLISH_NAME' and sortRule == 'ASC'" >
+      temp1.member_name asc
+      <!-- #PE20-212 2017-06-21 BEGIN -->
+      , rownum asc
+      <!-- #PE20-212 2017-06-21 END -->
+    </if>
+    <if test="sortCondition == 'ENGLISH_NAME' and sortRule == 'DESC'" >
+      temp1.member_name desc
+      <!-- #PE20-212 2017-06-21 BEGIN -->
+      , rownum asc
+      <!-- #PE20-212 2017-06-21 END -->
+    </if>
+    <if test="sortCondition == 'MEMBER_CODE' and sortRule == 'ASC'" >
+      temp1.member_code asc
+    </if>
+    <if test="sortCondition == 'MEMBER_CODE' and sortRule == 'DESC'" >
+      temp1.member_code desc
+    </if>),
+    5,
+    '0'),
+    6,
+    '9') serial_number,
+    temp1.member_code,
+    temp1.member_name,
+    temp1.address_line1,
+    temp1.address_line2,
+    temp1.address_line3,
+    temp1.zip_code
+    from (select
+    mm.member_code,
+    decode(mm.member_type,
+    'COMP',
+    decode(mm.ref_company_en, '', mm.ref_company, mm.ref_company_en),
+    decode(mm.english_last_name || mm.english_first_name,
+    NULL,
+    mm.chinese_last_name || mm.chinese_first_name || ' ',
+    (decode(mm.english_last_name,
+    NULL,
+    '',
+    mm.english_last_name || ',') ||
+    decode(mm.english_first_name,
+    NULL,
+    '',
+    mm.english_first_name || ' '))
+    )) member_name,
+    temp.totalBonus,
+    mm.member_type,
+    sl.address_line1,
+    sl.address_line2,
+    sl.address_line3,
+    sl.zip_code
+    from (select bbr.member_id member_id, sum(bbr.deliver_amt) totalBonus
+    from bm_bonus_release bbr
+    left outer join spm_period sp
+    on (sp.period_id = bbr.period_id and
+    (sp.org_id = (select smb.market_id
+    from spm_market_b smb
+    where smb.code = 'HK')))
+    where 1 = 1
+    <if test="year != null" >
+      and sp.period_name in
+      (#{year,jdbcType=DECIMAL} || '04',
+      #{year,jdbcType=DECIMAL} || '05',
+      #{year,jdbcType=DECIMAL} || '06',
+      #{year,jdbcType=DECIMAL} || '07',
+      #{year,jdbcType=DECIMAL} || '08',
+      #{year,jdbcType=DECIMAL} || '09',
+      #{year,jdbcType=DECIMAL} || '10',
+      #{year,jdbcType=DECIMAL} || '11',
+      #{year,jdbcType=DECIMAL} || '12',
+      to_char(to_number(#{year,jdbcType=DECIMAL}, '9999') + 1) || '01',
+      to_char(to_number(#{year,jdbcType=DECIMAL}, '9999') + 1) || '02',
+      to_char(to_number(#{year,jdbcType=DECIMAL}, '9999') + 1) || '03')
+    </if>
+    and sp.org_id = (select smb.market_id
+    from spm_market_b smb
+    where smb.code = 'HK')
+    group by bbr.member_id) temp
+    left outer join mm_member mm
+    on mm.member_id = temp.member_id
+    left outer join mm_mem_site mms
+    on (mms.member_id = temp.member_id and site_use_code = 'HOME')
+    left outer join spm_location sl
+    on sl.location_id = mms.location_id) temp1
+
+    where 1=1
+    <if test="totalBonus != null" >
+      <![CDATA[ and temp1.totalBonus >= #{totalBonus,jdbcType=DECIMAL} ]]>
+    </if>
+    <if test="memberCode != null" >
+      and temp1.member_code = #{memberCode,jdbcType=VARCHAR}
+    </if>
+    <if test="memberTypes != null" >
+      and temp1.member_type in
+      <foreach collection="memberTypes" item="memberType" index="index"
+               open="(" close=")" separator=",">
+        #{memberType,jdbcType=VARCHAR}
+      </foreach>
+    </if>
+    <!-- #PE20-212 2017-06-21 BEGIN -->
+    <if test="memCodes != null" >
+      and temp1.member_code in
+      <foreach collection="memCodes" item="memCode" index="index"
+               open="(" close=")" separator=",">
+        #{memCode,jdbcType=VARCHAR}
+      </foreach>
+    </if>
+    <!-- #PE20-212 2017-06-21 END -->
+    order by serial_number
+  </select>
+
+  <select id="queryBySalesOrgId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM SPM_LOCATION
+    WHERE LOCATION_ID =
+    (SELECT INVORG.LOCATION_ID
+    FROM SPM_ORG_DEFINATION_B INVORG
+    WHERE INVORG.SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL})
+  </select>
+  <select id="selectForSalesOrg" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from
+    spm_location
+    where location_id = (
+    select location_id from  SPM_SALES_ORGANIZATION_B where sales_org_id = #{salesOrgId,jdbcType=DECIMAL}
+    )
+  </select>
+
+</mapper>

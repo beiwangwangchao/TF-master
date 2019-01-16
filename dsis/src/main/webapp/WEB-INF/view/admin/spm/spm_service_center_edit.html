@@ -1,0 +1,734 @@
+<#--
+ * description: 服务中心详情界面
+ * version: 1.0 
+ * author:wangc
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+	<script
+		src="${base.contextPath}/common/code?scStatus=SC.SERVICE_CENTER_STATUS&telCountryCodeDate=SYS.TEL_COUNTRY_CODE"
+		type="text/javascript"></script>
+	<script src="${base.contextPath}/resources/js/spm/location_edit.min.js"
+		type="text/javascript"></script>
+	<script type="text/javascript"
+		src="${base.contextPath}/sys/org/current"></script>
+	<form id="spm_service_center_form"></form>
+	<div id="spm_service_center_grid" style="margin: 0; padding: 0"></div>
+	<div id="spm_service_btn"></div> 
+	<script type="text/javascript">
+	$l('sys.hand.title.addressinfo','<@spring.message "sys.hand.title.addressinfo"/>');
+<#assign isedit = (RequestParameters.isedit!'0')/> 
+<#assign isCloseBtnShow=accessService.access("CLOSE_VISIBLE")/> 
+<#assign isApproveBtnShow=accessService.access("APPROVE_VISIBLE")/> 
+var spmMembers;
+//会员表分页多选数据
+var checkedCustomerMem = [];
+$(function() {
+    window['serviceCenterForm'] = $("#spm_service_center_form").ligerForm({
+        fields: [{
+        	 type : 'text',
+        	 label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.salesmarket" />',
+             name : 'marketName',
+             options : {
+            	 value: _marketName,
+                 readonly: true
+             },
+             validate : {
+            	 required : true
+             }
+        },
+        {
+        	type: 'hidden',
+            name: 'marketId',
+            hidden: true,
+            options : {
+           	     value: _marketId,
+            }
+        },
+        <#if isedit == '1'>
+	        {
+	            type : 'text',
+	            label : '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition" />',
+	            newline: false,
+	            name : 'salesOrgName',
+	            options : {
+	                //value: ${RequestParameters.salesOrgId},
+	                readonly: true
+	            },
+	            validate : {
+	             required : true
+	            }
+	       },
+	       {
+	       	type: 'hidden',
+	           name: 'salesOrgId',
+	           hidden: true,
+	           options : {
+	          	     value: ${RequestParameters.salesOrgId},
+	           }
+	       },
+	      
+       <#else>
+	       {
+	           label: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition"/>',
+	           newline:false, 
+	           id : 'salesOrgId',
+	           name: 'salesOrgId',
+	           type : "combobox",
+	           options : {
+	               url: '${base.contextPath}/sys/salesOrg/queryOrg',
+	               valueField: "salesOrgId",
+	               textField: "name",
+	               value: _salesOrgId,
+	               onChangeValue : function() {
+	                   $.ajax({
+	                       type : 'POST',
+	                       dataType : 'json' ,
+	                       url : '${base.contextPath}/spm/serviceCenter/selectMarketByOrg',
+	                       data : {
+	                           salesOrgId : $("#salesOrgId").val()
+	                       },
+	                       success : function(data){
+	                          var data = data.rows;
+	                          if(data.length>0){
+	                              for(var i=0;i<data.length;i++){
+	                                  liger.get('marketName').setValue(data[i].name);
+	                                  $('#marketId').val(data[i].marketId);
+	                              }
+	                          }
+	                          //$("#spm_service_center_grid").find("tbody").children().remove();
+	                          liger.get('chargeMemberId').setText('');
+	                          serviceCenterGrid.loadData(null);
+	                       }
+	                   });
+	               }
+	           },
+	           validate : {
+	               required : true
+	           }
+	       },
+       </#if>
+        {
+            type: 'text',
+            name: 'code',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.code" />',
+            newline: false,
+            validate : {
+              	 required : true
+               }
+        },
+        {
+            type: 'text',
+            name: 'name',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.name" />',
+            newline: true,
+            validate : {
+           	 required : true
+            }
+        },
+        {
+            type: 'select',
+            name: 'status',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.status" />',
+            newline: false,
+            readonly : true,
+            options: {
+                valueField: "value",
+                textField: "meaning",
+                data: scStatus
+            }
+        },
+        {
+            name : 'areaCode',
+            type : 'select',
+            label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phonenumber" />',
+            newline : false , 
+            attr : { 
+            	placeHolder : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.countrycode" />'
+            },
+            width : 50,
+            space : 8,
+            validate : {
+                required : true
+            },
+            options : {
+            	valueField : "value",
+            	textField : "meaning",
+            	data : telCountryCodeDate
+            }
+        },
+        {   name : 'phone', 
+        	label : '-', 
+        	newline : false , 
+        	type : 'text',
+        	hideLabel: true,
+        	width:122,
+            validate : {
+                required : true
+            }
+        },
+        {
+            type: 'popup',
+            name: 'chargeMemberId',
+            textField: 'chargeMemberCode',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.chargeMemberId" />',
+            newline: true,
+            options:$.extend(${lovService.getLov(base.contextPath,base.locale, "lov_service_center_member")},{
+            	onLoadData:function(){
+                        this.setParm('marketId',$('#marketId').val());
+                    },
+                onSelect: function(e){
+                	if(!e.data || !e.data.length) return false;
+                	$.ligerui.get('chargeMemberId').setValue(e.data[0].memberId);
+                	var members = serviceCenterGrid.getData();
+                	if(members!=null){
+                		for(var i in members){
+                			if(members[i].memberId == e.data[0].memberId){
+                				$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.tip.memberrepeat" />');
+                				return false;
+                			}
+                		}
+                	}
+                	
+                }
+            }
+           ),
+           validate : {
+          	 required : true
+           }
+        },
+        {
+            type: 'date',
+            name: 'joinDate',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.joindate" />',
+            newline: false,
+            opions: {
+                format: 'yyyy-MM-dd',
+            },
+            validate : {
+           	 required : true
+            }
+        },
+        {
+            type: 'date',
+            name: 'approvedDate',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvaldate" />',
+            newline: false,
+            readonly : true,
+            opions: {
+                format: 'yyyy-MM-dd',
+            }
+        },
+        {
+            type: 'text',
+            name: 'remark',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.remark" />',
+            newline: true,
+        },
+        {
+        	type: 'hidden',
+            name: 'locationId',
+            hidden: true
+        },
+        {
+            type: 'text',
+            name: 'locationName',
+            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.locationname" />',
+            newline: false,
+            width : 498,
+            options : {
+            	 onFocus: function() {
+                    var e = this;
+                    var centerData = serviceCenterForm.getData();
+                    location_edit('${base.contextPath}', centerData.spmLocation, function(data){
+                        e.setValue(data.address);
+                        centerData.spmLocation = data;
+                    })
+                } 
+            },
+            validate : {
+            	required : true
+            }
+        },{
+        	type:'date',
+        	name:'terminateDate',
+        	label: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.terminatedate" />',
+        	readonly:true,
+        	options: {
+        		format: 'yyyy-MM-dd'
+        	}
+        }],
+    });
+    <#if isedit != '1'>
+        liger.get('salesOrgId').setText(_salesOrgName);
+    </#if>
+    window['serviceCenterGrid'] = $("#spm_service_center_grid").ligerGrid({
+        unSetValidateAttr: false,
+        columns: [{
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.memberid" />',
+            name: 'memberCode',
+            align: 'left',
+            width: '150',
+            validate : {
+            	required : true
+            }
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.chinesename" />',
+            name: 'chineseName',
+            align: 'left',
+            width: '150',
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.englishname" />',
+            name: 'englishName',
+            align: 'left',
+            width: '150',
+        },
+        {
+            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.phone" />',
+            name: 'phoneNo',
+            align: 'left',
+            width: '150',
+        }],
+        toolbar: {
+        	id : 'member_grid_tool',
+            items: [{
+            	id: 'member_grid_add',
+                text: '<@spring.message "sys.hand.btn.new"/>',
+                <#if accessService.access("EDITABLE") == false>
+                disable: true,
+                </#if>
+                click: function() {
+                	f_import_member();
+                },
+                icon: 'add'
+            },
+            {
+            	id: 'member_grid_del',
+                text: '<@spring.message "sys.hand.btn.delete"/>',
+                <#if accessService.access("EDITABLE") == false>
+                disable: true,
+                </#if>
+                click: function() {
+                    Hap.gridDelete({
+                        grid: serviceCenterGrid,
+                        url: '${base.contextPath}/spm/serviceCenter/removeMember'
+                    })
+
+                },
+                icon: 'delete'
+            }]
+        },
+        <#if isedit == '1'>
+        url : '${base.contextPath}/spm/serviceCenter/getMembers',
+        parms : {
+        	 serviceCenterId: '${RequestParameters.serviceCenterId}'
+        },
+        </#if>
+        enabledEdit: false,
+        width: '99%',
+        height: '90%',
+        checkbox: true,
+        rownumbers: true,
+        //enabledEdit: true,
+        onBeforeEdit : function(editParm){
+        	var e = this;
+        	clickGridRecord = editParm.record;
+        	var status = $('#status').val();
+        	var columnname = editParm.column.columnname;
+        	if(status == "ALING"){
+        		if(columnname=='memberCode'){
+            		return false;
+            	}
+        	}
+        },
+    });
+    
+    //按钮组
+    window['spm_service_btn'] = $("#spm_service_btn").ligerForm({
+    	buttons: [{
+            text: '<@spring.message "sys.hand.btn.save"/>',
+            id: 'btn_save',
+            align: 'right',
+            width: 60,
+            click: f_save
+        },
+        <#if isCloseBtnShow>
+        {
+            text: '<@spring.message "sys.hand.btn.close"/>',
+            id: 'btn_close',
+            width: 60,
+            disabled: true,
+            <#if isedit == '1'>
+            click: f_close
+            </#if>
+        },
+        </#if>
+        {
+            text: '<@spring.message "sys.hand.btn.submit"/>',
+            id: 'btn_submit',
+            width: 60,
+            <#if isedit == '1'>
+            disabled: true,
+            </#if>
+            click: f_submit
+        },
+        <#if isApproveBtnShow>
+        {
+            text: '<@spring.message "sys.hand.btn.approve"/>',
+            id: 'btn_approve',
+            disabled: true,
+            width: 60,
+            <#if isedit == '1'>
+            click: f_approve
+            </#if>
+        },
+        {
+            text: '<@spring.message "sys.hand.btn.reject"/>',
+            id: 'btn_reject',
+            width: 60,
+            disabled: true,
+            <#if isedit == '1'>
+            click: f_reject
+            </#if>
+        }
+        </#if>
+        ]
+    });
+    
+    <#if isedit == '1'>
+    Hap.loadForm({
+        form: serviceCenterForm,
+        url: '${base.contextPath}/spm/serviceCenter/get',
+        para: {
+            serviceCenterId: '${RequestParameters.serviceCenterId}',
+            salesOrgId : '${RequestParameters.salesOrgId}'
+        },
+        callback: function(data) {
+            var status = $('#status').val();
+            if ('NEW' == status) {
+            	$.ligerui.get('code').setReadonly(false);
+            	$.ligerui.get('btn_submit').setEnabled(true);
+            }
+            if ('ALING' == status) {
+            	$.ligerui.get('btn_approve').setEnabled(true);
+            	$.ligerui.get('btn_reject').setEnabled(true);
+            	$.ligerui.get('btn_save').setDisabled(true);
+            	$.ligerui.get('btn_submit').setDisabled(true);
+                
+                $.ligerui.get('code').setReadonly(true);
+                $.ligerui.get('name').setReadonly(true);
+                $.ligerui.get('areaCode').setReadonly(true);
+                $.ligerui.get('phone').setReadonly(true);
+                $.ligerui.get('chargeMemberId').setReadonly(true);
+                $.ligerui.get('joinDate').setReadonly(true);
+                $('#remark').attr('readonly', 'true');
+                $.ligerui.get('locationName').setReadonly(true);
+                $.ligerui.get('remark').setReadonly(true);
+                //按钮
+                liger.get('member_grid_tool').setDisabled('member_grid_add');
+                liger.get('member_grid_tool').setDisabled('member_grid_del');
+            }
+            if ('RJED' == status) {
+            	$.ligerui.get('code').setReadonly(false);
+            	$.ligerui.get('btn_close').setEnabled(true);
+            	$.ligerui.get('btn_submit').setEnabled(true);
+            }
+            if ('ALED' == status) {
+            	$.ligerui.get('code').setReadonly(false);
+            	$.ligerui.get('btn_close').setEnabled(true);
+            }
+            if ('CLOSD' == status) {
+                $.ligerui.get('code').setReadonly(false);
+            }
+        }
+    });
+    </#if>
+    
+    <#if isedit == '0'>
+    $.ligerui.get('status').setValue('NEW');
+    </#if>
+    
+    <#if accessService.access("EDITABLE") == false>
+    window['serviceCenterForm'].setEditable(false);
+    window['serviceCenterGrid'].setEditable(false);
+    </#if>
+    <#if accessService.access("SAVE_EDITABLE") == false>
+    $.ligerui.get('btn_save').setDisabled(true);
+    </#if>
+    
+    <#if accessService.access("SUBMIT_EDITABLE") == false>
+    $.ligerui.get('btn_submit').setDisabled(true);
+    </#if>
+    
+    
+    
+    
+});
+
+    /*新增会员弹窗*/
+function f_import_member(){
+    	var options = ${lovService.getLov(base.contextPath,base.locale, "lov_service_center_member")};
+        options.grid.checkbox = true;
+        options.grid.isSingleCheck = false;
+        options.grid.isChecked = m_isChecked; 
+        options.grid.onCheckRow = m_onCheckRow; 
+        options.grid.onCheckAllRow = m_onCheckAllRow;
+        
+        options.condition.fields.push({
+    		name: 'marketId',
+    		type : "text",
+    		style : 'display:none',
+    		options : {
+    			value :$('#marketId').val()
+    		}
+    	});
+        var fn = $.ligerui.getPopupFn({
+    		onSelect : function(e){
+    			f_select_member(e);
+    		},
+    		condition: options.condition,
+    		grid: options.grid,
+    		title: options.title,
+    		delayLoad : true,
+    	});
+    	fn();
+}
+    
+function f_select_member(e){
+	var selectRows;
+    if(e.data.length == 1){
+        selectRows = e.data;
+    }else{
+        selectRows = checkedCustomerMem;
+    }
+	if(selectRows == null || selectRows == undefined || selectRows.length < 1){
+		Hap.showError('<@spring.message "msg.error.config.country.selectrecord" />');
+	}
+	var gridRows = serviceCenterGrid.getData();
+	if(gridRows.length > 0){
+		for(var i = 0; i< selectRows.length; i++){
+			var memCodeSel = selectRows[i].memberCode;
+			for(var j=0;j<gridRows.length;j++){
+				var memCodeGrid = gridRows[j].memberCode;
+				if(memCodeSel == memCodeGrid){
+					Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.member.error"/>');
+					return;
+				}
+			}
+		}
+	}
+	if(e.data.length == 1){
+		serviceCenterGrid.addRows(e.data);
+	}else{
+		serviceCenterGrid.addRows(checkedCustomerMem);
+	}
+	checkedCustomerMem = [];
+}
+
+//分配会员表多选
+function m_onCheckAllRow(checked)
+{
+    for (var rowid in this.records)
+    {
+        if(checked)
+            addMember(this.records[rowid]);
+        else
+            removeMember(this.records[rowid]);
+    }
+}
+function findMember(member)
+{
+    for(var i =0;i<checkedCustomerMem.length;i++)
+    {
+        if(checkedCustomerMem[i] == member) return i;
+    }
+    return -1;
+}
+function addMember(member)
+{
+    //debugger;
+    if(findMember(member) == -1)
+        checkedCustomerMem.push(member);
+}
+function removeMember(member)
+{
+    var i = findMember(member);
+    if(i==-1) return;
+    checkedCustomerMem.splice(i,1);
+}
+
+function m_isChecked(rowdata)
+{
+    if (checkedCustomerMem(rowdata) == -1)
+        return false;
+    return true;
+}
+function m_onCheckRow(checked, data)
+{
+	if (checked) addMember(data);
+    else removeMember(data);
+}   
+
+/**
+ * Grid重复会员校验.
+ */
+function f_validate() {
+	var data = serviceCenterGrid.getData();
+	if (data.length >= 2) {
+		for (var i=0;i<data.length;i++) {
+			for (var j=i+1;j<data.length;j++) {
+				if (data[i].memberId == data[j].memberId) {
+					return false;
+				}
+			}
+		}
+	}
+	return true;
+}
+
+/*填充会员字段，并验证是否与头上会员重复*/
+function lotMemberGrid(e){
+	//负责会员与Grid新增会员不能重复校验
+	var chargeMemberId = $('#chargeMemberId').val();
+	if(e.data[0].memberId == chargeMemberId){
+		$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.config.dto.spmservicecenter.tip.memberrepeat" />');
+		serviceCenterGrid.endEdit();
+		serviceCenterGrid.remove(serviceCenterGrid.lastEditRow);
+		return false;
+	}
+	//Grid中新增会员重复校验
+	if (!f_validate()) {
+		$.ligerDialog.warn('<@spring.message "msg.error.member.cannot.select.duplicate.member" />');
+		return false;
+	}
+	
+	if(!e.data || !e.data.length) return false;
+	var updateData = {
+			'memberId' : e.data[0].memberId,
+			'chineseName' : e.data[0].chineseName,
+			'englishName' : e.data[0].englishName,
+			'phoneNo' : e.data[0].phoneNo
+	}
+	serviceCenterGrid.updateRow(serviceCenterGrid.lastEditRow,updateData);
+}
+function f_save(){
+	if (!f_validate()) {
+		$.ligerDialog.warn('<@spring.message "msg.error.member.cannot.select.duplicate.member" />');
+		return false;
+	}
+	Hap.submitForm({
+		form:serviceCenterForm,
+        grid:serviceCenterGrid,
+        gridName:'spmMembers',
+        url:'${base.contextPath}/spm/serviceCenter/save',
+        success:function(json,opt){
+        	var serviceCenterId = json.rows[0].serviceCenterId;
+        	var salesOrgId = json.rows[0].salesOrgId;
+            $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+            	window.location = '${base.contextPath}/spm/spm_service_center_edit.html?isedit=1&serviceCenterId='+serviceCenterId + '&salesOrgId='+salesOrgId
+            });                 
+        }
+	});
+}
+
+function f_submit(){
+	if (!f_validate()) {
+		$.ligerDialog.warn('<@spring.message "msg.error.member.cannot.select.duplicate.member" />');
+		return false;
+	}
+	$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.event.submit.sure" />', function(yes){
+		if(yes){
+			Hap.submitForm({
+				form:serviceCenterForm,
+		        grid:serviceCenterGrid,
+		        gridName:'spmMembers',
+		        url:'${base.contextPath}/spm/serviceCenter/submit',
+		        success:function(json,opt){
+		        	var serviceCenterId = json.rows[0].serviceCenterId;
+		        	var salesOrgId = json.rows[0].salesOrgId;
+		            $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+		            	window.location = '${base.contextPath}/spm/spm_service_center_edit.html?isedit=1&serviceCenterId='+serviceCenterId + '&salesOrgId='+salesOrgId
+		            });                 
+		        }
+			});
+		}
+    }); 
+}
+<#if isedit == '1'>
+function f_close(){
+	if (!f_validate()) {
+		$.ligerDialog.warn('<@spring.message "msg.error.member.cannot.select.duplicate.member" />');
+		return false;
+	}
+	$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.event.close.sure" />', function(yes){
+		if(yes){
+			Hap.submitForm({
+				form:serviceCenterForm,
+		        grid:serviceCenterGrid,
+		        gridName:'spmMembers',
+		        url:'${base.contextPath}/spm/serviceCenter/close',
+		        success:function(json,opt){
+		        	var serviceCenterId = json.rows[0].serviceCenterId;
+		        	var salesOrgId = json.rows[0].salesOrgId;
+		            $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+		            	window.location = '${base.contextPath}/spm/spm_service_center_edit.html?isedit=1&serviceCenterId='+serviceCenterId + '&salesOrgId='+salesOrgId
+		            });                 
+		        }
+			});
+		}
+    }); 
+}
+
+function f_approve(){
+	if (!f_validate()) {
+		$.ligerDialog.warn('<@spring.message "msg.error.member.cannot.select.duplicate.member" />');
+		return false;
+	}
+	$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.event.approve.sure" />',function(yes){
+		if(yes){
+			$.ajax({
+				url : '${base.contextPath}/spm/serviceCenter/approve',
+				data : {
+					serviceCenterId : ${RequestParameters.serviceCenterId},
+					salesOrgId : ${RequestParameters.salesOrgId}
+				},
+				success : function(){
+					$.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+						<#if isedit=='1'>
+		            	window.location = '${base.contextPath}/spm/spm_service_center_edit.html?isedit=1&serviceCenterId='+${RequestParameters.serviceCenterId} + '&salesOrgId='+${RequestParameters.salesOrgId}
+		            	</#if>
+		            }); 
+				}
+			});
+		}
+	});
+	
+}
+function f_reject(){
+	$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.event.reject.sure" />',function(yes){
+		if(yes){
+			$.ajax({
+				url : '${base.contextPath}/spm/serviceCenter/reject',
+				data : {
+					serviceCenterId : ${RequestParameters.serviceCenterId}
+				},
+				success : function(){
+					$.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+						<#if isedit=='1'>
+		            	window.location = '${base.contextPath}/spm/spm_service_center_edit.html?isedit=1&serviceCenterId='+${RequestParameters.serviceCenterId} + '&salesOrgId='+${RequestParameters.salesOrgId}
+		            	</#if>
+		            }); 
+				}
+			});
+		}
+	});
+	 
+}
+</#if>
+</script>
+</body>
+</html>

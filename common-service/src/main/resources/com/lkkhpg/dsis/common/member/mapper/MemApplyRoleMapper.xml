@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.member.mapper.MemApplyRoleMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.member.dto.MemApplyRole" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD" >
+    <id column="APPLY_ID" property="applyId" jdbcType="DECIMAL" />
+    <result column="apply_number" property="applyNumber" jdbcType="VARCHAR"/>
+    <result column="apply_date" property="applyDate" jdbcType="TIMESTAMP" />
+    <result column="member_id" property="memberId" jdbcType="DECIMAL"/>
+    <result column="market_id" property="marketId" jdbcType="DECIMAL"/>
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="approve_date" property="approveDate" jdbcType="TIMESTAMP" />
+    <result column="old_role" property="oldRole" jdbcType="VARCHAR" />
+    <result column="new_role" property="newRole" jdbcType="VARCHAR" />
+    <!--关联属性 -->
+    <result column="member_code" property="memberCode" jdbcType="VARCHAR" />
+    <result column="member_name" property="memberName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    APPLY_ID,apply_number,apply_date,member_id,market_id,status,approve_date,old_role,new_role,
+    OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+    LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+    ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+    ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemApplyRole" >
+    <selectKey resultType="java.lang.Long" keyProperty="applyId" order="BEFORE" >
+      select MM_MEM_APPLY_ROLE_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_APPLY_ROLE (<include refid="Base_Column_List"></include>)
+    values (#{applyId,jdbcType=DECIMAL}, #{applyNumber,jdbcType=VARCHAR}, #{applyDate,jdbcType=TIMESTAMP}, 
+      #{memberId,jdbcType=DECIMAL}, #{marketId,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, 
+      #{approveDate,jdbcType=TIMESTAMP}, #{oldRole,jdbcType=VARCHAR}, #{newRole,jdbcType=VARCHAR}, 
+      1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+     CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <select id="selectAllPendingRecords" resultMap="BaseResultMap">
+      select <include refid="Base_Column_List"></include>
+        from mm_mem_apply_role mmar
+      where mmar.status = 'APING'
+        and old_role = 'VIP'
+        and new_role = 'DIS'
+  </select>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemApplyRole" >
+    update mm_mem_apply_role
+    <set >
+      <if test="applyId != null" >
+        APPLY_ID = #{applyId,jdbcType=DECIMAL},
+      </if>
+      <if test="applyNumber != null" >
+        APPLY_NUMBER = #{applyNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="applyDate != null" >
+        APPLY_DATE = #{applyDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="approveDate != null" >
+        APPROVE_DATE = #{approveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="oldRole != null" >
+        OLD_ROLE = #{oldRole,jdbcType=VARCHAR},
+      </if>
+      <if test="newRole != null" >
+        NEW_ROLE = #{newRole,jdbcType=VARCHAR},
+      </if>
+       OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where APPLY_ID = #{applyId,jdbcType=DECIMAL}
+  </update>
+  <select id="selectAllRecords" parameterType="com.lkkhpg.dsis.common.member.dto.MemApplyRole" resultMap="BaseResultMap">
+      select mmar.apply_number,mmv.member_code,mmv.member_name,mmar.old_role,mmar.new_role,mmar.status,mmar.approve_date,mmar.member_id,mmar.market_id
+        from mm_mem_apply_role mmar ,mm_member_v mmv
+      <where>
+          mmar.member_id = mmv.member_id
+          <if test="marketId != null" >
+            and mmar.market_id = #{marketId,jdbcType=DECIMAL}
+          </if>
+          <if test="memberId != null" >
+            and mmv.member_id = #{memberId,jdbcType=DECIMAL}
+          </if>
+          <if test="memberName != null" >
+            and mmv.member_name = #{memberName,jdbcType=VARCHAR}
+          </if>
+          <if test="applyNumber != null" >
+            and mmar.apply_number = #{applyNumber,jdbcType=VARCHAR}
+          </if>
+          <if test="approveDateFrom != null" >
+            and TRUNC(mmar.approve_date) &gt;= TRUNC(#{approveDateFrom,jdbcType=TIMESTAMP})
+          </if>
+          <if test="approveDateTo != null" >
+            and TRUNC(mmar.approve_date) &lt;= TRUNC(#{approveDateTo,jdbcType=TIMESTAMP})
+          </if>
+          <if test="status != null" >
+            and mmar.status = #{status,jdbcType=VARCHAR}
+          </if>
+      </where>
+  </select>
+  <select id="selectByMemberId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+      select <include refid="Base_Column_List"></include>
+       from mm_mem_apply_role 
+      where member_id = #{memberId,jdbcType=DECIMAL}
+  </select>
+</mapper>

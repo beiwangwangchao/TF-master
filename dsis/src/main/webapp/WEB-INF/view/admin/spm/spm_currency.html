@@ -1,0 +1,207 @@
+<#--
+ * description: 币种维护.
+ * version: 1.0
+ * author: hanrui.huang
+ * .
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?languageData=SPM.LANGUAGE&taxTypeData=OM.TAX_CALCULATION_TYPE&currencyCodes=SPM.CURRENCY&taxLevelData=SPM.TAX_CALCULATION_LEVEL&timezoneData=SPM.TIME_ZONE" type="text/javascript"></script>
+<body style="padding: 10px;">
+    <form id="spm_currency_form" ></form>
+    <div id="spm_currency_grid"></div>
+    <script type="text/javascript">
+    $(function(){
+        window['spm_currency_form'] = $("#spm_currency_form").ligerForm({
+            fields: [
+                     {
+                         label :'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.currency.code"/>',
+                         name : "currencyCode",type : "text",newline : false
+                     },
+                     {
+                         label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.currency.name"/>',
+                         name : "currencyName",type : "text",newline : false
+                         
+                     }
+                 ],
+                 buttons: [
+                           { 
+                               text: '<@spring.message "sys.hand.btn.query"/>',
+                               disabled:false, 
+                               width: 60, 
+                               click: function(){
+                            	   Hap.gridQuery({
+                                       form:spm_currency_form,
+                                       grid:spm_currency_grid
+                                   })
+                               }
+                           },
+                           {
+                        	   text: '<@spring.message "sys.hand.btn.save"/>',
+                        	   disabled: false,
+                        	   width: 60,
+                        	   click: function(){
+                                   if(Hap.validateGrid(spm_currency_grid)){
+                                       var gridData = spm_currency_grid.rows;
+                                       if(gridData.length >0){
+                                    	   $.ajax({
+                                               type : "POST",
+                                               url : '${base.contextPath}/spm/currency/save',
+                                               contentType : "application/json",
+                                               data : JSON2.stringify(gridData),
+                                               dataType : "json",
+                                               success : function(data) {
+                                                   if (data.success) {
+                                                       Hap.showSuccess($l('sys.hand.tip.success'),
+                                                       function() {
+                                                           location.reload();
+                                                       });
+                                                   }
+                                               }
+                                           });
+                                       }
+                                   }
+                        	   }
+                           }
+                       ]
+        });
+
+        window['spm_currency_grid'] = $("#spm_currency_grid").ligerGrid({
+        	onBeforeEdit : function(e){
+                if(e.record.__status == 'add'){
+                    return true;
+                }else if(e.column.name == 'currencyCode'){
+                    return false;            
+                }else if(e.column.name == 'symbol'){
+                    return true;            
+                }else if(e.column.name == 'currencyName'){
+                    return true;            
+                }else if(e.column.name == 'precision'){
+                 return true;            
+                }else if(e.column.name == 'startEndDate'){
+                    return true;            
+                }else if(e.column.name == 'description'){
+                    return true;            
+                }else{
+                    return false;
+                }
+            },
+        	onBeforeSubmitEdit : function(e) {
+        		var rs = spm_currency_grid.rows;
+                if (e.column.columnname == "startEndDate") {
+                    if (e.value == null || e.value == "") {
+                        return true;
+                    }
+                    now = new Date() ;
+                    if (e.value < new Date(now.getFullYear(),now.getMonth(),now.getDate())) {
+                        Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.expiration.date"/>');
+                        return false;
+                    }
+                }
+                //币种编码必须唯一
+                if(e.column.columnname == "currencyCode"){
+                	if (e.value == null || e.value == "") {
+                        return true;
+                    }
+                	for(var i=0;i<rs.length;i++){
+                		if(rs[i].currencyCode == e.value){
+                			Hap.showError('<@spring.message "type.currencycode.error"/>');
+                			return false;
+                		}
+                	}
+                }
+                //币种名称必须唯一
+                if(e.column.columnname == "currencyName"){
+                    if (e.value == null || e.value == "") {
+                        return true;
+                    }
+                    for(var i=0;i<rs.length;i++){
+                        if(rs[i].currencyName == e.value){
+                        	Hap.showError('<@spring.message "type.currencyname.error"/>');
+                            return false;
+                        }
+                    }
+                }
+        	},
+        	columns: [
+        	          {
+        	        	  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.currency.code"/>',
+        	        	  name: 'currencyCode', align: 'left', width: '150',
+        	        	  editor : {
+                              type:'text'
+                          },
+                          validate: {
+                              required: true
+                          }
+        	          },
+        	          {
+        	        	  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.currency.symbol"/>',
+        	        	  name: 'symbol', align: 'left', width: '150',
+        	        	  editor : {
+                              type:'text'
+                          },
+                          validate: {
+                              required: true
+                          }
+        	          },
+                      {
+                    	  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.currency.name"/>',
+                    	  name: 'currencyName', align: 'left', width: '150',
+                    	  editor : {
+                              type:'text'
+                          },
+                          validate: {
+                              required: true
+                          }
+                      },
+                      {
+                    	  display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.currency.precision"/>',
+                          name: 'precision', align: 'left', width: '150',
+                          editor : {
+                              type:'int',
+                              sign:false
+                          },
+                          validate: {
+                              required: true
+                          }
+                      },
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.endActiveDate"/>',
+                          name: 'startEndDate', align: 'left', width: '150',
+                          format: 'yyyy-MM-dd',
+                          type: 'date',
+                          editor : {
+                              type:'date'
+                          }
+                      },
+                      {
+                    	  display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.profile.profiledesc"/>',
+                          name: 'description', align: 'left', width: '150',
+                          editor : {
+                              type:'text'
+                          }
+                      }
+        	          ],
+        	          url:'${base.contextPath}/spm/currency/query',
+        	          toolbar: {
+        	        	  items: [
+                                  {
+                                      id : 'member_grid_add',
+                                       text : '<@spring.message "sys.hand.btn.new"/>',
+                                       disabled : true,
+                                       click : function() {
+                                    	   spm_currency_grid.addRow({
+                                    		   precision:2
+                                    	   })
+                                       },
+                                       icon : 'add'
+                                  }
+                                  ]
+        	          },
+        	          enabledEdit : true,
+        	          width : '99%',
+        	          height : '98%'
+        });
+    });
+    </script>
+</body>

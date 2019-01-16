@@ -1,0 +1,779 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmMarketMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    <id column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+    <result column="LOCATION_ID" property="locationId" jdbcType="DECIMAL" />
+    <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+    <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="ORG_TYPE" property="orgType" jdbcType="VARCHAR"/>
+    <result column="company_name" property="companyName" jdbcType="VARCHAR"/>
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR"/>
+    <result column="BR_NO" property="brNo" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    MARKET_ID, CODE, NAME, DESCRIPTION, COMPANY_ID, LOCATION_ID, ENABLED_FLAG, START_ACTIVE_DATE, 
+    END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+    LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+    ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+    ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,
+    ORG_TYPE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    SELECT smb.market_id,
+	       smb.code,
+	       smt.name,
+	       smb.description,
+	       smb.company_id,
+       	   smb.location_id,
+	       smb.enabled_flag,
+	       smb.start_active_date,
+	       smb.end_active_date,
+	       smb.object_version_number,
+	       smb.request_id,
+	       smb.program_id,
+	       smb.creation_date,
+	       smb.created_by,
+	       smb.last_updated_by,
+	       smb.last_update_date,
+	       smb.last_update_login,
+	       smb.attribute_category,
+	       smb.attribute1,
+	       smb.attribute2,
+	       smb.attribute3,
+	       smb.attribute4,
+	       smb.attribute5,
+	       smb.attribute6,
+	       smb.attribute7,
+	       smb.attribute8,
+	       smb.attribute9,
+	       smb.attribute10,
+	       smb.attribute11,
+	       smb.attribute12,
+	       smb.attribute13,
+	       smb.attribute14,
+	       smb.attribute15,
+	       smb.org_type
+	  FROM spm_market_b smb, spm_market_tl smt
+	 WHERE smb.market_id = smt.market_id
+   		AND smb.market_id = #{marketId,jdbcType=DECIMAL}
+   		AND smt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    delete from SPM_MARKET_B
+    where MARKET_ID = #{marketId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    <selectKey resultType="java.lang.Long" keyProperty="marketId" order="BEFORE" >
+      SELECT SPM_MARKET_S.nextval from dual
+    </selectKey>
+    insert into SPM_MARKET_B (MARKET_ID, CODE, NAME, 
+      DESCRIPTION, COMPANY_ID, LOCATION_ID, 
+      ENABLED_FLAG,OBJECT_VERSION_NUMBER, START_ACTIVE_DATE, END_ACTIVE_DATE, 
+       REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,ORG_TYPE
+      )
+    values (#{marketId,jdbcType=DECIMAL}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, #{companyId,jdbcType=DECIMAL}, #{locationId,jdbcType=DECIMAL}, 
+      #{enabledFlag,jdbcType=VARCHAR},1,CURRENT_TIMESTAMP, #{endActiveDate,jdbcType=TIMESTAMP}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{orgType,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    <selectKey resultType="java.lang.Long" keyProperty="marketId" order="BEFORE" >
+      SELECT SPM_MARKET_S.nextval from dual
+    </selectKey>
+    insert into SPM_MARKET_B
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      MARKET_ID,
+      <if test="code != null" >
+        CODE,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="description != null" >
+        DESCRIPTION,
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID,
+      </if>
+      <if test="locationId != null" >
+        LOCATION_ID,
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG,
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE,
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{marketId,jdbcType=DECIMAL},
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=DECIMAL},
+      </if>
+      <if test="locationId != null" >
+        #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="enabledFlag != null" >
+        #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endActiveDate != null" >
+        #{endActiveDate,jdbcType=TIMESTAMP},
+      </if> 
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+       CURRENT_TIMESTAMP,
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    update SPM_MARKET_B
+    <set >
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="code != null" >
+        CODE = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null" >
+        COMPANY_ID = #{companyId,jdbcType=DECIMAL},
+      </if>
+      <if test="locationId != null" >
+        LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="orgType != null" >
+        ORG_TYPE = #{orgType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where MARKET_ID = #{marketId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    update SPM_MARKET_B
+    set CODE = #{code,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      DESCRIPTION = #{description,jdbcType=VARCHAR},
+      COMPANY_ID = #{companyId,jdbcType=DECIMAL},
+      LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+      ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where MARKET_ID = #{marketId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="queryByMarket" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    select 
+    b.market_id,b.code,tl.name,b.org_type,b.location_id,b.END_ACTIVE_DATE,b.COMPANY_ID,sc.name as company_name
+    from SPM_MARKET_B b
+    left outer join SPM_MARKET_TL tl
+    on(b.MARKET_ID=tl.MARKET_ID and  tl.LANG = #{request.locale,jdbcType=VARCHAR})
+    left outer join SPM_COMPANY_B sc
+    on(b.COMPANY_ID=sc.COMPANY_ID)
+    <where>
+    <if test="marketId != null">
+    b.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+    </if>
+    <if test="code != null">
+    AND Upper(b.CODE)
+    like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="name != null">
+    AND Upper(tl.NAME) like concat('%',concat(Upper(#{name,jdbcType=VARCHAR}),'%'))
+    </if>
+    </where>
+     <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+    
+  </select>
+
+  <select id="queryByMarket2" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    select
+    b.market_id,b.code,tl.name,b.org_type,b.location_id,b.END_ACTIVE_DATE,b.COMPANY_ID,sc.name as company_name
+    from SPM_MARKET_B b
+    left outer join SPM_MARKET_TL tl
+    on(b.MARKET_ID=tl.MARKET_ID and  tl.LANG = #{request.locale,jdbcType=VARCHAR})
+    left outer join SPM_COMPANY_B sc
+    on(b.COMPANY_ID=sc.COMPANY_ID)
+    <where>
+      (sc.COMPANY_ID = (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+        OR sc.GST_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+        OR SC.COMPANY_ID=(SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+                 (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+        OR SC.GST_ID=(SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+                 (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL})))
+      <if test="marketId != null">
+        AND b.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+      </if>
+      <if test="code != null">
+        AND Upper(b.CODE)
+        like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="name != null">
+        AND Upper(tl.NAME) like concat('%',concat(Upper(#{name,jdbcType=VARCHAR}),'%'))
+      </if>
+    </where>
+    <if test="sortname != null">
+      <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+      ORDER BY ${_colName} ${sortorder}
+    </if>
+  </select>
+
+<!--根据市场去显示改公司与分公司的市场-->
+  <select id="queryByMarketId" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    select
+    b.market_id,b.code,tl.name,b.org_type,b.location_id,b.END_ACTIVE_DATE,b.COMPANY_ID,sc.name as company_name
+    from SPM_MARKET_B b
+    left outer join SPM_MARKET_TL tl
+    on(b.MARKET_ID=tl.MARKET_ID and  tl.LANG = #{request.locale,jdbcType=VARCHAR})
+    left outer join SPM_COMPANY_B sc
+    on(b.COMPANY_ID=sc.COMPANY_ID)
+    <where>
+      (sc.COMPANY_ID = (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+      OR sc.GST_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL}))
+      <if test="marketId != null">
+        AND b.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+      </if>
+      <if test="code != null">
+        AND Upper(b.CODE)
+        like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="name != null">
+        AND Upper(tl.NAME) like concat('%',concat(Upper(#{name,jdbcType=VARCHAR}),'%'))
+      </if>
+    </where>
+    <if test="sortname != null">
+      <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+      ORDER BY ${_colName} ${sortorder}
+    </if>
+  </select>
+
+
+
+  <select id="queryByPoHeaderMarket" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    select 
+    b.market_id,b.code,tl.name,b.org_type,b.location_id,b.END_ACTIVE_DATE,b.COMPANY_ID,sc.name as company_name
+    from SPM_MARKET_B b
+    left outer join SPM_MARKET_TL tl
+    on(b.MARKET_ID=tl.MARKET_ID and  tl.LANG = #{request.locale,jdbcType=VARCHAR})
+    left outer join SPM_COMPANY_B sc
+    on(b.COMPANY_ID=sc.COMPANY_ID)
+    left outer join 
+    <where>
+    <if test="marketId != null">
+    b.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+    </if>
+    <if test="code != null">
+    AND Upper(b.CODE)
+    like concat('%',concat(Upper(#{code,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="name != null">
+    AND Upper(tl.NAME) like concat('%',concat(Upper(#{name,jdbcType=VARCHAR}),'%'))
+    </if>
+    </where>
+  </select>
+  
+  <select id="queryCount" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.config.dto.SpmMarket" >
+    select 
+    count(1)
+    from SPM_MARKET_B where code=#{code,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 根据销售区域查询所属市场 -->
+  <select id="selectBySalesOrgId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    select b.MARKET_ID,tl.name,b.code from SPM_MARKET_B b
+    left outer join SPM_MARKET_TL tl
+    on(b.MARKET_ID=tl.MARKET_ID and  tl.LANG = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+    <where>
+        b.MARKET_ID =(select sog.MARKET_ID from SPM_SALES_ORGANIZATION_B sog where sog.SALES_ORG_ID=#{salesOrgId,jdbcType=DECIMAL})
+    </where>
+  </select>
+  
+  <!-- 根据市场名查询市场 -->
+  <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select <include refid="Base_Column_List"/> from SPM_MARKET_B
+    <where>
+        NAME =#{name,jdbcType=VARCHAR}
+    </where>
+  </select>
+  
+  <!-- 根据销售组织Id获取公司和市场 -->
+  <resultMap type="java.util.HashMap" id="compAndMarketResultMap">
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="SALES_ORG_CODE" property="salesOrgCode" jdbcType="VARCHAR" />
+    <result column="SALES_ORG_NAME" property="salesOrgName" jdbcType="VARCHAR" />
+    <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+    <result column="MARKET_CODE" property="marketCode" jdbcType="VARCHAR" />
+    <result column="MARKET_NAME" property="marketName" jdbcType="VARCHAR" />
+    <result column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+    <result column="COMPANY_CODE" property="companyCode" jdbcType="VARCHAR" />
+    <result column="COMPANY_NAME" property="companyName" jdbcType="VARCHAR" />
+  </resultMap>
+  <select id="selectCompAndMarketBySalesOrgId" resultMap="compAndMarketResultMap" parameterType="java.lang.Long">
+    SELECT sso.sales_org_id,
+           sso.code sales_org_code,
+           coalesce((SELECT ssot.name
+                      FROM spm_sales_organization_tl ssot
+                     WHERE ssot.sales_org_id = sso.sales_org_id
+                       AND ssot.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}),
+                    sso.name) sales_org_name,
+           sm.market_id,
+           sm.code market_code,
+           coalesce((SELECT smt.name
+                      FROM spm_market_tl smt
+                     WHERE smt.market_id = sm.market_id
+                       AND smt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}),
+                    sm.name) market_name,
+           sc.company_id,
+           sc.code company_code,
+           coalesce((SELECT sct.name
+                      FROM spm_company_tl sct
+                     WHERE sct.company_id = sm.company_id
+                       AND sct.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}),
+                    sc.name) company_name
+      FROM spm_sales_organization_b sso,
+           spm_market_b             sm,
+           spm_company_b            sc
+     WHERE sso.market_id = sm.market_id
+       AND sm.company_id = sc.company_id
+       AND sso.sales_org_id = #{salesOrgId,jdbcType=DECIMAL}
+  </select>
+  <select id="queryMarketIdByCodeAndCompany" resultType="java.lang.Long" parameterType="java.util.Map">
+    select mb.MARKET_ID from SPM_MARKET_B mb
+	LEFT JOIN SPM_COMPANY_B cb on MB.COMPANY_ID = CB.COMPANY_ID
+	<where>
+    <if test="marketCode != null">
+    mb.CODE = #{marketCode,jdbcType=VARCHAR}
+    </if>
+    <if test="companyCode != null">
+   	and CB.CODE = #{companyCode,jdbcType=VARCHAR}
+    </if>
+    </where>
+  </select>
+  <select id="queryMarket" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    SELECT 
+        smb.market_id,
+        smb.COMPANY_ID,
+        smb.code,
+        tl.name
+    FROM spm_market_b smb
+         left join spm_market_tl tl on smb.market_id=tl.market_id and tl.lang=#{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+   WHERE smb.market_id=#{marketId,jdbcType=DECIMAL}
+  </select>
+  
+  <!-- 根据市场代码查询市场 -->
+  <select id="selectMarketByCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select <include refid="Base_Column_List"/>
+      from SPM_MARKET_B
+     where code =#{code,jdbcType=VARCHAR}
+       AND enabled_flag = 'Y'
+  </select>
+<!--根据市场id查询公司是否启用信用额度-->
+  <select id="selectCompanyId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    SELECT s.company_id
+     FROM SPM_COMPANY_B s, SPM_MARKET_B m
+    where m.market_id =#{marketId,jdbcType=DECIMAL}
+      and s.br_no = 'Y'
+      AND M.COMPANY_ID=S.COMPANY_ID
+  </select>
+  
+  <!-- Mclin添加查询市场数量,验证SMS帐号的grid条数是否大于当前市场数量 -->
+  <select id="queryMarketsQuanties" resultType="java.lang.Integer">
+    select count(*) FROM SPM_MARKET_B where enabled_flag = 'Y'
+  </select>
+  
+  <!-- 查询IGI映射的市场 -->
+  <select id="selectIGIMappingMarket" resultType="java.lang.Long">
+    SELECT SMB.MARKET_ID FROM SPM_MARKET_B SMB WHERE SMB.CODE=(
+    SELECT SCVB."VALUE" FROM SYS_CODE_B SCB LEFT OUTER JOIN SYS_CODE_VALUE_B SCVB ON(SCVB.CODE_ID=SCB.CODE_ID)
+    WHERE SCB.CODE='SYS.IGI_MAPPING' AND SCVB."MEANING"=(
+    SELECT SMB2.CODE FROM SPM_MARKET_B SMB2 WHERE SMB2.MARKET_ID=#{markeId,jdbcType=DECIMAL}))
+    
+  </select>
+  
+  <!-- 根据市场代码查询市场 , 无启用限制 -->
+  <select id="selectMarketWithoutEnabled" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select <include refid="Base_Column_List"/>
+      from SPM_MARKET_B
+     where code =#{code,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 根据市场代码查询市场 , 无启用限制 -->
+  <select id="queryMarketsByRole" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    SELECT smb.market_id,
+           smb.code,
+           smt.name,
+           smb.description,
+           smb.company_id,
+           smb.location_id,
+           smb.enabled_flag,
+           smb.start_active_date,
+           smb.end_active_date,
+           smb.object_version_number,
+           smb.request_id,
+           smb.program_id,
+           smb.creation_date,
+           smb.created_by,
+           smb.last_updated_by,
+           smb.last_update_date,
+           smb.last_update_login,
+           smb.attribute_category,
+           smb.attribute1,
+           smb.attribute2,
+           smb.attribute3,
+           smb.attribute4,
+           smb.attribute5,
+           smb.attribute6,
+           smb.attribute7,
+           smb.attribute8,
+           smb.attribute9,
+           smb.attribute10,
+           smb.attribute11,
+           smb.attribute12,
+           smb.attribute13,
+           smb.attribute14,
+           smb.attribute15,
+           smb.org_type
+      FROM spm_market_b smb
+      left outer join SPM_MARKET_TL smt
+    on(smb.MARKET_ID=smt.MARKET_ID and  smt.LANG = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+     WHERE 
+         smb.market_id in (select market_id
+                          from spm_sales_organization_b
+                        where sales_org_id in
+                            (select assign_value
+                               from sys_user_role_assign
+                              where role_id = #{roleId,jdbcType=DECIMAL}
+                                and user_id = #{userId,jdbcType=DECIMAL}
+                                and assign_type = 'SALES'))
+  </select>
+
+  <select id="getEnableEinvoiceMarkets" resultType="com.lkkhpg.dsis.common.config.dto.SpmMarket">
+    select <include refid="Base_Column_List"/>
+    from spm_market_b smb
+    where exists (select 1
+    from spm_org_param_value sopv
+    where sopv.org_param_id in
+    (select sop.org_param_id
+    from spm_org_param sop
+    where sop.parameter = 'SPM.ENABLE_EINVOICE'
+    and sopv.param_value = 'Y')
+    and sopv.level_value = smb.market_id)
+    <if test="userId != null and roleId != null">
+      and exists (select 1
+      from spm_sales_organization_b ssob
+      where ssob.sales_org_id in
+      (select sura.assign_value
+      from sys_user_role_assign sura
+      where
+      sura.user_id = #{userId,jdbcType=DECIMAL}
+      and sura.role_id = #{roleId,jdbcType=DECIMAL}
+      and sura.assign_type = 'SALES')
+      and ssob.market_id = smb.market_id)
+    </if>
+  </select>
+
+ <select id="selectSpmMarketByMemberId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+  select SMB.MARKET_ID,SMB.NAME,MM.MEMBER_CODE from MM_MEMBER mm ,SPM_MARKET_B smb
+  WHERE MM.MARKET_ID = SMB.MARKET_ID
+  AND MM.MEMBER_ID = #{memberId}
+ </select>
+
+
+</mapper>

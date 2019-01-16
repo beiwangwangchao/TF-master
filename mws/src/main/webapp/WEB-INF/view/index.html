@@ -1,0 +1,144 @@
+<#include "/mws/include/header.html">
+<style>
+.ad-card  {
+    position:relative;
+}
+.ad-card .cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    height: 100%;
+    width: 100%;
+    padding:0px;
+    background-image: url("${base.contextPath}/resources/img/5.png");
+    color: #ffffff;
+}
+.ad-card .caption-inner{
+    position: absolute;
+    font-weight:bold;
+    padding:15px;
+    padding-left:25px;
+    font-size:24px;
+    bottom:0px;
+    left:0px;
+}
+.ad-card.hover .cover {
+    background-image: none;
+}
+</style>
+<!-- ========== MENU END ========== -->
+
+<!-- ========== SLIDER START ========== -->
+
+<section id="slider">
+  <div id="bs-carousel" class="carousel slide" data-ride="carousel" >
+
+    <ol class="carousel-indicators">
+    <#if sliderImages??>
+        <#list sliderImages as indexImage>
+            <#if indexImage??>
+	            <#if indexImage_index == 0>
+	                <li data-target="#bs-carousel" data-slide-to="${indexImage_index}" class="active"></li>
+	            <#else>
+	                <li data-target="#bs-carousel" data-slide-to="${indexImage_index}"></li>
+	            </#if>
+            </#if>
+        </#list>
+    </#if>
+
+    </ol>
+
+    <div class="carousel-inner">
+        <#if sliderImages??>
+            <#list sliderImages as indexImage>
+                <#if indexImage??>
+		            <#if indexImage_index == 0>
+		                <div class="item active">
+		                    <a href="${indexImage.url!'#'}">
+                                <#if indexImage.fileId??>
+                                    <img src="${base.contextPath}/resources/${indexImage.filePath}" onerror="javascript:this.src='${base.contextPath}/resources/img/1600-400.png';">
+                                </#if>
+		                    </a>
+		                </div>
+		            <#else>
+		                <div class="item">
+		                    <a href="${indexImage.url!'#'}">
+		                        <#if indexImage.fileId??>
+		                            <img src="${base.contextPath}/resources/${indexImage.filePath}" onerror="javascript:this.src='${base.contextPath}/resources/img/1600-400.png';">
+		                        </#if>
+		                    </a>
+		                </div>
+		            </#if>
+                </#if>
+            </#list>
+        </#if>
+    </div>
+
+
+    <a class="left carousel-control" href="#bs-carousel" data-slide="prev">
+      <i class="fa fa-angle-left"></i>
+
+    </a>
+    <a class="right carousel-control" href="#bs-carousel" data-slide="next">
+      <i class="fa fa-angle-right"></i>
+
+    </a>
+  </div>
+</section>
+
+<!-- ========== SLIDER END ========== -->
+
+<!-- ========== CONTENT START ========== -->
+
+<section id="content">
+  <div class="container ">
+
+    <div class="row ad-banners">
+        <#if contentImages??>
+            <#list contentImages as indexImage>
+                <#if indexImage??>
+		            <div class="col-sm-6">
+		                <div class="ad-card">
+		                        <#if indexImage.url??>
+		                            <a href="${indexImage.url}">
+		                        <#else>
+		                            <a href="#">
+		                        </#if>
+		                        <#if indexImage.fileId??>
+		                            <img src="${base.contextPath}/resources/${indexImage.filePath}" onerror="javascript:this.src='${base.contextPath}/resources/img/490-275.png';"/>
+		                        </#if>
+		                        <div class="cover">
+		                            <div class="caption-inner"></div>
+		                        </div>
+		                    </a>
+		                </div>
+		            </div>
+                </#if>
+            </#list>
+        </#if>  
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+
+<script>
+var hover = $('.ad-card');
+hover.hover(
+	function () {
+		$(this).addClass('hover');
+	},
+	function () {
+		$(this).removeClass('hover');
+	}
+);
+</script>
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">
+<!-- ========== FOOTER END ========== -->

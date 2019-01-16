@@ -1,0 +1,363 @@
+<#--
+ * description:  查询转出单界面 
+ * version: 1.0 
+ * author:chuangsheng.zhang 
+ * .
+ * --> 
+ <#include "../include/head.html">
+<body style="padding: 10px; overflow: hidden;">
+	<form id="d_im_009_1_form"></form>
+	<div id="d_im_009_1_grid"></div>
+	<script
+		src="${base.contextPath}/common/code?outStatusData=INV.TRANSFER_OUT_STATUS&overallStatusData=INV.TRANSFER_OVERALL_STATUS"
+		type="text/javascript"></script>
+	<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+	<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+	<script type="text/javascript">
+		// 获取库存组织
+		var orgData; 
+		$(function() {
+			     var orgData ;
+				 $.ajax({
+			         url : "${base.contextPath}/spm/organization/query",
+			         type : "POST", 
+			         dataType : "json",
+			         async : false,
+			         contentType : "application/json",
+			         success : function(json) {
+			        	 orgData=json;
+			        	 //用于导出Excle
+			        	 for(var i=0; i<orgData.length; i++){
+			        		 orgData[i]["value"] = orgData[i].invOrgId;
+			        		 orgData[i]["meaning"] = orgData[i].name;
+			        	 }
+			         }
+			     });
+		  
+		
+			window['d_im_009_1_form'] = $("#d_im_009_1_form")
+					.ligerForm(
+							{
+								fields : [
+										{
+											type : 'select',
+											label : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.organizationid"/>',
+											name : 'organizationId',
+											options : 
+							            	{
+												value : _invOrgId,
+												 valueField : 'invOrgId',
+												textField : 'name',
+												/*modified by furong.tang*/
+                                                url : '${base.contextPath}/spm/validOrg/get2',
+											   //url : "${base.contextPath}/spm/invOrganization/queryInvOrgsByRole",
+// 												data :[{ invOrgId:_invOrgId,invOrgName:_invOrgName}],
+// 											   readonly : true ,
+											   cancelable : false ,
+											   autocomplete:false,
+											   onSelected : function(e){
+												   resetFormData();
+												   Hap.gridQuery({
+			                                            form : d_im_009_1_form,
+			                                            grid : d_im_009_1_grid
+			                                        })
+											   }
+							            	},
+											newline : true,
+                                            validate : {
+                                                 required : true
+                                            }
+										},
+										{
+											type : 'combobox',
+											label : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.transferorgid"/>',
+											name : 'transferOrgId',
+											newline : false,
+											options : {
+												valueField : 'invOrgId',
+												textField : 'name',
+												url : '${base.contextPath}/spm/validOrg/get2',
+												autocomplete : true,
+												keySupport : true
+											}
+										},
+										{
+											type : 'text',
+											label : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.trxnumber"/>',
+											name : 'trxNumber',
+											newline : false,
+										},
+										{
+											type : 'date',
+											label : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.trxdatefrom"/>',
+											name : 'trxDateFrom',
+											newline : true,
+											options : {
+									             format : 'yyyy-MM-dd'  
+									          }
+										},
+										{
+											type : 'date',
+											display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.trxdateto"/>',
+											name : 'trxDateTo',
+											newline : false,
+											options : {
+									             format : 'yyyy-MM-dd'  
+									          }
+										},
+										{
+											type : 'combobox',
+											label : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.status"/>',
+											name : 'outStatus',
+											newline : false,
+											options : {
+												isMultiSelect : true,
+												valueField : 'value',
+												textField : 'meaning',
+												data : outStatusData
+											}
+										},
+										{
+											type : 'date',
+											label : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.createdatefrom"/>',
+											name : 'createDateFrom',
+											newline : true,
+											options : {
+									             format : 'yyyy-MM-dd'  
+									          }
+										}, {
+											type : 'date',
+											display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.createdateto"/>',
+											name : 'createDateTo',
+											newline : false,
+											options : {
+									             format : 'yyyy-MM-dd'  
+									          }
+										},
+										{
+											type : 'combobox',
+											label : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.overallstatus"/>',
+											name : 'overallStatusQ',
+											newline : false,
+											options : {
+												isMultiSelect : true,
+												valueField : 'value',
+												textField : 'meaning',
+												data : overallStatusData
+											}
+										}
+								],
+								buttons : [ {
+									text : '<@spring.message "sys.hand.btn.query"/>',
+									disabled : false,
+									width : 60,
+									click : function() {
+										Hap.gridQuery({
+											form : d_im_009_1_form,
+											grid : d_im_009_1_grid
+										})
+									}
+								} ]
+							});
+
+			window['d_im_009_1_grid'] = $("#d_im_009_1_grid")
+					.ligerGrid(
+							{
+								unSetValidateAttr : false,
+								columns : [
+										{
+											display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.trxnumber"/>',
+											name : 'trxNumber',
+											align : 'left',
+											isSort : true,
+											width : 100,
+											render : function(rowData) {
+												/*  return '<a href="${base.contextPath}/im/im_transfer_out_trx_create.html?isedit=1&trxId='
+														+ rowdata.trxId
+														+ '">'
+														+ rowdata.trxNumber
+														+ '</a>'  */
+												return "<a href='javascript:void(0)' onclick=\'link(" + rowData.trxId + ")' >" + rowData.trxNumber + "</a>";
+											             
+											}
+										},
+										{
+											display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.organizationid"/>',
+											name : 'organizationId',
+											align : 'left',
+											width : 100,
+											render : function(item){
+												for(var i = 0; i < orgData.length; i++ ){
+													if(orgData[i].invOrgId == item.organizationId){
+													return 	orgData[i].name;
+													}
+												}
+												return item.organizationId;
+											} 
+										},
+										{
+											display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.transferorgid"/>',
+											name : 'transferOrgId',
+											align : 'left',
+											width : 100,
+											render : function(item){
+												for(var i = 0; i < orgData.length; i++ ){
+													if(orgData[i].invOrgId == item.transferOrgId){
+													return 	orgData[i].name;
+													}
+												}
+												return item.transferOrgId;
+											} 
+										},
+										{
+											display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.status"/>',
+											name : 'status',
+											align : 'left',
+											width : 100,
+											render : function(item) {
+												for (var i = 0; i < outStatusData.length; i++) {
+													if (item.status == outStatusData[i].value) {
+														return outStatusData[i].meaning;
+													}
+												}
+												return item.status;
+											}
+										},
+										{
+											display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.overallstatus"/>',
+											name : 'overallStatus',
+											align : 'left',
+											width : 100,
+											render : function(item) {
+												for (var i = 0; i < overallStatusData.length; i++) {
+													if (item.overallStatus == overallStatusData[i].value) {
+														return overallStatusData[i].meaning;
+													}
+												}
+												return item.overallStatus;
+											}
+										},
+										{
+											display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.createdate"/>',
+											name : 'creationDate',
+											align : 'left',
+							                isSort: true,
+											width : 150,
+								            format : 'yyyy-MM-dd hh:mm:ss'
+										},
+										{
+											display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.out.trxdate"/>',
+											name : 'trxDate',
+											align : 'left',
+							                isSort: true,
+											width : 150, 
+											format : 'yyyy-MM-dd hh:mm:ss'
+										} ],
+								url : '${base.contextPath}/im/transferOutTrx/query',
+								toolbar : {
+									items : [
+											{
+												text : '<@spring.message "sys.hand.btn.new"/>',
+												<#if accessService.access("NEW_EDITABLE") == false>
+						                        disable:true, 
+						                        </#if> 
+												click : function() {
+												
+													if (window.parent.f_addTab != undefined) {
+	                                                       window.parent.f_addTab(null, '<@spring.message "type.com.lkkhpg.dsis.common.inventory.transfer.out.create"/>',
+	                        		                        '${base.contextPath}/im/im_transfer_out_trx_create.html');
+	                                                 } else {
+	                    	                             window.open('${base.contextPath}/im/im_transfer_out_trx_create.html')
+	                                                 }		
+												},
+												icon : 'add'
+											},
+											{
+												line : true
+											},
+											{
+												text : '<@spring.message "sys.hand.btn.delete"/>',
+												<#if accessService.access("DELETE_EDITABLE") == false>
+						                        disable:true, 
+						                        </#if> 
+												click : function() {
+													if (d_im_009_1_grid.getSelecteds().length == 0) {
+														return;
+													}
+													var tempData = d_im_009_1_grid.getSelecteds();
+													for (var i = 0; i < tempData.length; i++) {
+														if (tempData[i].status != 'NEW') {
+															$.ligerDialog.warn('<@spring.message "msg.warn.status_not_allowed_operation"/>');
+															return;
+														}
+													}
+
+													$.ligerDialog.confirm(
+																	'<@spring.message "msg.alert.pub.delete_or_not"/>',
+																	function(yes) {
+																		Hap.gridDelete({
+																					grid : d_im_009_1_grid,
+																					url : '${base.contextPath}/im/transferOut/remove'
+																				});
+
+																	});
+												},
+												icon : 'delete'
+											},{
+												line:true
+											},
+											{                	
+						                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+						                        menu:{ width: 120, items:
+							                            [
+								                 			{                	
+								                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+								                 			    click:   function (){exportSelected("d_im_009_1_form","d_im_009_1_grid",{"organizationId":orgData,"transferOrgId":orgData,"status":outStatusData,"overallStatus":overallStatusData},_basePath);}
+								                 			},
+								                 			{ line: true },
+								                 			{                	
+								                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+								                 			    click: function (){exportDirectAll("d_im_009_1_form","d_im_009_1_grid",{"organizationId":orgData,"transferOrgId":orgData,"status":outStatusData,"overallStatus":overallStatusData},_basePath);}
+								                 			}
+							                          ]
+						                     	}                        
+						                    } ]
+								},
+								enabledEdit : true,
+								pageSize : 10,
+								width : '99%',
+								height : '98%',
+								checkbox : true,
+								dateFormat: "yyyy-MM-dd hh:mm:ss",
+								rownumbers : true,
+								delayLoad: true
+							});
+							Hap.gridQuery({
+                                form : d_im_009_1_form,
+                                grid : d_im_009_1_grid
+                            })
+		});
+		 function link(trxId){
+	        	var path = "${base.contextPath}/im/im_transfer_out_trx_create.html?isedit=1&trxId=" + trxId + "";
+	        	if (window.parent.f_addTab != undefined) {
+	                window.parent.f_addTab('transferOut'+trxId, '<@spring.message "type.com.lkkhpg.dsis.common.inventory.transfer.out.create"/>', path);
+	            } else {
+	            	window.open(path)
+	            }
+	        }
+		 function resetFormData(){
+			 d_im_009_1_form.setData({
+                trxNumber:'',
+                outStatus:'',
+                transferOrgId:'',
+                overallStatusQ:'',
+                trxDateFrom:'',
+                trxDateTo:'',
+                createDateFrom:'',
+                createDateTo:''
+             });
+         }
+	</script>
+
+</body>
+</html>

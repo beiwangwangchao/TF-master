@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.integration.recorder.mapper.ListenerRecordMapper" >
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.integration.recorder.dto.ListenerRecord" >
+        <id column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="IP" property="ip" jdbcType="VARCHAR" />
+        <result column="HOST" property="host" jdbcType="VARCHAR" />
+        <result column="PORT" property="port" jdbcType="DECIMAL" />
+        <result column="SERVICE_NAME" property="serviceName" jdbcType="VARCHAR" />
+        <result column="METHOD_NAME" property="methodName" jdbcType="VARCHAR" />
+        <result column="REQUEST_DATE" property="requestDate" jdbcType="TIMESTAMP" />
+        <result column="QUERY_STRING" property="queryString" jdbcType="VARCHAR" />
+        <result column="ORIGIN" property="origin" jdbcType="VARCHAR" />
+        <result column="USER_AGENT" property="userAgent" jdbcType="VARCHAR" />
+        <result column="BODY" property="body" jdbcType="CLOB"/>
+    </resultMap>
+    <sql id="Base_Column_List" >
+        REQUEST_ID, IP, HOST, PORT, SERVICE_NAME, METHOD_NAME, REQUEST_DATE, QUERY_STRING,
+        ORIGIN, USER_AGENT,BODY
+    </sql>
+
+    <select id="select" parameterType="com.lkkhpg.dsis.integration.recorder.dto.ListenerRecord" resultMap="BaseResultMap">
+        select * from sys_interface_listener
+        <where>
+            <if test="requestDateFrom!=null">
+                AND request_date &gt;=#{requestDateFrom,jdbcType=DATE}
+            </if>
+            <if test="requestDateTo!=null">
+                AND request_date &lt;=#{requestDateTo,jdbcType=DATE}
+            </if>
+            <if test="serviceName!=null">
+                AND service_name = #{serviceName,jdbcType=VARCHAR}
+            </if>
+            <if test="methodName!=null">
+                AND method_name = #{methodName,jdbcType=VARCHAR}
+            </if>
+            <if test="body!=null">
+                AND body like #{body,jdbcType=VARCHAR}
+            </if>
+        </where>
+        order by request_date desc,request_id desc
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+        select 
+        <include refid="Base_Column_List" />
+        from SYS_INTERFACE_LISTENER
+        where REQUEST_ID = #{requestId,jdbcType=DECIMAL}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+        delete from SYS_INTERFACE_LISTENER
+        where REQUEST_ID = #{requestId,jdbcType=DECIMAL}
+    </delete>
+    <delete id="deleteByDate" parameterType="java.lang.Long">
+      delete from sys_interface_listener
+      where request_date &lt; (trunc(sysdate)-#{day})
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.integration.recorder.dto.ListenerRecord" >
+        <selectKey resultType="long" keyProperty="requestId" order="BEFORE">
+            select SYS_INTERFACE_LISTENER_S.NEXTVAL from dual
+        </selectKey>
+        insert into SYS_INTERFACE_LISTENER (REQUEST_ID, IP, HOST, 
+            PORT, SERVICE_NAME,
+            METHOD_NAME, REQUEST_DATE, QUERY_STRING, 
+            ORIGIN, USER_AGENT,BODY)
+        values (#{requestId,jdbcType=DECIMAL}, #{ip,jdbcType=VARCHAR}, #{host,jdbcType=VARCHAR}, 
+            #{port,jdbcType=DECIMAL}, #{serviceName,jdbcType=VARCHAR},
+            #{methodName,jdbcType=VARCHAR}, #{requestDate,jdbcType=TIMESTAMP}, #{queryString,jdbcType=VARCHAR}, 
+            #{origin,jdbcType=VARCHAR}, #{userAgent,jdbcType=VARCHAR},#{body,jdbcType=CLOB})
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.integration.recorder.dto.ListenerRecord" >
+        update SYS_INTERFACE_LISTENER
+        <set >
+            <if test="ip != null" >
+                IP = #{ip,jdbcType=VARCHAR},
+            </if>
+            <if test="host != null" >
+                HOST = #{host,jdbcType=VARCHAR},
+            </if>
+            <if test="port != null" >
+                PORT = #{port,jdbcType=DECIMAL},
+            </if>
+            <if test="serviceName != null" >
+                SERVICE_NAME = #{serviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="methodName != null" >
+                METHOD_NAME = #{methodName,jdbcType=VARCHAR},
+            </if>
+            <if test="requestDate != null" >
+                REQUEST_DATE = #{requestDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="queryString != null" >
+                QUERY_STRING = #{queryString,jdbcType=VARCHAR},
+            </if>
+            <if test="origin != null" >
+                ORIGIN = #{origin,jdbcType=VARCHAR},
+            </if>
+            <if test="userAgent != null" >
+                USER_AGENT = #{userAgent,jdbcType=VARCHAR},
+            </if>
+            <if test="body!=null">
+                body = #{body,jdbcType=CLOB}
+            </if>
+        </set>
+        where REQUEST_ID = #{requestId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.integration.recorder.dto.ListenerRecord" >
+        update SYS_INTERFACE_LISTENER
+        set IP = #{ip,jdbcType=VARCHAR},
+            HOST = #{host,jdbcType=VARCHAR},
+            PORT = #{port,jdbcType=DECIMAL},
+            SERVICE_NAME = #{serviceName,jdbcType=VARCHAR},
+            METHOD_NAME = #{methodName,jdbcType=VARCHAR},
+            REQUEST_DATE = #{requestDate,jdbcType=TIMESTAMP},
+            QUERY_STRING = #{queryString,jdbcType=VARCHAR},
+            ORIGIN = #{origin,jdbcType=VARCHAR},
+            USER_AGENT = #{userAgent,jdbcType=VARCHAR},
+            BODY = #{body,jdbcType=CLOB}
+        where REQUEST_ID = #{requestId,jdbcType=DECIMAL}
+    </update>
+</mapper>

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.order.mapper.QueryOrderMapper">
+<resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.order.dto.QueryOrder">
+    <id column="HEADER_ID" property="headerId" jdbcType="DECIMAL" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL"/>
+    <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+    <result column="CHINESE_NAME" property="chineseName" jdbcType="VARCHAR" />
+    <result column="ENGLISH_NAME" property="englishName" jdbcType="VARCHAR" />
+    <result column="ORDER_TYPE" property="orderType" jdbcType="VARCHAR" />
+    <result column="CHANNEL" property="channel" jdbcType="VARCHAR" />
+    <result column="ORDER_STATUS" property="orderStatus" jdbcType="VARCHAR" />
+    <result column="PAYMENT" property="paymentAmount" jdbcType="DECIMAL" />
+    <result column="PV" property="pvNumber" jdbcType="DECIMAL" />
+    <result column="ORDER_DATE" property="orderDate" jdbcType="TIMESTAMP" />
+    <result column="CREATE_USER_ID" property="createUserId" jdbcType="DECIMAL" />
+    <result column="CREATE_USER_NAME" property="createUserName" jdbcType="VARCHAR" />
+    <result column="DELIVERY_TYPE" property="deliveryType" jdbcType="VARCHAR" />
+    <result column="RETURN_FLAG" property="returnFlag" jdbcType="VARCHAR" />
+    <result column="TRANSACTION_NUMBER" property="transactionNumber" jdbcType="VARCHAR" />
+    <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR" />
+    <result column="INVOICE_NUMBER" property="invoiceNumber" jdbcType="VARCHAR" />
+    <result column="MEMBER_ROLE" property="memberRole" jdbcType="VARCHAR" />
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="WPAY_DATE" property="waitPayDate" jdbcType="TIMESTAMP"/>
+    <result column="ORDER_AMT" property="orderAmt" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+</resultMap>
+    <select id="selectOrders" resultMap="BaseResultMap">
+	        SELECT 
+	       o.header_id header_id,
+	       o.order_number order_number,
+           o.ORDER_AMT orderAmt,
+           o.ATTRIBUTE15 attribute15,
+	       (case
+              WHEN o.ORDER_TYPE in ('STFP','STFPT')
+              THEN o.STAFF_NUM
+              ELSE m.member_code
+            END) member_code,
+           (case
+              WHEN o.ORDER_TYPE in ('STFP','STFPT')
+              THEN 'STA'
+              ELSE m.member_role
+            END) member_role,  
+           m.CHINESE_NAME,
+           m.ENGLISH_NAME,
+           (case
+               WHEN o.ORDER_TYPE in ('STFP','STFPT')
+               THEN o.STAFF_NAME
+               ELSE mmn.MEMBER_NAME
+            END) MEMBER_NAME,
+           o.INVOICE_NUMBER,
+	       o.order_type order_type,
+	       oop.TRANSACTION_NUMBER,
+	       o.channel channel,
+	       o.DELIVERY_TYPE DELIVERY_TYPE,
+	       o.order_status order_status,
+	       o.ORDER_DATE ORDER_DATE,
+	       o.create_user_id create_user_id,
+	       coalesce(l.pv, 0) pv,
+	       coalesce(o.actrual_pay_amt, 0) payment,
+	       (CASE
+	         WHEN o.source_type = 'MWS' THEN
+	          'mwsuser'
+	         ELSE
+	          (SELECT su.user_name
+	             FROM sys_account sa,
+	                  sys_acc_rel sar,
+	                  sys_user    su
+	            WHERE o.created_by = sa.account_id
+	              AND sar.account_id = sa.account_id
+	              AND su.user_id = sar.rel_party_id)
+	       END) create_user_name,
+	       o.created_by,
+	       (case WHEN coalesce(rt.quantity,0) = 0 
+       	         THEN 'N'
+                 ELSE 'Y' END) return_flag
+	  FROM om_sales_order o
+	  LEFT OUTER JOIN (SELECT l1.header_id header_id,
+	                          SUM(l1.pv * l1.quantity) pv
+	                     FROM om_sales_line l1
+	                    GROUP BY l1.header_id) l
+	    ON o.header_id = l.header_id
+	  LEFT OUTER JOIN mm_member_v m
+	    ON o.member_id = m.member_id
+	  LEFT OUTER JOIN (
+		SELECT
+		    r.ORDER_HEADER_ID ,
+		    COUNT(1) quantity
+		FROM
+		    OM_SALES_RETURN r
+		WHERE
+		    r.RETURN_STATUS not in('NEW')
+		GROUP BY
+		    r.ORDER_HEADER_ID ) rt on o.HEADER_ID = rt.ORDER_HEADER_ID
+	  LEFT OUTER JOIN 
+	  (select oop1.* from OM_ORDER_PAYMENT oop1 where oop1.TRANSACTION_NUMBER is not null ) oop 
+	  on oop.ORDER_HEADER_ID = o.HEADER_ID
+	  LEFT OUTER JOIN
+	  (SELECT mm.MEMBER_ID, 
+        (CASE MM.MEMBER_TYPE  WHEN  'COMP' THEN COALESCE(CASE
+                WHEN MM.REF_COMPANY IS NULL THEN
+                MM.REF_COMPANY_EN
+                ELSE
+                MM.REF_COMPANY
+                END ,'')
+            ELSE
+       CONCAT(CASE
+                WHEN MM.ENGLISH_NAME IS NULL THEN
+                 ''
+                WHEN MM.CHINESE_NAME IS NULL THEN
+                 MM.ENGLISH_NAME
+                ELSE
+                 CONCAT(MM.ENGLISH_NAME, '/')
+              END,
+              MM.CHINESE_NAME)  END )AS MEMBER_NAME from MM_MEMBER_V mm ) mmn on mmn.MEMBER_ID = o.MEMBER_ID
+	 WHERE 1 = 1
+        <trim>
+
+            <if test="queryOrder.memberCode != null">
+                and (m.MEMBER_CODE  like concat('%',concat(#{queryOrder.memberCode,jdbcType=VARCHAR},'%'))
+                or o.STAFF_NUM like concat('%',concat(#{queryOrder.memberCode,jdbcType=VARCHAR},'%'))
+                )
+            </if>
+            <if test="queryOrder.orderStatus != null">
+                and o.ORDER_STATUS in 
+                <foreach collection="statusList" open="(" separator="," close=")" item="status" index="index">
+                    #{status,jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <if test="queryOrder.memberRole != null and queryOrder.memberRole != 'STA'">
+                and m.MEMBER_ROLE = #{queryOrder.memberRole,jdbcType=VARCHAR}
+            </if>
+            <if test="queryOrder.memberRole != null and queryOrder.memberRole == 'STA'">
+                and o.ORDER_TYPE in ('STFP','STFPT')
+            </if>
+            <if test="queryOrder.channel != null">
+                and o.CHANNEL = #{queryOrder.channel,jdbcType=VARCHAR}
+            </if>
+            <if test="queryOrder.orderNumber != null">
+                and o.ORDER_NUMBER like concat('%',concat(#{queryOrder.orderNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="queryOrder.orderType != null">
+                and o.ORDER_TYPE = #{queryOrder.orderType,jdbcType=VARCHAR}
+            </if>
+            <if test="queryOrder.deliveryType != null">
+            	and o.DELIVERY_TYPE = #{queryOrder.deliveryType,jdbcType=VARCHAR}
+            </if>
+            <if test="userType == 'IPONT'">
+                and o.ORDER_DATE &gt;= trunc(CURRENT_TIMESTAMP) and o.ORDER_DATE &lt;= trunc(CURRENT_TIMESTAMP)+1
+                and o.CREATE_USER_ID = #{request.accountId,jdbcType=DECIMAL}
+            </if>
+            <if test="userType == 'INNER'">
+                <if test="queryOrder.queryTimeStart != null">
+                    and o.ORDER_DATE &gt;= #{queryOrder.queryTimeStart,jdbcType=TIMESTAMP}
+                </if>
+                <if test="queryOrder.queryTimeEnd != null">
+                    and trunc(o.ORDER_DATE) &lt;= trunc(#{queryOrder.queryTimeEnd,jdbcType=TIMESTAMP})
+                </if>
+            </if>
+            <if test="queryOrder.sourceKey != null">
+                and o.source_key = #{queryOrder.sourceKey,jdbcType=VARCHAR}
+            </if>
+            <if test="queryOrder.salesOrgId != null">
+                and o.sales_org_id = #{queryOrder.salesOrgId,jdbcType=DECIMAL}
+            </if>
+            <if test="queryOrder.batchNumber != null">
+                and o.BATCH_NUMBER = #{queryOrder.batchNumber,jdbcType=VARCHAR}
+            </if>
+            <if test="queryOrder.transactionNumber != null">
+                and oop.TRANSACTION_NUMBER like concat('%',concat(#{queryOrder.transactionNumber,jdbcType=VARCHAR},'%')) 
+            </if>
+            <if test="queryOrder.invoiceNumber != null">
+                and o.INVOICE_NUMBER like concat('%',concat(#{queryOrder.invoiceNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="queryOrder.attribute15 !=null">
+                and o.ATTRIBUTE15 = #{queryOrder.attribute15,jdbcType=VARCHAR}
+            </if>
+            <if test="queryOrder.memberName != null">
+                and (mmn.MEMBER_NAME like concat('%',concat(#{queryOrder.memberName,jdbcType=VARCHAR},'%'))
+                or o.STAFF_NAME like concat('%',concat(#{queryOrder.memberName,jdbcType=VARCHAR},'%'))
+                )
+            </if>
+            <if test="queryOrder.sortname =='orderNumber'">
+                order by o.ORDER_NUMBER ${queryOrder.sortorder}
+            </if>
+            <if test="queryOrder.sortname =='orderDate'">
+                order by o.ORDER_DATE ${queryOrder.sortorder},o.header_id ${queryOrder.sortorder}
+            </if>
+
+         </trim>
+    </select>
+
+    <select id="queryOrders" resultMap="BaseResultMap">
+        SELECT
+        o.header_id,
+        o.member_id member_id,
+        o.order_date,
+        o.order_number,
+        o.wpay_date
+        FROM om_sales_order o
+        WHERE o.order_status = 'WPAY'
+    </select>
+
+    <select id="queryOrderStatusByKey" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT
+        o.order_status
+        FROM om_sales_order o
+        WHERE o.header_id = #{headerId,jdbcType=DECIMAL}
+    </select>
+
+    <update id="updateQueryOrder" parameterType="com.lkkhpg.dsis.common.order.dto.QueryOrder">
+     UPDATE om_sales_order
+     SET  ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+     WHERE ORDER_NUMBER=#{orderNumber,jdbcType=VARCHAR}
+    </update>
+</mapper>

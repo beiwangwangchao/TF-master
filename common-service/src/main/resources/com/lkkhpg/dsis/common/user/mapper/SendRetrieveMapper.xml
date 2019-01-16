@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.common.user.mapper.SendRetrieveMapper">
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.user.dto.SendRetrieve">
+    <result column="ACCOUNT_ID" jdbcType="DECIMAL" property="accountId" />
+    <result column="RETRIEVE_TYPE" jdbcType="VARCHAR" property="retrieveType" />
+    <result column="RETRIEVE_DATE" jdbcType="TIMESTAMP" property="retrieveDate" />
+    <result column="OBJECT_VERSION_NUMBER" jdbcType="DECIMAL" property="objectVersionNumber" />
+    <result column="REQUEST_ID" jdbcType="DECIMAL" property="requestId" />
+    <result column="PROGRAM_ID" jdbcType="DECIMAL" property="programId" />
+    <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+    <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+    <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="LAST_UPDATE_LOGIN" jdbcType="DECIMAL" property="lastUpdateLogin" />
+    
+    <result column="EMAIL" jdbcType="VARCHAR" property="email" />
+    <result column="PHONE_NO" jdbcType="VARCHAR" property="phoneNo" />
+  </resultMap>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.user.dto.SendRetrieve">
+    insert into SYS_ACCOUNT_RETRIEVE (ACCOUNT_ID, RETRIEVE_TYPE, RETRIEVE_DATE, 
+      OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN)
+    values (#{accountId,jdbcType=DECIMAL},'NAME', #{retrieveDate,jdbcType=TIMESTAMP}, 
+      1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL})
+  </insert>
+  
+  <select id="query" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.user.dto.SendRetrieve">
+     SELECT 
+         COUNT(1)
+     FROM 
+         sys_user             su,
+         sys_acc_rel          sar,
+         sys_account          sa,
+         sys_account_retrieve sat
+     where su.user_id=sar.rel_party_id
+     and sar.account_id=sa.account_id
+     and sa.account_id=sat.account_id
+     and sat.RETRIEVE_DATE = #{retrieveDate,jdbcType=TIMESTAMP}
+     <if test="email != null">
+        and su.email= #{email,jdbcType=VARCHAR}
+     </if>
+     <if test="phoneNo != null">
+        and su.phone_no =#{phoneNo,jdbcType=VARCHAR}
+     </if>
+  </select>
+  
+  
+  
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.user.dto.SendRetrieve">
+    <selectKey keyProperty="accountId" order="BEFORE" resultType="java.math.BigDecimal">
+      SELECT SYS_ACCOUNT_RETRIEVE_S.nextval from dual
+    </selectKey>
+    insert into SYS_ACCOUNT_RETRIEVE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      ACCOUNT_ID,
+      <if test="retrieveType != null">
+        RETRIEVE_TYPE,
+      </if>
+      <if test="retrieveDate != null">
+        RETRIEVE_DATE,
+      </if>
+      <if test="objectVersionNumber != null">
+        OBJECT_VERSION_NUMBER,
+      </if>
+      <if test="requestId != null">
+        REQUEST_ID,
+      </if>
+      <if test="programId != null">
+        PROGRAM_ID,
+      </if>
+      <if test="creationDate != null">
+        CREATION_DATE,
+      </if>
+      <if test="createdBy != null">
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null">
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateDate != null">
+        LAST_UPDATE_DATE,
+      </if>
+      <if test="lastUpdateLogin != null">
+        LAST_UPDATE_LOGIN,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      #{accountId,jdbcType=DECIMAL},
+      <if test="retrieveType != null">
+        #{retrieveType,jdbcType=VARCHAR},
+      </if>
+      <if test="retrieveDate != null">
+        #{retrieveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="objectVersionNumber != null">
+        #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null">
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null">
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null">
+        #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null">
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null">
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null">
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+</mapper>

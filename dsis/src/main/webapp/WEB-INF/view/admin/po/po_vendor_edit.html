@@ -1,0 +1,180 @@
+<#--
+ * description: 供应商维护界面
+ * version: 1.0
+ * author: liang.rao
+ * .
+ *
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+<script src="${base.contextPath}/common/code?vendorStatus=PO.VENDOR_STATUS" type="text/javascript"></script>
+        <script src="${base.contextPath}/common/code?incortems=INV.INCORTEMS&telCountryCode=SYS.TEL_COUNTRY_CODE"
+            type="text/javascript"></script>
+    <form id="po_vendor_edit_tool"></form>
+    <form id="po_vendor_edit_form"></form>
+    <script type="text/javascript">
+    jQuery.validator.addMethod("stringMaxLength", function(value, element, param) {  
+        var length = value.length;  
+        for(var i = 0; i < value.length; i++){  
+            if(value.charCodeAt(i) > 127){  
+                length = length + 2;  
+            }  
+        }  
+        return this.optional(element) || ( length <= param );  
+    }, "<@spring.message "sys.hand.btn.string240"/>");  
+    $(function() {
+    	window['po_vendor_edit_tool'] = $("#po_vendor_edit_tool").ligerForm({
+            buttons : [ {
+                text : '<@spring.message "sys.hand.btn.save"/>',
+                disabled : false,
+                width : 60,
+                click : function() {
+                    save();
+                }
+            }]
+    	})
+        var vendorId = "${RequestParameters.vendorId!}";
+        var vendorFormUrl = '${base.contextPath}/po/vendor/queryById?vendorId=' + vendorId;
+        window['po_vendor_edit_form'] = $("#po_vendor_edit_form").ligerForm({
+            fields : [ {   type: 'hidden',
+                name: 'vendorId'
+            },{
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.code"/>',
+                validate:{required:true },
+                readonly: true,
+                name : 'code'
+            }, {
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.name"/>',
+                validate:{required:true },
+                name : 'name',
+                newline : false,
+                type: 'tl',
+                options: {
+                    idField: 'vendorId',
+                    dto: 'com.lkkhpg.dsis.common.inventory.vendor.dto.PoVendor'
+                }
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.contacts"/>',
+                validate:{required:true },
+                name : 'contacts',
+                newline : false
+            },
+            {
+            	name : 'areaCode',
+                type : 'select',
+                textField : "areaCodeName",
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phoneno"/>',
+                newline : true , 
+                attr : { placeHolder : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.countrycode"/>' },
+                space : 8,
+                width: 43,
+                options: {
+                    valueField: "value",
+                    textField: "meaning",
+                    data: telCountryCode
+                },
+                validate : {
+                    required : true
+                }
+            },
+            {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.phone"/>',
+                hideLabel: true,
+                validate:{required:true },
+                name : 'phone',
+                width:130,
+                newline : false
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.email"/>',
+                name : 'email',
+                newline : false
+            }, {
+                type : 'checkbox',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.status"/>',
+                validate:{required:true },
+                readonly: true,
+                name : 'enabledFlag',
+                options : {
+                    checkValue:'Y', 
+                    uncheckValue:'N'
+                },
+                newline : false
+            }, {
+                type : 'date',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.endActiveDate"/>',
+                readonly: false,
+                name : 'endActiveDate',
+                newline : true
+            }, {
+                type : 'text',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.address"/>',
+                validate:{required:true },
+                width:495,
+                name : 'address',
+                newline : false
+            }, {
+                type : 'textarea',
+                label : '<@spring.message "type.com.lkkhpg.dsis.common.po.vendor.remark"/>',
+                name : 'remark',
+                width:810,
+                newline : true,
+                validate: {
+                	 stringMaxLength : 240
+                }
+            } ]
+        });
+        
+        /*若从查询页面编码跳转来,则加载form*/
+        if(vendorId != null && vendorId != ""){
+            Hap.loadForm({
+                form: po_vendor_edit_form,
+                url: vendorFormUrl,
+                callback: function(json) {
+                    var data = po_vendor_edit_form.getData();
+                    var Status = json.enabledFlag;
+                    if (Status == 'N') {
+                        po_vendor_edit_form.setEditable(false);
+                        po_vendor_edit_form.setData({'endActiveDate':json.endActiveDate});
+                    }
+                }
+            });
+        }
+    });
+    
+    /*保存*/
+    function save() {
+        var emailReg = /^([\s\S]*)+@([\S\s]*)+(\.([\S\s]*)+)+$/;
+        var form = new liger.get("po_vendor_edit_form");
+        var data = form.getData();
+        if(data.email != null && data.email != ""){
+            if (emailReg.test(data.email) == false) {
+                $.ligerDialog.error("<@spring.message 'msg.error.user.email_format'/>".replace("{0}", "<@spring.message 'type.com.lkkhpg.dsis.platform.dto.system.user.email'/>"), $l("sys.hand.tip.info"));
+                return;
+            }
+        }
+        if(Hap.validateForm(po_vendor_edit_form)){
+        	$.ajax({
+                type : "POST",
+                url : '${base.contextPath}/po/vendor/save',
+                contentType : "application/json",
+                data : JSON2.stringify(data),
+                dataType : "json",
+                success : function(data) {
+                    if (data.success) {
+                        Hap.showSuccess($l('sys.hand.tip.success'), function() {
+                        	window.top.f_addTab('po_vendor_query_edit', '<@spring.message "sys.hand.tab.vendor"/>', 
+                        			'${base.contextPath}/po/po_vendor_edit.html?vendorId=' + data.rows[0].vendorId);
+                        	window.top.f_removeTab('po_vendor_query_add');
+                        });
+                    }
+                }
+            }); 
+        }
+    }
+    </script>
+</body>
+</html>

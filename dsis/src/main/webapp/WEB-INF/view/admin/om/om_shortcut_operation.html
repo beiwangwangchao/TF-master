@@ -1,0 +1,219 @@
+<#-- 
+ * description: 快速操作小工具页面 
+ * version: 1.0 
+ * author:linxixin 
+ * .
+ *
+--> 
+<#include "../include/head.html"> 
+<script
+    src="${base.contextPath}/common/code?salesStatusCode=OM.SALES_STATUS"
+    type="text/javascript"></script>
+<script
+    src="${base.contextPath}/common/code?genderCode=MM.MEMBER_GENDER&memberStatus=MM.MEMBER_STATUS"
+    type="text/javascript"></script>
+<style type="text/css">
+.functionTitle {
+    height: 30px;
+    font-size: 15px;
+    line-height: 30px;
+    margin-top: 10px;
+}
+
+.header {
+    font-size: 18px;
+    background-color: #C02827;
+    vertical-align: center;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    font-weight: bold;
+    color: white;
+}
+</style>
+<body style="height: 380px;">
+    <div class="header"><@spring.message
+        "type.com.lkkhpg.dsis.common.order.dto.shortcut_operation.quicktool"/></div>
+    <div class="l-dialog-title functionTitle"><@spring.message
+        "type.com.lkkhpg.dsis.common.order.dto.shortcut_operation.queryorder"/></div>
+
+    <div style="padding: 0 6px 0 6px;">
+        <input type="text" id="saleOrderCombox" width="" />
+        <div id = "refresh"></div>
+        <script type="text/javascript">
+   $(function() {
+
+     
+       $("#saleOrderCombox").ligerPopupEdit($.extend(${lovService.getLov(base.contextPath,base.locale, "lov_full_sale_order")},{
+           onSelected : function (datas) {
+               orderDetail(datas.data[0].orderNumber);
+           } 
+       }));
+       $("#refresh").ligerButton({
+   		click : refreshButton,
+   		text : '<@spring.message "sys.hand.btn.refresh"/>'
+   		});
+       
+        $("#memberCombox").ligerPopupEdit($.extend(${lovService.getLov(base.contextPath,base.locale, "lov_query_member")},{
+            onSelected : function (datas) {
+                $.ajax({
+                       type : "POST",
+                       url : "${base.contextPath}/mm/member/get?memberId="+datas.value,
+                       success: function(data) {
+                            fillMemberInfo(data);
+                       }
+                   });
+            },
+            onLoadData:function() {
+            	this.setParm("marketId",${Session._marketId});
+            }
+        }));
+        
+        function refreshButton() {
+        	location.reload();
+        }
+        function fillMemberInfo(detailData) {
+
+            if(typeof(detailData) == "undefined" || !detailData.success) {
+                return '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.error.in.obtaining.detailed.information"/>';
+            }
+            detailData = detailData.rows[0];
+            
+            var genderMap = new Object();
+            var statusMap = new Object();
+            //根据code显示性别
+            $(genderCode).each(function(i){
+                var meaning = genderCode[i].meaning;
+                var value = genderCode[i].value;
+                genderMap[value] = meaning;
+            });
+            //根据code显示会员状态
+            $(memberStatus).each(function(i){
+                var meaning = memberStatus[i].meaning;
+                var value = memberStatus[i].value;
+                statusMap[value] = meaning;
+            });
+            
+            var showData = [
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid'/>"    : detailData.memberCode},
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.member.dto.memberdetails.chinesename'/>": detailData.chineseName},
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.member.dto.memberdetails.englishname'/>": detailData.englishName},
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.member.dto.memberdetails.gender'/>"     : detailData.gender != null ? genderMap[detailData.gender] : ""},
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.member.dto.memberdetails.dob'/>"          : detailData.dob},
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.order.dto.shortcut_operation.currentmoneypv'/>": detailData.currentPv},
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.order.dto.memberdetails.salesPiont'/>": detailData.salesPiont},
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.order.dto.memberdetails.exchangeBalance'/>": detailData.exchangeBalance},
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.order.dto.memberdetails.remainingBalance'/>": detailData.remainingBalance},
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.member.dto.marketchange.phonenumber'/>": detailData.phoneNo},
+            {"<@spring.message 'type.com.lkkhpg.dsis.common.order.dto.memberdetails.status'/>": detailData.status != null ? statusMap[detailData.status] : ""}
+            ];
+
+            //重新插入用户信息
+            var table = $("#memberInfo");
+            table.html("");
+            for ( var i in showData ){
+                 for ( var j in showData[i] ) {
+                     var tr = $("<tr></tr>");
+                     tr.append($("<td style='width: 60px;text-align: right; padding-right: 40px;'></td>").html(j));
+                     tr.append($("<td style='width: 60px;text-align: left; padding-left: 40px;'></td>").html(showData[i][j]));
+                     table.append(tr);
+                 }
+            } 
+
+        }
+   }); 
+   $(function(){
+           <#-- 设置最近订单状态的显示 -->
+           var salesStatusCodeMapping = new Object();
+        for(var i in salesStatusCode) {
+            salesStatusCodeMapping[salesStatusCode[i].value] = salesStatusCode[i].meaning;
+         }
+
+         $(".lastOrderTable .orderStatus").each(function(){
+             $(this).html(salesStatusCodeMapping[$(this).html()]);
+         });
+
+   });
+   /*根据订单编号查到ID并跳到订单详情*/
+   function orderDetail(Number) {
+       var obj = {};
+       obj.orderNumber = Number;
+       $.ajax({
+           type : "POST",
+           url : "${base.contextPath}/om/order/queryOrdersId",
+           data : obj,
+           success: function(data) {
+               var id = data.rows[0].headerId;
+               var status = data.rows[0].orderStatus;
+               var channel = data.rows[0].channel;
+               orderInfo(id, status, channel);
+           }
+       });
+   }
+   
+   function orderInfo(headerId,orderStatus,channel) {
+       /* window.top.f_removeTab('ORDER_INFO');
+       if ('NEW' == orderStatus || 'SAV' == orderStatus) {
+           window.top.f_addTab('ORDER_INFO', '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.orderinfo"/>',
+                   '${base.contextPath}/om/om_order_create.html?orderId=' + headerId);
+       } else if ('WPAY' == orderStatus) {
+           if (window.top.tab.isTabItemExist('ORDER_PAYMENT')) {
+               $.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.payexisted"/>');
+               return;
+           }
+           window.top.f_addTab('ORDER_PAYMENT', '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.orderpayment"/>',
+                   '${base.contextPath}/om/om_order_payment.html?orderHeaderId=' + headerId);
+       } else {
+           window.top.f_addTab('ORDER_INFO', '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.orderinfo"/>',
+                   '${base.contextPath}/om/om_order_detail.html?orderId=' + headerId);
+       } */
+       
+	   $.ajax({
+           url: "${base.contextPath}/om/om_order_info?orderId=" + headerId,
+           type:"POST",
+           success : function(data) {
+               if(data){
+                   if ("ORDER_CREATE" == data.tabId && window.top.tab.isTabItemExist('ORDER_CREATE')) {
+                       $.ligerDialog.warn('<@spring.message "msg.warn.om.order_tab_exists"/>',function(){
+                           window.top.tab.selectTabItem('ORDER_CREATE');
+                       });
+                       return;
+                   } else if ("ORDER_INFO" == data.tabId){
+                       window.top.f_removeTab('ORDER_INFO');
+                   }
+                   window.top.f_addTab(data.tabId, data.title, '${base.contextPath}' + data.url);
+               }
+           }
+       });
+       
+   }
+    </script>
+        <p><@spring.message
+            'type.com.lkkhpg.dsis.common.order.dto.shortcut_operation.recentorder'/>：</p>
+        <div style="height: 50%">
+            <table class="lastOrderTable" style="width: 100%; line-height: 20px">
+                <#list orders as order>
+                <tr>
+                       <td width="20%"><a href="#"
+                        onclick="orderDetail($(this).text())"
+                        style="color: blue; font-weight: bold;">${order.orderNumber}</a></td>
+                    <td width="10%" class="orderStatus">${order.orderStatus}</td>
+                    <td width="10%">${order.orderDate?string("MM-dd")}</td>
+                </tr>
+                </#list>
+            </table>
+        </div>
+        <div>
+            <div class="l-dialog-title functionTitle"><@spring.message
+                "type.com.lkkhpg.dsis.common.member.dto.member.memberquery"/></div>
+            <input type="text" id="memberCombox" />
+            <div style="text-align: center;"></div>
+            <div style="text-align: center;">
+                <table id="memberInfo"
+                    style="width: 100%; line-height: 23px; margin-top: 20px;">
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

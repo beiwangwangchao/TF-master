@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.report.mapper.GdsSalaryMasterMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lkkhpg.dsis.common.report.dto.GdsSalaryMaster">
+		<result column="PERIOD" property="period" jdbcType="VARCHAR" />
+		<result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+		<result column="SALE_ORG_CODE" property="saleOrgCode" jdbcType="VARCHAR" />
+		<result column="SPONSOR_NO" property="sponsorNo" jdbcType="VARCHAR" />
+		<result column="BB_REFNO" property="bbRefno" jdbcType="VARCHAR" />
+		<result column="IS_LEAF" property="isLeaf" jdbcType="VARCHAR" />
+		<result column="PV" property="pv" jdbcType="DECIMAL" />
+		<result column="GV" property="gv" jdbcType="DECIMAL" />
+		<result column="TITLERATE" property="titlerate" jdbcType="DECIMAL" />
+		<result column="GDCAMT" property="gdcamt" jdbcType="DECIMAL" />
+		<result column="LBCNT" property="lbcnt" jdbcType="DECIMAL" />
+		<result column="LBGV" property="lbgv" jdbcType="DECIMAL" />
+		<result column="LBAMT" property="lbamt" jdbcType="DECIMAL" />
+		<result column="PBRATE" property="pbrate" jdbcType="DECIMAL" />
+		<result column="PBAMT" property="pbamt" jdbcType="DECIMAL" />
+		<result column="BBCNT" property="bbcnt" jdbcType="DECIMAL" />
+		<result column="BBGV" property="bbgv" jdbcType="DECIMAL" />
+		<result column="BBLEVELNO" property="bblevelno" jdbcType="DECIMAL" />
+		<result column="BBAMT" property="bbamt" jdbcType="DECIMAL" />
+		<result column="PARSED_TITLERATE" property="parsedTitlerate" jdbcType="VARCHAR" />
+		<result column="PARSED_PBRATE" property="parsedPbrate" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		PERIOD,DEALER_NO,SALE_ORG_CODE,PV,GV,TITLERATE,GDCAMT,LBCNT,LBGV,LBAMT,PBRATE,
+		PBAMT,BBCNT,BBGV,BBLEVELNO,BBAMT
+	</sql>
+
+	<!-- -->
+	<select id="queryBasicSalesBonusRoot" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.report.dto.GdsSalaryMaster">
+		SELECT
+		    gsm.dealer_no,
+		    gsm.sale_org_code,
+			CASE
+			WHEN gsm.is_leaf = 1
+			OR NOT (
+			    gsm.pv <![CDATA[>=]]> CASE
+			    WHEN gsm.sale_org_code = 'CHN' THEN
+			        300
+			    ELSE
+			        500
+			    END
+			    AND gsm.titlerate <![CDATA[>]]> 0
+			) THEN
+			    'Y'
+			ELSE
+			    'N'
+			END AS is_leaf,
+		    gsm.pv,
+		    gsm.gv,
+		    TO_CHAR (gsm.titlerate * 100) || '%' AS parsed_titlerate,
+		    gsm.gdcamt
+		FROM
+		    omk.gds_salary_master gsm
+		WHERE
+		    gsm.dealer_no = #{dealerNo,jdbcType=VARCHAR}
+		AND gsm.period = #{period,jdbcType=VARCHAR}
+		ORDER BY
+		    gsm.dealer_post_code DESC,
+		    gsm.dealer_no
+	</select>
+
+	<!-- -->
+	<select id="queryBasicSalesBonusLeaf" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.report.dto.GdsSalaryMaster">
+		SELECT
+		    gsm.dealer_no,
+		    gsm.sale_org_code,
+		    CASE
+			WHEN gsm.is_leaf = 1
+			OR (
+			    gsm.pv <![CDATA[>=]]> CASE
+			    WHEN gsm.sale_org_code = 'CHN' THEN
+			        300
+			    ELSE
+			        500
+			    END
+			    OR (
+			        gsm.pv <![CDATA[<]]> CASE
+			        WHEN gsm.sale_org_code = 'CHN' THEN
+			            300
+			        ELSE
+			            500
+			        END
+			        AND gsm.gv <![CDATA[<]]> 1000
+			    )
+			) THEN
+			    'Y'
+			ELSE
+			    'N'
+			END AS is_leaf,
+		    gsm.pv,
+		    gsm.gv,
+		    TO_CHAR (gsm.titlerate * 100) || '%' AS parsed_titlerate,
+		    gsm.gdcamt
+		FROM
+		    omk.gds_salary_master gsm
+		WHERE
+		    gsm.sponsor_no = #{sponsorNo,jdbcType=VARCHAR}
+		AND gsm.period = #{period,jdbcType=VARCHAR}
+		ORDER BY
+		    gsm.dealer_post_code DESC,
+		    gsm.dealer_no
+	</select>
+
+	<!-- -->
+	<select id="queryExtraSalesBonusRoot" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.report.dto.GdsSalaryMaster">
+		SELECT
+		    gsm.dealer_no,
+		    gsm.sale_org_code,
+		    CASE
+			WHEN gsm.is_leaf = 1
+			OR NOT (
+			    gsm.pv <![CDATA[>=]]> CASE
+			    WHEN gsm.sale_org_code = 'CHN' THEN
+			        300
+			    ELSE
+			        500
+			    END
+			) THEN
+			    'Y'
+			ELSE
+			    'N'
+			END AS is_leaf,
+		    gsm.pv,
+		    gsm.gv,
+		    gsm.lbcnt,
+		    gsm.lbgv,
+		    gsm.lbamt
+		FROM
+		    omk.gds_salary_master gsm
+		WHERE
+		    gsm.dealer_no = #{dealerNo,jdbcType=VARCHAR}
+		AND gsm.period = #{period,jdbcType=VARCHAR}
+		ORDER BY
+		    gsm.dealer_post_code DESC,
+		    gsm.dealer_no
+	</select>
+
+	<!-- -->
+	<select id="queryExtraSalesBonusLeaf" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.report.dto.GdsSalaryMaster">
+		SELECT
+		    gsm.dealer_no,
+		    gsm.sale_org_code,
+		    CASE
+			WHEN gsm.is_leaf = 1
+			OR (1 = 1) THEN
+			    'Y'
+			ELSE
+			    'N'
+			END AS is_leaf,
+			gsm.pv,
+            gsm.gv,
+		    gsm.lbcnt,
+		    gsm.lbgv,
+		    gsm.lbamt
+		FROM
+		    omk.gds_salary_master gsm
+		WHERE
+		    gsm.sponsor_no = #{sponsorNo,jdbcType=VARCHAR}
+		AND gsm.period = #{period,jdbcType=VARCHAR}
+		ORDER BY
+		    gsm.dealer_post_code DESC,
+		    gsm.dealer_no
+	</select>
+
+	<!-- -->
+	<select id="queryPerformanceBonusRoot" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.report.dto.GdsSalaryMaster">
+		SELECT
+		    gsm.dealer_no,
+		    gsm.sale_org_code,
+		    CASE
+			WHEN gsm.is_leaf = 1
+			OR NOT (
+			    gsm.pv <![CDATA[>=]]> CASE
+			    WHEN gsm.sale_org_code = 'CHN' THEN
+			        300
+			    ELSE
+			        500
+			    END
+			    AND gsm.pbrate <![CDATA[>]]> 0
+			) THEN
+			    'Y'
+			ELSE
+			    'N'
+			END AS is_leaf,
+		    gsm.pv,
+		    gsm.gv,
+		    TO_CHAR (gsm.pbrate * 100) || '%' AS parsed_pbrate,
+		    gsm.pbamt
+		FROM
+		    omk.gds_salary_master gsm
+		WHERE
+		    gsm.dealer_no = #{dealerNo,jdbcType=VARCHAR}
+		AND gsm.period = #{period,jdbcType=VARCHAR}
+		ORDER BY
+		    gsm.dealer_post_code DESC,
+		    gsm.dealer_no
+	</select>
+
+	<!-- -->
+	<select id="queryPerformanceBonusLeaf" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.report.dto.GdsSalaryMaster">
+		SELECT
+		    gsm.dealer_no,
+		    gsm.sale_org_code,
+		    CASE
+			WHEN gsm.is_leaf = 1
+			OR (
+			    gsm.pv <![CDATA[>=]]> CASE
+			    WHEN gsm.sale_org_code = 'CHN' THEN
+			        300
+			    ELSE
+			        500
+			    END
+			    OR (
+			        gsm.pv <![CDATA[<]]> CASE
+			        WHEN gsm.sale_org_code = 'CHN' THEN
+			            300
+			        ELSE
+			            500
+			        END
+			        AND gsm.gv <![CDATA[<]]> 1000
+			    )
+			) THEN
+			    'Y'
+			ELSE
+			    'N'
+			END AS is_leaf,
+		    gsm.pv,
+		    gsm.gv,
+		    TO_CHAR (gsm.pbrate * 100) || '%' AS parsed_pbrate,
+		    gsm.pbamt
+		FROM
+		    omk.gds_salary_master gsm
+		WHERE
+		    gsm.sponsor_no = #{sponsorNo,jdbcType=VARCHAR}
+		AND gsm.period = #{period,jdbcType=VARCHAR}
+		ORDER BY
+		    gsm.dealer_post_code DESC,
+		    gsm.dealer_no
+	</select>
+
+	<!-- -->
+	<select id="queryLeadershipBonusRoot" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.report.dto.GdsSalaryMaster">
+		SELECT
+		    gsm.dealer_no,
+		    gsm.sale_org_code,
+		    CASE
+			WHEN NOT EXISTS (
+			    SELECT
+			        dealer_no
+			    FROM
+			        omk.gds_salary_master
+			    WHERE
+			        bb_refno = gsm.dealer_no
+			    AND period = gsm.period
+			)
+			OR NOT (
+			    gsm.pv <![CDATA[>=]]> CASE
+			    WHEN gsm.sale_org_code = 'CHN' THEN
+			        300
+			    ELSE
+			        500
+			    END
+			) THEN
+			    'Y'
+			ELSE
+			    'N'
+			END AS is_leaf,
+		    gsm.pv,
+		    gsm.bbcnt,
+		    CASE
+		        WHEN gsm.IFCLEARBB = 1 THEN 0
+		        ELSE gsm.bbgv
+		        END AS bbgv,
+			gsm.bblevelno,
+			gsm.bbamt
+		FROM
+		    omk.gds_salary_master gsm
+		WHERE
+		    gsm.dealer_no = #{dealerNo,jdbcType=VARCHAR}
+		AND gsm.period = #{period,jdbcType=VARCHAR}
+		ORDER BY
+		    gsm.dealer_post_code DESC,
+		    gsm.dealer_no
+	</select>
+
+	<!-- -->
+	<select id="queryLeadershipBonusLeaf" resultMap="BaseResultMap"
+		parameterType="com.lkkhpg.dsis.common.report.dto.GdsSalaryMaster">
+		SELECT
+		    gsm.dealer_no,
+		    gsm.sale_org_code,
+		    CASE
+			WHEN NOT EXISTS (
+			    SELECT
+			        dealer_no
+			    FROM
+			        omk.gds_salary_master
+			    WHERE
+			        bb_refno = gsm.dealer_no
+			    AND period = gsm.period
+			) THEN
+			    'Y'
+			ELSE
+			    'N'
+			END AS is_leaf,
+		    gsm.pv,
+		    gsm.bbcnt,
+		    CASE
+		        WHEN gsm.IFCLEARBB = 1 THEN 0
+		        ELSE gsm.bbgv
+		        END AS bbgv,
+		     gsm.bblevelno,
+		     gsm.bbamt
+		FROM
+		    omk.gds_salary_master gsm
+		WHERE
+		    gsm.bb_refno = #{bbRefno,jdbcType=VARCHAR}
+		AND gsm.period = #{period,jdbcType=VARCHAR}
+		ORDER BY
+		    gsm.dealer_post_code DESC,
+		    gsm.dealer_no
+	</select>
+
+</mapper>

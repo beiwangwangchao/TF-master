@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>天府电商</title>
+<link rel="shortcut icon" href="${base.contextPath}/resources/img/favicon.ico" />
+<script src="${base.contextPath}/resources/js/jquery-1.11.3${resource_suffix!}.js"></script>
+
+    <#include "/mws/include/header01.html">
+    <!-- Bootstrap -->
+<link href="${base.contextPath}/resources/css/bootstrap${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.carousel${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.theme${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.transitions${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/style${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/config${resource_suffix!}.css" rel="stylesheet">
+<!-- HTML5 Shim and Respond${resource_suffix!}.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond${resource_suffix!}.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="${base.contextPath}/resources/js/html5shiv${resource_suffix!}.js"></script>
+  <![endif]-->
+
+</head>
+<body>
+    <header id="header">
+        <div>
+            <img src="${base.contextPath}/resources/img/top-line.jpg" style="width: 100%; height: 24px"/>
+        </div>
+        <!-- / #top-bar -->
+
+        <!-- ========== TOP BAR START ========== -->
+
+        <!-- ========== MENU START ========== -->
+
+        <nav id="main-nav">
+            <div class="navbar">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle"
+                            data-toggle="collapse"
+                            data-target=".main-nav">
+                            <span class="icon-bar"></span> <span
+                                class="icon-bar"></span> <span
+                                class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="${base.contextPath}/login.html"><img
+                            src="${base.contextPath}/resources/img/logo.png" alt="Infinitus"
+                            class="img-responsive"></a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+<style>
+    .input{
+        width: 262px;
+    }
+    .vait{
+        font-size: 16px;
+        font-weight :900;
+        color: red;
+        width: 50px;
+        height: 30px;
+        cursor:pointer;
+        margin-left: 100px;
+    }
+    .form-group-div{
+        width: 100%;
+    }
+    .center { MARGIN-RIGHT: auto !important; MARGIN-LEFT: auto !important; }
+</style>
+<script type="text/javascript">
+
+    $(function(){
+    	var emailRemainingSec = -1;
+        var phoneRemainingSec = -1;
+        var curWay = null;
+        //选择事件
+        $("#checkSelect").change(function(){
+           var checkSelect = $("#checkSelect").val();
+           curWay = checkSelect;
+           if(checkSelect == "EMAIL"){
+               $("#phone").hide();
+               $("#email").show();
+               $("#checkPhone").val("");
+               $("#areaCode").val("");
+               $("#emailButton").show();
+               $("#phoneButton").hide();
+           }else if(checkSelect == "PHONE"){
+               $("#email").hide();
+               $("#phone").show();
+               $("#checkEmail").val("");
+               $("#emailButton").hide();
+               $("#phoneButton").show();
+           }
+       });
+    });
+    
+   //提交
+    function f_button(){
+        var checkSelect = $("#checkSelect").val();
+        if(checkSelect == "EMAIL"){    
+            //debugger
+            var email = $("#checkEmail").val();
+            //邮箱不为空校验
+            if(email == ""){
+                $("#prompt").html('<@spring.message "msg.error.user.email_not_isempty"/>');
+                return;
+            }
+            //邮箱格式校验
+            var regexEmail = /^([\s\S]*)+@([\S\s]*)+(\.([\S\s]*)+)+$/;
+            if(regexEmail.test(email) == false){
+                $("#prompt").html('<@spring.message "msg.error.user.email_format"/>');
+                $("#checkEmail").val("");
+                return;
+            }
+            if($("input[name='verifiCode']").val() == ""){
+                $("#prompt").html('<@spring.message "msg.error.user.verification_code_not_isempty"/>');
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: "${base.contextPath}/account/sendMessageByEmail",
+                data: {
+                    email:email,
+                    way : checkSelect,
+                    verifiCode: $( "input[name='verifiCode']").val()
+                },
+                dataType: "json",
+                success: function(data){
+                    if(data.success){
+                        $("#prompt").html('<@spring.message "msg.info.system.user_sent_email"/>'); 
+                    }else{
+                            $("#prompt").html(data.message);
+                            $("#checkPhone").val("");
+                    }
+                 //   changeImg();
+                }
+            });
+        }else{
+            var phone = $("#checkPhone").val();
+            var areaCode = +86;//$("#areaCode").val();
+            //var phoneNo = areaCode+phone;
+            //区号不能为空
+            if(areaCode == ""){
+                $("#prompt").html('<@spring.message "msg.error.user.area_code_not_isempty"/>');
+                return;
+            }
+            var regexArea = /^[0-9]{1,3}$/;
+            var regexPhone = /^[0-9]{1,14}$/;
+            if(regexArea.test(areaCode) == false){
+                $("#prompt").html('<@spring.message "msg.error.user.area_code_format"/>');
+                $("#areaCode").val("");
+                return;
+            }
+            //手机不为空校验
+            if(phone == ""){
+                $("#prompt").html('<@spring.message "msg.error.user.phone_not_isempty"/>');
+                return;
+            }
+            //手机号码格式校验
+            var regexPhone = /^[0-9]{1,14}$/;
+            if(regexPhone.test(phone) == false){
+                $("#prompt").html('<@spring.message "msg.error.user.phone_format"/>');
+                $("#checkPhone").val("");
+                return;
+            }
+            if($("input[name='verifiCode']").val() == ""){
+                $("#prompt").html('<@spring.message "msg.error.user.verification_code_not_isempty"/>');
+                return;
+            }
+            makerVal = $("#makerId").val();
+            $.ajax({
+                type: "POST",
+                url: "${base.contextPath}/account/sendMessageByPhone",
+                data: {
+                    phoneNo:phone,
+                    marketId:makerVal,
+                    way : checkSelect,
+                    verifiCode: $( "input[name='verifiCode']").val()
+                },
+                dataType: "json",
+                success: function(data){
+                    if(data.success){
+                        /*updated by 8327 2018.05.08*/
+                        $("#prompt").html("您的帐号是：" +data.rows[0].loginName);
+//                        $("#prompt").html('<@spring.message "msg.info.system.user_sent_phone"/>');
+//                        /*updated by 13525 2018.03.06*/
+//
+//                        window.localStorage["loginName"] = JSON.stringify(data.rows[0].loginName);
+//                        window.localStorage["accountFlag"] = JSON.stringify("Y");
+//                        window.location.href="${base.contextPath}/login.html"
+                    }else{                        
+                            $("#prompt").html(data.message);
+                            $("#checkEmail").val("");
+                    }
+                   // changeImg();
+                }
+            });
+        }
+        $( "input[name='verifiCode']").val("");
+    }
+   
+   function sendCheckCode(){
+	   if($("#checkSelect").val() == "EMAIL"){
+           //发送验证码的时候邮箱不为空校验
+           if($("#checkEmail").val() == ""){
+               $("#prompt").html('<@spring.message "msg.error.user.email_not_isempty"/>');
+               return;
+           }
+	   }else{
+		   var phone = $("#checkPhone").val();
+           var areaCode = +86;/*$("#areaCode").val();*/
+           var areaPhone = areaCode+phone;
+		   //区号不能为空
+           if($("#areaCode").val() == ""){
+               $("#prompt").html('<@spring.message "msg.error.user.area_code_not_isempty"/>');
+               return;
+           }
+		   //发送验证码的时候电话不能为空
+		    if($("#checkPhone").val() == ""){
+		    	$("#prompt").html('<@spring.message "msg.error.user.phone_not_isempty"/>');
+                return;
+           }
+	   }
+
+       makerVal = $("#makerId").val();
+	  /* if(makerVal==null||makerVal==""){
+           $.dialog.warning("<@spring.message 'mws.dialog.confirm'/>", "请选择所属市场！");
+       }else{*/
+           $.ajax({
+               type: "POST",
+               url: "${base.contextPath}/account/sendCheckCode",
+               data: {
+                   email : $("#checkEmail").val(),
+                   phoneNo :phone,
+                   areaPhone:areaPhone,
+                   marketId:makerVal,
+                   type : $("#checkSelect").val()
+               },
+               dataType: "json",
+               success: function(data){
+                   if(data.success){
+                       if($("#checkSelect").val() == "EMAIL"){
+                           $("#prompt").html('<@spring.message "msg.info.sys.verification_sent_email"/>');
+                       }else{
+                           $("#prompt").html('<@spring.message "msg.info.sys.verification_sent_phone"/>');
+                       }
+                       //按钮不可点击
+                       curWay = $("#checkSelect").val();
+                       if(curWay == "EMAIL"){
+                           $("#sendEmail").text("<@spring.message 'type.com.lkkhpg.dsis.common.sc.already.sent.verifycode'/>(60)");
+                           $("#sendEmail").attr("disabled", "disabled");
+                           $("#sendEmail").attr("style", "background-color:grey;");
+                           emailRemainingSec = 60;
+                       }else if(curWay == "PHONE"){
+                           $("#sendPhone").text("<@spring.message 'type.com.lkkhpg.dsis.common.sc.already.sent.verifycode'/>(60)");
+                           $("#sendPhone").attr("disabled", "disabled");
+                           $("#sendPhone").attr("style", "background-color:grey;");
+                           phoneRemainingSec = 60;
+                       }
+                       setTimer();
+                   }else{
+                       $("#prompt").html(data.message);
+                   }
+               }
+           });
+     //  }
+
+   }
+   function setTimer(){
+	   if(curWay == "EMAIL"){
+           if(emailRemainingSec >= 0){//距离上次点击发送验证码不足一小时
+               $("#sendEmail").text("<@spring.message 'type.com.lkkhpg.dsis.common.sc.already.sent.verifycode'/>("+(emailRemainingSec--)+")");
+               t = setTimeout("setTimer()",1000)
+           }else{
+               $("#sendEmail").text("<@spring.message 'type.com.lkkhpg.dsis.common.sc.send.verifycode'/>");
+               $("#sendEmail").removeAttr("disabled");
+               $("#sendEmail").attr("style", "background-color:#FFFFFF;");
+           }
+       }else if(curWay == "PHONE"){
+           if(phoneRemainingSec >= 0){//距离上次点击发送验证码不足一小时
+               $("#sendPhone").text("<@spring.message 'type.com.lkkhpg.dsis.common.sc.already.sent.verifycode'/>("+(phoneRemainingSec--)+")");
+               t = setTimeout("setTimer()",1000)
+           }else{
+               $("#sendPhone").text("<@spring.message 'type.com.lkkhpg.dsis.common.sc.send.verifycode'/>");
+               $("#sendPhone").removeAttr("disabled");
+               $("#sendPhone").attr("style", "background-color:#FFFFFF;");
+           }
+       }
+   }
+</script>
+    </header>
+<section id="content">
+    <div class="container center">
+        <div class="row row-size">
+            <!-- <div style="height: 676px;"> -->
+			<form class="form-horizontal">
+			  <div class="form-group" style="color: red;">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-7" id="prompt" style="text-align: center;height: 30px;">
+                </div>
+            </div>
+			  <div class="form-group center" style="display:none;">
+			    <label class="col-sm-2 col-md-offset-2 control-label"><@spring.message"type.com.lkkhpg.dsis.common.sc.way.to.validate"/></label>
+			    <div class="col-sm-3">
+			      <!--<select class="form-control" id="checkSelect">-->
+			         <!--<option value="PHONE"><@spring.message"type.com.lkkhpg.dsis.common.member.dto.marketchange.phonenumber"/></option>-->
+                      <!--<option value="EMAIL"><@spring.message"type.com.lkkhpg.dsis.common.member.dto.marketchange.email"/></option>-->
+			     <!--</select>-->
+                    <!--&lt;!&ndash;  update by 13525 2018.03.05&ndash;&gt;-->
+                    <select class="form-control" id="checkSelect">
+                        <option value="PHONE"><@spring.message"type.com.lkkhpg.dsis.common.member.dto.marketchange.phonenumber"/></option>
+                    </select>
+			     <!-- <select class="form-control" id="checkSelect">
+			         <option value="EMAIL"><@spring.message"type.com.lkkhpg.dsis.common.member.dto.marketchange.email"/></option>
+			         <option value="PHONE"><@spring.message"type.com.lkkhpg.dsis.common.member.dto.marketchange.phonenumber"/></option>
+			     </select>-->
+			    </div>
+			  </div>
+			  <div class="form-group center" style="display:none;" id="email">
+			    <label class="col-sm-2 col-md-offset-2 control-label"><@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.email"/></label>
+			    <div class="col-sm-3">
+			      <input class="form-control" type="text" placeholder="" id="checkEmail" name="checkEmail">
+			    </div>
+			  </div>
+			  <div class="form-group center" id="phone">
+                <label class="col-sm-2 col-md-offset-2 control-label"><@spring.message"type.com.lkkhpg.dsis.common.member.dto.upstreamchange.phonenumber"/></label>
+                <!--<div class="col-sm-1">
+                  <input class="form-control" style="width: 65px;float: left;" type="text" placeholder="" id="areaCode" name="areaCode" />
+                </div>-->
+                <div class="col-sm-3">
+                  <input class="form-control" type="text" placeholder="" id="checkPhone" name="checkPhone">
+                </div>
+              </div>
+
+
+                <div class="form-group center" id="selectMakerId">
+                    <label class="col-sm-2 col-md-offset-2 control-label"><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.salesmarket"/></label>
+                    <div class="col-sm-3">
+                        <!--<input class="form-control" type="select" placeholder="" id="makerId" name="makerId">-->
+                        <select style="height: 35px;width: 263px;border: 1px solid #ccc" id="makerId" name="makerId">
+                        </select>
+                    </div>
+                </div>
+
+
+              <div class="form-group center">
+                <label class="col-sm-2 col-md-offset-2 control-label"><@spring.message "type.com.hand.hap.dto.sys.user.verifycode"/></label>
+                <div class="col-sm-3">
+                  <input class="form-control" type="text" placeholder="" id="verifiCode" name="verifiCode">
+                </div>
+              </div>
+              <div class="form-group center" style="display: none;" id="emailButton">
+              <label class="col-sm-2 col-md-offset-2 control-label"></label>
+                <div class="col-sm-3">
+                  <button id="sendEmail" type="button" class="btn btn-default col-sm-12" onclick="sendCheckCode()"><@spring.message "type.com.lkkhpg.dsis.common.sc.send.verifycode"/></button>
+                </div>
+              </div>
+              <div class="form-group center" id="phoneButton">
+              <label class="col-sm-2 col-md-offset-2 control-label"></label>
+                <div class="col-sm-3">
+                  <button id="sendPhone" type="button" class="btn btn-default col-sm-12" onclick="sendCheckCode()"><@spring.message "type.com.lkkhpg.dsis.common.sc.send.verifycode"/></button>
+                </div>
+              </div>
+			  <div class="form-group center">
+			  <label class="col-sm-2 control-label"></label>
+			    <div class="col-sm-3 col-md-offset-2">
+			      <button type="button" class="btn btn-success col-sm-12" onclick="f_button()"><@spring.message "type.com.lkkhpg.dsis.common.member.marketchange.submit.commit"/></button>
+			    </div>
+			  </div>
+			</form>
+            <!-- </div> -->
+            <script>
+                $("#checkPhone").bind("input",function () {
+                    phoneNo = $("#checkPhone").val();
+                    areaCode = +86;//$(areaCode).val();
+                    $.ajax({
+                        type: "GET",
+                        url: "${base.contextPath}/account/selectMarket",
+                        data: {
+                            phoneNo :phoneNo,
+                            areaCode:areaCode
+                        },
+                        dataType: "json",
+                        success: function(data){
+                            //console.log(data.rows)
+                            htmlContent = "";
+                            if(data.rows.length>1){
+                                $("#selectMakerId").show();
+                                for(var i=0;i<data.rows.length;i++){
+                                    htmlContent = htmlContent+'<option value="'+data.rows[i].marketId+'" >'+data.rows[i].name+'</option>';
+                                }
+                            } else if(data.rows.length==1) {
+                                htmlContent = htmlContent+'<option selected value="'+data.rows[0].marketId+'" >'+data.rows[0].name+'</option>';
+                            }
+                            $("#makerId").empty();
+                            $("#makerId").append(htmlContent);
+                        }
+                    });
+                });
+                $("#selectMakerId").hide();
+                $("#checkPhone").focus(function(){
+                    $("#makerId").empty();
+                    $("#selectMakerId").hide();
+                });
+            </script>
+		</div>
+    </div>
+</section>
+<#include "/mws/include/footer.html">

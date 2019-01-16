@@ -1,0 +1,171 @@
+<#--
+ * description: 采购订单查询界面
+ * version: 1.0 
+ * author: huangjiajing
+ * .
+ * 
+-->
+
+<#include "../include/head.html">
+<body style="padding: 10px;">
+<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?stockIoStatus=INV.STOCK_IN_OUT_STATUS"></script>
+    <form id="d_stm_001_form"></form>
+    <div id="d_stm_001_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    $(function() {
+        window['d_stm_001_form'] = $("#d_stm_001_form").ligerForm({
+            fields : [
+				{ name : 'poNumber', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poheadernumber"/>', newline : false ,type:'text'
+				},
+                { name : 'vendorName', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.vendorname"/>', newline : false
+                },
+                { name : 'marketId',type:'select', label : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.marketid"/>', newline : false,
+                    options: {
+                        valueField: 'marketId',
+                        textField: 'name',
+                        url: '${base.contextPath}/spm/market/query'
+                    }
+                },
+	            {
+	                name : 'orderDateTo',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.poheader.dateto"/>',
+	                type : 'date',
+	                format: 'YYYY-MM-DD',
+	                newline:true,
+	                options:{
+		                onChangeDate  :function(date){
+		                	if($("input[name='endActiveDate']").val()<date){
+		                		if($("input[name='endActiveDate']").val()!=""){
+			                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+			                		$.ligerui.get("startActiveDate").setValue("");
+		                		}
+		                	}
+		                }
+	                }
+	            },
+	            {
+	                name : 'orderDateDo',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.poheader.datedo"/>',
+	                type : 'date',
+	                format: 'YYYY-MM-DD',
+	                newline:false,
+	                options:{
+		                onChangeDate : function(date){
+		                	if($("input[name='startActiveDate']").val()>date){
+		                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberexamine.tip"/>');
+		                		$.ligerui.get("endActiveDate").setValue("");
+		                	}
+		                }
+	                }
+	            }
+	        ],
+            buttons : [
+                {
+	                text : '<@spring.message "sys.hand.btn.query"/>',
+	                disabled : false,
+	                width : 60,
+	                click : function() {
+	                    Hap.gridQuery({
+	                        form : d_stm_001_form,
+	                        grid : d_stm_001_grid
+	                    })
+	                }
+	            },{
+                    text : '<@spring.message "sys.hand.btn.create"/>',
+                    disabled : false,
+                    width : 60,
+                    click: function(){  
+                        window.top.f_removeTab('IM_PO_HEADER_ADD');
+                        window.top.f_addTab('IM_PO_HEADER_ADD','<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poheaders"/>','im/im_po_header_edit.html');
+                    }
+                }
+            ]
+        });
+         var d_stm_001_grid;
+         d_stm_001_grid = window['d_stm_001_grid'] = $("#d_stm_001_grid").ligerGrid({
+            columns : [
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.marketid"/>',
+	                name : 'name',
+	                align : 'left',
+	                width : 100
+                },
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poheadernumber"/>',
+	                name : 'poNumber',
+	                align : 'left',
+	                width : 200,
+                    type : 'text',
+                    render: function (row){
+                        return "<a href='javascript:void(0);' onclick='poheaderEdit(\""+row.poHeaderId+"\",\""+row.trxNumber+"\")'>" + row.poNumber + "</a> ";
+                    }
+	            },
+	            {
+	                name : 'poTo',
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poto"/>',
+	                align : 'left',
+	                width : 200
+	            },
+                {
+                    name : 'trxNumber',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.trxNumber"/>',
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.status"/>',
+                    name: 'status',
+                    align: 'center',
+                    width: 100,
+                    editor: {
+                        type: 'select',
+                        valueField: 'value',
+                        textField: 'meaning',
+                        data: stockIoStatus
+                    },
+                    render: function(item) {
+                        return getCodeDesc(stockIoStatus, item.status);
+                    }
+                },
+                {
+                    name : 'vendorName',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.vendorname"/>',
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    name : 'deliveryTo',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.deliveryto"/>',
+                    align : 'left',
+                    width : 200
+                },
+                {
+                    name : 'orderDate',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.orderdates"/>',
+                    align : 'left',
+                    width : 200,
+                    format: "YYYY-MM-DD",
+                    type : 'date'
+                },
+                {
+                    name : 'remark',
+                    display : '<@spring.message "sys.hand.common.comment"/>',
+                    align : 'left',
+                    width : 200
+                }
+            ],
+            url : '${base.contextPath}/inv/poheader/query',
+            enabledEdit : false,
+            width : '99%',
+            height : '98%',
+            rownumbers : true
+        });
+    });
+    function poheaderEdit(poHeaderId,trxNumber){
+        window.top.f_removeTab('IM_PO_HEADER_ID');
+        window.top.f_addTab('IM_PO_HEADER_ID', '<@spring.message "type.com.lkkhpg.dsis.common.im.dto.poheader.poheaderedit"/>', 'im/im_po_header_edit.html?isedit=1&poHeaderId=' + poHeaderId+'&trxNumber='+trxNumber);
+    }
+</script>
+</body>
+</html>

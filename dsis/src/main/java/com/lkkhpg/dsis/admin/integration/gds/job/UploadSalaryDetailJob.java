@@ -1,0 +1,65 @@
+package com.lkkhpg.dsis.admin.integration.gds.job;
+
+import com.lkkhpg.dsis.admin.integration.dapp.exception.IntegrationException;
+import com.lkkhpg.dsis.admin.integration.gds.dto.IsgGdsProcedureParam;
+import com.lkkhpg.dsis.admin.integration.gds.service.IUploadSalaryDetailService;
+import com.lkkhpg.dsis.platform.job.AbstractJob;
+import org.quartz.JobExecutionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.text.SimpleDateFormat;
+
+/**
+ * 月结支付明細上傳上传执行的job.
+ * 
+ * @author songyuanhuang
+ * 
+ */
+public class UploadSalaryDetailJob extends AbstractJob {
+    private Logger logger = LoggerFactory.getLogger(UploadMonthDealerJob.class);
+    @Autowired
+    private IUploadSalaryDetailService uploadSalaryDetailService;
+
+    /**
+     * 月结支付明細上傳上传执行的job. （每月的3号，12号）.
+     */
+    @Override
+    public void safeExecute(JobExecutionContext context) throws Exception {
+        // TODO Auto-generated method stub
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat(IntegrationException.MSG_ERROR_DAPP_DATE_FORMAT_ERROR);
+            String dateFrom = context.getMergedJobDataMap().getString("dateFrom");
+            String dateTo = context.getMergedJobDataMap().getString("dateTo");
+            IsgGdsProcedureParam isgGdsProcedureParam = new IsgGdsProcedureParam();
+            isgGdsProcedureParam.setIntCode(context.getMergedJobDataMap().getString("intCode"));
+            isgGdsProcedureParam.setFullOrOffset(context.getMergedJobDataMap().getString("fullOrOffset"));
+            isgGdsProcedureParam.setPeriodCode(context.getMergedJobDataMap().getString("periodCode"));
+            isgGdsProcedureParam.setDateFrom(formatter.parse(dateFrom));
+            isgGdsProcedureParam.setDateTo(formatter.parse(dateTo));
+            isgGdsProcedureParam.setTimeZone(context.getMergedJobDataMap().getString("timeZone"));
+            isgGdsProcedureParam.setLangCode(context.getMergedJobDataMap().getString("langCode"));
+            isgGdsProcedureParam.setRetryFlag(context.getMergedJobDataMap().getString("retryFlag"));
+            isgGdsProcedureParam.setClearFlag(context.getMergedJobDataMap().getString("clearFlag"));
+            int result = uploadSalaryDetailService.uploadSalaryDetail(isgGdsProcedureParam);
+            if (logger.isDebugEnabled()) {
+                logger.debug("result: {}", new Object[] { result });
+                logger.debug("returnStatus: {}", new Object[] { isgGdsProcedureParam.getReturnStatus() });
+                logger.debug("returnMessage: {}", new Object[] { isgGdsProcedureParam.getReturnMessage() });
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            if (logger.isErrorEnabled()) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+    }
+
+    @Override
+    public boolean isRefireImmediatelyWhenException() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+}

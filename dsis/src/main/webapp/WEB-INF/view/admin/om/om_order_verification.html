@@ -1,0 +1,637 @@
+<#-- 
+ * description: 订单查询页面
+ * version: 1.0 
+ * author:lin.gu@hand-china.com 
+ * .
+ * 
+--> 
+<#include "../include/head.html">
+
+<body style="padding: 10px;">
+	<script src="${base.contextPath}/common/code?salesStatus=OM.SALES_STATUS&salesChannel=OM.SALES_CHANNEL&orderType=OM.ORDER_TYPE&productSalesType=OM.PRODUCT_SALES_TYPE&deliveryType=DM.DELIVERY_TYPE&returnOrNot=OM.RETURN_OR_NOT&memberRole=OM.ORDER_SEREACH_MEMBER_ROLE&verificationStatus=VERIFICATION_STATUS"
+		type="text/javascript"></script>
+	<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+    <script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+	<form id="om_orderQuery_form"></form>
+		<div id="om_orderQuery_grid"></div>
+
+	<script type="text/javascript">
+		$(function(){
+			newOrderStatus();
+			newMemRole();
+			initForm();
+			initGrid();
+			disabledText();
+			/* liger.get("marketId").setValue(_marketId); */
+			liger.get("salesOrgId").setValue(_salesOrgId);
+			/* liger.get("marketId").setText(_marketName); */
+			liger.get("salesOrgId").setText(_salesOrgName);
+			//由会员详情页链接过来
+	        <#assign memberCode = (RequestParameters.memberCode ! ) />
+	        <#if memberCode != ''>
+	            var memberCode = '${RequestParameters.memberCode}';
+	            $.ligerui.get('memberCode').setValue(memberCode);
+	            $.ligerui.get('memberCode').setText(memberCode);
+	            Hap.gridQuery({
+	                form : om_orderQuery_form,
+	                grid : om_orderQuery_grid
+	            });
+	        </#if>
+		});
+		
+		var salesStatusTemp = [];
+		function newOrderStatus() {
+			for (var i = 0; i < salesStatus.length; i++) {
+				if (salesStatus[i].value != 'FAIL' && salesStatus[i].value != 'NEW') {
+					//salesStatus.splice(i,1);
+					salesStatusTemp.push(salesStatus[i]);
+				}
+			}
+		}
+		var memRoleTemp = [];
+		function newMemRole() {
+			for(var i = 0; i < memberRole.length;i++){
+				memRoleTemp.push(memberRole[i])
+			}
+		}
+		
+		function disabledText(){
+			om_orderQuery_form.setVisible(["sourceKey"],false);
+			om_orderQuery_form.setVisible(["batchNumber"],false);
+		}
+		
+		//初始化查询条件表单
+		function initForm(){
+			window['om_orderQuery_form'] = $("#om_orderQuery_form").ligerForm({
+				inputWidth: 170, labelWidth: 120, space: 40,labelAlign : 'right',
+				title : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.orderquery"/>',
+				fields : [
+				    /* {
+				    	display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+				    	name : "marketId",
+				    	newline : false,
+				    	type : "combobox",
+				    	textField: 'name',
+	                    readonly:true
+				    }, */
+				    {
+				    	display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.salesOrg"/>',
+				    	name : "salesOrgId",
+				    	newline : false,
+                        type : "combobox",
+                        textField: 'name',
+                        options : {
+                            valueField : 'salesOrgId',
+                            textField : 'name',
+                            url : '${base.contextPath}/sys/salesOrg/queryOrg',
+                            isShowCheckBox: false,
+                            isMultiSelect: false,
+                            cancelable : false,
+                            onChangeValue :function (value,text){
+                                if (om_orderQuery_grid.currentData != null && om_orderQuery_grid.currentData.rows.length > 0) {
+                                    var rows = om_orderQuery_grid.currentData.rows;
+                                    rows.splice(0, rows.length);
+                                    om_orderQuery_grid.reRender();
+                                }
+                            }
+                        },
+                        validate : {
+                            required : true
+                        }
+                        /* readonly:true */
+				    },
+				    {
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.ordernumber"/>',
+						name : "orderNumber",
+						newline : false,
+						type : "text"
+					},
+				    {
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.orderstatus"/>',
+						name : "orderStatus",
+						newline : false,
+						type : "combobox",
+						options : {
+							valueField : 'value',
+							textField : 'meaning',
+							data : salesStatusTemp,
+							isShowCheckBox: true,
+						    isMultiSelect: true
+						}
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.menberid"/>',
+						name : "memberCode",
+						textField:'memberCode', 
+						newline : true,
+						type : "popup",
+						editor : $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{ 
+		                    onLoadData:function(){
+		                    	var marketId ;
+		                    	var salesOrgId = liger.get("salesOrgId").getValue();
+		                    	var datas = liger.get("salesOrgId").data;
+		                    	for(var t = 0 ; t< datas.length;t++){
+		                    		if(datas[t].salesOrgId == salesOrgId){
+		                    			marketId = datas[t].market.marketId;
+		                    		}
+		                    	}
+		                        this.setParm('marketId',marketId)   
+		                    }
+		                })
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.deliverytype"/>',
+						name : "deliveryType",
+						newline : false,
+						type : "combobox",
+						options : {
+							valueField : 'value',
+							textField : 'meaning',
+							data : deliveryType
+						}
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.ordertype"/>',
+						name : "orderType",
+						newline : false,
+						type : "combobox",
+						options : {
+							valueField : 'value',
+							textField : 'meaning',
+							data : orderType
+						}
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.channel"/>',
+						name : "channel",
+						newline : true,
+						type : "combobox",
+						options : {
+							valueField : 'value',
+							textField : 'meaning',
+							data : salesChannel
+						},
+						editor : {
+							onSelected : function(newValue){
+								if ("AUTOS" == newValue){
+									om_orderQuery_form.setVisible(["sourceKey"],true);
+									om_orderQuery_form.setVisible(["batchNumber"],true);
+								}else if ("DISAP" == newValue) {
+									om_orderQuery_form.setVisible(["sourceKey"],true);
+									om_orderQuery_form.setVisible(["batchNumber"],false);
+								} else {
+									om_orderQuery_form.setVisible(["sourceKey"],false);
+									om_orderQuery_form.setVisible(["batchNumber"],false);
+									liger.get("om_orderQuery_form").setData({
+										sourceKey : "",
+										batchNumber : ""
+									});
+								}
+							}	
+						},
+						
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.querytimestart"/>',
+						name : "queryTimeStart",
+						newline : false,
+						type : "date",
+						format : "yyyy-MM-dd"
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.querytimeend"/>',
+						name : "queryTimeEnd",
+						newline : false,
+						type : "date",
+						format : "yyyy-MM-dd"
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.membername"/>',
+						name : "memberName",
+						newline : true,
+						type : "text"
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.invoicenumber"/>',
+						name : "invoiceNumber",
+						newline : false,
+						type : "text"
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.transactionnumber"/>',
+						name : "transactionNumber",
+						newline : false,
+						type : "text"
+					},
+					{
+						display:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberrole"/>',
+						name : "memberRole",
+						newline : true,
+						type : "combobox",
+						options : {
+							valueField : 'value',
+							textField : 'meaning',
+							data : memRoleTemp/* ,
+							isShowCheckBox: true,
+						    isMultiSelect: true */
+						}
+					},
+                    {
+                        display : '<@spring.message "com.lkkhpg.dsis.common.order.dto.salesorder.attribute15"/>',
+                        name : "attribute15",
+                        newline : false,
+                        type : "combobox",
+                        options : {
+                            valueField : 'value',
+                            textField : 'meaning',
+                            data : verificationStatus
+                        }
+                    },
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.sourcekey"/>',
+						name : "sourceKey",
+						newline : false,
+						type : "text"
+					},
+					{
+						display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.batchnumber"/>',
+						name : "batchNumber",
+						newline :　false,
+						type : "popup",
+						options : ${lovService.getLov(base.contextPath,base.locale, "lov_order_batchNumber")}
+					}
+					
+				],
+				buttons : [ {
+					text : '<@spring.message "sys.hand.btn.query"/>',
+					disabled : false,
+					width : 60,
+					click : function() {
+						var form = liger.get("om_orderQuery_form");
+						var data = form.getData();
+						//校验结束时间是否大于起始时间
+						if(data.queryTimeEnd != null && data.queryTimeStart != null 
+								&& data.queryTimeEnd != "" && data.queryTimeStart != ""
+								&& data.queryTimeEnd <data.queryTimeStart){
+							$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.timeerror"/>');
+						}else{
+							
+							Hap.gridQuery({
+								form : om_orderQuery_form,
+								grid : om_orderQuery_grid
+							});
+							/* for ( var key in data) {
+				                if (!data[key]) {
+				                    delete data[key]
+				                }
+				            }
+							om_orderQuery_grid.set({
+								url : '${base.contextPath}/om/order/query',
+								parms : data,
+								sortName: 'orderDate',
+								sortOrder: 'desc',
+								dataAction : 'server'
+							}); */
+							
+						}
+					}
+				}]
+			});
+		}
+		
+		//初始化查询结果表格
+		function initGrid(){
+			window['om_orderQuery_grid'] = $("#om_orderQuery_grid").ligerGrid({
+				columns : [
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.ordernumber"/>',
+						name : 'orderNumber',
+						isSort: true,
+						width : 160,
+						render : function(item) {
+							return "<a href='#' onclick='orderInfo("+item.headerId+",\""+item.orderStatus +"\",\""+item.channel+"\")'>"+item.orderNumber+"</a>";
+						}
+					},
+//					{
+//						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.returnflag"/>',
+//						name : 'returnFlag',
+//						isSort: false,
+//						width : 100,
+//						render : function(item) {
+//							for (var i = 0; i < returnOrNot.length; i++) {
+//								if (returnOrNot[i].value == item.returnFlag) {
+//									return returnOrNot[i].meaning;
+//								}
+//							}
+//						}
+//					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.menberid"/>',
+						name : 'memberCode',
+						isSort: false,
+						width : 130,
+					},
+					{
+                        display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.membername"/>',
+                        name : 'memberName',
+                        isSort: false,
+                        width : 200,
+                    },
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberrole"/>',
+						name : 'memberRole',
+						isSort: false,
+						width : 100,
+						render : function(item) {
+							for (var i = 0; i < memberRole.length; i++) {
+								if (memberRole[i].value == item.memberRole) {
+									return memberRole[i].meaning;
+								}
+							}
+						}
+					},
+					/* {
+                        display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.chinesename"/>',
+                        name : 'chineseName',
+                        isSort: false,
+                        width : 130,
+                    },
+                    {
+                        display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.englishname"/>',
+                        name : 'englishName',
+                        isSort: false,
+                        width : 130,
+                    }, */
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.ordertype"/>',
+						name : 'orderType',
+						isSort: false,
+						width : 120,
+						render : function(item) {
+							for (var i = 0; i < orderType.length; i++) {
+								if (orderType[i].value == item.orderType) {
+									return orderType[i].meaning;
+								}
+							}
+						}
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.channel"/>',
+						name : 'channel',
+						isSort: false,
+						width : 110,
+						render : function(item) {
+							for (var i = 0; i < salesChannel.length; i++) {
+								if (salesChannel[i].value == item.channel) {
+									return salesChannel[i].meaning;
+								}
+							}
+						}
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.orderstatus"/>',
+						name : 'orderStatus',
+						isSort: false,
+						width : 100,
+						render : function(item) {
+							for (var i = 0; i < salesStatus.length; i++) {
+								if (salesStatus[i].value == item.orderStatus) {
+									return salesStatus[i].meaning;
+								}
+							}
+						}
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.deliverytype"/>',
+						name : 'deliveryType',
+						isSort: false,
+						width : 100,
+						render : function(item) {
+							for (var i = 0; i < deliveryType.length; i++) {
+								if (deliveryType[i].value == item.deliveryType) {
+									return deliveryType[i].meaning;
+								}
+							}
+						}
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.paymentamount"/>',
+						name : 'paymentAmount',
+						width : 130,
+						isSort: false
+					},
+                    {
+                        display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.autoshipamt"/>',
+                        name : 'orderAmt',
+                        width : 130,
+                        isSort: false
+                    },
+//					{
+//						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.pvnumber"/>',
+//						name : 'pvNumber',
+//						type : 'int',
+//						width : 130,
+//						isSort: false
+//					},
+                    {
+                        display: '核销状态',
+                        name: 'attribute15',
+                        align: 'left',
+                        width: '130',
+//                        validate : {
+//                            required : true
+//                        },
+                        editor : {
+                            type : 'select',
+                            data : verificationStatus,
+                            valueField : 'value',
+                            textField : 'meaning'
+                        },
+                        render : function(item) {
+                            for (var i = 0; i < verificationStatus.length; i++) {
+                                if (verificationStatus[i]['value'] == item.attribute15)
+                                    return verificationStatus[i]['meaning']
+                            }
+                            return item.attribute15;
+                        }
+                    },
+
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.orderdate"/>',
+						name : 'orderDate',
+						isSort: true,
+						type : 'date',
+						width : 130,
+					},
+					
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.createuserid"/>',
+						name : 'createUserName',
+						width : 130,
+						isSort: false
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.invoicenumber"/>',
+						name : 'invoiceNumber',
+						width : 130,
+						isSort: false
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.transactionnumber"/>',
+						name : 'transactionNumber',
+						width : 130,
+						isSort: false
+					}
+				],
+				url : '${base.contextPath}/om/order/query',
+				sortName: 'orderDate',
+				sortOrder: 'desc',
+				dataAction : 'server',
+				delayLoad : true,
+				dateFomat : "yyyy-MM-dd",
+				enabledEdit : true,
+				checkbox: true,
+                rownumbers: true,
+                isSingleCheck : false,
+                pageSize : 20,
+                width: '99%', 
+                height: '98%',
+				toolbar : {
+					items : [
+							/*{
+								text : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.addorder"/>',
+								click : function() {
+									window.top.f_addTab("ORDER_CREATE",'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.createorder"/>', '${base.contextPath}/om/om_order_create.html');
+								},
+								<#if accessService.access("ADD_EDITABLE") == false>
+		                        disable:true, 
+		                        </#if> 
+								icon : 'add'
+							},
+							{ line: true },*/
+
+		                    {                   
+		                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+		                        menu:{ width: 120, items:
+		                                [
+		                                    {                   
+		                                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+		                                        click:   function (){exportSelected("om_orderQuery_form","om_orderQuery_grid",{"memberRole":memberRole,"orderType":orderType,"channel":salesChannel,"orderStatus":salesStatus,"deliveryType":deliveryType},_basePath);}
+		                                    },
+		                                    { line: true },
+		                                    {                   
+		                                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+		                                        click: function (){exportDirectAll("om_orderQuery_form","om_orderQuery_grid",{"memberRole":memberRole,"orderType":orderType,"channel":salesChannel,"orderStatus":salesStatus,"deliveryType":deliveryType},_basePath);}
+
+                                }
+		                              ]
+		                        }                        
+		                    },
+						   {line : true},
+						   { text:'<@spring.message "sys.hand.btn.save"/>',
+                               click : function() {
+                                   Hap.gridSave({
+                                       grid : om_orderQuery_grid,
+                                       url : '${base.contextPath}/sys/order/submit'
+                                   })
+                               },
+                               icon : 'save'
+						      }
+							
+							/* , 
+							{
+								text : '<@spring.message "sys.hand.btn.cancel"/>',
+								<#if accessService.access("DELETE_EDITABLE") == false>
+		                        disable:true, 
+		                        </#if> 
+								click : function() {
+									var selectedRows = om_orderQuery_grid.getSelectedRows();
+									if(selectedRows.length == 0){
+										$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.no_selected"/>');
+										return false;
+									}
+									for (var i = 0 ; i < selectedRows.length ; i++) {
+										if ("SAV" != selectedRows[i].orderStatus) {
+											$.ligerDialog.error('<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deletesavedorder"/>');
+											return false;
+										}
+									}
+									$.ligerDialog.confirm('<@spring.message "msg.warn.iscancel"/>', function (yes){
+										if(yes){
+											f_cancel(selectedRows);
+										}
+									});
+								},
+								icon : 'delete'
+							} */
+							]
+				}
+			});
+		}
+		
+		function orderInfo(headerId,orderStatus,channel) {
+			<#if accessService.access("DETAIL_EDITABLE") == false>
+				window.top.f_removeTab('ORDER_INFO');
+				window.top.f_addTab('ORDER_INFO', '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.orderinfo"/>', '${base.contextPath}/om/om_order_detail.html?orderId=' + headerId);
+			<#else>
+				$.ajax({
+	                url: "${base.contextPath}/om/om_order_info?orderId=" + headerId,
+	                type:"POST",
+	                success : function(data) {
+	                    if(data){
+	                        if ("ORDER_CREATE" == data.tabId && window.top.tab.isTabItemExist('ORDER_CREATE')) {
+	                            $.ligerDialog.warn('<@spring.message "msg.warn.om.order_tab_exists"/>',function(){
+	                                window.top.tab.selectTabItem('ORDER_CREATE');
+	                            });
+	                            return;
+	                        } else if ("ORDER_INFO" == data.tabId){
+	                            window.top.f_removeTab('ORDER_INFO');
+	                        }
+	                        window.top.f_addTab(data.tabId, data.title, '${base.contextPath}' + data.url);
+	                    }
+	                }
+	            });
+			</#if>
+            
+		}
+		
+		function deleteOrder(orderData) {
+			$.ajax({
+				url: "${base.contextPath}/om/order/batch/remove",
+				type:"POST",
+				dataType:"json",
+				contentType : "application/json",
+				data : JSON2.stringify(orderData),
+	            success : function(data) {
+	            	if(data.success){
+	            		$.ligerDialog.success('<@spring.message "msg.info.system.delete_successful"/>');
+	            		liger.get("om_orderQuery_grid").reload();
+	            	}
+	            },
+	            error : function() {
+	                alert("error");
+	            }
+			});
+		}
+		/**
+		 * 取消订单
+		 */
+		function f_cancel(requestData) {
+		   
+		            $.ajax({
+		                type : 'POST',
+		                url : "${base.contextPath}/om/order/batch/cancel",
+		                data : JSON2.stringify(requestData),
+		                success : function(json) {
+		                    if (json.success) {
+		                        $.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>');
+		                        liger.get("om_orderQuery_grid").reload();
+		                    }
+		                },
+		                contentType : "application/json; charset=utf-8"
+		            });
+		      
+		}
+	</script>
+</body>
+</html>

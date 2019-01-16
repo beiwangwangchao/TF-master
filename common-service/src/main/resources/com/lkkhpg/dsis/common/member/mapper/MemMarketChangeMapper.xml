@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.member.mapper.MemMarketChangeMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.member.dto.MemMarketChange" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD" >
+    <id column="CHANGE_ID" property="changeId" jdbcType="DECIMAL" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="FROM_MARKET_ID" property="fromMarketId" jdbcType="DECIMAL" />
+    <result column="TO_MARKET_ID" property="toMarketId" jdbcType="DECIMAL" />
+    <result column="APPLY_DATE" property="applyDate" jdbcType="TIMESTAMP" />
+    <result column="APPROVAL_STATUS" property="approvalStatus" jdbcType="VARCHAR" />
+    <result column="APPROVAL_DATE" property="approvalDate" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="CHINESE_NAME" property="chineseName" jdbcType="VARCHAR" />
+    <result column="ENGLISH_NAME" property="englishName" jdbcType="VARCHAR" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+    <result column="FROM_MARKET_NAME" property="fromMarketName" jdbcType="VARCHAR" />
+    <result column="TO_MARKET_NAME" property="toMarketName" jdbcType="VARCHAR" />
+    <result column="GDS_ID" property="gdsId" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    CHANGE_ID, MEMBER_ID, FROM_MARKET_ID, TO_MARKET_ID, APPLY_DATE, APPROVAL_STATUS, 
+    APPROVAL_DATE,REMARK, GDS_ID,OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+    LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+    ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+    ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  <select id="queryMarketChange" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.member.dto.MemMarketChange" >
+    select 
+        C.CHANGE_ID,
+        C.MEMBER_ID,
+        M.MEMBER_CODE,
+        M.CHINESE_NAME,
+        M.ENGLISH_NAME,
+        C.FROM_MARKET_ID,
+        C.TO_MARKET_ID,
+        (SELECT coalesce(smt.name, sm.name)
+              FROM spm_market_b sm
+              LEFT OUTER JOIN spm_market_tl smt
+                ON (sm.market_id = smt.market_id AND smt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+             WHERE sm.market_id = c.from_market_id) as FROM_MARKET_NAME,
+        (SELECT coalesce(smt.name, sm.name)
+              FROM spm_market_b sm
+              LEFT OUTER JOIN spm_market_tl smt
+                ON (sm.market_id = smt.market_id AND smt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+             WHERE sm.market_id = c.to_market_id) as TO_MARKET_NAME,
+        <!-- (select name from SPM_MARKET_B mk where mk.market_id = c.from_market_id) as FROM_MARKET_NAME,
+        (select name from SPM_MARKET_B mk where mk.market_id = c.to_market_id) as TO_MARKET_NAME, -->
+        C.APPLY_DATE,
+        C.APPROVAL_STATUS,
+        C.APPROVAL_DATE,
+        C.REMARK,
+        C.GDS_ID from MM_MEMBER_V M,MM_MEM_MARKET_CHANGE C 
+    <where>
+    	<if test="marketId != null">
+            	c.from_MARKET_ID = #{marketId,jdbcType=DECIMAL}
+        </if>
+        <if test="marketId == null">
+                c.from_MARKET_ID = #{request.marketId,jdbcType=DECIMAL}
+        </if>
+        <if test="memberCode != null" >
+           AND M.MEMBER_CODE = #{memberCode,jdbcType=DECIMAL}
+        </if>
+        <if test="beforeDate != null" >
+           AND C.APPROVAL_DATE <![CDATA[ >= #{beforeDate,jdbcType=TIMESTAMP} ]]> 
+        </if>
+        <if test="afterDate != null" >
+           AND C.APPROVAL_DATE <![CDATA[ <= #{afterDate,jdbcType=TIMESTAMP} ]]>
+        </if>
+        AND M.MEMBER_ID = C.MEMBER_ID
+    </where>
+    <if test="sortname =='applyDate' and sortorder == 'asc'">
+            order by APPLY_DATE asc
+    </if>
+    <if test="sortname =='applyDate' and sortorder == 'desc'">
+            order by APPLY_DATE desc
+    </if>
+  </select>
+<select id="queryApprovingMarketChange" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.member.dto.MemMarketChange" >
+   select GDS_ID,m.CHINESE_NAME,m.ENGLISH_NAME,m.MEMBER_CODE,
+  <!--  (select name from SPM_MARKET_B mk where mk.market_id = c.from_market_id) as FROM_MARKET_NAME,
+	(select name from SPM_MARKET_B mk where mk.market_id = c.to_market_id) as TO_MARKET_NAME, -->
+	(SELECT coalesce(smt.name, sm.name)
+              FROM spm_market_b sm
+              LEFT OUTER JOIN spm_market_tl smt
+                ON (sm.market_id = smt.market_id AND smt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+             WHERE sm.market_id = c.from_market_id) as FROM_MARKET_NAME,
+        (SELECT coalesce(smt.name, sm.name)
+              FROM spm_market_b sm
+              LEFT OUTER JOIN spm_market_tl smt
+                ON (sm.market_id = smt.market_id AND smt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+             WHERE sm.market_id = c.to_market_id) as TO_MARKET_NAME,
+  	c.CHANGE_ID, c.MEMBER_ID, c.FROM_MARKET_ID, c.TO_MARKET_ID, c.APPLY_DATE, c.APPROVAL_STATUS, 
+    c.APPROVAL_DATE,c.REMARK
+     from MM_MEM_MARKET_CHANGE c
+    LEFT JOIN MM_MEMBER_V m on m.MEMBER_ID = c.MEMBER_ID
+      <where>
+      c.APPROVAL_STATUS != 'P'
+      <if test="marketId != null">
+            	and c.to_market_id = #{marketId,jdbcType=DECIMAL} 
+        </if>
+        <if test="marketId == null">
+                and c.to_market_id = #{request.marketId,jdbcType=DECIMAL} 
+        </if>
+        <if test="memberCode != null" >
+         and m.MEMBER_CODE = #{memberCode,jdbcType=VARCHAR}
+        </if>
+         <if test="memberId !=null">
+	     and m.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+	    </if>
+	    <if test="memberId == null and memberName != null">
+            and ((upper(m.english_name) LIKE upper(concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%'))) OR
+                   m.member_id IN
+                   (SELECT member_id
+                        FROM MM_MEM_RELATIONSHIP rel
+                       WHERE rel.rel_type = 'SUPSE'
+                         AND (rel.chinese_name LIKE concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')) OR
+                             upper(rel.english_name) LIKE
+                             concat('%', concat(upper(#{memberName,jdbcType=VARCHAR}), '%'))))) OR
+                   (m.chinese_name LIKE concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')) OR
+                   m.member_id IN
+                   (SELECT member_id
+                        FROM MM_MEM_RELATIONSHIP rel
+                       WHERE rel.rel_type = 'SUPSE'
+                         AND (rel.chinese_name LIKE concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')) OR
+                             upper(rel.english_name) LIKE
+                             concat('%', concat(upper(#{memberName,jdbcType=VARCHAR}), '%')))))
+                             or (
+        						upper(m.member_name) LIKE upper(concat('%', concat(#{memberName,jdbcType=VARCHAR}, '%')))
+      							)
+                             )
+        </if>
+        <if test="phoneNumber != null" >
+            and (m.PHONE_NO = #{phoneNumber,jdbcType=VARCHAR} or m.OTHER_PHONE_NO = #{phoneNumber,jdbcType=VARCHAR})
+        </if>
+        <if test="registerCode != null" >
+            and (m.BR_NUMBER = #{registerCode,jdbcType=VARCHAR} or m.ID_NUMBER = #{registerCode,jdbcType=VARCHAR}
+             or 
+                 m.member_id IN
+                   (SELECT member_id
+                        FROM MM_MEM_RELATIONSHIP rel
+                       WHERE rel.rel_type = 'SPOUS'
+                         AND rel.ID_NUMBER = #{registerCode,jdbcType=VARCHAR}) 
+                         )
+        </if>
+         <if test="approvalStatus != null" >
+            and c.APPROVAL_STATUS = #{approvalStatus,jdbcType=VARCHAR}
+        </if> 
+    </where>
+    order by c.APPROVAL_DATE desc
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from MM_MEM_MARKET_CHANGE
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemMarketChange" >
+    insert into MM_MEM_MARKET_CHANGE (CHANGE_ID, MEMBER_ID, FROM_MARKET_ID, 
+      TO_MARKET_ID, APPLY_DATE, APPROVAL_STATUS, 
+      APPROVAL_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+      PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+      ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+      ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, 
+      ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+      ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+      ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+      ATTRIBUTE15, GDS_ID)
+    values (#{changeId,jdbcType=DECIMAL}, #{memberId,jdbcType=DECIMAL}, #{fromMarketId,jdbcType=DECIMAL}, 
+      #{toMarketId,jdbcType=DECIMAL}, #{applyDate,jdbcType=TIMESTAMP}, #{approvalStatus,jdbcType=VARCHAR}, 
+      #{approvalDate,jdbcType=TIMESTAMP}, 1, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL},CURRENT_TIMESTAMP, -1, 
+      -1, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, 
+      #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, 
+      #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, 
+      #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, 
+      #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, 
+      #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR}, ##{gdsId,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemMarketChange" >
+    <selectKey resultType="java.lang.Long" keyProperty="changeId" order="BEFORE" >
+      select MM_MEM_MARKET_CHANGE_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_MARKET_CHANGE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+        CHANGE_ID,
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+       <if test="gdsId != null" >
+        GDS_ID,
+      </if>
+      <if test="fromMarketId != null" >
+        FROM_MARKET_ID,
+      </if>
+      <if test="toMarketId != null" >
+        TO_MARKET_ID,
+      </if>
+      <if test="applyDate != null" >
+        APPLY_DATE,
+      </if>
+      <if test="approvalStatus != null" >
+        APPROVAL_STATUS,
+      </if>
+      <if test="approvalDate != null" >
+        APPROVAL_DATE,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+       CREATION_DATE,
+
+ 
+      
+        CREATED_BY,
+      
+      
+        LAST_UPDATED_BY,
+      
+       LAST_UPDATE_DATE,
+
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+        #{changeId,jdbcType=DECIMAL},
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="gdsId != null" >
+        #{gdsId,jdbcType=DECIMAL},
+      </if>
+      <if test="fromMarketId != null" >
+        #{fromMarketId,jdbcType=DECIMAL},
+      </if>
+      <if test="toMarketId != null" >
+        #{toMarketId,jdbcType=DECIMAL},
+      </if>
+      <if test="applyDate != null" >
+        #{applyDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approvalStatus != null" >
+        #{approvalStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDate != null" >
+        #{approvalDate,jdbcType=TIMESTAMP},
+      </if> 
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+       CURRENT_TIMESTAMP,
+      -1,
+      -1,
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemMarketChange" >
+    update MM_MEM_MARKET_CHANGE
+    <set >
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="fromMarketId != null" >
+        FROM_MARKET_ID = #{fromMarketId,jdbcType=DECIMAL},
+      </if>
+      <if test="toMarketId != null" >
+        TO_MARKET_ID = #{toMarketId,jdbcType=DECIMAL},
+      </if>
+      <if test="applyDate != null" >
+        APPLY_DATE = #{applyDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approvalStatus != null" >
+        APPROVAL_STATUS = #{approvalStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDate != null" >
+        APPROVAL_DATE = #{approvalDate,jdbcType=TIMESTAMP},
+      </if> 
+       OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </update>
+ <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.member.dto.MemMarketChange" >
+    update MM_MEM_MARKET_CHANGE
+    set
+      APPROVAL_STATUS = #{approvalStatus,jdbcType=VARCHAR},
+      APPROVAL_DATE = #{approvalDate,jdbcType=TIMESTAMP},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </update>
+<!--   根据memberId查找记录 -->
+ <select id="queryMarketChangeByMemberId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from MM_MEM_MARKET_CHANGE 
+    <where>
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+    </where>
+  </select>
+  
+  <select id="getMarketIdByCode" resultType="java.lang.Long" parameterType="java.util.Map" >
+    select DISTINCT m.MARKET_ID from SPM_MARKET_B m
+	where m.CODE = #{marketCode,jdbcType=VARCHAR} and m.ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR}
+  </select>
+<!--   根据变更市场表主键删除记录 -->
+  <delete id="deleteMarketChangeByChangeId" parameterType="java.lang.Long">
+    delete from mm_mem_market_change 
+    where change_id = #{changeId,jdbcType=DECIMAL}
+  </delete>
+ 
+</mapper>

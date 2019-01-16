@@ -1,0 +1,81 @@
+<#--
+ * description: 新会员审核界面
+ * version: 1.0
+ * author: mclin
+ * .
+ *
+-->
+<#include "../include/import.html">
+<body style="padding: 10px;">
+	<script src="${base.contextPath}/common/code?reasonCode=MM.MEMBER_UPLOAD_FAIL&flagArray=SYS.YES_NO" type="text/javascript"></script>
+    <div id="member_import_dialog_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    	$(function(){
+            window['member_import_dialog_grid'] = $("#member_import_dialog_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [ 
+					/* 表ID */
+					{ 
+						display: '', hide: true,
+						name: 'memberId', align: 'left', width: 100
+					},
+                   /* 会员ID */
+                   { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+                	name: 'memberCode', align: 'center', width: 140,
+                	render: function(rowData){
+                		if (rowData.enabled == "N") {
+                			return "<span style='color: red'>" +  rowData.memberCode +"</span>";
+                		} else {
+                			return rowData.memberCode;
+                		}
+                    }
+                  },
+                  /* 验证通过 */
+                  { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.import.validate"/>',
+                	name: 'enabled', align: 'center', width: 100,
+                	editor: {
+                		type: 'select',
+                		data: flagArray,
+                		valueField: 'value',
+                		textField: 'meaning'
+                	},
+                	render: function(item){
+                		for (var i in flagArray) {
+                			if (flagArray[i].value == item.enabled) {
+                				return flagArray[i].meaning;
+                			}
+                		}
+                		return '';
+                	}
+                  },
+                  /* 失败原因 */
+                  { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.import.failreason"/>',
+                	name: 'resonCode', align: 'left', width: 180,
+                	editor: {
+                		type: 'select',
+                		data: reasonCode,
+                		valueField: 'value',
+                		textField: 'meaning'
+                	},
+                	render: function(item){
+                		for (var i in reasonCode) {
+                			if (reasonCode[i].value == item.resonCode) {
+                				return reasonCode[i].meaning;
+                			}
+                		}
+                		return '';
+                	}
+                  } 
+                ], 
+                data: {rows: ${RequestParameters.param}.rows},
+                enabledEdit: false,
+                width: '99%', 
+                height: '98%'
+            }); 
+    	});//$function
+    </script>
+</body>
+</html>

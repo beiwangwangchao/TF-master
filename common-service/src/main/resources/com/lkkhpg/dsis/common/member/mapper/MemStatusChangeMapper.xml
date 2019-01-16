@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.member.mapper.MemStatusChangeMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.member.dto.MemStatusChange" extends="com.lkkhpg.dsis.platform.mapper.BaseMapper.STD" >
+    <id column="CHANGE_ID" property="changeId" jdbcType="DECIMAL" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="OPERATION_TYPE" property="operationType" jdbcType="VARCHAR" />
+    <result column="APPLY_DATE" property="applyDate" jdbcType="TIMESTAMP" />
+    <result column="APPROVAL_STATUS" property="approvalStatus" jdbcType="VARCHAR" />
+    <result column="APPROVAL_DATE" property="approvalDate" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="APP_NO" property="appNo" jdbcType="VARCHAR" />
+    <result column="SYN_STATUS" property="synStatus" jdbcType="VARCHAR" />
+    <result column="SYN_MESSAGE" property="synMessage" jdbcType="VARCHAR" />
+    <result column="SYN_DATE" property="synDate" jdbcType="TIMESTAMP" />
+	<result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+    <result column="TERMINATE_DATE" property="terminateDate" jdbcType="TIMESTAMP" />
+     <!--关联Member属性  -->
+    <result column="ENGLISH_NAME" property="englishName" jdbcType="VARCHAR" />
+    <result column="CHINESE_NAME" property="chineseName" jdbcType="VARCHAR" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+    
+    <!-- 通过Member的marketId寻找market表的marketName -->
+    <result column="MARKET_NAME" property="marketName" jdbcType="VARCHAR" />
+    
+  </resultMap>
+  <sql id="Base_Column_List" >
+    CHANGE_ID, MEMBER_ID, OPERATION_TYPE, APPLY_DATE, APPROVAL_STATUS, APPROVAL_DATE, 
+    REMARK, ADVISE_NO, APP_NO, SYN_STATUS, SYN_MESSAGE, SYN_DATE, OBJECT_VERSION_NUMBER, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+
+<!-- 会员状态变更记录查询（根据memberId和申请日期查询） -->
+  <select id="selectByApplyDateAndmemberId" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.member.dto.MemStatusChange" >
+    select 
+        MSC.CHANGE_ID CHANGE_ID,
+        MSC.MEMBER_ID MEMBER_ID,
+        MM.ENGLISH_NAME ENGLISH_NAME, 
+        MM.CHINESE_NAME CHINESE_NAME,
+        MSC.OPERATION_TYPE OPERATION_TYPE, 
+        MSC.APPLY_DATE APPLY_DATE, 
+        MSC.APPROVAL_STATUS APPROVAL_STATUS, 
+        MSC.APPROVAL_DATE APPROVAL_DATE, 
+        MSC.REMARK REMARK,
+        MSC.APP_NO APP_NO,
+        MM.MEMBER_CODE MEMBER_CODE,
+        MSC.SYN_STATUS SYN_STATUS,
+        <!-- SM.NAME -->coalesce(smt.name, sm.name) MARKET_NAME
+    from MM_MEM_STATUS_CHANGE MSC,MM_MEMBER_V MM,<!-- SPM_MARKET_B SM -->
+    spm_market_b sm 
+    LEFT OUTER JOIN spm_market_tl smt ON 
+    (sm.market_id = smt.market_id AND smt.lang = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+    where MSC.MEMBER_ID=MM.MEMBER_ID AND MSC.MARKET_ID=SM.MARKET_ID
+    <if test="marketId != null">
+    and MSC.MARKET_ID = #{marketId,jdbcType=DECIMAL} 
+    </if>
+    <if test="marketId == null">
+    and MSC.MARKET_ID = #{request.marketId,jdbcType=DECIMAL} 
+    </if>
+    <if test="beginDate != null">
+        AND trunc(MSC.APPLY_DATE,'dd') >= #{beginDate,jdbcType=TIMESTAMP}    
+    </if> 
+    <if test="endDate != null">
+        AND trunc(MSC.APPLY_DATE,'dd')<![CDATA[<]]>=#{endDate,jdbcType=TIMESTAMP}
+    </if> 
+    <if test="memberCode != null">
+        AND MEMBER_CODE= #{memberCode,jdbcType=VARCHAR}
+    </if>
+    <if test="sortname =='APPLY_DATE' and sortorder == 'asc'">
+            order by APPLY_DATE asc
+    </if>
+    <if test="sortname =='APPLY_DATE' and sortorder == 'desc'">
+            order by APPLY_DATE desc
+    </if>
+    
+  </select>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.math.BigDecimal" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEM_STATUS_CHANGE
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.math.BigDecimal" >
+    delete from MM_MEM_STATUS_CHANGE
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemStatusChange" >
+    <selectKey resultType="java.math.BigDecimal" keyProperty="changeId" order="BEFORE" >
+      select MM_MEM_STATUS_CHANGE_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_STATUS_CHANGE (CHANGE_ID, MEMBER_ID, OPERATION_TYPE, 
+      APPLY_DATE, APPROVAL_STATUS, APPROVAL_DATE, 
+      REMARK, ADVISE_NO, APP_NO, 
+      SYN_STATUS, SYN_MESSAGE, SYN_DATE, 
+      OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+      )
+    values (#{changeId,jdbcType=DECIMAL}, #{memberId,jdbcType=DECIMAL}, #{operationType,jdbcType=VARCHAR}, 
+      #{applyDate,jdbcType=TIMESTAMP}, #{approvalStatus,jdbcType=VARCHAR}, #{approvalDate,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR}, #{adviseNo,jdbcType=VARCHAR}, #{appNo,jdbcType=VARCHAR}, 
+      #{synStatus,jdbcType=VARCHAR}, #{synMessage,jdbcType=VARCHAR}, #{synDate,jdbcType=TIMESTAMP}, 
+      1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, 
+     CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemStatusChange" >
+    <selectKey resultType="java.lang.Long" keyProperty="changeId" order="BEFORE" >
+      select MM_MEM_STATUS_CHANGE_S.nextval from dual
+    </selectKey>
+    insert into MM_MEM_STATUS_CHANGE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      CHANGE_ID,
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="operationType != null" >
+        OPERATION_TYPE,
+      </if>
+      <if test="applyDate != null" >
+        APPLY_DATE,
+      </if>
+      <if test="approvalStatus != null" >
+        APPROVAL_STATUS,
+      </if>
+      <if test="approvalDate != null" >
+        APPROVAL_DATE,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO,
+      </if>
+      <if test="appNo != null" >
+        APP_NO,
+      </if>
+      <if test="synStatus != null" >
+        SYN_STATUS,
+      </if>
+      <if test="synMessage != null" >
+        SYN_MESSAGE,
+      </if>
+      <if test="synDate != null" >
+        SYN_DATE,
+      </if> 
+      OBJECT_VERSION_NUMBER,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+      
+         CREATION_DATE,
+         
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+      
+       LAST_UPDATE_DATE,
+       
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID,
+      </if>
+      <if test="terminateDate != null" >
+        TERMINATE_DATE
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{changeId,jdbcType=DECIMAL},
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="operationType != null" >
+        #{operationType,jdbcType=VARCHAR},
+      </if>
+      <if test="applyDate != null" >
+        #{applyDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approvalStatus != null" >
+        #{approvalStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDate != null" >
+        #{approvalDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appNo != null" >
+        #{appNo,jdbcType=VARCHAR},
+      </if>
+      <if test="synStatus != null" >
+        #{synStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="synMessage != null" >
+        #{synMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="synDate != null" >
+        #{synDate,jdbcType=TIMESTAMP},
+      </if> 
+      1,
+ 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+       CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="marketId != null" >
+        #{request.marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="terminateDate != null" >
+        #{terminateDate,jdbcType=TIMESTAMP} 
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemStatusChange" >
+    update MM_MEM_STATUS_CHANGE
+    <set >
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="operationType != null" >
+        OPERATION_TYPE = #{operationType,jdbcType=VARCHAR},
+      </if>
+      <if test="applyDate != null" >
+        APPLY_DATE = #{applyDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approvalStatus != null" >
+        APPROVAL_STATUS = #{approvalStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDate != null" >
+        APPROVAL_DATE = #{approvalDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appNo != null" >
+        APP_NO = #{appNo,jdbcType=VARCHAR},
+      </if>
+      <if test="synStatus != null" >
+        SYN_STATUS = #{synStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="synMessage != null" >
+        SYN_MESSAGE = #{synMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="synDate != null" >
+        SYN_DATE = #{synDate,jdbcType=TIMESTAMP},
+      </if> 
+       OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+ 
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+ 
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.member.dto.MemStatusChange" >
+    update MM_MEM_STATUS_CHANGE
+    set MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      OPERATION_TYPE = #{operationType,jdbcType=VARCHAR},
+      APPLY_DATE = #{applyDate,jdbcType=TIMESTAMP},
+      APPROVAL_STATUS = #{approvalStatus,jdbcType=VARCHAR},
+      APPROVAL_DATE = #{approvalDate,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      APP_NO = #{appNo,jdbcType=VARCHAR},
+      SYN_STATUS = #{synStatus,jdbcType=VARCHAR},
+      SYN_MESSAGE = #{synMessage,jdbcType=VARCHAR},
+      SYN_DATE = #{synDate,jdbcType=TIMESTAMP},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where CHANGE_ID = #{changeId,jdbcType=DECIMAL}
+  </update>
+  <!--   更新同步状态和接口信息 -->
+  <update id="updateSynStatusAndMsgByMemberId" parameterType="java.util.Map" >
+    update MM_MEM_STATUS_CHANGE
+     set SYN_STATUS = #{synStatus,jdbcType=VARCHAR} ,
+         SYN_MESSAGE = #{synMessage,jdbcType=VARCHAR} ,
+         SYN_DATE = CURRENT_TIMESTAMP
+         where MEMBER_ID = #{memberId,jdbcType=DECIMAL} and APPROVAL_STATUS = 'P'
+  </update>
+  <!-- 停权申请状态查询-更新审批状态 -->
+  <update id="updateApproveStatusByAppNo" parameterType="java.util.Map">
+        update MM_MEM_STATUS_CHANGE
+          set APPROVAL_STATUS = #{approvalStatus, jdbcType=VARCHAR},
+              SYN_STATUS = #{synStatus, jdbcType=VARCHAR},
+              SYN_MESSAGE = #{synMessage, jdbcType=VARCHAR},
+              APPROVAL_DATE = #{approvalDate,jdbcType=TIMESTAMP},
+              SYN_DATE = CURRENT_TIMESTAMP,
+              OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+              REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+              PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+              LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+              LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+              LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL}
+         where APP_NO = #{appNo,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="selectByAppNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_MEM_STATUS_CHANGE
+    where APP_NO = #{appNo,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="validRecord" resultType="java.lang.Long" parameterType="com.lkkhpg.dsis.common.member.dto.MemStatusChange" >
+    select 
+    count(*)
+    from MM_MEM_STATUS_CHANGE c
+    where c.APPROVAL_STATUS = 'P'
+	and  c.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+	and  #{operationType,jdbcType=VARCHAR} in ('TERM','ATERM')
+  </select>
+
+  <select id="selectAppNoByMemberCode" parameterType="java.lang.String" resultType="java.lang.String">
+      select mmsc.app_No
+        from mm_mem_status_change mmsc, mm_member mm
+      where mmsc.member_id = mm.member_id
+        and mmsc.approval_status = 'P'
+        and mmsc.operation_type = 'TERM'
+        and mm.member_code = #{memberCode,jdbcType=VARCHAR}
+  </select>
+</mapper>

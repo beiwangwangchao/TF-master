@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.common.inventory.mapper.InvTransactionMapper">
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.inventory.dto.InvTransaction">
+    <id column="TRX_ID" jdbcType="DECIMAL" property="trxId" />
+    <result column="ORGANIZATION_ID" jdbcType="DECIMAL" property="organizationId" />
+    <result column="SUBINVENTORY_ID" jdbcType="DECIMAL" property="subinventoryId" />
+    <result column="LOCATOR_ID" jdbcType="DECIMAL" property="locatorId" />
+    <result column="ITEM_ID" jdbcType="DECIMAL" property="itemId" />
+    <result column="LOT_NUMBER" jdbcType="VARCHAR" property="lotNumber" />
+    <result column="TRX_DATE" jdbcType="TIMESTAMP" property="trxDate" />
+    <result column="TRX_QTY" jdbcType="DECIMAL" property="trxQty" />
+    <result column="TRX_TYPE" jdbcType="VARCHAR" property="trxType" />
+    <result column="TRX_REASON" jdbcType="VARCHAR" property="trxReason" />
+    <result column="TRX_SOURCE_TYPE" jdbcType="VARCHAR" property="trxSourceType" />
+    <result column="TRX_SOURCE_KEY" jdbcType="VARCHAR" property="trxSourceKey" />
+    <result column="TRX_SOURCE_REFERENCE" jdbcType="VARCHAR" property="trxSourceReference" />
+    <result column="UNIT_COST" jdbcType="DECIMAL" property="unitCost" />
+    <result column="EXPIRY_DATE" jdbcType="TIMESTAMP" property="expiryDate" />
+    <result column="TRANSFER_SUBINV_ID" jdbcType="DECIMAL" property="transferSubinvId" />
+    <result column="TRANSFER_LOCATOR_ID" jdbcType="DECIMAL" property="transferLocatorId" />
+    <result column="TRANSFER_LOT" jdbcType="VARCHAR" property="transferLot" />
+    <result column="TRANSFER_LOT_EXPIRY" jdbcType="TIMESTAMP" property="transferLotExpiry" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="OBJECT_VERSION_NUMBER" jdbcType="DECIMAL" property="objectVersionNumber" />
+    <result column="REQUEST_ID" jdbcType="DECIMAL" property="requestId" />
+    <result column="PROGRAM_ID" jdbcType="DECIMAL" property="programId" />
+    <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+    <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+    <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="LAST_UPDATE_LOGIN" jdbcType="DECIMAL" property="lastUpdateLogin" />
+    <result column="ATTRIBUTE_CATEGORY" jdbcType="VARCHAR" property="attributeCategory" />
+    <result column="ATTRIBUTE1" jdbcType="VARCHAR" property="attribute1" />
+    <result column="ATTRIBUTE2" jdbcType="VARCHAR" property="attribute2" />
+    <result column="ATTRIBUTE3" jdbcType="VARCHAR" property="attribute3" />
+    <result column="ATTRIBUTE4" jdbcType="VARCHAR" property="attribute4" />
+    <result column="ATTRIBUTE5" jdbcType="VARCHAR" property="attribute5" />
+    <result column="ATTRIBUTE6" jdbcType="VARCHAR" property="attribute6" />
+    <result column="ATTRIBUTE7" jdbcType="VARCHAR" property="attribute7" />
+    <result column="ATTRIBUTE8" jdbcType="VARCHAR" property="attribute8" />
+    <result column="ATTRIBUTE9" jdbcType="VARCHAR" property="attribute9" />
+    <result column="ATTRIBUTE10" jdbcType="VARCHAR" property="attribute10" />
+    <result column="ATTRIBUTE11" jdbcType="VARCHAR" property="attribute11" />
+    <result column="ATTRIBUTE12" jdbcType="VARCHAR" property="attribute12" />
+    <result column="ATTRIBUTE13" jdbcType="VARCHAR" property="attribute13" />
+    <result column="ATTRIBUTE14" jdbcType="VARCHAR" property="attribute14" />
+    <result column="ATTRIBUTE15" jdbcType="VARCHAR" property="attribute15" />
+    <result column="TRANSFER_ORG_ID" jdbcType="DECIMAL" property="transferOrgId" />
+    <result column="UOM_CODE" jdbcType="VARCHAR" property="uomCode" />
+    <result column="sum_qty" jdbcType="DECIMAL" property="sumQty" />
+
+    
+    <result column="TRANSFER_FROM" property="transferFrom" jdbcType="VARCHAR" />
+    <result column="TRANSFER_TO" property="transferTo" jdbcType="VARCHAR" />
+    <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR" />
+    <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+    <result column="UNIT_PRICE" property="unitPrice" jdbcType="VARCHAR" />
+    <result column="TOTAL_PRICE" property="totalPrice" jdbcType="VARCHAR" />
+    <result column="ASSIST_COUNT" property="assistCount" jdbcType="VARCHAR" />
+    <result column="ASSIST_CODE" property="assistCode" jdbcType="VARCHAR" />
+    <result column="TRANSFER_ORG_NAME" property="transferOrgName" jdbcType="VARCHAR" />
+    <result column="PACKAGE_ITEM_ID" property="packageItemId" jdbcType="DECIMAL" />
+    <result column="PACKAGE_ITEM_NUMBER" property="packageItemNumber" jdbcType="VARCHAR" />
+    <result column="OUT_REFUND_NO" property="outRefundNo" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    TRX_ID, ORGANIZATION_ID, SUBINVENTORY_ID, LOCATOR_ID, ITEM_ID, LOT_NUMBER, TRX_DATE, 
+    TRX_QTY, TRX_TYPE, TRX_REASON, TRX_SOURCE_TYPE, TRX_SOURCE_KEY, TRX_SOURCE_REFERENCE, 
+    UNIT_COST, EXPIRY_DATE, TRANSFER_SUBINV_ID, TRANSFER_LOCATOR_ID, TRANSFER_LOT, TRANSFER_LOT_EXPIRY, 
+    REMARK, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+    LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+    ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+    ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, 
+    TRANSFER_ORG_ID, UOM_CODE,OUT_REFUND_NO
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from INV_TRANSACTION
+    where TRX_ID = #{trxId,jdbcType=DECIMAL}
+  </select>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.dto.InvTransaction">
+    <selectKey keyProperty="trxId" order="BEFORE" resultType="java.lang.Long">
+      select INV_TRANSACTION_S.nextval from dual
+    </selectKey>
+    insert into INV_TRANSACTION (TRX_ID, ORGANIZATION_ID, SUBINVENTORY_ID, 
+      LOCATOR_ID, ITEM_ID, LOT_NUMBER, 
+      TRX_DATE, TRX_QTY, TRX_TYPE, 
+      TRX_REASON, TRX_SOURCE_TYPE, TRX_SOURCE_KEY, 
+      TRX_SOURCE_REFERENCE, UNIT_COST, EXPIRY_DATE, 
+      TRANSFER_SUBINV_ID, TRANSFER_LOCATOR_ID, TRANSFER_LOT, 
+      TRANSFER_LOT_EXPIRY, REMARK, OBJECT_VERSION_NUMBER, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15, TRANSFER_ORG_ID, 
+      UOM_CODE, PACKAGE_ITEM_ID,OUT_REFUND_NO)
+    values (#{trxId,jdbcType=DECIMAL}, #{organizationId,jdbcType=DECIMAL}, #{subinventoryId,jdbcType=DECIMAL}, 
+      #{locatorId,jdbcType=DECIMAL}, #{itemId,jdbcType=DECIMAL}, #{lotNumber,jdbcType=VARCHAR}, 
+      #{trxDate,jdbcType=TIMESTAMP}, #{trxQty,jdbcType=DECIMAL}, #{trxType,jdbcType=VARCHAR}, 
+      #{trxReason,jdbcType=VARCHAR}, #{trxSourceType,jdbcType=VARCHAR}, #{trxSourceKey,jdbcType=VARCHAR}, 
+      #{trxSourceReference,jdbcType=VARCHAR}, #{unitCost,jdbcType=DECIMAL}, #{expiryDate,jdbcType=TIMESTAMP}, 
+      #{transferSubinvId,jdbcType=DECIMAL}, #{transferLocatorId,jdbcType=DECIMAL}, #{transferLot,jdbcType=VARCHAR}, 
+      #{transferLotExpiry,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 1, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},CURRENT_TIMESTAMP, 
+      -1, -1, CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{transferOrgId,jdbcType=DECIMAL}, 
+      #{uomCode,jdbcType=VARCHAR}, #{packageItemId,jdbcType=DECIMAL},#{outRefundNo,jdbcType=VARCHAR})
+  </insert>
+
+    <select id="getOrganization1" resultType="java.util.HashMap" >
+        select sio.INV_ORG_ID as id,t.NAME as text from SPM_INV_ORGANIZATION_B sio
+        LEFT OUTER JOIN spm_inv_organization_tl t on (
+        sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR}
+        )
+    </select>
+
+  <select id="getOrganization" resultType="java.util.HashMap" >
+   	select sio.INV_ORG_ID as id,t.NAME as text from SPM_INV_ORGANIZATION_B sio
+      LEFT OUTER JOIN spm_inv_organization_tl t on (
+      sio.INV_ORG_ID = t.INV_ORG_ID AND t.LANG = #{request.locale,jdbcType=VARCHAR}
+      )
+      LEFT OUTER JOIN  SPM_ORG_DEFINATION_B sod on SIO.INV_ORG_ID=SOD.INV_ORG_ID
+      left outer join SPM_COMPANY_B sc on sod.COMPANY_ID=sc.COMPANY_ID
+      <where>
+      (sc.COMPANY_ID = (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+      OR sc.GST_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+      OR SC.COMPANY_ID=(SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+      (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+      OR SC.GST_ID=(SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+      (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL})))
+      </where>
+  </select>
+  
+   <select id="getTransactions" resultMap="BaseResultMap" parameterType="java.util.Map" >
+	  	select i.ITEM_NUMBER,tl.ITEM_NAME,t.TRX_ID,
+		(SELECT o.NAME from SPM_INV_ORGANIZATION_B o where o.INV_ORG_ID = t.TRANSFER_ORG_ID) as TRANSFER_ORG_NAME, 
+		(select coalesce(IUT.NAME, iu.name) from INV_UNIT_OF_MEASURE_B iu LEFT OUTER JOIN INV_UNIT_OF_MEASURE_TL iut on (IUT.UOM_CODE = IU.UOM_CODE and IUT.LANG = #{request.locale,jdbcType=VARCHAR}) where iu.UOM_CODE = i.UOM_CODE) as UOM_CODE,
+		  CASE t.trx_source_type
+         WHEN 'TRANSFER_TRX_DETAIL' THEN
+          (SELECT coalesce(mbct.name, mb.name)
+             FROM inv_transfer_trx_detail dtl,INV_UNIT_OF_MEASURE_B mb left join INV_UNIT_OF_MEASURE_TL mbct 
+             on (mb.uom_code = mbct.uom_code and mbct.lang = #{request.locale,jdbcType=VARCHAR})
+            WHERE t.trx_source_key = to_char(dtl.trx_detail_id) and mb.uom_code = dtl.packing_type)
+         WHEN 'INV_STOCK_TRX_DETAIL' THEN
+          (SELECT coalesce(mbct.name, mb.name)
+             FROM inv_stock_trx_detail dtl,INV_UNIT_OF_MEASURE_B mb left join INV_UNIT_OF_MEASURE_TL mbct 
+             on (mb.uom_code = mbct.uom_code and mbct.lang = #{request.locale,jdbcType=VARCHAR})
+            WHERE t.trx_source_key = to_char(dtl.trx_detail_id) and mb.uom_code = dtl.packing_type) 
+     END as ASSIST_CODE,
+		  CASE t.trx_source_type
+         WHEN 'TRANSFER_TRX_DETAIL' THEN
+          (SELECT dtl.number_of_carton
+             FROM inv_transfer_trx_detail dtl
+            WHERE t.trx_source_key = to_char(dtl.trx_detail_id))
+         WHEN 'INV_STOCK_TRX_DETAIL' THEN
+          (SELECT dtl.number_of_carton
+             FROM inv_stock_trx_detail dtl
+            WHERE t.trx_source_key = to_char(dtl.trx_detail_id)) 
+     END as ASSIST_COUNT,
+		t.TRX_QTY,
+		(SELECT
+		    SCVT.MEANING
+		FROM
+		    SYS_CODE_B SYCB,
+		    SYS_CODE_VALUE_B SCVB,
+		    SYS_CODE_VALUE_TL SCVT
+		WHERE
+		    SYCB.CODE = 'INV.TRANSACTION_TYPE'
+		AND SYCB.CODE_ID = SCVB.CODE_ID
+		AND SCVB."VALUE" = t.TRX_TYPE
+		AND SCVB.CODE_VALUE_ID = SCVT.CODE_VALUE_ID
+		AND SCVT.LANG = #{request.locale,jdbcType=VARCHAR}) AS TRX_TYPE,
+		t.TRX_DATE,
+		t.TRX_REASON, 
+		t.REMARK,
+		t.TRX_SOURCE_REFERENCE,
+		t.LOT_NUMBER,
+		t.EXPIRY_DATE,
+       t.OUT_REFUND_NO,
+		(select it.ITEM_NUMBER from INV_ITEM_B it where t.PACKAGE_ITEM_ID = it.ITEM_ID) as PACKAGE_ITEM_NUMBER
+		 from INV_TRANSACTION t
+	    LEFT JOIN INV_ITEM_B i on t.ITEM_ID = i.ITEM_ID
+	    LEFT OUTER JOIN INV_ITEM_TL TL ON TL.ITEM_ID = t.ITEM_ID AND TL.LANG = #{request.locale,jdbcType=VARCHAR}
+    <where>
+     <!-- t.ORGANIZATION_ID = #{request.invOrgId,jdbcType=DECIMAL} -->
+    <if test="organizationId != null">
+    and t.ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL}
+    </if>
+    <if test="itemNumber != null">
+    and upper(i.ITEM_NUMBER) like concat('%',concat(upper(#{itemNumber,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="expiryDateFrom != null">
+    and t.EXPIRY_DATE >= #{expiryDateFrom,javaType=java.util.Date}
+    </if>
+     <if test="expiryDateTo != null">
+    and t.EXPIRY_DATE <![CDATA[<]]>= #{expiryDateTo,javaType=java.util.Date}
+    </if>
+    <if test="trxDateFrom != null">
+    and trunc(t.TRX_DATE) >= #{trxDateFrom,javaType=java.util.Date}
+    </if>
+    <if test="trxDateTo != null">
+    and trunc(t.TRX_DATE) <![CDATA[<]]>= #{trxDateTo,javaType=java.util.Date}
+    </if>
+    <if test="lotNumber != null">
+    <!-- and t.LOT_NUMBER = #{lotNumber,jdbcType=VARCHAR} -->
+    and upper(t.LOT_NUMBER) like concat('%',concat(upper(#{lotNumber,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="itemName != null">
+    and upper(TL.ITEM_NAME) like concat('%',concat(upper(#{itemName,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="trxType != null">
+    and t.TRX_TYPE = #{trxType,jdbcType=VARCHAR}
+    </if>
+    <if test="transferOrgId != null">
+    and t.TRANSFER_ORG_ID = #{transferOrgId,jdbcType=DECIMAL}
+    </if>
+    <if test="trxNumber != null">
+    and t.TRX_SOURCE_REFERENCE = #{trxNumber,jdbcType=VARCHAR}
+    </if>
+    </where>
+    order by t.TRX_ID desc
+  </select>
+  
+   <select id="getItems" resultType="java.util.Map" parameterType="java.util.Map" >
+      select i.ITEM_NUMBER ,i.ITEM_NAME  from INV_ITEM_B i
+  </select>
+  
+  <select id="getCurrentOrganization" resultType="java.util.Map">
+      SELECT o.INV_ORG_ID,o.NAME from SPM_INV_ORGANIZATION_B o
+		where o.INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+  </select>
+  <select id="getQuantity" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.inventory.dto.InvTransaction">
+  select sum(TRX_QTY) 
+  from INV_TRANSACTION it
+  <where>
+    <if test="lotNumber != null">
+         it.LOT_NUMBER = #{lotNumber,jdbcType=VARCHAR}
+    </if>
+    <if test="itemId != null">
+        AND it.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+    </if>
+    <if test="packageItemId != null">
+        AND it.PACKAGE_ITEM_ID = #{packageItemId,jdbcType=DECIMAL}
+    </if>
+    <if test="trxType != null">
+        AND it.TRX_TYPE = #{trxType,jdbcType=VARCHAR}
+    </if>
+  </where>
+  </select>
+  
+  <select id="queryInvTrxQtySumOfFIFO"  resultMap="BaseResultMap">
+    SELECT
+    	ORGANIZATION_ID,
+     	ITEM_ID,
+     	NVL(LOT_NUMBER, 'NONE') 	AS LOT_NUMBER,
+     	SUM(TRX_QTY)				AS SUM_QTY,
+     	NVL(EXPIRY_DATE, SYSDATE) 	AS EXPIRY_DATE
+    FROM INV_TRANSACTION
+    WHERE ORGANIZATION_ID IN (
+            SELECT SODB.INV_ORG_ID
+			FROM SPM_ORG_DEFINATION_B SODB
+			WHERE SODB.COST_ORG_ID = #{costOrgId,jdbcType=DECIMAL}
+		 )
+    AND TO_CHAR(TRX_DATE, 'YYYYMM') = #{trxDateName, jdbcType=VARCHAR} 
+    GROUP BY ORGANIZATION_ID,ITEM_ID,LOT_NUMBER,EXPIRY_DATE
+  </select>
+  
+  <select id="queryCostDetailsOfAvrag" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from INV_TRANSACTION
+    where organization_id in (
+            SELECT SODB.INV_ORG_ID
+			FROM SPM_ORG_DEFINATION_B SODB
+			WHERE SODB.COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+		 )
+    and to_char(trx_date, 'YYYY') = #{year,jdbcType=VARCHAR}
+    and to_char(trx_date, 'MM') = #{month,jdbcType=VARCHAR}
+    <!-- and trx_type in ('STKIN','TRFIN','COMCP','DCMCS','RETRN') -->
+  </select>
+  <!-- 根据库存归集中心、参数年月份判断是否有产生库存事务 -->
+  <select id="queryTrxs" resultMap="BaseResultMap">
+  	SELECT
+  		MIN(IT.TRX_DATE) 	TRX_DATE,
+  		IT.ORGANIZATION_ID,
+  		INV_ORG_NAME.NAME	TRANSFER_ORG_NAME
+  	FROM INV_TRANSACTION IT
+  		LEFT OUTER JOIN (
+		    SELECT SIOB.INV_ORG_ID, TL.NAME
+			FROM SPM_INV_ORGANIZATION_B SIOB
+				LEFT OUTER JOIN SPM_INV_ORGANIZATION_TL TL 
+					ON SIOB.INV_ORG_ID = TL.INV_ORG_ID AND TL.LANG=#{request.locale,jdbcType=VARCHAR}
+		) INV_ORG_NAME ON IT.ORGANIZATION_ID = INV_ORG_NAME.INV_ORG_ID
+  	<where> 
+  		ORGANIZATION_ID IN (
+  			SELECT SODB.INV_ORG_ID
+			FROM SPM_ORG_DEFINATION_B SODB
+			WHERE SODB.COST_ORG_ID = #{costOrgId,jdbcType=DECIMAL}
+  		)
+  		<if test="year != null">
+	  		AND TO_CHAR(IT.TRX_DATE, 'YYYY') = #{year,jdbcType=DECIMAL}
+  		</if>
+  		<if test="month != null">
+	    	AND TO_CHAR(IT.TRX_DATE, 'MM') = #{month,jdbcType=DECIMAL}
+  		</if>
+  		GROUP BY IT.ORGANIZATION_ID, INV_ORG_NAME.NAME
+  		ORDER BY TRX_DATE ASC
+    </where>
+  </select>
+
+
+    <select id="queryOrgsByRole" resultType="java.util.HashMap"  >
+  select siob.inv_org_id as id,
+  siot.name as text
+      from spm_inv_organization_b siob
+      left outer join spm_inv_organization_tl siot
+        on siob.inv_org_id = siot.inv_org_id
+       and siot.lang = #{request.locale,jdbcType=VARCHAR}
+      LEFT JOIN SPM_OPERATING_UNIT_B
+        ou ON (siob.OPERATION_UNIT_ID = ou.OPERATING_UNIT_ID)
+      LEFT JOIN SPM_OPERATING_UNIT_TL out
+        ON (out.OPERATING_UNIT_ID = siob.OPERATION_UNIT_ID
+	   AND out.lang = #{request.locale,jdbcType=VARCHAR})
+     where siot.inv_org_id in (select assign_value
+                                 from sys_user_role_assign
+                                where role_id = #{request.roleId,jdbcType=DECIMAL}
+                                  and user_id = #{request.userId,jdbcType=DECIMAL}
+                                  and assign_type = 'INV') order by siob.inv_org_id asc
+    </select>
+
+    <select id="queryOutRefund"   resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM INV_TRANSACTION inv
+        where INV.OUT_REFUND_NO=#{outRefundNo,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

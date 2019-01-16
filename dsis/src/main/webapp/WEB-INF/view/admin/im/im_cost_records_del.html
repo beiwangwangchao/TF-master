@@ -1,0 +1,110 @@
+<#--
+ * description: 取消成本记录
+ * version: 1.0 
+ * author: hanrui.huang
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?periodYear=SPM.PERIOD_YEAR&periodMonth=SPM.PERIOD_MONTH" type="text/javascript"></script>
+<body style="padding: 10px;">
+    <form id="cost_records_del"></form>
+    <div id="delbtns" style="float: right;margin-top: 65px;"></div>
+    <script type="text/javascript">
+    $(function() {
+    	window['cost_records_del'] = $("#cost_records_del").ligerForm({
+    		fields : [{ 
+    			name : 'year', 
+    			label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.year"/>', 
+    			type : 'select',
+    			labelwidth: 30,
+    			width: 80,
+    			options: {
+    				valueField: 'value',
+    				textField: 'meaning',
+    				data: periodYear
+    			},
+    			validate : {
+    				required : true
+    			}
+    		},
+    		{
+    			label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.month"/>',
+    			name : 'month',
+    			type : 'select',
+    			labelwidth: 30,
+    			width: 80,
+    			newline : false,
+    			options: {
+    				valueField: 'value',
+    				textField: 'meaning',
+    				data: periodMonth
+    			},
+    			validate : {
+    				required : true
+    			}
+    		},
+    		{
+    			name : 'invOrgId',
+    			style : 'display:none',
+    			options : {
+    				value :${RequestParameters.invOrgId}
+    			}
+    		}]
+    	})
+    	window['delbtns'] = $('#delbtns').ligerForm({
+    		buttons : [{
+    			text : '<@spring.message "sys.hand.btn.ok"/>',
+    			name : 'grant_btn',
+    			disabled : false,
+    			width : 80,
+    			click : function() {
+    				if(Hap.validateForm(cost_records_del)){
+    					var records = $.ligerui.get('cost_records_del').getData();
+    					$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.cancel.cost"/>', function (isyes) {
+    						if(isyes){
+    							$.ajax({
+    								url:"${base.contextPath}/inv/cost/remove",
+    								type : "POST",
+    								data:records,
+    								success:function(data){
+    									if(data.success){
+    										f_cancel();
+    									}
+    								}
+    							})
+    						}
+    					})
+    				}
+    			}
+    		}]
+    	});
+    })
+    /*确定*/
+    function f_submit() {
+    	if(Hap.validateForm(cost_records_del)){
+			var records = $.ligerui.get('cost_records_del').getData();
+			$.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.cancel.cost"/>', function (isyes) {
+				if(isyes){
+					$.ajax({
+						url:"${base.contextPath}/inv/cost/remove",
+						type : "POST",
+						data:records,
+						success:function(data){
+							if(data.success){
+								f_cancel();
+							}
+						}
+					})
+				}
+			})
+		}
+    }
+    /*关闭窗口*/
+    function f_cancel() {
+        var dialog = frameElement.dialog;
+        dialog.close();
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>天府电商</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<link href="${base.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css">
+<link rel="shortcut icon" href="${base.contextPath}/resources/img/favicon.ico" />
+<!-- Bootstrap -->
+<link href="${base.contextPath}/resources/css/bootstrap${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.carousel${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.theme${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.transitions${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/style${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/config${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/dialog${resource_suffix!}.css" rel="stylesheet">
+<link rel="stylesheet" href="${base.contextPath}/resources/css/bootstrapnav.css"  rel="stylesheet">
+<!-- HTML5 Shim and Respond${resource_suffix!}.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond${resource_suffix!}.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="${base.contextPath}/resources/js/html5shiv.js"></script>
+  <![endif]-->
+  <#assign IMG_H = "_480_480">
+  <#assign IMG_M = "_360_360">
+  <#assign IMG_L = "_78_78">
+<script type="text/javascript">
+!function(){
+var p = {};
+$l = function(code,value){
+    var al = arguments.length;
+    if(al == 1){
+        var v = p[code];
+        return v ? v : code;
+    }else if(al == 2){
+        p[code] = value;
+    }
+}
+}();
+$l('sys.hand.btn.cancel','<@spring.message "sys.hand.btn.cancel"/>');
+$l('sys.hand.btn.ok','<@spring.message "sys.hand.btn.ok"/>');
+</script>
+<script src="${base.contextPath}/resources/js/jquery-1.11.3${resource_suffix!}.js"></script>
+<script>
+$.isEmpty = function(v, allowBlank){
+    return v === null || v === undefined || (($.isArray(v) && !v.length)) || (!allowBlank ? v === '' : false);
+}
+$.isString = function(v){
+    return typeof v === 'string';
+}
+$.escapeHtml = function(str){
+    if($.isEmpty(str) || !$.isString(str))
+        return str;
+    return String(str).replace(/&/gm,'&amp;').replace(/\'/gm,'&#39;').replace(/\(/gm,'&#40;').replace(/\)/gm,'&#41;').replace(/\+/gm,'&#43;').replace(/\%/gm,'&#37;')
+    .replace(/</gm,'&lt;').replace(/>/gm,'&gt;');
+}
+$.unescapeHtml = function(str){
+    if($.isEmpty(str) || !$.isString(str))
+        return str;
+    return String(str).replace(/&amp;/gm,'&').replace(/&#39;/gm,'\'').replace(/&quot;/gm,'"').replace(/&#40;/gm,'(').replace(/&#41;/gm,')').replace(/&#43;/gm,'+').replace(/&#37;/gm,'%')
+    .replace(/&lt;/gm,'<').replace(/&gt;/gm,'>');
+}
+</script>
+<script src="${base.contextPath}/resources/js/dialog${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/lib/json2${resource_suffix!}.js"></script>
+<script type="text/javascript">var _basePath = "${base.contextPath}";</script>
+<style type="text/css">
+    .hover{
+        color: #000000;
+        background:#F4EFCF;
+    }
+</style>
+
+<style type="text/css">
+          .main-menu{ background: #F1F1F1; }
+          nav.navbar.bootsnav{
+              border: none;
+              background: none;
+              margin-left: 160px;
+          }
+          nav.navbar.bootsnav ul.nav > li{
+              margin-right: 10px;
+          }
+
+          nav.navbar.bootsnav ul.nav > li:hover:before{ height: 25px; }
+          nav.navbar.bootsnav ul.nav > li.megamenu-fw:before{ left: 11.3%; }
+
+          nav.navbar.bootsnav ul.nav > li:hover:after{
+              bottom: 1px;
+              opacity: 1;
+          }
+          nav.navbar.bootsnav ul.nav > li.megamenu-fw:after{ left: 11.3%; }
+          nav.navbar.bootsnav ul.nav > li > a{
+              padding: 25px 15px 20px 15px;
+              margin: 0;
+              color: #000;
+              text-transform: uppercase;
+              z-index: 1;
+              transition: all 0.5s ease 0s;
+          }
+          nav.navbar.bootsnav ul.nav > li.dropdown > a{
+              padding: 25px 15px 20px 15px;
+          }
+          nav.navbar.bootsnav ul.nav > li > a:hover{ color: #fff; }
+          nav.navbar.bootsnav ul.nav > li.dropdown > a.dropdown-toggle:after{
+              position: absolute;
+              margin: 0 0 0 7px;
+          }
+          nav.navbar.bootsnav ul.nav > li.dropdown > ul{
+              top: 120%;
+              transition: all 0.4s ease 0s;
+          }
+          nav.navbar.bootsnav ul.nav > li.dropdown.on > ul{
+              top: 100%;
+          }
+          .dropdown-menu.multi-dropdown{
+              position: absolute;
+              left: -100% !important;
+          }
+          nav.navbar.bootsnav li.dropdown ul.dropdown-menu{
+              box-shadow: 0 0 10px rgba(255, 100, 100, 0.4);
+              border: none;
+          }
+          nav.navbar.bootsnav li.dropdown ul.dropdown-menu.megamenu-content li{
+              font-size: 14px;
+              color: #6f6f6f;
+          }
+          nav.navbar.bootsnav li.dropdown ul.dropdown-menu.megamenu-content .title{
+              font-size: 16px;
+              font-weight: bold;
+              color: #3f3f3f;
+          }
+          @media only screen and (max-width:200px){
+
+              nav.navbar.bootsnav ul.nav > li > a,
+              nav.navbar.bootsnav ul.nav > li > a:hover{
+                  color: #333;
+              }
+
+          }
+      </style>
+
+<script type="text/javascript">
+    //登出
+    function logout() {
+        $.dialog.confirm('<@spring.message "mws.dialog.confirm"/>','<@spring.message "sys.hand.confirm_exit"/>',function(){
+            location.href = _basePath + "/logout";
+        },function(){
+            //取消-无操作
+        });
+    }
+    //获得店铺
+    function getOrgName(){
+        var code = "${Session._marketCode}";
+    	var igiCode = "";
+    	for(var i=0;i<igiMapping.length;i++){
+    		if(code == igiMapping[i]['value']){
+    			igiCode = igiMapping[i]['meaning']
+                //console.log(igiCode);
+    			break;
+    		}
+    	}
+    	var  memberId= ${Session.memberId};
+        var marketId = ${Session._marketId};
+    	$.ajax({
+            type : "POST",
+            url:"${base.contextPath}/account/selectByMarketName",
+            data:{memberId:memberId,igiCode:igiCode},
+            dataType : "json",
+            success : function(data) {
+                if(data.success){
+                	var html = [];
+                    var data = data.rows;
+                    if(data.length>0){
+                        //for(var i=0;i<data.length;i++){
+                        $.each(data, function(index, item) {
+                            //var item = data[i];
+                            html.push("<tr>\
+                            		   <td style='width:160px;' id='"+ item.salesOrgId +"' onclick='selectShop("+ item.salesOrgId +",\""+ item.name +"\")'><span title='"+ item.name +"'>"+ item.name +"</span></td>\
+                                 </tr>");
+                        //}
+                        });
+                        $("#showShopTbody").html(html.join(''));
+                    }
+                    click_span();
+                }
+            }
+        });
+    }
+    
+    function selectShop(val,name){
+    	$.ajax({
+            type : "POST",
+            url:"${base.contextPath}/account/select/shop",
+            data:{salesOrgId:val,salesOrgName:name},
+            dataType : "json",
+            success : function(data) {
+            	if(data.success == true){
+            		//window.location.href="${base.contextPath}/";
+            		window.location.reload([true]);// 当前页面
+            	}
+            }
+    	});
+    }
+    
+    function click_span(){
+        $("#${Session._salesOrgId}").addClass("hover");
+        $("#showShopTbody td").hover(
+                  function () {
+                    $(this).addClass("hover");
+                  },
+                  function () {
+                    $(this).removeClass("hover");
+                  }
+        );
+        $("#showShopTbody td").on("click",function(){
+            $("td").css({ "color": "", "background": ""});
+            $(this).addClass("hover");
+        });
+    }
+
+    var bootsnav = {
+        initialize: function() {
+            this.event();
+            this.hoverDropdown();
+            this.navbarSticky();
+            this.navbarScrollspy();
+        },
+        event : function(){
+
+            // ------------------------------------------------------------------------------ //
+            // Variable
+            // ------------------------------------------------------------------------------ //
+            var getNav = $("nav.navbar.bootsnav");
+
+            // ------------------------------------------------------------------------------ //
+            // Navbar Center
+            // ------------------------------------------------------------------------------ //
+            if( getNav.hasClass("brand-center")){
+                var postsArr = new Array(),
+                    index = $("nav.brand-center"),
+                    $postsList = index.find('ul.navbar-nav');
+
+                //Create array of all posts in lists
+                index.find('ul.navbar-nav > li').each(function(){
+                    postsArr.push($(this).html());
+                });
+
+                //Split the array at this point. The original array is altered.
+                var firstList = postsArr.splice(0, Math.round(postsArr.length / 2)),
+                    secondList = postsArr,
+                    ListHTML = '';
+
+                var createHTML = function(list){
+                    ListHTML = '';
+                    for (var i = 0; i < list.length; i++) {
+                        ListHTML += '<li>' + list[i] + '</li>'
+                    }
+                }
+
+                //Generate HTML for first list
+                createHTML(firstList);
+                $postsList.html(ListHTML);
+                index.find("ul.nav").first().addClass("navbar-left");
+
+                //Generate HTML for second list
+                createHTML(secondList);
+                //Create new list after original one
+                $postsList.after('<ul class="nav navbar-nav"></ul>').next().html(ListHTML);
+                index.find("ul.nav").last().addClass("navbar-right");
+
+                //Wrap navigation menu
+                index.find("ul.nav.navbar-left").wrap("<div class='col-half left'></div>");
+                index.find("ul.nav.navbar-right").wrap("<div class='col-half right'></div>");
+
+                //Selection Class
+                index.find('ul.navbar-nav > li').each(function(){
+                    var dropDown = $("ul.dropdown-menu", this),
+                        megaMenu = $("ul.megamenu-content", this);
+                    dropDown.closest("li").addClass("dropdown");
+                    megaMenu.closest("li").addClass("megamenu-fw");
+                });
+            }
+
+
+            // ------------------------------------------------------------------------------ //
+            // Navbar Sidebar
+            // ------------------------------------------------------------------------------ //
+            if( getNav.hasClass("navbar-sidebar")){
+                // Add Class to body
+                $("body").addClass("wrap-nav-sidebar");
+                getNav.wrapInner("<div class='scroller'></div>");
+            }else{
+                $(".bootsnav").addClass("on");
+            }
+
+            // ------------------------------------------------------------------------------ //
+            // Menu Center
+            // ------------------------------------------------------------------------------ //
+            if( getNav.find("ul.nav").hasClass("navbar-center")){
+                getNav.addClass("menu-center");
+            }
+
+            // ------------------------------------------------------------------------------ //
+            // Navbar Full
+            // ------------------------------------------------------------------------------ //
+            if( getNav.hasClass("navbar-full")){
+                // Add Class to body
+                $("nav.navbar.bootsnav").find("ul.nav").wrap("<div class='wrap-full-menu'></div>");
+                $(".wrap-full-menu").wrap("<div class='nav-full'></div>");
+                $("ul.nav.navbar-nav").prepend("<li class='close-full-menu'><a href='#'><i class='fa fa-times'></i></a></li>");
+            }else if( getNav.hasClass("navbar-mobile")){
+                getNav.removeClass("no-full");
+            }else{
+                getNav.addClass("no-full");
+            }
+
+            // ------------------------------------------------------------------------------ //
+            // Navbar Mobile
+            // ------------------------------------------------------------------------------ //
+            if( getNav.hasClass("navbar-mobile")){
+                // Add Class to body
+                $('.navbar-collapse').on('shown.bs.collapse', function() {
+                    $("body").addClass("side-right");
+                });
+                $('.navbar-collapse').on('hide.bs.collapse', function() {
+                    $("body").removeClass("side-right");
+                });
+
+                $(window).on("resize", function(){
+                    $("body").removeClass("side-right");
+                });
+            }
+
+            // ------------------------------------------------------------------------------ //
+            // Navbar Fixed
+            // ------------------------------------------------------------------------------ //
+            if( getNav.hasClass("no-background")){
+                $(window).on("scroll", function(){
+                    var scrollTop = $(window).scrollTop();
+                    if(scrollTop >34){
+                        $(".navbar-fixed").removeClass("no-background");
+                    }else {
+                        $(".navbar-fixed").addClass("no-background");
+                    }
+                });
+            }
+
+            // ------------------------------------------------------------------------------ //
+            // Navbar Fixed
+            // ------------------------------------------------------------------------------ //
+            if( getNav.hasClass("navbar-transparent")){
+                $(window).on("scroll", function(){
+                    var scrollTop = $(window).scrollTop();
+                    if(scrollTop >34){
+                        $(".navbar-fixed").removeClass("navbar-transparent");
+                    }else {
+                        $(".navbar-fixed").addClass("navbar-transparent");
+                    }
+                });
+            }
+
+            // ------------------------------------------------------------------------------ //
+            // Button Cart
+            // ------------------------------------------------------------------------------ //
+            $(".btn-cart").on("click", function(e){
+                e.stopPropagation();
+            });
+
+            // ------------------------------------------------------------------------------ //
+            // Toggle Search
+            // ------------------------------------------------------------------------------ //
+            $("nav.navbar.bootsnav .attr-nav").each(function(){
+                $("li.search > a", this).on("click", function(e){
+                    e.preventDefault();
+                    $(".top-search").slideToggle();
+                });
+            });
+            $(".input-group-addon.close-search").on("click", function(){
+                $(".top-search").slideUp();
+            });
+
+            // ------------------------------------------------------------------------------ //
+            // Toggle Side Menu
+            // ------------------------------------------------------------------------------ //
+            $("nav.navbar.bootsnav .attr-nav").each(function(){
+                $("li.side-menu > a", this).on("click", function(e){
+                    e.preventDefault();
+                    $("nav.navbar.bootsnav > .side").toggleClass("on");
+                    $("body").toggleClass("on-side");
+                });
+            });
+            $(".side .close-side").on("click", function(e){
+                e.preventDefault();
+                $("nav.navbar.bootsnav > .side").removeClass("on");
+                $("body").removeClass("on-side");
+            });
+
+            // ------------------------------------------------------------------------------ //
+            // Navbat Tabs
+            // ------------------------------------------------------------------------------ //
+            $(".tab-nav li").each(function(){
+                $("a", this).off("click");
+                $("a", this).on("click", function(e){
+                    e.preventDefault();
+                    var cek = $(this).closest("li").hasClass("active");
+                    if( cek ){
+                        $("a", this).off("click");
+                    }else{
+                        var getID = $(this).attr("href");
+                        $(".tab-nav li").removeClass("active");
+                        $(this).closest("li").addClass("active");
+                    }
+                });
+            });
+
+            $(".dropdown-tabs .tab-pane").each(function(){
+                var getBG = $(this).data("background");
+                $(this).css("background-image","url('" + getBG +"')");
+                $(this).addClass("animated");
+            });
+
+            // ------------------------------------------------------------------------------ //
+            // Wrapper
+            // ------------------------------------------------------------------------------ //
+            $("body").wrapInner( "<div class='wrapper'></div>");
+        },
+
+
+        // ------------------------------------------------------------------------------ //
+        // Change dropdown to hover on dekstop
+        // ------------------------------------------------------------------------------ //
+        hoverDropdown : function(){
+            var getNav = $("nav.navbar.bootsnav"),
+                getWindow = $(window).width(),
+                getHeight = $(window).height(),
+                getIn = getNav.find("ul.nav").data("in"),
+                getOut = getNav.find("ul.nav").data("out");
+
+            if( getWindow < 981 ){
+
+                // Height of scroll navigation sidebar
+                $(".scroller").css("height", "auto");
+
+                // Disable mouseenter event
+                $("nav.navbar.bootsnav ul.nav").find("li.dropdown").off("mouseenter");
+                $("nav.navbar.bootsnav ul.nav").find("li.dropdown").off("mouseleave");
+                $("nav.navbar.bootsnav ul.nav").find(".title").off("mouseenter");
+                $("nav.navbar.bootsnav ul.nav").off("mouseleave");
+                $(".navbar-collapse").removeClass("animated");
+
+                // Enable click event
+                $("nav.navbar.bootsnav ul.nav").each(function(){
+                    $(".dropdown-menu", this).addClass("animated");
+                    $(".dropdown-menu", this).removeClass(getOut);
+
+                    // Dropdown Fade Toggle
+                    $("a.dropdown-toggle", this).off('click');
+                    $("a.dropdown-toggle", this).on('click', function (e) {
+                        e.stopPropagation();
+                        $(this).closest("li.dropdown").find(".dropdown-menu").first().stop().fadeToggle().toggleClass(getIn);
+                        $(this).closest("li.dropdown").first().toggleClass("on");
+                        return false;
+                    });
+
+                    // Hidden dropdown action
+                    $('li.dropdown', this).each(function () {
+                        $(this).find(".dropdown-menu").stop().fadeOut();
+                        $(this).on('hidden.bs.dropdown', function () {
+                            $(this).find(".dropdown-menu").stop().fadeOut();
+                        });
+                        return false;
+                    });
+
+                    // Megamenu style
+                    $(".megamenu-fw", this).each(function(){
+                        $(".col-menu", this).each(function(){
+                            $(".content", this).addClass("animated");
+                            $(".content", this).stop().fadeOut();
+                            $(".title", this).off("click");
+                            $(".title", this).on("click", function(){
+                                $(this).closest(".col-menu").find(".content").stop().fadeToggle().addClass(getIn);
+                                $(this).closest(".col-menu").toggleClass("on");
+                                return false;
+                            });
+
+                            $(".content", this).on("click", function(e){
+                                e.stopPropagation();
+                            });
+                        });
+                    });
+                });
+
+                // Hidden dropdown
+                var cleanOpen = function(){
+                    $('li.dropdown', this).removeClass("on");
+                    $(".dropdown-menu", this).stop().fadeOut();
+                    $(".dropdown-menu", this).removeClass(getIn);
+                    $(".col-menu", this).removeClass("on");
+                    $(".col-menu .content", this).stop().fadeOut();
+                    $(".col-menu .content", this).removeClass(getIn);
+                }
+
+                // Hidden om mouse leave
+                $("nav.navbar.bootsnav").on("mouseleave", function(){
+                    cleanOpen();
+                });
+
+                // Enable click atribute navigation
+                $("nav.navbar.bootsnav .attr-nav").each(function(){
+                    $(".dropdown-menu", this).removeClass("animated");
+                    $("li.dropdown", this).off("mouseenter");
+                    $("li.dropdown", this).off("mouseleave");
+                    $("a.dropdown-toggle", this).off('click');
+                    $("a.dropdown-toggle", this).on('click', function (e) {
+                        e.stopPropagation();
+                        $(this).closest("li.dropdown").find(".dropdown-menu").first().stop().fadeToggle();
+                        $(".navbar-toggle").each(function(){
+                            $(".fa", this).removeClass("fa-times");
+                            $(".fa", this).addClass("fa-bars");
+                            $(".navbar-collapse").removeClass("in");
+                            $(".navbar-collapse").removeClass("on");
+                        });
+                    });
+
+                    $(this).on("mouseleave", function(){
+                        $(".dropdown-menu", this).stop().fadeOut();
+                        $("li.dropdown", this).removeClass("on");
+                        return false;
+                    });
+                });
+
+                // Toggle Bars
+                $(".navbar-toggle").each(function(){
+                    $(this).off("click");
+                    $(this).on("click", function(){
+                        $(".fa", this).toggleClass("fa-bars");
+                        $(".fa", this).toggleClass("fa-times");
+                        cleanOpen();
+                    });
+                });
+
+            }else if( getWindow > 981 ){
+                // Height of scroll navigation sidebar
+                $(".scroller").css("height", getHeight + "px");
+
+                // Navbar Sidebar
+                if( getNav.hasClass("navbar-sidebar")){
+                    // Hover effect Sidebar Menu
+                    $("nav.navbar.bootsnav ul.nav").each(function(){
+                        $("a.dropdown-toggle", this).off('click');
+                        $("a.dropdown-toggle", this).on('click', function (e) {
+                            e.stopPropagation();
+                        });
+
+                        $(".dropdown-menu", this).addClass("animated");
+                        $("li.dropdown", this).on("mouseenter", function(){
+                            $(".dropdown-menu", this).eq(0).removeClass(getOut);
+                            $(".dropdown-menu", this).eq(0).stop().fadeIn().addClass(getIn);
+                            $(this).addClass("on");
+                            return false;
+                        });
+
+                        $(".col-menu").each(function(){
+                            $(".content", this).addClass("animated");
+                            $(".title", this).on("mouseenter", function(){
+                                $(this).closest(".col-menu").find(".content").stop().fadeIn().addClass(getIn);
+                                $(this).closest(".col-menu").addClass("on");
+                                return false;
+                            });
+                        });
+
+                        $(this).on("mouseleave", function(){
+                            $(".dropdown-menu", this).stop().removeClass(getIn);
+                            $(".dropdown-menu", this).stop().addClass(getOut).fadeOut();
+                            $(".col-menu", this).find(".content").stop().fadeOut().removeClass(getIn);
+                            $(".col-menu", this).removeClass("on");
+                            $("li.dropdown", this).removeClass("on");
+                            return false;
+                        });
+                    });
+                }else{
+                    // Hover effect Default Menu
+                    $("nav.navbar.bootsnav ul.nav").each(function(){
+                        $("a.dropdown-toggle", this).off('click');
+                        $("a.dropdown-toggle", this).on('click', function (e) {
+                            e.stopPropagation();
+                        });
+
+                        $(".megamenu-fw", this).each(function(){
+                            $(".title", this).off("click");
+                            $("a.dropdown-toggle", this).off("click");
+                            $(".content").removeClass("animated");
+                        });
+
+                        $(".dropdown-menu", this).addClass("animated");
+                        $("li.dropdown", this).on("mouseenter", function(){
+                            $(".dropdown-menu", this).eq(0).removeClass(getOut);
+                            $(".dropdown-menu", this).eq(0).stop().fadeIn().addClass(getIn);
+                            $(this).addClass("on");
+                            return false;
+                        });
+
+                        $("li.dropdown", this).on("mouseleave", function(){
+                            $(".dropdown-menu", this).eq(0).removeClass(getIn);
+                            $(".dropdown-menu", this).eq(0).stop().fadeOut().addClass(getOut);
+                            $(this).removeClass("on");
+                        });
+
+                        $(this).on("mouseleave", function(){
+                            $(".dropdown-menu", this).removeClass(getIn);
+                            $(".dropdown-menu", this).eq(0).stop().fadeOut().addClass(getOut);
+                            $("li.dropdown", this).removeClass("on");
+                            return false;
+                        });
+                    });
+                }
+
+                // ------------------------------------------------------------------------------ //
+                // Hover effect Atribute Navigation
+                // ------------------------------------------------------------------------------ //
+                $("nav.navbar.bootsnav .attr-nav").each(function(){
+                    $("a.dropdown-toggle", this).off('click');
+                    $("a.dropdown-toggle", this).on('click', function (e) {
+                        e.stopPropagation();
+                    });
+
+                    $(".dropdown-menu", this).addClass("animated");
+                    $("li.dropdown", this).on("mouseenter", function(){
+                        $(".dropdown-menu", this).eq(0).removeClass(getOut);
+                        $(".dropdown-menu", this).eq(0).stop().fadeIn().addClass(getIn);
+                        $(this).addClass("on");
+                        return false;
+                    });
+
+                    $("li.dropdown", this).on("mouseleave", function(){
+                        $(".dropdown-menu", this).eq(0).removeClass(getIn);
+                        $(".dropdown-menu", this).eq(0).stop().fadeOut().addClass(getOut);
+                        $(this).removeClass("on");
+                    });
+
+                    $(this).on("mouseleave", function(){
+                        $(".dropdown-menu", this).removeClass(getIn);
+                        $(".dropdown-menu", this).eq(0).stop().fadeOut().addClass(getOut);
+                        $("li.dropdown", this).removeClass("on");
+                        return false;
+                    });
+                });
+            }
+
+            // ------------------------------------------------------------------------------ //
+            // Menu Fullscreen
+            // ------------------------------------------------------------------------------ //
+            if( getNav.hasClass("navbar-full")){
+                var windowHeight = $(window).height(),
+                    windowWidth =  $(window).width();
+
+                $(".nav-full").css("height", windowHeight + "px");
+                $(".wrap-full-menu").css("height", windowHeight + "px");
+                $(".wrap-full-menu").css("width", windowWidth + "px");
+
+                $(".navbar-collapse").addClass("animated");
+                $(".navbar-toggle").each(function(){
+                    var getId = $(this).data("target");
+                    $(this).off("click");
+                    $(this).on("click", function(e){
+                        e.preventDefault();
+                        $(getId).removeClass(getOut);
+                        $(getId).addClass("in");
+                        $(getId).addClass(getIn);
+                        return false;
+                    });
+
+                    $("li.close-full-menu").on("click", function(e){
+                        e.preventDefault();
+                        $(getId).addClass(getOut);
+                        setTimeout(function(){
+                            $(getId).removeClass("in");
+                            $(getId).removeClass(getIn);
+                        }, 500);
+                        return false;
+                    });
+                });
+            }
+        },
+
+        // ------------------------------------------------------------------------------ //
+        // Navbar Sticky
+        // ------------------------------------------------------------------------------ //
+        navbarSticky : function(){
+            var getNav = $("nav.navbar.bootsnav"),
+                navSticky = getNav.hasClass("navbar-sticky");
+
+            if( navSticky ){
+                // Wraped navigation
+                getNav.wrap("<div class='wrap-sticky'></div>");
+
+                // Set Height Navigation
+                var getHeight = getNav.height();
+                $(".wrap-sticky").height(getHeight);
+
+                // Windown on scroll
+                var getOffset = $(".wrap-sticky").offset().top;
+                $(window).on("scroll", function(){
+                    var scrollTop = $(window).scrollTop();
+                    if(scrollTop > getOffset){
+                        getNav.addClass("sticked");
+                    }else {
+                        getNav.removeClass("sticked");
+                    }
+                });
+            }
+        },
+
+        // ------------------------------------------------------------------------------ //
+        // Navbar Scrollspy
+        // ------------------------------------------------------------------------------ //
+        navbarScrollspy : function(){
+            var navScrollSpy = $(".navbar-scrollspy"),
+                $body   = $('body'),
+                getNav = $('nav.navbar.bootsnav'),
+                offset  = getNav.outerHeight();
+
+            if( navScrollSpy.length ){
+                $body.scrollspy({target: '.navbar', offset: offset });
+
+                // Animation Scrollspy
+                $('.scroll').on('click', function(event) {
+                    event.preventDefault();
+
+                    // Active link
+                    $('.scroll').removeClass("active");
+                    $(this).addClass("active");
+
+                    // Remove navbar collapse
+                    $(".navbar-collapse").removeClass("in");
+
+                    // Toggle Bars
+                    $(".navbar-toggle").each(function(){
+                        $(".fa", this).removeClass("fa-times");
+                        $(".fa", this).addClass("fa-bars");
+                    });
+
+                    // Scroll
+                    var scrollTop = $(window).scrollTop(),
+                        $anchor = $(this).find('a'),
+                        $section = $($anchor.attr('href')).offset().top,
+                        $window = $(window).width(),
+                        $minusDesktop = getNav.data("minus-value-desktop"),
+                        $minusMobile = getNav.data("minus-value-mobile"),
+                        $speed = getNav.data("speed");
+
+                    if( $window > 992 ){
+                        var $position = $section - $minusDesktop;
+                    }else{
+                        var $position = $section - $minusMobile;
+                    }
+
+                    $('html, body').stop().animate({
+                        scrollTop: $position
+                    }, $speed);
+                });
+
+                // Activate Navigation
+                var fixSpy = function() {
+                    var data = $body.data('bs.scrollspy');
+                    if (data) {
+                        offset = getNav.outerHeight();
+                        data.options.offset = offset;
+                        $body.data('bs.scrollspy', data);
+                        $body.scrollspy('refresh');
+                    }
+                }
+
+                // Activate Navigation on resize
+                var resizeTimer;
+                $(window).on('resize', function() {
+                    clearTimeout(resizeTimer);
+                    var resizeTimer = setTimeout(fixSpy, 200);
+                });
+            }
+        }
+    };
+
+
+    $(function(){
+
+        // Reset on resize
+        $(window).on("resize", function(){
+            bootsnav.hoverDropdown();
+            bootsnav.navbarSticky();
+
+            // Toggle Bars
+            $(".navbar-toggle").each(function(){
+                $(".fa", this).removeClass("fa-times");
+                $(".fa", this).addClass("fa-bars");
+                $(this).removeClass("fixed");
+            });
+            $(".navbar-collapse").removeClass("in");
+            $(".navbar-collapse").removeClass("on");
+            $(".navbar-collapse").removeClass("bounceIn");
+        });
+
+
+
+        // 市场为台湾时，则隐藏钱包信息
+    	var marketCode = '${Session._marketCode}';
+    	if("TW" == marketCode){
+    		$("#walletMessage").hide();
+    	}
+    	//加载页面时获得产品下拉框
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : "${base.contextPath}/fastShopping/queryCategory",
+            data : {},
+            success : function(data) {
+                initProductCombobox(data);
+            }
+
+        });
+
+    	//加载登录会员默认市场
+        $.ajax({
+            type : "POST",
+            url:"${base.contextPath}/account/queryMarket",
+            data:{},
+            dataType : "json",
+            success : function(data) {
+                if(data.success){
+                    var html = [];
+                    var data = data.rows;
+                    if(data.length>0){
+                        for(var i=0;i<data.length;i++){
+                            var item = data[i];
+                            $("#market_li").text(item.name);
+                        }
+                    }
+                    getOrgName();
+                }
+            }
+        });
+    	
+        $("li[name='lang']").hover(
+                function () {
+                  $(this).addClass("hover");
+                },
+                function () {
+                  $(this).removeClass("hover");
+                }
+       );
+       init();
+    });
+
+/*
+* 初始化产品列表，注意加载的先后顺序
+*
+* */
+    function initProductCombobox(data) {
+//    	var str = null;
+//    	for(var i = 0; i < data.total; i++) {
+//    		str = "<li><a href='${base.contextPath}/product/category.html?categoryId="+ data.rows[i].categoryId +"'>"+ data.rows[i].categoryName +"</a></li>";
+//    		$("ul[name=dropdown-menu]").append(str);
+//    	}
+        var htmlStr = [],cId='',yName='';
+        $.each(data.rows[0],function(str,data){
+            var temp = str.split("-");
+            cId = str.substring(0,str.indexOf("-"));
+            yName = str.substring(str.indexOf("-")+1,str.length);
+            if(data!=null){
+                var str=  Traversal(data);
+                htmlStr.push("<li "," class=\"dropdown\" ","><a ", " class=\"dropdown-toggle\" data-toggle=\"dropdown\" "," >" ,
+                    yName , "</a>","<ul "," class=\"dropdown-menu\" ",">",str,"</ul>","</li>");
+            }else{
+                htmlStr.push("<li><a href='${base.contextPath}/product/category.html?categoryId=" , cId , "'>" , yName , "</a></li>");
+            }
+        });
+        $("#productMenu ").html(htmlStr.join(''));
+        bootsnav.initialize();
+    }
+
+    //遍历菜单数组
+    function Traversal(data) {
+        var htmlStr = [],cId='',yName='';
+        for(var key in data){
+            var temp = key.split("-");
+            cId = key.substring(0,key.indexOf("-"));
+            yName = key.substring(key.indexOf("-")+1,key.length);
+            if(data[key] !=null){
+                var str=Traversal(data[key]);
+                if(str!=''){
+                        htmlStr.push("<li "," class=\"dropdown\"","><a ", " class=\"dropdown-toggle\" data-toggle=\"dropdown\" "," >" ,
+                            yName , "</a>","<ul "," class=\"dropdown-menu\" ",">",str,"</ul>","</li>");
+                }else{
+                    htmlStr.push("<li><a href='${base.contextPath}/product/category.html?categoryId=" , cId , "'>" , yName , "</a>","</li>");
+                }
+            }else{
+                htmlStr.push("<li><a href='${base.contextPath}/product/category.html?categoryId=" , cId , "'>" , yName , "</a></li>");
+            }
+        }
+        return htmlStr.join('');
+    }
+
+
+    function changeLang(lang){       
+	    var urlString = window.location.href;
+	　　var par = "lang" + "=" + lang;
+	　　if (getUrlParam("lang") == null){
+			urlString = urlString + (urlString.indexOf("?") > 0 ? "&" : "?") + par;
+	　　}else{
+			urlString = urlString.replace(eval('/(' + "lang" + '=)([^&]*)/gi'), par);
+	　　}
+		window.location.href=urlString;       
+    }
+    
+    function init(){
+        $.ajax({
+            type : "POST",
+            async: false,
+            url:"${base.contextPath}/account/selectLanguageAfter",
+            data:{},
+            dataType : "json",
+            success : function(data) {
+            	$("#shopName").text(data.rows[0].name);
+            }
+        });
+    }
+    
+    function getUrlParam(name) {
+   	　　var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+   	　　var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+   	　　if (r != null) return unescape(r[2]); return null; //返回参数值
+    }
+</script>
+
+</head>
+<body>
+<script src="${base.contextPath}/common/code?igiMapping=SYS.IGI_MAPPING " type="text/javascript"></script>
+    <header id="header">
+        <div>
+            <img src="${base.contextPath}/resources/img/top-line.jpg" style="width: 100%; height: 24px"/>
+        </div>
+        <div id="top-bar">
+            <div class="container">
+                
+                <nav id="top-nav" role="navigation" class="navbar">
+                    <div class="navbar-header">
+                        <button data-target=".top-nav"
+                            data-toggle="collapse" class="navbar-toggle"
+                            type="button">
+                            <span class="sr-only">Toggle
+                                navigation</span> <span class="icon-bar"></span>
+                            <span class="icon-bar"></span> <span
+                                class="icon-bar"></span>
+                        </button>
+                    </div>
+                    <div class="collapse navbar-collapse top-nav">
+                        <ul class="nav navbar-nav">
+                            <li style="font-weight: 900;"><a href="#">${Session.memberName}</a></li>
+                            <li class="dropdown"><a
+                                href="${base.contextPath}/account/account-info.html"><@spring.message "mws.menu.myaccount"/>
+                            </a></li>
+                            <li style="cursor: pointer;">
+                                <a data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><@spring.message "mws.myaccount.accountinfo.language_selection"/><span class="caret"></span></a>
+                                <ul class="dropdown-menu" id="lang">
+                                    <#list languages as l>
+                                        <li name="lang" onclick="changeLang('${l.langCode}')" value="${l.langCode}" style="width: 100%;margin-left: 0;" <#if base.getLocale() == l.langCode>selected</#if> ><span style="margin-left: 15px;">${l.description}</span></li>
+                                    </#list>
+                                </ul>
+                            </li>
+                            <li style="cursor: pointer;">
+                                    <a data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="margin-top : -2px;"><span id="shopName">${Session._salesOrgName}</span><span class="caret"></span></a>
+                                    <!-- <a data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">切换店铺<span class="caret"></span></a> -->
+                                <table class="dropdown-menu showShopTable">
+                                    <thead>
+	                                    <tr><td id="market_li" style="text-align: center;width:160px;"></td></tr>
+	                                    <tr><td style="height:2px;margin-top: 30px; position:absolute;width:160px;top:0;bottom:0;background:-webkit-gradient(linear, center top, center bottom, from(#fff), color-stop(0.45, #ccc),color-stop(0.55, #ccc), to(#fff));"></td></tr>
+                                    </thead>
+                                    <tbody id="showShopTbody" style="text-align: center;"></tbody>
+                                </table>
+                            </li>
+                            <li><a href="javascript:logout()"><@spring.message "sys.hand.btn.logout"/></a></li>
+                            <li>
+                            	<a href="${base.contextPath}/account/account-messagebox.html"> 
+   									<i class="glyphicon glyphicon-envelope"></i> 消息
+   									<!-- <span class="fa-stack">
+   									    <i class="fa fa-circle fa-stack-2x"></i> 
+   									    <i class="fa fa-stack-1x fa-inverse" id = "messageUnreadNumber">${manualMessageService.getMessageUnreadCount(Session.memberId)}</i>
+   									</span> -->
+   									<span class="fa-stack"> 
+                                    <i class="fa fa-circle fa-stack-2x"></i> 
+                                    <i class="fa fa-stack-1x fa-inverse" id = "">${manualMessageService.getMessageUnreadCount(Session.accountId)}</i>
+                                    </span>
+								</a>
+                            </li>
+                            <li>
+                                <a href="${base.contextPath}/order/shopping-cart.html"> 
+                       				<i class="fa fa-shopping-cart fa-lg"></i> 购物车
+                       				<span class="fa-stack"> 
+                       				<i class="fa fa-circle fa-stack-2x"></i> 
+                       				<i class="fa fa-stack-1x fa-inverse" id = "shopCartNumber">${shopCartService.getShopCartCount(Session.memberId,Session._salesOrgId)}</i>
+                    				</span>
+                    			</a>
+                            </li>
+
+                            <!--<li class="dropdown"  id="count">-->
+                                <!--<label for="count">该页面被访问了：</label>-->
+                                <!--<span></span>-->
+                            <!--</li>-->
+
+                        </ul>
+                    </div>
+                    <!-- /.navbar-collapse -->
+                </nav>
+            </div>
+        </div>
+        <!-- / #top-bar -->
+
+        <!-- ========== TOP BAR START ========== -->
+
+        <!-- ========== MENU START ========== -->
+
+        <div class="main-menu">
+
+            <div class="container">
+                <div class="row">
+                    <div class="navbar-header " style="height: 60px;">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-menu">
+                            <span class="fa fa-bars"></span>
+                            <span class="fa fa-bars"></span>
+                            <span class="fa fa-bars"></span>
+                        </button>
+                        <!--updated by 11816 at 12/12 13:43 add  with margin-top -->
+                        <a class="navbar-brand" style="margin-top: -15px;margin-left: -15px" href="${base.contextPath}/index.html"><img
+                                src="${base.contextPath}/resources/img/logo.png"  alt="Infinitus"
+                                class="img-responsive" ></a>
+                    </div>
+
+                         <nav class="navbar navbar-default navbar-mobile bootsnav">
+
+                            <div class="collapse navbar-collapse" id="navbar-menu">
+
+                                <ul class="nav navbar-nav" data-in="fadeInDown" data-out="fadeOutUp">
+
+                                    <li class="dropdown">
+                                        <a href="${base.contextPath}/product/category.html?categoryId=" class="dropdown-toggle" data-toggle="dropdown" data-hover="Shortcodes"> <@spring.message "mws.nav.products"/></a>
+                                        <ul class="dropdown-menu" id="productMenu">
+
+                                          </ul>
+                                    </li>
+
+                                    <li><a href="${base.contextPath}/order/fast-shopping.html"><@spring.message "mws.nav.quickbuy"/></a></li>
+                                </ul>
+
+                            </div>
+
+                        </nav>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!--<nav id="main-nav">-->
+            <!--<div class="navbar">-->
+                <!--<div class="container">-->
+                    <!--<div class="navbar-header">-->
+                        <!--<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".main-nav">-->
+                            <!--<span class="icon-bar"></span>-->
+                            <!--<span class="icon-bar"></span>-->
+                            <!--<span class="icon-bar"></span>-->
+                        <!--</button>-->
+                        <!--&lt;!&ndash;updated by 11816 at 12/12 13:43 add  with margin-top &ndash;&gt;-->
+                        <!--<a class="navbar-brand" href="${base.contextPath}/index.html"><img-->
+                            <!--src="${base.contextPath}/resources/img/logo.png"  alt="Infinitus"-->
+                            <!--class="img-responsive" style="margin-top: 20px"></a>-->
+                    <!--</div>-->
+                    <!--<div class="navbar-collapse collapse main-nav">-->
+                        <!--<ul class="nav navbar-nav navbar-left">-->
+                            <!--<li>-->
+                                <!--<a href="${base.contextPath}/index.html" class="dropdown-toggle"data-toggle="dropdown">-->
+                                    <!--<@spring.message "mws.nav.products"/><b class="caret"></b>-->
+                                <!--</a>-->
+                                <!--<ul class="dropdown-menu" name="dropdown-menu">-->
+                                    <!--<li><a href="${base.contextPath}/product/category.html?categoryId="><@spring.message "mws.product.allproducts"/></a></li>-->
+                                    <!--<li class="divider"></li>-->
+                                <!--</ul>-->
+                            <!--</li>-->
+                            <!--<li><a href="${base.contextPath}/order/fast-shopping.html"><@spring.message "mws.nav.quickbuy"/></a></li>-->
+                            <!--&lt;!&ndash;<li><a href="${base.contextPath}/account/account-myteam.html"><@spring.message "mws.nav.myteam"/></a></li>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<li><a href="${base.contextPath}/events.html"><@spring.message "mws.nav.event"/></a></li>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<li><a href="${base.contextPath}/account/account-download-center.html"><@spring.message "mws.nav.download"/></a>-->
+                            <!--</li>&ndash;&gt;-->
+                        <!--</ul>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</nav>-->
+
+
+
+    </header>
+

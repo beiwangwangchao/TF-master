@@ -1,0 +1,387 @@
+<#--
+        * description: 组织定义界面.
+        * version: 1.0
+        * author: wangc
+        * Copyright LKK Health Products Group Limited.
+        *
+        -->
+    <#include "../include/head.html">
+        <script src="${base.contextPath}/resources/js/spm/location_edit.min.js" type="text/javascript"></script>
+        <script src="${base.contextPath}/common/code?orgClassifyData=SPM.ORGANIZATION_CLASSIFY&typeData=SYS.ORGANIZATION_TYPE&yesno=SYS.YES_NO" type="text/javascript"></script>
+        <body style="padding: 10px;">
+        <form id="spm_organization_form" ></form>
+        <div id="spm_organization_grid"></div>
+        <script type="text/javascript">
+            $l('sys.hand.title.addressinfo','<@spring.message "sys.hand.title.addressinfo"/>');
+            var _basePath = "${base.contextPath}";
+            var spm_organization_form;
+            var spm_organization_grid;
+            var clickGridRecord;
+            var userId='${Session.userId}';
+            $(function() {
+                window['spm_organization_form'] = $("#spm_organization_form").ligerForm({
+                    fields: [{
+                        type: 'text',
+                        label: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.code" />',
+                        name: 'code',
+                    },
+                        {
+                            type: "text",
+                            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.name" />',
+                            name: 'name',
+                            newline: false
+                        },
+                        {
+                            type: "select",
+                            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.type" />',
+                            name: 'orgType',
+                            newline: false,
+                            options : {
+                                valueField: 'value',
+                                textField: 'meaning',
+                                data: orgClassifyData
+                            }
+                        },
+                        {
+                            type: "select",
+                            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.salesOrgFlag" />',
+                            name: 'salesOrgFlag',
+                            newline: true,
+                            options : {
+                                valueField: 'value',
+                                textField: 'meaning',
+                                data: yesno
+                            }
+                        },
+                        {
+                            type: "select",
+                            label: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.invOrgFlag" />',
+                            name: 'invOrgFlag',
+                            newline: false,
+                            options : {
+                                valueField: 'value',
+                                textField: 'meaning',
+                                data: yesno
+                            }
+                        }
+                    ],
+                    buttons: [{
+                        text: '<@spring.message "sys.hand.btn.query"/>',
+                        disabled: false,
+                        click: function() {
+                            Hap.gridQuery({
+                                form: spm_organization_form,
+                                grid: spm_organization_grid
+                            })
+                        }
+                    }]
+                });
+
+                window['spm_organization_grid'] = $("#spm_organization_grid").ligerGrid({
+                    columns: [{
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.code" />',
+                        name: 'code',
+                        width: 50,
+                        editor: {
+                            type: 'text'
+                        },
+                        validate : {
+                            required : true,
+                        },
+                        isSort: true
+                    },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.name" />',
+                            name: 'name',
+                            width: 50,
+                            editor: {
+                                type: 'tl',
+                                idField: 'definationId',
+                                dto: 'com.lkkhpg.dsis.common.config.dto.SpmOrgDefination'
+                            },
+                            validate: {
+                                required: true
+                            },
+                            isSort: true
+                        },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.type" />',
+                            name: 'orgType',
+                            width: 50,
+                            editor: {
+                                type: 'select',
+                                valueField: 'value',
+                                textField: 'meaning',
+                                data: orgClassifyData
+                            },
+                            render: function(item) {
+                                for (var i = 0; i < orgClassifyData.length; i++) {
+                                    if (orgClassifyData[i].value == item.orgType) {
+                                        return orgClassifyData[i].meaning;
+                                    }
+                                }
+                            },
+                            validate: {
+                                required: true
+                            }
+                        },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.address" />',
+                            width: 348,
+                            type: 'text',
+                            name: 'locationName',
+                            editor: {
+                                type: 'text',
+                                onFocus: function() {
+                                    var e = this;
+                                    location_edit('${base.contextPath}', clickGridRecord.spmLocation,
+                                        function(data) {
+                                            e.setValue(data.address);
+                                            clickGridRecord.spmLocation = data;
+                                        },clickGridRecord.salesOrgId)
+                                }
+                            },
+                            validate: {
+                                required: true
+                            }
+                        },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.endActiveDate" />',
+                            name: 'endActiveDate',
+                            width: 100,
+                            format: 'yyyy-MM-dd',
+                            type: 'date',
+                            editor: {
+                                type: 'date'
+                            }
+                        },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.company"/>',
+                            name: 'companyId',
+                            align: 'left',
+                            width: '150',
+                            type:'popup',
+                            textField:'companyName',
+                        <#if  userId==1>
+                editor:${lovService.getLov(base.contextPath,base.locale, "lov_query_company_sysadmin")},
+                <#else>
+                editor:${lovService.getLov(base.contextPath,base.locale, "query_company")},
+                </#if>
+                            validate : {
+                                required : true
+                            }
+                        },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.salesOrgFlag" />',
+                            width: 100,
+                            name: 'salesOrgFlag',
+                            editor: {
+                                type: 'select',
+                                valueField: 'value',
+                                textField: 'meaning',
+                                data: yesno
+                            },
+                            render: function(item) {
+                                for (var i = 0; i < yesno.length; i++) {
+                                    if (yesno[i].value == item.salesOrgFlag) {
+                                        return yesno[i].meaning;
+                                    }
+                                }
+                            },
+                            validate: {
+                                required: true
+                            }
+                        },
+                <#if  userId==1>
+                        {
+                            display: '<@spring.message "sys.hand.btn.action"/>',
+                            align: 'center',
+                            render: function(rowdata) {
+                                var salesOrgFlag = rowdata.salesOrgFlag;
+                                if(salesOrgFlag == 'Y' && rowdata.salesOrgId != null){
+                                    rowdata.type = 'SALES';
+                                    orgId = rowdata.salesOrgId;
+                                    return "<a href='javascript:void(0);' onclick='editOrg(\"SALES\"," + orgId + ")'><@spring.message "sys.hand.btn.action"/></a>"
+                                }else{
+                                    return '<@spring.message "sys.hand.btn.action"/>';
+                                }
+                            }
+                        },
+                    </#if>
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.invOrgFlag" />',
+                            name: 'invOrgFlag',
+                            editor: {
+                                type: 'select',
+                                valueField: 'value',
+                                textField: 'meaning',
+                                data: yesno
+                            },
+                            render: function(item) {
+                                for (var i = 0; i < yesno.length; i++) {
+                                    if (yesno[i].value == item.invOrgFlag) {
+                                        return yesno[i].meaning;
+                                    }
+                                }
+                            },
+                            validate: {
+                                required: true
+                            }
+                        },
+                        {
+                            display: '<@spring.message "sys.hand.btn.action"/>',
+                            align: 'center',
+                            render: function(rowdata) {
+                                var invOrgFlag = rowdata.invOrgFlag;
+                                if(invOrgFlag == 'Y' && rowdata.invOrgId != null){
+                                    rowdata.type = 'INV';
+                                    orgId = rowdata.invOrgId;
+                                    return "<a href='javascript:void(0);' onclick='editOrg(\"INV\"," + orgId + ")'><@spring.message "sys.hand.btn.action"/></a>"
+                                }else{
+                                    return '<@spring.message "sys.hand.btn.action"/>';
+                                }
+                            }
+                        },
+                        {
+                            display: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.costorgid" />',
+                            name: 'costOrgId',
+                            textField : 'costOrgName',
+//                            editor : $.extend(${lovService.getLov(base.contextPath, base.locale, "lov_costorg_select")}, {
+//                                staticOptions : function(e) {
+//                                    e.column.editor.parms = {
+//                                        invOrgId : e.record.invOrgId
+//                                    }
+//                                },
+//                            }),
+//                            render : function(item,index,value,obj) {
+//                                if (item.salesOrgFlag == 'Y' && item.salesOrgId != null) {
+//                                    return "";
+//                                }
+//                                return item.costOrgName;
+//                            },
+                        <#if  userId==1>
+                        editor:${lovService.getLov(base.contextPath,base.locale, "im_org_id_autocomplete")},
+                        <#else>
+                            editor:${lovService.getLov(base.contextPath,base.locale, "lov_inv_org")},
+                        </#if>
+                            type:'popup',
+                            validate: {
+                                required:true
+                            }
+                        }],
+                    url: _basePath + '/spm/organization/queryAll',
+                    toolbar: {
+                        items: [{
+                            text: '<@spring.message "sys.hand.btn.new"/>',
+                            disable: false,
+                            click: function() {
+                                spm_organization_grid.addRow({})
+                            },
+                            icon: 'add'
+                        },
+                            {
+                                text: '<@spring.message "sys.hand.btn.save"/>',
+                                disable: false,
+                                click: function() {
+                                    /*add 2016-10-18 grid校验*/
+                                    if(!f_validateGrid()) {
+                                        return false;
+                                    }
+                                    Hap.gridSave({
+                                        grid: spm_organization_grid,
+                                        url:'${base.contextPath}/spm/organization/save'
+                                    })
+                                },
+                                icon: 'save'
+                            },
+
+                        ]
+                    },
+                    enabledEdit: true,
+                    width: '99%',
+                    height: '98%',
+                    onBeforeEdit : function(editParm){
+                        var e = this;
+                        clickGridRecord = editParm.record;
+                        var columnname = editParm.column.columnname;
+                        if(editParm.record.definationId != null){
+                            if(columnname=='code'
+                                || columnname=='salesOrgFlag'
+                                || columnname=='invOrgFlag'){
+                                return false;
+                            }
+                        }
+                        //houmin add 2016-10-18 库存归集中心
+                        if (editParm.column.columnname == "costOrgId") {
+                            if (editParm.record.invOrgFlag == 'Y' && editParm.record.invOrgId != null) {
+                                editParm.column.validate = {
+                                    required: true
+                                }
+                                return true;
+                            } else {
+                                editParm.column.validate = null;
+                                return false;
+                            }
+                        }
+                    },
+                    onBeforeSubmitEdit : function(e) {
+                        if (e.column.columnname == "code") {
+                            if(e.value == null || e.value==""){
+                                return true;
+                            }
+                            if (e.value.length > 20 || e.value.length < 2) {
+                                $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.config.tip.orgcodelength" />');
+                                return false;
+                            }
+                        }
+                        if (e.column.columnname == "endActiveDate") {
+                            if (e.value == null || e.value == "") {
+                                return true;
+                            }
+                            now = new Date() ;
+                            if (e.value < new Date(now.getFullYear(),now.getMonth(),now.getDate())) {
+                                $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.config.tip.enddateselect" />');
+                                return false;
+                            }
+                        }
+                    },
+                    onAfterEdit : function(e) {
+                        spm_organization_grid.reRender();
+                        return true;
+                    }
+                });
+            });
+
+            /**
+             * grid校验.
+             */
+            function f_validateGrid() {
+                var gridData = spm_organization_grid.getData();
+                for (var i=0; i<gridData.length; i++) {
+                    if ("Y" == gridData[i].invOrgFlag && gridData[i].invOrgId != null) {
+                        if (gridData[i].costOrgId) {
+                            continue;
+                        } else {
+                            Hap.showError("["+gridData[i].name+ "]的库存归集中心不能为空");
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+            /**
+             * 组织参数设置弹出框.
+             * @param type 组织类型
+             * @param orgId 组织Id
+             */
+            function editOrg(type,orgId) {
+                $.ligerDialog.open({
+                    width: 800,
+                    height:500,
+                    title: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.paramedit" />',
+                    url: 'spm_org_params.html?orgType='+type+'&orgId='+orgId
+                });
+            }
+        </script>
+        </body>
+        </html>

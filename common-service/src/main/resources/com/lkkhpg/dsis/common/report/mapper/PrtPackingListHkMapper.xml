@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.report.mapper.PrtPackingListHkMapper">
+	<resultMap id="shipmentResultMap" type="com.lkkhpg.dsis.common.report.dto.PackingListHkShipment">
+		<result column="DELIVERY_NUMBER"  property="shipmentNo" jdbcType="VARCHAR"/>
+	</resultMap>
+	<resultMap id="headerResultMap" type="com.lkkhpg.dsis.common.report.dto.PackingListHkSalesHeader">
+		<result column="DISTRIBUTOR_NAME"  property="distributorName" jdbcType="VARCHAR"/>
+		<result column="DISTRIBUTOR_NO"  property="distributorNo" jdbcType="VARCHAR"/>
+		<result column="RECEIPT_NO"  property="receiptNo" jdbcType="VARCHAR"/>
+		<result column="PRINT_DATE"  property="printDate" jdbcType="VARCHAR"/>
+		<result column="SALES_ORG"  property="salesOrg" jdbcType="VARCHAR"/>
+	</resultMap>
+	<resultMap id="lineResultMap" type="com.lkkhpg.dsis.common.report.dto.PackingListHkSalesLine">
+		<result column="ITEM_NAME"  property="itemName" jdbcType="VARCHAR"/>
+		<result column="ITEM_NUMBER"  property="itemNumber" jdbcType="VARCHAR"/>
+		<result column="INVENTORY"  property="inventory" jdbcType="VARCHAR"/>
+		<result column="NOT_SHIPPED_QTY"  property="notShippedQty" jdbcType="DECIMAL"/>
+		<result column="QTY"  property="qty" jdbcType="DECIMAL"/>
+		<result column="SHIPMENT_QTY"  property="shipmentQty" jdbcType="DECIMAL"/>
+	</resultMap>
+	<resultMap type="com.lkkhpg.dsis.common.report.dto.PackingListDeliveryHeader" id="deliveryResultMap">
+		<result column="INVENTORY" property="inventory" jdbcType="VARCHAR"/>
+		<result column="DISTRIBUTOR_NAME" property="distributorName" jdbcType="VARCHAR"/>
+		<result column="DISTRIBUTOR_NO" property="distributorNo" jdbcType="VARCHAR"/>
+		<result column="RECEIPT_NO" property="ReceiptNo" jdbcType="VARCHAR"/>
+		<result column="SHIPMENT_NO" property="shipmentNo" jdbcType="VARCHAR"/>
+		<result column="DELIVERY_DATE" property="deliveryDate" jdbcType="VARCHAR"/>
+		<result column="DELIVERY_ID" property="deliveryId" jdbcType="DECIMAL"/>
+	</resultMap>
+	<resultMap type="com.lkkhpg.dsis.common.report.dto.PackingListDeliveryLine" id="deliveryLineResultMap">
+		<result column="LINE_ID" property="lineId" jdbcType="DECIMAL"/>
+		<result column="PACKAGE_CODE" property="packageCode" jdbcType="VARCHAR"/>
+		<result column="PRODUCT_CODE" property="productCode" jdbcType="VARCHAR"/>
+		<result column="DESCTIPTION" property="desctiption" jdbcType="VARCHAR"/>
+		<result column="QTY" property="qty" jdbcType="DECIMAL"/>
+		<result column="LOT_NUMBER" property="lotNumber" jdbcType="VARCHAR"/>
+		<result column="EXPIRY_DATE" property="expiryDate" jdbcType="VARCHAR"/>
+		<result column="SHIPMENT_QTY" property="shipmentQty" jdbcType="DECIMAL"/>
+		<result column="NOT_SHIPPED_QTY" property="notShippedQty" jdbcType="DECIMAL"/>
+		<result column="PAGE" property="page" jdbcType="DECIMAL"/>
+		<result column="PAGES" property="pages" jdbcType="DECIMAL"/>
+	</resultMap>
+	<select id="queryShipmentNo" resultMap="shipmentResultMap" parameterType="java.lang.String">
+		SELECT DOD.DELIVERY_NUMBER 
+  		  FROM DM_ORDER_DELIVERY DOD
+ 		 WHERE DOD.DELIVERY_STATUS != 'CANCL'
+   		   AND DOD.ORDER_HEADER_ID = (SELECT O.HEADER_ID 
+   		   								FROM OM_SALES_ORDER O 
+   		   							   WHERE O.ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR})
+	</select>
+	
+	
+	<select id="queryHeader" resultMap="headerResultMap" parameterType="java.lang.String">
+		SELECT OSO.INVOICE_NUMBER RECEIPT_NO,
+      		   M.ENGLISH_FIRST_NAME || M.ENGLISH_LAST_NAME || '  ' ||
+       		   M.CHINESE_LAST_NAME || M.CHINESE_FIRST_NAME DISTRIBUTOR_NAME,
+       		   M.MEMBER_CODE DISTRIBUTOR_NO,
+       		   T.NAME SALES_ORG,
+       		   TO_CHAR(SYSDATE,'YYYY/MM/DD') PRINT_DATE
+  		 FROM MM_MEMBER M,
+       		  SPM_SALES_ORGANIZATION_TL T,
+       		  OM_SALES_ORDER OSO
+ 		WHERE M.MEMBER_ID = OSO.MEMBER_ID
+   		  AND OSO.SALES_ORG_ID = T.SALES_ORG_ID
+   		  AND OSO.ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR}
+   		  AND T.LANG = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+	</select>
+	<select id="queryLine" resultMap="lineResultMap" parameterType="java.lang.String">
+		SELECT B.ITEM_NUMBER,
+       		   I.ITEM_NAME,
+       		   L.QUANTITY QTY,
+       		   CASE L.ITEM_TYPE
+         		WHEN 'VN' THEN
+          		    NULL
+         		WHEN 'VY' THEN
+          			NULL
+         		ELSE
+          			(CASE L.LINE_ID
+            		WHEN (SELECT DISTINCT D.ORDER_LINE_ID
+                		    FROM DM_ORDER_DELIVERY_LINE D
+               			   WHERE D.ORDER_LINE_ID = L.LINE_ID) THEN
+             			  (SELECT LISTAGG(A.NAME, '；') WITHIN GROUP(ORDER BY A.NAME) INVORGNAME
+                			 FROM (SELECT DISTINCT T.NAME
+                        		     FROM DM_ORDER_DELIVERY_LINE  DL,
+                             			  SPM_INV_ORGANIZATION_TL T
+                       				WHERE T.INV_ORG_ID = DL.INV_ORG_ID
+                         			  AND DL.ORDER_LINE_ID = L.LINE_ID
+                         			  AND T.LANG = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}) A)
+            		ELSE
+             			(SELECT T.NAME
+                		   FROM SPM_INV_ORGANIZATION_TL T
+               			  WHERE T.INV_ORG_ID = L.DEFAULT_INV_ORG_ID
+                 		    AND T.LANG = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String})
+          			END)
+       		   END INVENTORY,
+		       CASE L.LINE_ID
+		         WHEN (SELECT DISTINCT D.ORDER_LINE_ID
+		             FROM DM_ORDER_DELIVERY_LINE D
+		            WHERE D.ORDER_LINE_ID = L.LINE_ID) THEN
+		          (SELECT SUM(dodl.outstanding_qty)
+		             FROM dm_order_delivery dod, dm_order_delivery_line dodl
+		            WHERE dod.delivery_id = dodl.delivery_id
+		              AND dod.delivery_status IN ('SHIPP', 'PCKUP')
+		              AND dodl.order_line_id = l.line_id)
+		         ELSE
+		          CASE L.ITEM_TYPE
+		            WHEN 'VN' THEN
+		             NULL
+		            WHEN 'VY' THEN
+		             NULL
+		            ELSE
+		             (CASE
+		               WHEN (SELECT SUM(IOQ.QUANTITY)
+		                       FROM INV_ONHAND_QUANTITY IOQ
+		                      WHERE IOQ.ORGANIZATION_ID = L.DEFAULT_INV_ORG_ID
+		                        AND IOQ.ITEM_ID = L.ITEM_ID) - L.QUANTITY > 0 THEN
+		                L.QUANTITY
+		               ELSE
+		                (SELECT SUM(IOQ.QUANTITY)
+		                   FROM INV_ONHAND_QUANTITY IOQ
+		                  WHERE IOQ.ORGANIZATION_ID = L.DEFAULT_INV_ORG_ID
+		                    AND IOQ.ITEM_ID = L.ITEM_ID)
+		             END)
+		          END
+		       END SHIPMENT_QTY,
+		       CASE L.ITEM_TYPE
+		         WHEN 'VN' THEN
+		          NULL
+		         WHEN 'VY' THEN
+		          NULL
+		         ELSE
+		          L.QUANTITY - NVL((CASE L.LINE_ID
+		                             WHEN (SELECT DISTINCT D.ORDER_LINE_ID
+		                                 FROM DM_ORDER_DELIVERY_LINE D
+		                                WHERE D.ORDER_LINE_ID = L.LINE_ID) THEN
+		                              (SELECT SUM(dodl.outstanding_qty)
+		                        FROM dm_order_delivery dod, dm_order_delivery_line dodl
+		                         WHERE dod.delivery_id = dodl.delivery_id
+		                        AND dod.delivery_status IN ('SHIPP', 'PCKUP')
+		                         AND dodl.order_line_id = l.line_id)
+		                             ELSE
+		                              CASE L.ITEM_TYPE
+		                                WHEN 'VN' THEN
+		                                 NULL
+		                                WHEN 'VY' THEN
+		                                 NULL
+		                                ELSE
+		                                 (CASE
+		                                   WHEN (SELECT SUM(IOQ.QUANTITY)
+		                                           FROM INV_ONHAND_QUANTITY IOQ
+		                                          WHERE IOQ.ORGANIZATION_ID = L.DEFAULT_INV_ORG_ID
+		                                            AND IOQ.ITEM_ID = L.ITEM_ID) - L.QUANTITY > 0 THEN
+		                                    L.QUANTITY
+		                                   ELSE
+		                                    (SELECT SUM(IOQ.QUANTITY)
+		                                       FROM INV_ONHAND_QUANTITY IOQ
+		                                      WHERE IOQ.ORGANIZATION_ID = L.DEFAULT_INV_ORG_ID
+		                                        AND IOQ.ITEM_ID = L.ITEM_ID)
+		                                 END)
+		                              END
+		                           END),
+		                           0)
+		       END NOT_SHIPPED_QTY
+		  FROM INV_ITEM_B B, INV_ITEM_TL I, OM_SALES_LINE L
+		 WHERE L.ITEM_ID = I.ITEM_ID
+		   AND L.ITEM_ID = B.ITEM_ID
+		   AND I.LANG = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+		   AND L.HEADER_ID =
+		       (SELECT O.HEADER_ID FROM OM_SALES_ORDER O WHERE O.ORDER_NUMBER = #{orderNumber,jdbcType=VARCHAR})
+	</select>
+	<select id="queryDeliveryHeader" resultMap="deliveryResultMap" parameterType="java.util.Map">
+		SELECT S.NAME INVENTORY,
+       (case
+         when (m.member_type != 'COMP') then
+          (M.ENGLISH_NAME || '  ' || M.CHINESE_NAME)
+         else
+          (coalesce(m.ref_company, m.ref_company_en))
+       end) DISTRIBUTOR_NAME,
+       M.MEMBER_CODE DISTRIBUTOR_NO,
+       O.ORDER_NUMBER RECEIPT_NO,
+       D.DELIVERY_NUMBER SHIPMENT_NO,
+       TO_CHAR(D.DELIVERY_DATE,'YYYY/MM/DD') DELIVERY_DATE,
+       D.DELIVERY_ID
+  FROM SPM_INV_ORGANIZATION_TL S,
+       MM_MEMBER_V             M,
+       OM_SALES_ORDER          O,
+       DM_ORDER_DELIVERY       D
+ WHERE D.INV_ORG_ID = S.INV_ORG_ID
+   AND D.ORDER_HEADER_ID = O.HEADER_ID
+   AND O.MEMBER_ID = M.MEMBER_ID(+)
+   AND S.LANG = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+   AND D.DELIVERY_ID in
+    <trim>
+    	<foreach collection="deliveryList" open="(" separator="," close=")" item="deliveryId" index="index">
+            #{deliveryId,jdbcType=VARCHAR}
+        </foreach>
+    </trim>
+	</select>
+	
+	<select id="queryDeliveryLine" resultMap="deliveryLineResultMap" parameterType="java.lang.Long">
+			SELECT ceil(rownum/15) page, A.*
+  FROM (SELECT DL.LINE_ID,
+  			   (SELECT IIB.ITEM_NUMBER
+                  FROM INV_ITEM_B IIB
+                 WHERE IIB.ITEM_ID = DL.PACKAGE_ITEM_ID) PACKAGE_CODE,
+               B.ITEM_NUMBER PRODUCT_CODE,
+               TL.ITEM_NAME DESCTIPTION,
+               L.QUANTITY QTY,
+               DT.LOT_NUMBER,
+               DT.EXPIRY_DATE,
+               CASE
+                 WHEN dt.lot_number IS NOT NULL THEN
+                  nvl(nvl(dt.outstanding_qty, 0) - nvl(dt.return_qty, 0), 0)
+                 ELSE
+                  dl.outstanding_qty
+               END shipment_qty,
+               L.QUANTITY -
+               (SELECT SUM(DOL.OUTSTANDING_QTY)
+                  FROM DM_ORDER_DELIVERY DO, DM_ORDER_DELIVERY_LINE DOL
+                 WHERE DO.DELIVERY_ID = DOL.DELIVERY_ID
+                   AND DO.DELIVERY_STATUS IN ('SHIPP', 'PCKUP')
+                   AND DOL.ORDER_LINE_ID = L.LINE_ID) NOT_SHIPPED_QTY
+          FROM INV_ITEM_B B,
+               INV_ITEM_TL TL,
+               OM_SALES_LINE L,
+               (SELECT T.DELIVERY_LINE_ID,
+                       T.LOT_NUMBER,
+                       T.OUTSTANDING_QTY,
+                       T.RETURN_QTY,
+                       TO_CHAR(I.EXPIRY_DATE, 'YYYY/MM/DD') EXPIRY_DATE
+                  FROM DM_ORDER_DELIVERY_LOT  T,
+                       INV_LOT                I,
+                       DM_ORDER_DELIVERY      DOD,
+                       DM_ORDER_DELIVERY_LINE DODL
+                 WHERE DODL.LINE_ID = T.DELIVERY_LINE_ID
+                   AND DOD.DELIVERY_ID = DODL.DELIVERY_ID
+                   AND DODL.INV_ORG_ID = I.ORGANIZATION_ID
+                   AND DODL.COUNT_ITEM_ID = I.ITEM_ID
+                   AND DOD.DELIVERY_STATUS IN ('SHIPP', 'PCKUP')
+                   AND T.LOT_NUMBER = I.LOT_NUMBER) DT,
+               DM_ORDER_DELIVERY_LINE DL
+         WHERE DL.ITEM_ID = B.ITEM_ID
+           AND DL.ITEM_ID = TL.ITEM_ID
+           AND DL.ORDER_LINE_ID = L.LINE_ID
+           AND DL.LINE_ID = DT.DELIVERY_LINE_ID(+)
+           AND TL.LANG = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+           AND DL.DELIVERY_ID = #{deliveryId,jdbcType=DECIMAL}
+         ORDER BY DL.LINE_ID ASC) A
+ WHERE EXISTS
+ (SELECT 1 FROM DM_ORDER_DELIVERY_LINE L WHERE L.LINE_ID = A.LINE_ID)
+	</select>
+	
+	<select id="queryPage" resultMap="deliveryLineResultMap" parameterType="java.lang.Long">
+			SELECT ceil(count(*)/15) pages
+  FROM (SELECT DL.LINE_ID,
+  			   (SELECT IIB.ITEM_NUMBER
+                  FROM INV_ITEM_B IIB
+                 WHERE IIB.ITEM_ID = DL.PACKAGE_ITEM_ID) PACKAGE_CODE,
+               B.ITEM_NUMBER PRODUCT_CODE,
+               TL.ITEM_NAME DESCTIPTION,
+               L.QUANTITY QTY,
+               DT.LOT_NUMBER,
+               DT.EXPIRY_DATE,
+               CASE
+                 WHEN dt.lot_number IS NOT NULL THEN
+                  nvl(nvl(dt.outstanding_qty, 0) - nvl(dt.return_qty, 0), 0)
+                 ELSE
+                  dl.outstanding_qty
+               END shipment_qty,
+               L.QUANTITY -
+               (SELECT SUM(DOL.OUTSTANDING_QTY)
+                  FROM DM_ORDER_DELIVERY DO, DM_ORDER_DELIVERY_LINE DOL
+                 WHERE DO.DELIVERY_ID = DOL.DELIVERY_ID
+                   AND DO.DELIVERY_STATUS IN ('SHIPP', 'PCKUP')
+                   AND DOL.ORDER_LINE_ID = L.LINE_ID) NOT_SHIPPED_QTY
+          FROM INV_ITEM_B B,
+               INV_ITEM_TL TL,
+               OM_SALES_LINE L,
+               (SELECT T.DELIVERY_LINE_ID,
+                       T.LOT_NUMBER,
+                       T.OUTSTANDING_QTY,
+                       T.RETURN_QTY,
+                       TO_CHAR(I.EXPIRY_DATE, 'YYYY/MM/DD') EXPIRY_DATE
+                  FROM DM_ORDER_DELIVERY_LOT  T,
+                       INV_LOT                I,
+                       DM_ORDER_DELIVERY      DOD,
+                       DM_ORDER_DELIVERY_LINE DODL
+                 WHERE DODL.LINE_ID = T.DELIVERY_LINE_ID
+                   AND DOD.DELIVERY_ID = DODL.DELIVERY_ID
+                   AND DODL.INV_ORG_ID = I.ORGANIZATION_ID
+                   AND DODL.COUNT_ITEM_ID = I.ITEM_ID
+                   AND DOD.DELIVERY_STATUS IN ('SHIPP', 'PCKUP')
+                   AND T.LOT_NUMBER = I.LOT_NUMBER) DT,
+               DM_ORDER_DELIVERY_LINE DL
+         WHERE DL.ITEM_ID = B.ITEM_ID
+           AND DL.ITEM_ID = TL.ITEM_ID
+           AND DL.ORDER_LINE_ID = L.LINE_ID
+           AND DL.LINE_ID = DT.DELIVERY_LINE_ID(+)
+           AND TL.LANG = #{request.locale,jdbcType=VARCHAR,javaType=java.lang.String}
+           AND DL.DELIVERY_ID = #{deliveryId,jdbcType=DECIMAL}
+         ORDER BY DL.LINE_ID ASC) A
+ WHERE EXISTS
+ (SELECT 1 FROM DM_ORDER_DELIVERY_LINE L WHERE L.LINE_ID = A.LINE_ID)
+	</select>
+</mapper>

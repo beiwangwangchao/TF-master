@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.member.mapper.MemOverseasSponsorMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.member.dto.MemOverseasSponsor" >
+    <id column="SPONSOR_ID" property="sponsorId" jdbcType="DECIMAL" />
+    <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+    <result column="DEALER_NAME" property="dealerName" jdbcType="VARCHAR" />
+    <result column="DEALER_POST_CODE" property="dealerPostCode" jdbcType="VARCHAR" />
+    <result column="SPONSOR_NO" property="sponsorNo" jdbcType="VARCHAR" />
+    <result column="SALE_BRANCH_NO" property="saleBranchNo" jdbcType="VARCHAR" />
+    <result column="SALE_ORG_CODE" property="saleOrgCode" jdbcType="VARCHAR" />
+    <result column="TAX_CUST_CODE" property="taxCustCode" jdbcType="VARCHAR" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    SPONSOR_ID, DEALER_NO, DEALER_NAME, DEALER_POST_CODE, SPONSOR_NO, SALE_BRANCH_NO, 
+    SALE_ORG_CODE, TAX_CUST_CODE, ADVISE_NO, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+    LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from MM_OVERSEAS_SPONSOR
+    where SPONSOR_ID = #{sponsorId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from MM_OVERSEAS_SPONSOR
+    where SPONSOR_ID = #{sponsorId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.member.dto.MemOverseasSponsor" >
+    <selectKey resultType="java.lang.Long" keyProperty="sponsorId" order="BEFORE" >
+      select MM_OVERSEAS_SPONSOR_S.nextval from dual
+    </selectKey>
+    insert into MM_OVERSEAS_SPONSOR (SPONSOR_ID, DEALER_NO, DEALER_NAME, 
+      DEALER_POST_CODE, SPONSOR_NO, SALE_BRANCH_NO, 
+      SALE_ORG_CODE, TAX_CUST_CODE, ADVISE_NO, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN)
+    values (#{sponsorId,jdbcType=DECIMAL}, #{dealerNo,jdbcType=VARCHAR}, #{dealerName,jdbcType=VARCHAR}, 
+      #{dealerPostCode,jdbcType=VARCHAR}, #{sponsorNo,jdbcType=VARCHAR}, #{saleBranchNo,jdbcType=VARCHAR}, 
+      #{saleOrgCode,jdbcType=VARCHAR}, #{taxCustCode,jdbcType=VARCHAR}, #{adviseNo,jdbcType=VARCHAR}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemOverseasSponsor" >
+    <selectKey resultType="java.lang.Long" keyProperty="sponsorId" order="BEFORE" >
+      select MM_OVERSEAS_SPONSOR_S.nextval from dual
+    </selectKey>
+    insert into MM_OVERSEAS_SPONSOR
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      SPONSOR_ID,
+      <if test="dealerNo != null" >
+        DEALER_NO,
+      </if>
+      <if test="dealerName != null" >
+        DEALER_NAME,
+      </if>
+      <if test="dealerPostCode != null" >
+        DEALER_POST_CODE,
+      </if>
+      <if test="sponsorNo != null" >
+        SPONSOR_NO,
+      </if>
+      <if test="saleBranchNo != null" >
+        SALE_BRANCH_NO,
+      </if>
+      <if test="saleOrgCode != null" >
+        SALE_ORG_CODE,
+      </if>
+      <if test="taxCustCode != null" >
+        TAX_CUST_CODE,
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{sponsorId,jdbcType=DECIMAL},
+      <if test="dealerNo != null" >
+        #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerName != null" >
+        #{dealerName,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerPostCode != null" >
+        #{dealerPostCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sponsorNo != null" >
+        #{sponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleBranchNo != null" >
+        #{saleBranchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleOrgCode != null" >
+        #{saleOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="taxCustCode != null" >
+        #{taxCustCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.member.dto.MemOverseasSponsor" >
+    update MM_OVERSEAS_SPONSOR
+    <set >
+      <if test="dealerNo != null" >
+        DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerName != null" >
+        DEALER_NAME = #{dealerName,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerPostCode != null" >
+        DEALER_POST_CODE = #{dealerPostCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sponsorNo != null" >
+        SPONSOR_NO = #{sponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleBranchNo != null" >
+        SALE_BRANCH_NO = #{saleBranchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleOrgCode != null" >
+        SALE_ORG_CODE = #{saleOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="taxCustCode != null" >
+        TAX_CUST_CODE = #{taxCustCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where SPONSOR_ID = #{sponsorId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.member.dto.MemOverseasSponsor" >
+    update MM_OVERSEAS_SPONSOR
+    set DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+      DEALER_NAME = #{dealerName,jdbcType=VARCHAR},
+      DEALER_POST_CODE = #{dealerPostCode,jdbcType=VARCHAR},
+      SPONSOR_NO = #{sponsorNo,jdbcType=VARCHAR},
+      SALE_BRANCH_NO = #{saleBranchNo,jdbcType=VARCHAR},
+      SALE_ORG_CODE = #{saleOrgCode,jdbcType=VARCHAR},
+      TAX_CUST_CODE = #{taxCustCode,jdbcType=VARCHAR},
+      ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL}
+    where SPONSOR_ID = #{sponsorId,jdbcType=DECIMAL}
+  </update>
+  
+  <delete id="deleteDataByOrgCode" parameterType="java.lang.String">
+    delete from MM_OVERSEAS_SPONSOR
+    where SALE_ORG_CODE = #{orgCode,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteByDealerNo" parameterType="java.lang.String">
+    delete from MM_OVERSEAS_SPONSOR
+    where DEALER_NO = #{dealerNo,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteAllData">
+    delete from MM_OVERSEAS_SPONSOR
+  </delete>
+  
+  <!-- Mclin添加 -->
+  <select id="getOverseasSponsorByNo" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select 
+  	<include refid="Base_Column_List"/>
+  	from MM_OVERSEAS_SPONSOR
+  	where DEALER_NO = #{sponsorNo, jdbcType=VARCHAR}
+  </select>
+  <!-- Mclin添加: 根据卡号插入或更新海外推荐人 -->
+  <insert id="insertOrUpdateOverseasSponsor">
+     <selectKey resultType="java.lang.Long" keyProperty="sponsorId" order="BEFORE" >
+       select MM_OVERSEAS_SPONSOR_S.nextval from dual
+     </selectKey>
+      merge into MM_OVERSEAS_SPONSOR mos
+    using 
+    (
+        select #{dealerNo, jdbcType=DECIMAL} as DEALER_NO
+        FROM dual
+    ) t
+    on (mos.DEALER_NO = t.DEALER_NO)
+    when matched then
+      update
+      <set>
+          <if test="dealerName != null">
+          	mos.DEALER_NAME = #{dealerName, jdbcType=VARCHAR},
+          </if>
+          <if test="dealerPostCode != null">
+          	mos.DEALER_POST_CODE = #{dealerPostCode, jdbcType=VARCHAR},
+          </if>
+          <if test="sponsorNo != null">
+          	mos.SPONSOR_NO = #{sponsorNo, jdbcType=VARCHAR},
+          </if>
+          <if test="saleBranchNo != null">
+          	mos.SALE_BRANCH_NO = #{saleBranchNo, jdbcType=VARCHAR},
+          </if>
+          <if test="saleOrgCode != null">
+          	mos.SALE_ORG_CODE = #{saleOrgCode, jdbcType=VARCHAR},
+          </if>
+          <if test="taxCustCode != null">
+          	mos.TAX_CUST_CODE = #{taxCustCode, jdbcType=VARCHAR},
+          </if>
+          <if test="adviseNo != null">
+          	mos.ADVISE_NO = #{adviseNo, jdbcType=VARCHAR},
+          </if>
+          <if test="requestId != null">
+            mos.REQUEST_ID = #{requestId, jdbcType=DECIMAL},
+          </if>
+          <if test="programId != null">
+            mos.PROGRAM_ID = #{programId,jdbcType=DECIMAL}
+          </if>
+      </set>
+    when not matched then
+    insert
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+		SPONSOR_ID,
+		<if test="dealerNo != null">
+			DEALER_NO,
+		</if>
+		<if test="dealerName != null">
+			DEALER_NAME,
+		</if>
+		<if test="dealerPostCode != null">
+			DEALER_POST_CODE,
+		</if>
+		<if test="sponsorNo != null">
+			SPONSOR_NO,
+		</if>
+		<if test="saleBranchNo != null">
+			SALE_BRANCH_NO,
+		</if>
+		<if test="saleOrgCode != null">
+			SALE_ORG_CODE,
+		</if>
+		<if test="taxCustCode != null">
+			TAX_CUST_CODE,
+		</if>
+		<if test="adviseNo != null">
+			ADVISE_NO,
+		</if>
+		<if test="requestId != null">
+			REQUEST_ID,
+		</if>
+		<if test="programId != null">
+			PROGRAM_ID
+		</if>
+	</trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+		#{sponsorId,jdbcType=DECIMAL},
+		<if test="dealerNo != null">
+			#{dealerNo, jdbcType=VARCHAR},
+		</if>
+		<if test="dealerName != null">
+			#{dealerName, jdbcType=VARCHAR},
+		</if>
+		<if test="dealerPostCode != null">
+			#{dealerPostCode, jdbcType=VARCHAR},
+		</if>
+		<if test="sponsorNo != null">
+			#{sponsorNo, jdbcType=VARCHAR},
+		</if>
+		<if test="saleBranchNo != null">
+			#{saleBranchNo, jdbcType=VARCHAR},
+		</if>
+		<if test="saleOrgCode != null">
+			#{saleOrgCode, jdbcType=VARCHAR},
+		</if>
+		<if test="taxCustCode != null">
+			#{taxCustCode, jdbcType=VARCHAR},
+		</if>
+		<if test="adviseNo != null">
+			#{adviseNo, jdbcType=VARCHAR},
+		</if>
+		<if test="requestId != null">
+			#{requestId, jdbcType=DECIMAL},
+		</if>
+		<if test="programId != null">
+			#{programId,jdbcType=DECIMAL}
+		</if>
+	</trim>      
+  </insert>
+</mapper>

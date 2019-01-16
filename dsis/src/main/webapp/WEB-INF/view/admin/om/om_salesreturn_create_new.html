@@ -1,0 +1,1252 @@
+ <#--
+ * description: 退货创建界面.
+ * version: 1.0 
+ * author:min.hou
+ * .
+ * 
+-->
+<#include "../include/head.html">
+
+<style type="text/css">
+.buttons {
+    position: absolute;
+    right: 0;
+    margin: 10px;
+    height: 35px;
+}
+.buttons div {
+    float: left;
+    margin-right: 5px;
+}
+#summary {
+	margin-left : 3px;
+	width: 99%;
+}
+#summary td {
+	width : 300px;
+    padding: 15px;
+}
+.panel-title {
+    font-size:14px;
+    font-weight : bold;
+    line-height:20px;
+    padding:5px;
+    background-color:#f4f4f4;
+}
+</style>
+
+<script src="${base.contextPath}/common/code?returnTypeData=RM.RETURN_TYPE&returnReasonData=RM.RETURN_REASON
+	&returnStatusData=RM.RETURN_STATUS&refundWayData=RM_REFUND_WAY&orderTypeRmMethod=RM.ORDER_TYPE_RETURN_METHOD&yesOrNo=SYS.YES_NO" 
+	type="text/javascript"></script>
+
+<link href="${base.contextPath}/resources/css/om_order_create.min.css" rel="stylesheet" type="text/css" />
+<script src="${base.contextPath}/resources/js/app/om_salesreturn_create.min.js?v=20161102" type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+
+<script type="text/javascript">
+
+	$l('type.com.lkkhpg.dsis.common.order.dto.salesrtnline.quantity','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.quantity" />');
+	$l('type.com.lkkhpg.dsis.common.order.dto.salesrtnline.itemname','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.itemname" />');
+	$l('type.com.lkkhpg.dsis.common.order.dto.salesrtnline.countitemname','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.countitemname" />');
+	$l('type.com.lkkhpg.dsis.common.order.dto.salesrtnline.itemid','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.itemid" />');
+	$l('type.com.lkkhpg.dsis.common.order.dto.salesrtnline.countitemnumber','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.countitemnumber" />');
+	$l('type.com.lkkhpg.dsis.common.order.dto.salesrtnline.lots','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.lots" />');
+	$l('type.com.lkkhpg.dsis.common.order.dto.salesrtnline.returninvflag','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.returninvflag" />');
+	$l('type.com.lkkhpg.dsis.common.order.dto.salesrtnline.orderquantity','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.orderquantity" />');
+	$l('type.com.lkkhpg.dsis.common.order.dto.salesrtnline.enabledrtnquantity','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.enabledrtnquantity" />');
+	$l('type.com.lkkhpg.dsis.common.order.dto.return.creationdate','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.return.creationdate" />');
+	$l('type.com.lkkhpg.dsis.report.type.choosing','<@spring.message "type.com.lkkhpg.dsis.report.type.choosing" />');
+	$l('type.com.lkkhpg.dsis.common.order.dto.return.manualadjustment','<@spring.message "type.com.lkkhpg.dsis.common.order.dto.return.manualadjustment" />')
+	
+	$l('msg.warning.dto.salesreturn.returndate.not_match','<@spring.message "msg.warning.dto.salesreturn.returndate.not_match" />');
+	$l('msg.error.dm.pickrelease.enter.valid.ordernumber','<@spring.message "msg.error.dm.pickrelease.enter.valid.ordernumber" />');
+	$l('msg.warning.dto.salesreturn.returntype.not_empty','<@spring.message "msg.warning.dto.salesreturn.returntype.not_empty" />');
+	$l('msg.warning.dto.salesreturn.returnreason.not_empty','<@spring.message "msg.warning.dto.salesreturn.returnreason.not_empty" />');
+	$l('msg.warning.dto.salesreturn.returndate.not_empty','<@spring.message "msg.warning.dto.salesreturn.returndate.not_empty" />');
+	$l('msg.warning.dto.salesreturn.returninvorg.not_empty','<@spring.message "msg.warning.dto.salesreturn.returninvorg.not_empty" />');
+	$l('msg.error.pm.inv.count_stock_type_is_null','<@spring.message "msg.error.pm.inv.count_stock_type_is_null" />');
+	$l('msg.error.dm.delivery_lot_can_not_be_empty','<@spring.message "msg.error.dm.delivery_lot_can_not_be_empty" />');
+	$l('msg.warning.dto.salesreturn.returnamount.not_match','<@spring.message "msg.warning.dto.salesreturn.returnamount.not_match" />');
+	$l('msg.warning.dto.salesreturn.returnquantity.not_match','<@spring.message "msg.warning.dto.salesreturn.returnquantity.not_match" />');
+	$l('msg.warning.dto.salesreturn.return.not_save','<@spring.message "msg.warning.dto.salesreturn.return.not_save" />');
+	$l('msg.warning.dto.salesreturn.returnquantity.larger_zero','<@spring.message "msg.warning.dto.salesreturn.returnquantity.larger_zero" />');
+	$l('msg.warning.dto.salesreturn.returndate.not_in_period','<@spring.message "msg.warning.dto.salesreturn.returndate.not_in_period" />');
+	$l('msg.warning.dto.salesreturn.item.not_same','<@spring.message "msg.warning.dto.salesreturn.item.not_same" />');
+	$l('msg.warning.dto.inventory.stockio.no_item_selected','<@spring.message "msg.warning.dto.inventory.stockio.no_item_selected" />');
+	$l('msg.error.order.return_inv_flag','<@spring.message "msg.error.order.return_inv_flag" />');
+	$l('msg.error.order.returninvflag_not_empty','<@spring.message "msg.error.order.returninvflag_not_empty" />');
+	$l('msg.warning.dto.salesreturn.returnquantity.not_equals','<@spring.message "msg.warning.dto.salesreturn.returnquantity.not_equals" />');
+	$l('msg.warning.dto.salesreturn.returnlot.not_selection','<@spring.message "msg.warning.dto.salesreturn.returnlot.not_selection" />');
+	$l('msg.warning.dto.salesreturn.returnadjustflag.not_empty','<@spring.message "msg.warning.dto.salesreturn.returnadjustflag.not_empty" />');
+	$l('msg.warning.dto.salesreturn.returninvflag.not_match_n','<@spring.message "msg.warning.dto.salesreturn.returninvflag.not_match_n" />');
+	$l('msg.warning.dto.salesreturn.returninvflag.not_match_y','<@spring.message "msg.warning.dto.salesreturn.returninvflag.not_match_y" />');
+	$l('msg.warning.dto.salesreturn.returnline_quantity_pre','<@spring.message "msg.warning.dto.salesreturn.returnline_quantity_pre" />');
+	$l('msg.warning.dto.salesreturn.returnline.lot_not_selection','<@spring.message "msg.warning.dto.salesreturn.returnline.lot_not_selection" />');
+	$l('msg.warning.dto.salesreturn.ordernumber.valid','<@spring.message "msg.warning.dto.salesreturn.ordernumber.valid" />');
+	$l('msg.warning.dto.salesreturn.returninv.valid','<@spring.message "msg.warning.dto.salesreturn.returninv.valid" />');
+	$l('msg.error.rm.refund_way_not_null','<@spring.message "msg.error.rm.refund_way_not_null" />');
+	$l('msg.warning.dto.salesreturn.rtnmethod.not_only','<@spring.message "msg.warning.dto.salesreturn.rtnmethod.not_only" />');
+	$l('msg.warning.dto.salesreturn.rtnmethod.not_allow','<@spring.message "msg.warning.dto.salesreturn.rtnmethod.not_allow" />');
+	$l('msg.error.rm.must_return_adjust_amt','<@spring.message "msg.error.rm.must_return_adjust_amt" />');	
+	$l('msg.error.rm.must_return_shipping_fee_amt','<@spring.message "msg.error.rm.must_return_shipping_fee_amt" />');
+	$l('msg.error.rm.must_return_shippingfee_and_adjustamt','<@spring.message "msg.error.rm.must_return_shippingfee_and_adjustamt" />');
+	$l('msg.warning.dto.salesreturn.conversionrate.error','<@spring.message "msg.warning.dto.salesreturn.conversionrate.error" />')
+	$l('msg.warning.dto.salesreturn.manualadjustamt.only_numeric','<@spring.message "msg.warning.dto.salesreturn.manualadjustamt.only_numeric" />');
+	$l('msg.warning.dto.salesreturn.manualadjustamt.larger_zero','<@spring.message "msg.warning.dto.salesreturn.manualadjustamt.larger_zero" />')
+
+	$l('msg.info.sys.delete_successful','<@spring.message "msg.info.sys.delete_successful" />');
+	$l('msg.warning.sys.delete_or_not','<@spring.message "msg.warning.sys.delete_or_not" />');
+	$l('msg.warning.sys.commit_or_not','<@spring.message "msg.warning.sys.commit_or_not" />');
+	$l('sys.hand.btn.save','<@spring.message "sys.hand.btn.save" />');
+	$l('sys.hand.btn.ok','<@spring.message "sys.hand.btn.ok" />');
+	$l('sys.hand.btn.delete','<@spring.message "sys.hand.btn.delete" />');
+	$l('sys.hand.btn.submit','<@spring.message "sys.hand.btn.submit" />');
+	$l('msg.info.order.salesreturn.print','<@spring.message "msg.info.order.salesreturn.print" />');
+	
+	/*默认组织*/
+	var defaultSaleOrg = ${Session._salesOrgId};
+	/*当前组织*/
+	var currentSalesOrgId = defaultSaleOrg;
+	
+	/*行上全局变量*/
+	var lineId,itemId;
+	var rowIndex;
+	
+	/*组织参数*/
+	var spmTaxFlag,spmTaxCode, spmReturnTypeData, spmReturnLimit, spmCurrentCode, spmEnableConversionRate;
+	var precision;	//精度
+	var returnType = [];
+	var refundMethod = [];
+	var refundMethodsData = [];
+	/*按钮*/
+	var printBtn, deleteBtn, saveBtn, submitBtn;
+	/*税率及市场Code*/
+	var taxPercent,marketCode;
+	/*当前组织*/
+	<#if RequestParameters.salesOrgId ?exists>
+		currentSalesOrgId = ${RequestParameters.salesOrgId};
+	</#if>
+	
+	$(function() {
+		/*退货单Form*/
+		var om_return_form = window['om_return_form'] =  $("#om_return_form").ligerForm({
+			fields : [{
+					type : 'hidden',
+					name : 'returnId'	//退货单头ID
+				},{
+					type : 'hidden',
+					name : 'orderHeaderId'	//订单头ID
+				},{
+					type : 'hidden',
+					name : 'orderType',				//订单类型
+				},{
+					type : 'hidden',
+					name : 'orderAmt',				//订单金额
+				},{
+					type : 'hidden',
+					name : 'orderActrualPayAmt',	//订单实付款
+				},
+//				{
+//					type : 'hidden',
+//					name : 'voucherAmt',			//优惠券优惠总额
+//				},
+//				{
+//					type : 'hidden',
+//					name : 'returnPromotionSum', 	//已返还优惠
+//				},
+//				{
+//					type : 'hidden',
+//					name : 'adjustAmt',				//人工调整金额
+//				},
+//				{
+//					type : 'hidden',
+//					name : 'rtnAdjustFlagBefore',	//是否已返还人工调整
+//				},
+				{
+					type : 'hidden',
+					name : 'shippingFeeAmt'			//运费
+				},{
+					type : 'hidden',
+					name : 'shippingFeeFlagBefore'	//是否已返还运费
+				},{
+					type : 'hidden',
+					name : 'returnAmt',				//历史退货金额
+				},{
+					type : 'hidden',
+					name : 'actualRtnAmtSum',		//历史实退款
+				},
+//				{
+//					type : 'hidden',
+//					name : 'voucherOrderAmt',		//优惠券额数
+//				},
+				{
+					type : 'hidden',
+					name : 'payDate'				//订单支付日期
+				},
+//				{
+//					type : 'hidden',
+//					name : 'periodId'				//奖金期间
+//				},
+				{
+					type : 'hidden',
+					name : 'memberId'				//会员ID
+				},{
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.salesorgid"/>',
+				name : 'salesOrgId',
+				type : 'combobox',
+				newline : false,
+				group : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returnorder" />',
+				options : {
+					value : currentSalesOrgId,
+					valueField : 'salesOrgId',
+					textField : 'name',
+					url : _basePath + "/sys/salesOrg/queryOrg",
+					isMultiSelect : false,
+					isShowCheckBox : false,
+	                onSelected : function(value,text) {
+	                	if (!value) {
+	                		return;
+	                	}
+	                	if (value != currentSalesOrgId) {
+	                		$.ligerDialog.confirm('<@spring.message "sys.dsis.changeorg.confirm" />', function(yes) {
+	                			if (yes) {
+				                	var path = "${base.contextPath}/om/om_salesreturn_create.html?salesOrgId=" + value;
+				                	window.parent.f_removeTab("CREATE_RETURN");
+				                    window.parent.f_removeTab("UPDATE_RETURN");
+				                    window.parent.f_addTab("UPDATE_RETURN", '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.new"/>',path);
+	                			} else {
+	                				liger.get("salesOrgId").setValue(currentSalesOrgId);
+	                			}
+							});
+	                	}
+	                },
+	                onSuccess : function(data) {
+	                	this.setValue(currentSalesOrgId);
+	                }
+                },
+                validate : {
+                    required : true
+                }
+			},{
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returnid"/>',
+				name : 'returnNumber',
+				type : 'text',
+				newline : false,
+				readonly : true
+			},{
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.orderheaderid"/>',
+				name : 'orderNumber',
+				textField : 'orderNumber', 
+				type : 'popup',
+				newline : false,
+				options : $.extend(${lovService.getLov(base.contextPath,base.locale,"om_return_ordernumber_lov")},{
+					parms : {'salesOrgId' : currentSalesOrgId},
+					onSelect : f_onSelectedOrderNumber,
+					onLoadData : function() {
+						this.setParm('salesOrgId', liger.get("salesOrgId").getValue());
+                    },
+				}),
+				validate : {
+		            required : true
+		        }
+			},
+//				{
+//				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returnstatus"/>',
+//				name : 'returnStatus',
+//				type : 'combobox',
+//				newline : false,
+//				readonly : true,
+//				options : {
+//					data : returnStatusData,
+//					valueFieldID : "returnStatus",
+//					valueField : 'value',
+//					textField : 'meaning',
+//					value : returnStatusData[0].value,
+//					text : returnStatusData[0].text
+//				},
+//				validate : {
+//		            required : true
+//		        }
+//			},
+				{
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returntype"/>',
+				name : 'returnType',
+				type : 'combobox',
+				newline : true,
+				options : {
+					data : returnType,
+					valueField : 'value',
+		            textField : 'meaning',
+		            onselected : function(data) {
+	            		om_return_grid.loadData();
+	            		om_rtnRefund_grid.loadData();
+	            		liger.get("returnAdjustFlag").setValue('N');
+		            	if ("EXCH" == data) {
+		            		om_rtnRefund_grid.reload();
+		            		$("#om_rtnRefund_grid").hide();
+		            		$("#returnAmtCount")[0].textContent = 0.00;
+		            		$("#rtnPromotionSum")[0].textContent = 0.00;
+		            		$("#actualRtnAmt")[0].textContent = 0.00;
+		            		$("#taxAmt")[0].textContent = 0.00;
+		            	} else if ("REFD" == data) {
+		            		$("#om_rtnRefund_grid").show();
+		            	}
+		            }
+				},
+				validate : {
+		            required : true
+		        }
+			},{
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returnreason"/>',
+				name : 'returnReason',
+				type : 'combobox',
+				newline : false,
+				options : {
+					data : returnReasonData,
+					valueField : 'value',
+					textField : 'meaning'
+				},
+				validate : {
+		            required : true
+		        }
+			},{
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returndate"/>',
+				name : 'returnDate',
+				type : 'date',
+				format : 'yyyy-MM-dd hh:mm:ss',
+				readonly : true,
+				newline : false
+			},{
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.invorgid"/>',
+				name : 'invOrgId',
+				textValue : 'invOrgName',
+				type : 'popup',
+				newline : true,
+				options : $.extend(${lovService.getLov(base.contextPath, base.locale, "om_return_orgId_lov")},{
+					onLoadData : function() {
+						this.setParm('orderHeaderId', $("#orderHeaderId").val());
+					},
+					onselect : function(datas) {
+						var parm = {"invOrgId" : datas.data[0].invOrgId};
+						f_getLocation(parm,false);
+					}
+				}),
+				validate : {
+		            required : true
+		        }
+			},
+//				{
+//				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.returnadjustment.adjust"/>',
+//				name : 'returnAdjustFlag',
+//				type : 'combobox',
+//				newline : false,
+//				options: {
+// 	            	value : 'N',
+// 	                valueField: 'value',
+// 	                textField: 'meaning',
+// 	                data: yesOrNo,
+// 	               	onSelected : function(data) {
+//						var orderType = $("#orderType").val();
+//						var returnType = liger.get("returnType").getValue();
+// 						if (data == 'Y') {
+// 							$("#adjustAmtCount")[0].textContent = Number($("#adjustAmt").val()).toFixed(precision);
+// 							if ("RDEM" == orderType) {
+//	 							$("[toolbarid='om_rtnRefund_gridAdd']").show();
+//								$("[toolbarid='om_rtnRefund_gridDel']").show();
+// 							}
+// 						} else {
+//							$("#adjustAmtCount")[0].textContent = Number(0).toFixed(precision);
+// 							if ("RDEM" == orderType) {
+// 								om_rtnRefund_grid.reload();
+// 							}
+// 						}
+// 						f_amtCalculation();
+// 					},
+// 	            },
+//				validate : {
+//		            required : true
+//		        }
+//			},
+                 {
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.return.shippingfee" />',
+				name : 'shippingFeeFlag',
+				type : 'combobox',
+				newline : false,
+				options: {
+ 	            	value : 'N',
+ 	                valueField: 'value',
+ 	                textField: 'meaning',
+ 	                data: yesOrNo,
+ 	               	onSelected : function(data) {
+						var orderType = $("#orderType").val();
+						var returnType = liger.get("returnType").getValue();
+ 						if (data == 'Y') {
+ 							$("#shippingFeeAmtCount")[0].textContent = Number($("#shippingFeeAmt").val()).toFixed(precision);
+ 							if ("RDEM" == orderType) {
+	 							$("[toolbarid='om_rtnRefund_gridAdd']").show();
+								$("[toolbarid='om_rtnRefund_gridDel']").show();
+ 							}
+ 						} else {
+							$("#shippingFeeAmtCount")[0].textContent = Number(0).toFixed(precision);
+ 							if ("RDEM" == orderType) {
+ 								om_rtnRefund_grid.reload();
+ 							}
+ 						}
+ 						f_amtCalculation();
+ 					},
+ 	            },
+				validate : {
+		            required : true
+		        }
+			},
+//				{
+//				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returnpromotion"/>',
+//				name : 'returnPromotion',
+//				type : 'text',
+//				newline : false,
+//				readonly : true
+//			},
+
+                {
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.return.creationdate" />',
+                    name : 'creationDate',
+                    type : 'date',
+                    format : 'yyyy-MM-dd hh:mm:ss',
+                    readonly : true,
+                    newline : false
+                },
+				{
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.salesorglocation"/>',
+				name : 'salesOrgLocation',
+				type : 'text',
+				width : 495,
+				newline : true,
+				readonly : true,
+				validate : {
+		            required : true
+		        }
+			},{
+            	label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.memberid"/>',
+            	type : 'text',
+            	name : 'memberCode',
+            	newline: false,
+            	readonly : true
+            },{
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.invorglocation"/>',
+				name : 'invOrgLocation',
+				type : 'text',
+				width : 495,
+				newline : true,
+				readonly : true,
+				validate : {
+		            required : true
+		        }
+			},
+                {
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername" />',
+                    type : 'text',
+                    name : 'memberName',
+                    newline : false,
+                    readonly : true
+                },
+//				{
+//            	label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.invoicenumber" />',
+//            	type : 'text',
+//            	name : 'invoiceNumber',
+//            	newline : false,
+//            	readonly : true
+//            },{
+//				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.return.credit_note" />',
+//				name : 'creditNote',
+//				type : 'text',
+//				newline : false,
+//				readonly : true
+//			},
+				{
+				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.remark"/>',
+				name : 'remark',
+				type : 'text',
+				width : 495,
+				newline : false
+			}
+//			,{
+//				label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.return.returnpv" />',
+//				type : 'text',
+//				name : 'returnPvSum',
+//				newline : false,
+//				readonly : true
+//			}
+			]
+		});
+		
+		/*退货订单明细Grid*/
+		var om_return_grid = window['om_return_grid'] = $("#om_return_grid").ligerGrid({
+			title : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returndetail" />',
+			width : '99%',
+			usePager : false,
+			enabledEdit : true,
+			allowHideColumn : false,
+			checkbox : true,
+			detail: { onShowDetail: f_getItemPackageDetail,height:'auto' },
+			frozen : false,
+			columns : [{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.itemid"/>',
+				name : 'itemId',
+				textField : 'itemNumber',
+				align : 'center',
+				editor : $.extend(${lovService.getLov(base.contextPath, base.locale, "return_item_lov")},{
+					staticOptions : function(e) {
+						rowIndex = e.rowindex;
+						e.column.editor.parms = {
+								returnId : $("#returnId").val(),
+								returnStatus : liger.get("returnStatus").getValue(),
+								headerId : $("#orderHeaderId").val(),
+								defaultInvOrgId : liger.get("invOrgId").getValue()
+						}
+					}, 
+					onSelect : f_onSelectedItem,
+					onChangeValue : f_onChangeValue
+				}),
+				validate : {
+					required : true
+				}
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.itemname"/>',
+				name : 'itemName',
+				type : 'text',
+				align : 'center',
+				isSort : false,
+				editor : {
+					type : 'text'
+				},
+				validate : {
+		            required : true
+		        }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.countitemnumber"/>',
+				name : 'countItemNumber',
+				type : 'text',
+				align : 'center',
+				isSort : false,
+				editor : {
+					type : 'text'
+				},
+				validate : {
+		            required : true
+		        }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.countitemname"/>',
+				name : 'countItemName',
+				type : 'float',
+				align : 'center',
+				isSort : false,
+				editor : {
+					type : 'float'
+				},
+				validate : {
+		            required : true
+		        }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.unitredeempoint"/>',
+				name : 'unitRedeemPoint',
+				type : 'text',
+				align : 'center',
+				isSort : false,
+				editor : {
+					type : 'text'
+				},
+				validate : {
+		            required : true
+		        }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.unitsellingprice"/>',
+				name : 'unitSellingPrice',
+				type : 'text',
+				align : 'center',
+				isSort : false,
+				editor : {
+					type : 'text'
+				},
+				validate : {
+		            required : true
+		        }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.uomname"/>',
+				name : 'uomName',
+				type : 'text',
+				align : 'center',
+				isSort : false,
+				editor : {
+					type : 'text'
+				},
+				validate : {
+		            required : true
+		        }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.orderquantity"/>',
+				name : 'orderQuantity',
+				type : 'float',
+				align : 'center',
+				isSort : false,
+				editor : {
+					type : 'int'
+				},
+				validate : {
+		            required : true
+		        }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.enabledrtnquantity"/>',
+				name : 'enabledRtnQuantity',
+				type : 'float',
+				align : 'center',
+				isSort : false,
+				editor : {
+					type : 'int'
+				},
+				validate : {
+		            required : true
+		        }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.lots"/>',
+				name : 'invLot',
+				align : 'center',
+				isSort : false,
+				render : f_itemTypeRender
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.quantity"/>',
+				name : 'quantity',
+				type : 'int',
+				align : 'center',
+				isSort : false,
+				editor : {
+					type : 'int'
+				},
+				validate : {
+		            
+		        }
+			},
+//				{
+//				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.returnpromotion"/>',
+//				name : 'returnPromotion',
+//				type : 'float',
+//				align : 'center',
+//				isSort : false,
+//				editor : {
+//					type : 'float'
+//				}
+//			},
+				{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.returninvflag"/>',
+				name : 'returnInvFlag',
+				align : 'center',
+				isSort : false,
+				validate : {
+		            required : true
+		        },
+				editor : {
+					type : 'select',
+					data : yesOrNo,
+					valueField : 'value',
+					textField : 'meaning'
+				},
+				render : Hap.gridCodeRenderer
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.conversionrate" />',
+				name : 'conversionRate',
+				type : 'float',
+				align : 'center',
+				validate : {
+					required : true
+				},
+				editor : {
+					type : 'float'
+				}
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnline.conversion_amt" />',
+				name : 'conversionAmt',
+				type : 'float',
+				align : 'center'
+			}],
+			onBeforeEdit : function(e) {
+				var returnStatus = liger.get("returnStatus").getValue();
+				if (returnStatus != 'NEW') {
+					return false;
+				}
+				//根据组织参数判断折扣率是否可编辑
+				if (e.column.columnname == "conversionRate") {
+					if (spmEnableConversionRate[0] == 'Y') {
+						return true;
+					}
+					return false;
+				}
+				var lotCtrlFlag = e.record.lotCtrlFlag;
+				var countStockFlag = e.record.countStockFlag;
+				var itemType = e.record.itemType;
+				if (e.column.columnname == "quantity") {
+					//商品时
+					if (itemType != "PACKG" && itemType != "VN" && itemType != "VY") {
+						if (countStockFlag == "N") {
+							e.column.validate = {
+                        			required: true
+                        		}
+							return true;
+						}
+						if (countStockFlag == "O" && lotCtrlFlag == "N") {
+							e.column.validate = {
+                        			required: true
+                        		}
+							return true;
+						}
+						if (countStockFlag == "R" && lotCtrlFlag == "N") {
+							e.column.validate = {
+                        			required: true
+                        		}
+							return true;
+						}
+					} else {//商品包时
+						var countType = e.record.countType;
+						if (countStockFlag == "Y"  && countType == 'IDV') {
+							e.column.validate = {
+                        			required: true
+                        		}
+							return true;
+						}
+						if (countStockFlag == "N") {
+							e.column.validate = {
+                        			required: true
+                        		}
+							return true;
+						}
+						if (countType == "PACKG") {
+							e.column.validate = {
+                        			required: true
+                        		}
+							return true;
+						}
+					}
+				}
+				if (e.column.columnname == "itemName" || e.column.columnname == "countItemNumber"
+						|| e.column.columnname == "countItemName" || e.column.columnname == "unitSellingPrice" 
+						|| e.column.columnname == "unitRedeemPoint" || e.column.columnname == "uomName" || e.column.columnname == "quantity" 
+						|| e.column.columnname == "orderQuantity"
+						|| e.column.columnname == "returnPromotion" || e.column.columnname == "enabledRtnQuantity") {
+					e.column.validate = null;
+					return false;
+				}
+				e.column.validate = {
+            			required: true
+            		}
+				return true;
+			},
+			onBeforeSubmitEdit : function(e) {
+				var om_return_gridData = om_return_grid.getData();
+				if (e.column.columnname == "quantity") {
+					var enabledRtnQuantity = om_return_gridData[e.rowindex].enabledRtnQuantity;
+					if (e.value <= 0 && e.value) {
+						Hap.showError($l('msg.warning.dto.salesreturn.returnquantity.larger_zero'));
+						return false;
+					}
+					if (e.value > enabledRtnQuantity) {
+						Hap.showError($l('msg.warning.dto.salesreturn.returnquantity.not_match'));
+						return false;
+					}
+				}
+				if (e.column.columnname == "conversionRate") {
+					if (e.value < 0 || e.value > 1) {
+						Hap.showError($l('msg.warning.dto.salesreturn.conversionrate.error'));
+						return false;
+					}
+				}
+				return true;
+			},
+			onAfterEdit : function(e) {
+				var om_return_gridData = om_return_grid.getData();
+				if (e.column.columnname == "quantity") {
+					var enabledRtnQuantity = om_return_gridData[e.rowindex].enabledRtnQuantity;
+					if (e.value <= 0 && e.value) {
+						return false;
+					}
+					if (e.value > enabledRtnQuantity) {
+						return false;
+					}
+				}
+				var itemType = om_return_gridData[e.rowindex].itemType; //商品类型
+				var countType = om_return_gridData[e.rowindex].countType;	//商品包库存计算方式
+				if (e.column.columnname == "returnInvFlag") {//更新商品包明细数据
+					if (itemType == "PACKG" || itemType == "VN" || itemType == "VY") {
+						if (countType != "PACKG") {
+							var itemDetailRows = e.record.itemPkgDetail;
+							if (e.value == 'N') {
+								//计算库存=是，计入库存=否，则商品明细中“计入库存”也必须都为“否”，
+								for (var i=0; i<itemDetailRows.length; i++) {
+									e.record.itemPkgDetail[i].returnInvFlag = 'N';
+				        		}
+				        	} else if (e.value == 'Y') {
+		        				//计算库存=是，计入库存=是，则商品明细中“计入库存”也必须都为“是”，批次明细不可编辑
+				        		for (var i=0; i<itemDetailRows.length; i++) {
+				        			e.record.itemPkgDetail[i].returnInvFlag = 'Y';
+								}
+				        	}
+							tr = $(om_return_grid.getRowObj(om_return_grid.getRow(e.rowindex)));
+				            tr.next('tr.l-grid-detailpanel').remove();
+				            tr.find('.l-grid-row-cell-detailbtn').removeClass('l-open');
+						}
+					}
+				}
+				if (e.column.columnname == "conversionRate" || e.column.columnname == "quantity") {
+					f_amtCalculation();
+				}
+				if (e.column.columnname == "quantity") {
+					if (itemType == "PACKG" || itemType == "VN" || itemType == "VY") {
+						if (countType != "PACKG") {
+							var salesRtnLineRow = e.record;
+							var itemDetailRows = salesRtnLineRow.itemPkgDetail;
+							//更新商品明细中退货数量
+							for (var i=0; i<itemDetailRows.length; i++) {
+								var itemAssignQty = itemDetailRows[i].orderQuantity/salesRtnLineRow.orderQuantity;
+								itemDetailRows[i].quantity = (itemAssignQty*e.value);
+							}
+							tr = $(om_return_grid.getRowObj(om_return_grid.getRow(e.rowindex)));
+				            tr.next('tr.l-grid-detailpanel').remove();
+				            tr.find('.l-grid-row-cell-detailbtn').removeClass('l-open');
+						}
+					}
+				}
+				om_return_grid.reRender();
+				return true;
+			},
+			toolbar : {
+				items : [{
+					id : 'om_return_gridAdd',
+					text : '<@spring.message "sys.hand.btn.create"/>',
+					click : function() {
+						var orderNumber = om_return_form.getData().orderNumber;
+						var invOrg = liger.get("invOrgId").getValue();
+						if (!orderNumber) {
+							Hap.showError($l('msg.warning.dto.salesreturn.ordernumber.valid'));
+							return false;
+						}
+						if (!invOrg) {
+							Hap.showError($l('msg.warning.dto.salesreturn.returninv.valid'));
+							return false;
+						}
+						om_return_grid.addRow({
+							returnId : $("#returnId").val(),			//退货单头ID
+							salesOrgId : '',		//销售区域ID
+							orderLineId : '',		//销售订单行ID
+							itemId : '',			//商品ID
+//							pv : '',				//商品PV
+							countItemId : '',		//实际商品ID
+							quantity : '',			//退货数量
+//							returnPromotion : '',	//返回优惠
+							returnInvFlag : '',		//是否返回库存
+							salesRtnLots : null,	//批次信息,
+							discountType : '',		//折扣类型
+							discountValue : '',		//折扣率
+							unitOrigPrice : '',		//原价
+							unitDiscountPrice : '',	//优惠价格
+							adjustmentAmount : '',	//优惠券额度
+							lotCtrlFlag : '',		//商品是否启用标识
+							countStockFlag : '',	//商品计算库存方式
+							itemType : '',			//商品类型(商品/商品包)
+							countType : '',			//商品包计算库存方式
+							itemPkgDetail : null,	//商品包明细
+							disableTaxFlag : null	//商品是否计税
+						});
+					},
+					icon : 'add'
+				},
+				{ line: true },
+				{
+					id : 'om_return_gridDel',
+					text : '<@spring.message "sys.hand.btn.delete"/>',
+					click : function() {
+					    $.ligerDialog.confirm($l('sys.hand.tip.delete_confirm'), $l('sys.hand.tip.info'),function(yes) {
+			                if (yes) {
+			                	om_return_grid.deleteSelectedRow();
+			                	var manager = $.ligerDialog.waitting($l('sys.hand.tip.success')); 
+			                	setTimeout(function () {
+			                		f_amtCalculation();
+			                		manager.close();
+			                	}, 10);
+			                }
+			            });
+					},
+					icon : 'delete'
+				}]
+			}
+		});
+		/*批次选择弹出框*/
+		var om_return_lotGrid = window['om_return_lotGrid'] = $('#om_return_lotGrid').ligerGrid({
+			height : 300,
+			width : '95%',
+			usePager : false,
+			enabledEdit : true,
+			checkbox : true,
+			columns : [{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnlot.lotnumber"/>',
+				name : 'lotNumber',
+				width : 150,
+				align : 'center',
+				editor : $.extend(${lovService.getLov(base.contextPath, base.locale, "om_return_lot")},{
+					staticOptions : function(e) {
+						var returnId = $("#returnId").val();
+						var returnStatus = liger.get("returnStatus").getValue();
+						e.column.editor.parms = {
+								returnId : returnId,
+								returnStatus : returnStatus,
+								lineId : lineId,
+								itemId : itemId
+						}
+					},
+					onSelect : function(datas) {
+						var outstandingQty = datas.data[0].outstandingQty;
+						var backQty = datas.data[0].backQty;
+						var returnQty = datas.data[0].returnQty;
+						var qty = outstandingQty - backQty - returnQty;
+						var p = this.options;
+						p.host_grid.updateCell('deliveryEndDate', datas.data[0].deliveryEndDate, p.host_grid_row);
+						p.host_grid.updateCell('enabledLotQty', qty, p.host_grid_row);
+					}
+				})
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnlot.deliveryenddate"/>',
+				name : 'deliveryEndDate',
+				type : 'date',
+				format : 'yyyy-MM-dd',
+				width : 150,
+				align : 'center',
+				editor : {
+					type : 'date'
+				},
+				validate : {
+					required : true
+				}
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnlot.quantity"/>',
+				name : 'quantity',
+				type : 'int',
+				width : 150,
+				align : 'center',
+				editor : {
+					type : 'int'
+				},
+				validate : {
+					required : true
+				}
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnlot.enabledqty"/>',
+				name : 'enabledLotQty',
+				type : 'int',
+				width : 150,
+				align : 'center',
+				editor : {
+					type : 'int'
+				},
+				validate : {
+					required : true
+				}
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnlot.remark"/>',
+				name : 'remark',
+				type : 'text',
+				width : 150,
+				align : 'center',
+				editor : {
+					type : 'text'
+				}
+			}],
+			onBeforeEdit : function(e) {
+				var returnStatus = liger.get("returnStatus").getValue();
+				if (returnStatus != 'NEW') {
+					return false;
+				}
+				if (e.column.columnname == "deliveryEndDate" || e.column.columnname == "enabledLotQty") {
+					return false;
+				}
+				return true;
+			},
+			onBeforeSubmitEdit : function(e) {
+				var qty = 0;
+				var lotLines = om_return_lotGrid.getData(); 
+				if (e.column.columnname == "quantity" && lotLines[e.rowindex].lotNumber) {
+					for (var i=0; i<lotLines.length; i++) {
+						if (lotLines[i].lotNumber == lotLines[e.rowindex].lotNumber && i != e.rowindex) {
+							qty += lotLines[i].quantity;
+						}
+					}
+					if ((qty+e.value) > lotLines[e.rowindex].enabledLotQty) {
+						Hap.showError("<@spring.message 'msg.warning.dto.salesreturn.returnline.lot.enabledqty_larger' />");
+						return false;
+					}
+				}
+			},
+			toolbar : {
+				items : [{
+					id : 'om_return_lotGridAdd',
+					text : '<@spring.message "sys.hand.btn.create"/>',
+					click : function() {
+						om_return_lotGrid.addRow();
+					},
+					icon : 'add'
+				},
+				{ line: true },
+				{
+					id : 'om_return_lotGridDel',
+					text : '<@spring.message "sys.hand.btn.delete"/>',
+					click : function() {
+						om_return_lotGrid.deleteSelectedRow();
+					},
+					icon : 'delete'
+				}]
+			}
+		});
+		
+//		/*退款方式Grid*/
+//		var om_rtnRefund_grid = window['om_rtnRefund_grid'] = $("#om_rtnRefund_grid").ligerGrid({
+//			title : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnrefund.refundmethod"/>',
+//			width : '99%',
+//			usePager : false,
+//			enabledEdit : true,
+//			checkbox : true,
+//			allowHideColumn : false,
+//			columns : [{
+//				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnrefund.refundmethod"/>',
+//				name : 'refundMethod',
+//				type : 'text',
+//				align : 'center',
+//				editor : {
+//					type : 'select',
+//					data : refundMethod,
+//					valueField : 'value',
+//					textField : 'meaning'
+//				},
+//				render: function (item) {
+//					if (!item) {
+//						return;
+//					}
+//					for (var i = 0; i < refundWayData.length; i++)
+//					{
+//						if (refundWayData[i].value == item.refundMethod)
+//							  	return refundWayData[i].meaning;
+//					}
+//				},
+//				validate : {
+//					required : true
+//				}
+//			},{
+//				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnrefund.refundamount"/>',
+//				name : 'refundAmount',
+//				type : 'float',
+//				align : 'center',
+//				editor : {
+//					type : 'text'
+//				},
+//				option : {
+//					sign : false
+//				},
+//				validate : {
+//					required : true
+//				}
+//			},{
+//				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesrtnrefund.remark"/>',
+//				name : 'remark',
+//				type : 'text',
+//				align : 'center',
+//				editor : {
+//					type : 'text'
+//				}
+//			}],
+//			onBeforeCheckRow : function(checked, data, rowindex, rowobj) {
+//				if (data.refundMethod == "SP")
+//					return false;
+//				return true;
+//			},
+//			onBeforeEdit : function(e) {
+//				var returnStatus = liger.get("returnStatus").getValue();
+//				var orderType = $("#orderType").val();
+//				if (returnStatus != 'NEW') {
+//					return false;
+//				}
+//				//订单是积分兑换时退款方式只能选择SalesPoint
+//				if ("RDEM" == orderType && e.rowindex == 0) {
+//					if (e.column.columnname == "refundMethod" || e.column.columnname == "refundAmount") {
+//						return false;
+//					}
+//				}
+//			},
+//			onBeforeSubmitEdit : function(e) {
+//				var orderType = $("#orderType").val();
+//				if (e.column.columnname == "refundMethod") {
+//					if ("RDEM" == orderType && "SP" == e.value) {
+//						Hap.showError($l('msg.warning.dto.salesreturn.rtnmethod.not_only'));
+//						return false;
+//					}
+//					if ("RDEM" != orderType && "SP" == e.value) {
+//						Hap.showError($l('msg.warning.dto.salesreturn.rtnmethod.not_allow'));
+//						return false;
+//					}
+//				}
+//				if (e.column.columnname == "refundAmount") {
+//					if(Number(e.value) <= 0 && e.value) {
+//						Hap.showError("<@spring.message 'type.com.lkkhpg.dsis.common.order.orderinvalid.amountError'/> ");
+//						return false;
+//					}
+//				}
+//			},
+//			toolbar : {
+//				items : [{
+//					id : 'om_rtnRefund_gridAdd',
+//					text : '<@spring.message "sys.hand.btn.create"/>',
+//					click : function() {
+//						var returnAdjustFlag = liger.get("returnAdjustFlag").getValue();
+//						var actualRtnAmt = Number($("#actualRtnAmt")[0].textContent).toFixed(precision);	//实退款
+//						var adjustAmt = Number($("#adjustAmtCount")[0].textContent).toFixed(precision);		//人工调整金额
+//						if (actualRtnAmt == 0) {
+//							return false;
+//						}
+//						var orderType = $("#orderType").val();
+//						if ("RDEM" == orderType && om_rtnRefund_grid.rows.length == 0) {
+//							om_rtnRefund_grid.addRow({
+//								salesOrgId : currentSalesOrgId,
+//								refundMethod : 'SP',
+//								refundAmount : (actualRtnAmt-adjustAmt)
+//							});
+//							if ("Y" == returnAdjustFlag) {
+//								om_rtnRefund_grid.addRow({
+//									salesOrgId : currentSalesOrgId,
+//								});
+//								$("[toolbarid='om_rtnRefund_gridAdd']").show();
+//								$("[toolbarid='om_rtnRefund_gridDel']").show();
+//							} else {
+//								$("[toolbarid='om_rtnRefund_gridAdd']").hide();
+//								$("[toolbarid='om_rtnRefund_gridDel']").hide();
+//							}
+//						} else {
+//							om_rtnRefund_grid.addRow({
+//								salesOrgId : currentSalesOrgId,
+//							});
+//						}
+//					},
+//					icon : 'add'
+//				},
+//				{ line: true },
+//				{
+//					id : 'om_rtnRefund_gridDel',
+//					text : '<@spring.message "sys.hand.btn.delete"/>',
+//					click : function() {
+//						om_rtnRefund_grid.deleteSelectedRow();
+//					},
+//					icon : 'delete'
+//				}]
+//			}
+//		});
+		
+		/*初始化按钮*/
+		init();
+    	
+	    <#if RequestParameters.returnId ?exists>
+	        var p = ${RequestParameters.returnId};
+		   // console.log(p);
+	        $.getJSON(_basePath + "/om/return/getReturnDetail?returnId="+p, function(data) {
+	        	currentSalesOrgId = data.rows[0].salesOrgId;
+//				console.log(data.rows);
+//                for (var i = 0; i < data.rows.length; i++) {
+//                    $('#test').append('<p>' + data.rows[i].salesOrgId + '</p>');
+//                }
+                f_getOrgParam(currentSalesOrgId, data);
+	        });
+	        /*获取当前市场CODE*/
+			$.ajaxSettings.async = false;
+			$.getJSON(_basePath + "/spm/market/getCompAndMarket?salesOrgId="+currentSalesOrgId, function(data) {
+				marketCode = data.rows[0].marketCode;
+			});
+	   <#else>
+	            /*当前销售组织地址获取*/
+	            var param = {salesOrgId : currentSalesOrgId};
+	            f_getLocation(param,true);
+	            /*组织参数获取*/
+	            f_getOrgParam(currentSalesOrgId, null);
+	            printBtn.setDisabled(true);
+	        
+	    </#if>
+
+	    
+	})
+</script>
+
+<body style="padding: 0px; margin-left: 10px;">
+	
+	<!-- 退货单Form表单 -->
+	<div id="omRtnForm">
+		<form id="om_return_form"></form>
+	</div>
+	<!-- 退货订单明细Grid -->
+	<div id="om_return_grid"></div>
+	<!-- 退货批次grid -->
+	<div id="om_return_lotGrid" style="display:none;"></div>
+	<!-- 手工调整 -->
+	<!--<div>-->
+		<!--<div id="returnAdjust" style="margin-top: 10px; clear: both;">-->
+        <!--<table class="returnAdjust">-->
+            <!--<tr>-->
+                <!--<td>-->
+                    <!--<label><@spring.message "type.com.lkkhpg.dsis.common.order.dto.return.manualadjustamt"/></label>-->
+                <!--</td>-->
+                <!--<td>-->
+                	<!--<input style="width: 60px" name="manualAdjustAmt" id="manualAdjustAmt" class="l-text" onBlur="f_returnAdjust(this)"  placeholder="00.00" />-->
+                <!--</td>-->
+                <!--<td>-->
+                	<!--<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.remark"/>-->
+                	<!--<input name="comments" id="comments" class="l-text" />-->
+                <!--</td>-->
+            <!--</tr>-->
+        <!--</table>-->
+    <!--</div>-->
+	</div>
+	<!-- 退款方式Grid -->
+	<div id="om_rtnRefund_grid" style="margin-top: 10px; clear: both;"></div>
+	<!-- 底部显示 -->
+	<div id="summary">
+		<table style="margin:0 auto;" >
+			<tr>
+				<td align="left">
+					<label> <@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.returnamtcount"/> :</label>
+					<label id="returnAmtCount" style="font-weight : bold;">0</label>
+				</td>
+				<!--<td align="left">-->
+					<!--<label><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.taxamt"/> : </label>-->
+					<!--<label id="taxAmt" style="font-weight : bold;">0</label>-->
+				<!--</td>-->
+				<!--<td align="left">-->
+					<!--<label><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesadjustment.adjust"/> : </label>-->
+					<!--<label id="adjustAmtCount" style="font-weight : bold;">0</label>-->
+				<!--</td>-->
+				<td align="left">
+					<label><@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.shippingfee"/> : </label>
+					<label id="shippingFeeAmtCount" style="font-weight : bold;">0</label>
+				</td>
+				<!--<td align="left">-->
+					<!--<label><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.rtnpromotionsum"/> : </label>-->
+					<!--<label id="rtnPromotionSum" style="font-weight : bold;">0</label>-->
+				<!--</td>-->
+				<td align="left">
+					<label><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesreturn.actualrtnamt"/>: </label>
+					<label id="actualRtnAmt" style="font-weight : bold;">0</label>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<!-- 按钮 -->
+	<div id="buttons" class="buttons">
+		<div id="printBtn"></div>
+		<div id="deleteBtn"></div>
+		<div id="saveBtn"></div>
+		<div id="submitBtn"></div>
+	</div>
+
+<div id="test">
+</div>
+
+</body>

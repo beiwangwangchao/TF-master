@@ -1,0 +1,1127 @@
+<#-- 
+ * description: 查询最终奖金. 
+ * version: 1.0 
+ * author: li.peng 
+ * CopyrightLKK Health Products Group Limited. 
+ * 
+--> 
+<#include "../include/head.html">
+<style>
+</style>
+<script
+	src="${base.contextPath}/common/code?retransferstatus=BM.RE_TRANSFER_STATUS&bonusPaymentStatus=BM.RE_BONUS_PAYMENT_STATUS&bonusType=BM.RE_BONUS_TYPE&receiveMethod=MM.MEMBER_BONUS_RECEIVE_METHOD&processMode=BM.PROCESS_MODE"
+	type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+<body style="padding: 10px;">
+	<form id="d_bm_011_form"></form>
+	<div id="d_bm_011_grid"></div>
+	<form id="bonus_type_grid"></form>
+	<form id="download_form" method="POST" target="_blank"></form>
+	
+	<form id = 'bonus_pay_form'></form>
+	<form id = 'bonus_pay_unlock'></form>
+	<form id = 'bonus_process_mode'></form>
+	<form id="bonus_comments"></form>
+	<script type="text/javascript">
+	var marketId = _marketId;
+    //原值保存
+    var oldValue = null;
+	
+	jQuery.validator.addMethod("stringMaxLength", function(value, element, param) {  
+	    var length = value.length;  
+	    for(var i = 0; i < value.length; i++){  
+	        if(value.charCodeAt(i) > 127){  
+	            length = length + 2;  
+	        }  
+	    }  
+	    return this.optional(element) || ( length <= param );  
+	}, '<@spring.message "sys.hand.validate.maxlength"/>');  
+
+	var lovEditorComments;
+	var processModeFail = new Array();
+	function intiForm(){
+		window['d_bm_011_form'] = $("#d_bm_011_form").ligerForm({
+	        fields : [ {
+	        	display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+		    	name : "marketId",
+		    	newline : false,
+		    	type : "combobox",
+		    	options : {
+		        	value : marketId,
+	                valueField : 'marketId',
+	                textField : 'name',
+	                url : '${base.contextPath}/spm/market/queryMarketsByRole',
+	                isShowCheckBox: false,
+	                isMultiSelect: false,
+	                cancelable : false,
+	                onSuccess : function(){
+	                	this.setValue(marketId);
+	                },
+	                onBeforeSelect : function(){ //该事件用于将初次加载标志置false,记录原值以及将重复标记置为true
+	                	oldValue = $.ligerui.get('marketId').getValue();
+	                },
+	                onSelected :function (value,text){
+	                	if (!value) {
+	                		return false;
+	                	}
+	                	if (marketId != value) {
+	                		$.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.refresh_page"/>', $l('sys.hand.tip.info'),function(yes) {
+	                            if(yes){
+	                                var newMarketId = $.ligerui.get('marketId').getValue();
+	                                var tabid = window.top.tab.selectedTabId;
+	              			    	var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+	                                window.top.f_removeTab(tabid);
+	                                parent.f_addTab(tabid,tabname,"${base.contextPath}/bm/bm_final_bonus.html?marketId="+newMarketId);
+	                            }else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+	                                $.ligerui.get('marketId').setValue(oldValue);
+	                            }
+	                        });
+	                	}
+	                }
+	            },
+	            validate : {
+	                required : true
+	            }
+		    },{
+	            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.menberid"/>',
+
+	            name : "memberCode",
+	            newline: true,
+	            type : "popup",
+	            textField:'memberCode',
+	            options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+	             	onLoadData: function(){
+	                this.setParm('marketId', marketId)
+	            } ,
+	              	onChangeValue: function(){
+	                this.setParm('marketId', marketId)
+	            }  
+	        	},{parms:{"marketId" : marketId}})
+	        }, {
+	            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonustype"/>',
+
+	            name : "bonusType",
+	            newline: false,
+	            type : "select",
+	            options : {
+	                valueField : 'value',
+	                textField : 'meaning',
+	                data : bonusType
+	            }
+	        },{
+	            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonusperiod"/>',
+	            name : "periodId",
+	            newline: false,
+	            type : 'select',
+	            options : {
+	                valueField : 'periodId',
+	                textField : 'periodName',
+	                url : '${base.contextPath}/bm/bonusfinal/getPeriod?marketId='+ marketId
+	            }
+	        },{
+	        	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.remitflag"/>',
+
+	            name : "remitFlag",
+	            newline: false,
+	            type : "select",
+	            options : {
+	                valueField : 'value',
+	                textField : 'meaning',
+	                data : bonusPaymentStatus
+	            }
+	        },{
+	        	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.remitmethod"/>',
+
+	            name : "remitMode",
+	            newline: false,
+	            type : "select",
+	            options : {
+	                valueField : 'value',
+	                textField : 'meaning',
+	                data : receiveMethod
+	            }
+	        },{
+	        	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.processmode"/>',
+	            name : "processMode",
+	            newline: false,
+	            type : "select",
+	            options : {
+	                valueField : 'value',
+	                textField : 'meaning',
+	                data : processMode
+	            }
+	        }],
+	        buttons : [ {
+	            text : '<@spring.message "sys.hand.btn.query"/>',
+	            disabled : false,
+	            width : 60,
+	            click : function() {
+	                 Hap.gridQuery({
+	                     form : d_bm_011_form,
+	                     grid : d_bm_011_grid
+	                 })
+	            }
+	        }]
+	    });
+	}
+    
+    function initGrid(columns){
+    	window['d_bm_011_grid'] = $("#d_bm_011_grid").ligerGrid({
+            columns : columns,
+            toolbar:{
+                items : [
+						 {
+							 text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.pay"/>',
+							 click : bonusPay,
+							 <#if accessService.access("PAY_EDITABLE") == false>
+		                        disable:true, 
+		                     </#if>
+							 icon: 'add'
+						 },
+						 {
+                             text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.unlock"/>',
+                             icon: 'back',
+                             <#if accessService.access("BACK_EDITABLE") == false>
+		                        disable:true, 
+		                     </#if>
+                             click : unlockBonus
+                         },
+                         {
+                        	 text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.print"/>',
+                        	 click : downLoadFile,
+                        	 <#if accessService.access("PRINT_EDITABLE") == false>
+		                        disable:true, 
+		                     </#if>
+                        	 icon: 'save'
+                         },
+                         {
+                        	 text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.reissue"/>',
+                        	 <#if accessService.access("REISSUE_EDITABLE") == false>
+		                        disable:true, 
+		                     </#if>
+                        	 click : function() {
+                        		 reissue();
+                        	 },
+                        	 icon: 'modify'
+                         },
+                         {
+                        	 text : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.payfail"/>',
+                        	 <#if accessService.access("PAYFAIL_EDITABLE") == false>
+		                        disable:true, 
+		                     </#if>
+                        	 click : function() {
+                        		 var row = d_bm_011_grid.getSelectedRow();
+                                 if (!row) { $.ligerDialog.error('<@spring.message "msg.error.bm.finalbonus.choose_one"/>'); return; }
+                        		 $.ligerDialog.confirm('<@spring.message "msg.confirm.bm.finalbonus.payfail"/>', function (yes){
+                            			if(yes){
+                            				payFail();
+                            			}
+                        		 });		
+                        	 },
+                        	 icon: 'modify'
+                         },
+                         { line: true },
+                         {                	
+                             text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                             menu:{ width: 120, items:
+     	                            [
+     		                 			{                	
+     		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+     		                 			    click:   function (){exportSelected("d_bm_011_form","d_bm_011_grid",{"bonusType":bonusType,"remitMode":receiveMethod,"remitFlag":bonusPaymentStatus,"processMode":processMode},_basePath);}
+     		                 			},
+     		                 			{ line: true },
+     		                 			{                	
+     		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+     		                 			    click: function (){exportDirectAll("d_bm_011_form","d_bm_011_grid",{"bonusType":bonusType,"remitMode":receiveMethod,"remitFlag":bonusPaymentStatus,"processMode":processMode},_basePath);}
+     		                 			    
+     		                 			}
+     	                          ]
+                          	}                        
+                         }
+                         ]
+             },
+            url:"${base.contextPath}/bm/bonusfinal/query",
+            detail : {
+    			onShowDetail : f_getReleaseDetail,
+    			height : 'auto'
+    		},
+            enabledEdit :true,
+            resizable: false,  
+            delayLoad :true,
+            allowUnSelectRow : true,
+            isSingleCheck  : true,
+            checkbox : true,
+            selectRowButtonOnly : false,
+            frozen : false,
+            width : '99%',
+            height : '98%',
+            pageSize :20
+            
+        });
+    }
+    
+    function f_getReleaseDetail(row, detailPanel, callback){
+    	var gridTemp = document.createElement('div');
+    	$(detailPanel).append(gridTemp);
+    	$(gridTemp).css('margin', 10).ligerGrid({
+			columns : [
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.bonuscode"/>',
+						name : 'bonusCode',
+						type : 'text'
+					},
+					{
+						display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.memberid"/>',
+						name : 'memberCode',
+						type : 'text'
+					},
+					{
+			             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.period"/>',
+			             name : 'periodName'
+			        },
+			        {
+			             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.bonustype"/>',
+			             name : 'bonusType',
+			             render: function(item) {
+			                    for (var i = 0; i < bonusType.length; i++) {
+			                        if (bonusType[i].value == item.bonusType) {
+			                            return bonusType[i].meaning;
+			                        }
+			                    }
+			                }
+			        },
+			        {
+			             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.deliveramt"/>',
+			             name : 'deliverAmt',
+			        }],
+			isScroll : false,
+			showToggleColBtn : false,
+			url : "${base.contextPath}/bm/release/querydetail?bonusId="
+					+ row.bonusId,
+			/* width: '90%', */
+			width : 800,
+			showTitle : false,
+// 			columnWidth: 100,
+			usePager : false, 
+			onAfterShowData : callback,
+			frozen : false
+		});
+    }
+    
+    function initColums(market){
+    	var columns =[{
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonuscode"/>',
+
+            name:"bonusCode",
+            width : 100,
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.menberid"/>',
+
+             name : 'memberCode',
+             width : 100,
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.membername"/>',
+
+             name : 'memberName',
+             width : 200,
+
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.company"/>',
+
+             name : 'companyName',
+             width : 200,
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusadjust.market"/>',
+
+             name : 'marketName',
+             width : 100
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonusperiod"/>',
+
+             name : 'periodName',
+             width : 60
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonustype"/>',
+
+             name : 'bonusType',
+             align : 'right',
+             width : 60,
+             render: function(item) {
+                 for (var i = 0; i < bonusType.length; i++) {
+                     if (bonusType[i].value == item.bonusType) {
+                         return bonusType[i].meaning;
+                     }
+                 }
+             }
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.pretaxamt"/>',
+
+             name : 'preTaxAmt',
+             align : 'right',
+             width : 60
+         }
+         ];
+    	var withholdingTaxAmt = {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.withholdingtax"/>',
+
+                name : 'taxAmt01',
+                align : 'right',
+                width : 60
+            }
+    	
+        var invoice = {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.invoicetax"/>',
+
+             name : 'taxAmt02',
+             align : 'right',
+             width : 60
+         };
+         var consume ={
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.consumptiontax"/>',
+             name : 'taxAmt02',
+             align : 'right',
+             width : 60
+         };
+         var health = {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.nhi"/>',
+
+             name : 'clearTaxAmt03',
+             align : 'right',
+             width : 60
+         };
+        
+         if("HK" == market){
+        	
+	     } else if('MY' == market){
+	     	columns.push(consume);
+	     } else if('TW' == market){
+	     	columns.push(withholdingTaxAmt);
+	        columns.push(invoice);
+	        columns.push(health);
+	     }
+         
+         var suffCol = [{
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.transamount"/>',
+             name : 'preTaxAmtAdjust',
+             align : 'right',
+             width : 60
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.paymentAmount"/>',
+             name : 'deliverAmt',
+             align : 'right',
+             width : 60
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.counterfee"/>',
+             name : 'deliverBankFee',
+             width : 60,
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.amount"/>',
+             name : 'remitNetAmt',
+             align : 'right',
+             width : 60
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.remitmethod"/>',
+             name : 'remitMode',
+             align : 'right',
+             width : 80,
+             render: function(item) {
+                 for (var i = 0; i < receiveMethod.length; i++) {
+                     if (receiveMethod[i].value == item.remitMode) {
+                         return receiveMethod[i].meaning;
+                     }
+                 }
+             }
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.remitbankcode"/>',
+             name : 'remitBankCode',
+             align : 'right',
+             width : 60
+         }];
+         
+         var branchCode = {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bankBranchCode"/>',
+             name : 'bankBranchCode',
+             align : 'right',
+             width : 80
+         };
+         if ('TW' == market) {
+        	 suffCol.push(branchCode);
+         }
+         
+         
+         var suffCol2 = [{
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.remitbankacount"/>',
+             name : 'remitBankAccount',
+             align : 'right',
+             width : 120
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.idnumber"/>',
+
+             name : 'idNumber',
+             align : 'right',
+             width : 120
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bankaccountname"/>',
+             name : 'remitBankAccountName',
+             width : 100
+         },
+         {
+             display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.remitDate"/>',
+             name : 'remitDate',
+             width : 120
+         },
+         {
+        	 display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.remitflag"/>',
+        	 name : 'remitFlag',
+        	 width : 80,
+        	 render: function(item) {
+                 for (var i = 0; i < bonusPaymentStatus.length; i++) {
+                     if (bonusPaymentStatus[i].value == item.remitFlag) {
+                         return bonusPaymentStatus[i].meaning;
+                     }
+                 }
+             }
+         },
+         {
+        	 display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.processmode"/>',
+        	 name : 'processMode',
+        	 width : 80,
+        	 render: function(item) {
+                 for (var i = 0; i < processMode.length; i++) {
+                     if (processMode[i].value == item.processMode) {
+                         return processMode[i].meaning;
+                     }
+                 }
+             }
+         },
+         {
+             display : '<@spring.message "sys.hand.common.comment"/>',
+             name : 'comments',
+             align : 'left',
+             textField:'comments',
+             valueField:'comments',
+             /* readonly : true, 
+             */
+             editor: {
+					type: 'popup',
+					onButtonClick : editComments,
+					cancelable : false
+				},
+             width : 100
+         }
+     ];
+         return columns.concat(suffCol.concat(suffCol2));
+    }
+    
+    
+    var editor;
+    function editComments() {
+    	editor = this;
+    	if (!lovEditorComments) {
+    		window['bonus_comments'] = $("#bonus_comments").ligerForm({
+    			prefixID:'bonus_comments_',
+	            fields : [{
+	            	display : '<@spring.message "sys.hand.common.comment"/>',
+	                name : "comments",
+	                newline: true,
+	                type : "textarea",
+	                validate:{
+	                    stringMaxLength: 200
+	                }
+	            }]
+    		});
+    		lovEditorComments = $.ligerDialog.open({
+	               height:200,
+	               width: 350,
+	               allowClose:false,
+	               title : '<@spring.message "sys.hand.common.comment"/>',
+	               target: $("#bonus_comments"),
+	               buttons: [{
+	                   text: '<@spring.message "sys.hand.btn.save"/>',
+	                   onclick: function(item, dialog) {
+	                	   if(Hap.validateForm(bonus_comments)){
+	                		   var comments = bonus_comments.getData().comments;
+	                		   var bonusId = d_bm_011_grid.editor.editParm.record.bonusId;
+	                		   $.ajax({
+		        					url: "${base.contextPath}/bm/bonusfinal/updatecomments",
+		        					type:"POST",
+		        					dataType:"json",
+		        					data : {
+		        						bonusId : bonusId,
+		        						comments : comments
+		        					} ,
+		        		            success : function(data) {
+		        		            	if (data.success) {
+		        		            		dialog.hide();
+		        		            		$.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>');
+		        		            		editor.setValue(comments);
+                                  			editor.setText(comments);
+		        		            		/* d_bm_011_grid.updateRow(d_bm_011_grid.editor.editParm.record,{comments:comments});
+		        		            		d_bm_011_grid.reload(); */
+		        		            	}
+		        		            },
+		        		            error : function() {
+		        		                alert("error");
+		        		            }
+		        				});
+	                		    clearTextArea();
+// 	                		    Hap.gridQuery({
+//      			            		form : d_bm_011_form,
+//      			                	grid : d_bm_011_grid
+//      			           	    });
+       		            	    
+	                	   }
+	                   }
+	               },
+	               {
+	                   text: '<@spring.message "sys.hand.btn.cancel"/>',
+	                   onclick: function(item, dialog) {
+	                	   clearTextArea();
+	                       dialog.hide();
+	                   }
+	               }],
+	           });
+    	}
+    	setTextArea();
+    	lovEditorComments.show();
+    }
+    
+    function clearTextArea(){
+    	bonus_comments.setData({
+    		comments:""
+		})
+		   
+	}
+    
+    function setTextArea() {
+    	var comments = d_bm_011_grid.editor.editParm.record.comments;
+    	bonus_comments.setData({
+    		comments: comments
+		})
+    }
+
+    
+    var lovEditorWin ;
+	function downLoadFile(){
+		if(!lovEditorWin){
+			   window['bonus_type_grid'] = $("#bonus_type_grid").ligerForm({
+		            prefixID:'bonus_type_grid_',
+		            fields : [{
+		                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonustype"/>',
+		                name : "bonusType",
+		                newline: false,
+		                type : "select",
+		                options : {
+		                    valueField : 'value',
+		                    textField : 'meaning',
+		                    data : bonusType
+		                },
+		                validate:{
+		                    required: true
+		                }
+		            },{
+			            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonusperiod"/>',
+			            name : "periodId",
+			            newline: false,
+			            type : 'select',
+			            options : {
+			                valueField : 'periodId',
+			                textField : 'periodName',
+			                url : '${base.contextPath}/bm/bonusfinal/getPeriod?marketId='+marketId
+			            },
+			            validate:{
+		                    required: true
+		                }
+			        }]  
+		        });
+			   
+	           lovEditorWin = $.ligerDialog.open({
+	               height:160,
+	               width: 350,
+	               allowClose:false,
+	               title : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.createfile"/>',
+	               target: $("#bonus_type_grid"),
+	               buttons: [{
+	                   text: '<@spring.message "type.com.lkkhpg.dsis.common.order.download"/>',
+	                   onclick: function(item, dialog) {
+	                	   if(Hap.validateForm(bonus_type_grid)){
+	                		   var id = bonus_type_grid.getData().periodId;
+	                		   var type = bonus_type_grid.getData().bonusType;
+	                		   $.ajax({
+		        					url: "${base.contextPath}/bm/downfile/checkempty",
+		        					type:"POST",
+		        					dataType:"json",
+		        					data : {
+		        						periodId : id,
+		        						bonusType : type,
+		        						marketId : marketId
+		        					} ,
+		        					
+		        		            success : function(data) {
+		        		            	if(data.rows[0] == 'empty'){
+		        		            		$.ligerDialog.error('<@spring.message "msg.error.bonus.final.record.empty"/>');
+		        		            		dialog.hide();
+		        		            		clearForm();
+		        		            	} else if (data.rows[0] == 'error') {
+		        		            		$.ligerDialog.error('<@spring.message "msg.error.bonus.final.record.no.lock"/>');
+		        		            		dialog.hide();
+		        		            		clearForm();
+		        		            	} else if (data.rows[0] == 'success'){
+		        		            		dialog.hide();
+		    	                		    var url ="${base.contextPath}/bm/bonusfinal/download?periodId=" + id +"&bonusType="+ type + "&marketId=" + marketId;
+		    	    						$("#download_form").attr("action",url).submit();
+		    	                		   	clearForm();
+		        		            	}
+		        		            },
+		        		            error : function() {
+		        		                alert("error");
+		        		            }
+		        				});
+	                	   }
+	                   }
+	               },
+	               {
+	                   text: '<@spring.message "sys.hand.btn.cancel"/>',
+	                   onclick: function(item, dialog) {
+	                	   clearForm();
+	                       dialog.hide();
+	                   }
+	               }],
+	           });
+	       }
+	       lovEditorWin.show();
+	}
+    
+	function clearForm(){
+		   bonus_type_grid.setData({
+			   bonusType:"",
+			   periodId:""
+		   })
+		   
+	}
+	
+	var lovBonusPayFail;
+	function payFail(){
+		if(!lovBonusPayFail){
+			window['bonus_process_mode'] = $("#bonus_process_mode").ligerForm({
+				prefixID:'bonus_process_mode_',
+				fields : [{
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.failreason"/>',
+	                name : "processMode",
+	                newline: false,
+	                type : "select",
+	                options : {
+	                    valueField : 'value',
+	                    textField : 'meaning',
+	                    data : processModeFail
+	                },
+	                validate:{
+	                    required: true
+	                }
+	            }]
+			});
+			
+			lovBonusPayFail = $.ligerDialog.open({
+				height:120,
+	            width: 350,
+	            allowClose:false,
+	            title : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.failreason"/>',
+	            target: $("#bonus_process_mode"),
+	            buttons: [{
+	                   text: '<@spring.message "sys.hand.btn.ok"/>',
+	                   onclick: function(item, dialog) {
+	                	   if(Hap.validateForm(bonus_process_mode)){
+	                		   dialog.hide();
+	                		   var row = d_bm_011_grid.getSelectedRow();
+	                		   var processDate = bonus_process_mode.getData().processMode;
+                               /* if (!row) { $.ligerDialog.error('<@spring.message "msg.error.bm.finalbonus.choose_one"/>'); return; } */
+                               row.processMode = processDate;
+                               /* $.ligerDialog.confirm('<@spring.message "msg.confirm.bm.finalbonus.payfail"/>', function (yes){
+                       			if(yes){ */
+                       				Hap.showLoading();
+                       				$.ajax({
+      		        					url: "${base.contextPath}/bm/payfail",
+      		        					type:"POST",
+      		        					dataType:"json",
+      		        					data : JSON2.stringify(row) ,
+      		        					contentType:"application/json",
+      		        		            success : function(data) {
+      		        		            	Hap.hideLoading();
+      		        		            	if(data.rows[0] == 'error'){
+      		        		            		$.ligerDialog.error('<@spring.message "msg.error.bm.finalbonus.conditionerror"/>');
+      		        		            	} else if (data.rows[0] == 'error1') {
+      		        		            		$.ligerDialog.error('<@spring.message "msg.error.bm.finalbonus.bank_refund"/>');
+      		        		            	} else if (data.rows[0] == 'success') {
+      		        		            		$.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>');
+      		        		            		Hap.gridQuery({
+      		        			                     form : d_bm_011_form,
+      		        			                     grid : d_bm_011_grid
+      		        			                 })
+      		        		            	}
+      		        		            },
+      		        		            error : function() {
+      		        		                alert("error");
+      		        		            }
+      		        				});
+                       				clearFormProcess();
+                       			/* }
+                       		  }); */
+	                	   }
+	                   }
+	               },
+	               {
+	                   text: '<@spring.message "sys.hand.btn.cancel"/>',
+	                   onclick: function(item, dialog) {
+	                	   clearFormProcess();
+	                       dialog.hide();
+	                   }
+	               }]
+			});
+		}
+		lovBonusPayFail.show();
+	}
+	
+	function clearFormProcess(){
+		bonus_process_mode.setData({
+			   processMode:""
+		   })
+	}
+	
+	function reissue(){
+		var row = d_bm_011_grid.getSelectedRow();
+        if (!row) { $.ligerDialog.error('<@spring.message "msg.error.bm.finalbonus.choose_one"/>'); return; }
+        $.ligerDialog.confirm('<@spring.message "msg.confirm.bm.finalbonus.reissue"/>', function (yes){
+			if(yes){
+				Hap.showLoading();
+				$.ajax({
+					url: "${base.contextPath}/bm/bonusfinal/reissue",
+					type:"POST",
+					dataType:"json",
+					data : JSON2.stringify(row) ,
+					contentType:"application/json",
+		            success : function(data) {
+		            	Hap.hideLoading();
+		            	if(data.rows[0] == 'error'){
+		            		$.ligerDialog.error('<@spring.message "msg.confirm.bm.finalbonus.reissue.market_error"/>');
+		            	} else if (data.rows[0] == 'error1') {
+		            		$.ligerDialog.error('<@spring.message "msg.confirm.bm.finalbonus.reissue.data_error"/>');
+		            	} else if (data.rows[0] == 'success'){
+		            		$.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>');
+		            		Hap.gridQuery({
+			                     form : d_bm_011_form,
+			                     grid : d_bm_011_grid
+			                 })
+		            	}
+		            },
+		            error : function() {
+		                alert("error");
+		            }
+				});
+			}
+		});
+	}
+	
+	jQuery.validator.addMethod("lessSysDate", function(value, element) {
+		   var sysDate = new Date();
+		   var remitDate = new Date(value);
+		   var toDate = new Date(sysDate.getFullYear()+'/'+(sysDate.getMonth()+1)+"/"+sysDate.getDate());
+	       return remitDate -toDate >= 0 ;
+	   }, '<@spring.message "msg.hand.warning.bonusrelease.lesssysdate"/>');
+	var lovBonusPay;
+	function bonusPay(){
+		if (!lovBonusPay) {
+			window['bonus_pay_form'] = $("#bonus_pay_form").ligerForm({
+	            prefixID:'bonus_pay_form',
+	            fields : [{
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonustype"/>',
+	                name : "bonusType",
+	                newline: false,
+	                type : "select",
+	                options : {
+	                    valueField : 'value',
+	                    textField : 'meaning',
+	                    data : bonusType
+	                },
+	                validate:{
+	                    required: true
+	                },
+	                editor : {
+						onSelected : function(value){
+							if (null != value && "" != value) {
+								showPeriod2(value);	
+							}
+						}	
+					}
+	            },{
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusrelease.remitdate"/>',
+                    name : "remitDate",
+                    type : "date",
+                    validate:{
+                        required: true,
+                        lessSysDate :true
+                    }
+                },
+	            {
+	            	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.period"/>',
+	                name : "periodId",
+	                newline: true,
+	                type : "text",
+	                readonly : true
+	            }]  
+	        });
+			
+			lovBonusPay = $.ligerDialog.open({
+	               height:180,
+	               width: 350,
+	               allowClose:false,
+	               title : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.pay"/>',
+	               target: $("#bonus_pay_form"),
+	               buttons: [{
+	                   text: '<@spring.message "sys.hand.btn.ok"/>',
+	                   onclick: function(item, dialog) {
+	                	   var obj = bonus_pay_form.getData();
+	                       obj.marketId = marketId.toString();
+	                	   if(Hap.validateForm(bonus_pay_form)){
+	                		   dialog.hide();
+	                		   Hap.showLoading();
+	                		   var options1 = {
+	                	               url:"${base.contextPath}/bm/bonusfinal/pay",
+	                	               contentType: "application/json",
+	                	               data:obj,
+	                	               success:function(data){
+	                	            	   Hap.hideLoading();
+	                	            	   $.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>');
+            	                    	   Hap.gridQuery({
+            	                               form : d_bm_011_form,
+            	                               grid : d_bm_011_grid
+            	                           })
+	                	               }
+	                	       }
+	                	       Hap.ajax(options1); 
+	                		   clearForm2();
+	                	   }
+	                   }
+	               },
+	               {
+	                   text: '<@spring.message "sys.hand.btn.cancel"/>',
+	                   onclick: function(item, dialog) {
+	                	   clearForm2();
+	                       dialog.hide();
+	                   }
+	               }],
+	           });
+		}
+		lovBonusPay.show();
+	}
+	
+	function showPeriod2(value){
+		   bonus_pay_form.setData({
+				periodId : ""
+		   });
+		   $.ajax({
+				url: "${base.contextPath}/bm/bonustype/period",
+				type:"POST",
+				dataType:"json",
+				data: {
+					bonusType : value,
+					queryType : 'pay',
+					marketId: marketId
+				} ,
+	            success : function(data) {
+	            	if (data.total > 0) {
+	            		bonus_pay_form.setData({
+	            			periodId : data.rows[0].periodName
+	            		});
+	            	}
+	            },
+	            error : function() {
+	               alert("error");
+	            }
+			});
+	   }
+	
+	function clearForm2(){
+		bonus_pay_form.setData({
+			   bonusType:"",
+			   remitDate:"",
+			   periodId:""
+		   })
+	}
+	
+	var lovPayUnlock;
+	function unlockBonus() {
+		if (!lovPayUnlock) {
+			window['bonus_pay_unlock'] = $("#bonus_pay_unlock").ligerForm({
+	            prefixID:'bonus_pay_unlock',
+	            fields : [{
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.bonustype"/>',
+	                name : "bonusType",
+	                newline: false,
+	                type : "select",
+	                options : {
+	                    valueField : 'value',
+	                    textField : 'meaning',
+	                    data : bonusType
+	                },
+	                validate:{
+	                    required: true
+	                },
+	                editor : {
+						onSelected : function(value){
+							if (null != value && "" != value) {
+								showPeriod(value);	
+							}
+						}	
+					}
+	            },
+	            {
+	            	display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.period"/>',
+	                name : "periodId",
+	                newline: true,
+	                type : "text",
+	                readonly : true
+	            }]  
+	        });
+			
+			lovPayUnlock = $.ligerDialog.open({
+	               height:150,
+	               width: 350,
+	               allowClose:false,
+	               title : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.unlock"/>',
+	               target: $("#bonus_pay_unlock"),
+	               buttons: [{
+	                   text: '<@spring.message "sys.hand.btn.ok"/>',
+	                   onclick: function(item, dialog) {
+	                	   var obj = bonus_pay_unlock.getData();
+	                       obj.marketId = marketId.toString();
+	                	   if(Hap.validateForm(bonus_pay_unlock)){
+	                		   $.ligerDialog.confirm('<@spring.message "msg.bm_unlock_confirm"/>', function (yes){
+	                				if(yes){
+	                					dialog.hide();
+	                					Hap.showLoading();
+	     	                		    var options1 = {
+	     	                	               url:"${base.contextPath}/bm/bonusfinal/unlock",
+	     	                	               contentType: "application/json",
+	     	                	               data:obj,
+	     	                	               success:function(data){
+	     	                	            	   Hap.hideLoading();
+	     	                	            	   $.ligerDialog.success('<@spring.message "sys.hand.tip.success"/>');
+	     	         	                    	   Hap.gridQuery({
+	     	         	                               form : d_bm_011_form,
+	     	         	                               grid : d_bm_011_grid
+	     	         	                           })
+	     	                	               }
+	     	                	         }
+	     	                	         Hap.ajax(options1); 
+	     	                		     clearForm3();	
+	                				}
+	                		   });
+	                	   }
+	                   }
+	               },
+	               {
+	                   text: '<@spring.message "sys.hand.btn.cancel"/>',
+	                   onclick: function(item, dialog) {
+	                	   clearForm3();
+	                       dialog.hide();
+	                   }
+	               }],
+	           });
+		}
+		lovPayUnlock.show();
+	}
+	
+	function showPeriod(value){
+		   bonus_pay_unlock.setData({
+				periodId : ""
+		   });
+		   $.ajax({
+				url: "${base.contextPath}/bm/bonustype/period",
+				type:"POST",
+				dataType:"json",
+				data: {
+					bonusType : value,
+					queryType : 'payBack',
+					marketId : marketId
+				} ,
+	            success : function(data) {
+	            	if (data.total > 0) {
+	            		bonus_pay_unlock.setData({
+	            			periodId : data.rows[0].periodName
+	            		});
+	            	}
+	            },
+	            error : function() {
+	               alert("error");
+	            }
+			});
+	}
+	
+	function clearForm3(){
+		bonus_pay_unlock.setData({
+			   bonusType:"",
+			   periodId: ""
+		   })
+	}
+    
+   $(function(){
+	   marketId = ${RequestParameters.marketId!_marketId};
+	   for (var i = 0; i < processMode.length; i++) {
+		   if (processMode[i].value == 'SDSB' || processMode[i].value == 'YHTK') {
+			   processModeFail.push(processMode[i]);
+		   }
+	   }
+	   var marketCode = '';
+       $.ajax({
+                   type: "POST",
+                   dataType: "json",
+                   /* contentType: "application/json", */
+                   url: "${base.contextPath}/bm/release/market",
+                   data: {
+       			       marketId : marketId
+       			   } ,
+                   success: function(data) {
+                        marketCode = data.code;
+                        intiForm();
+                        /* liger.get("marketId").setValue(_marketId);
+                        liger.get("marketId").setText(_marketName); */
+                 	    initGrid(initColums(marketCode));
+                 	    <#if RequestParameters.bonusId ?exists> 
+            		   	var bonusId = ${RequestParameters.bonusId};
+            		    $.ajax({
+                           type: "POST",
+                           dataType: "json",
+                           contentType: "application/json",
+                           url: "${base.contextPath}/bm/bonusfinal/query?bonusId="+bonusId + '&marketId=' +marketId,
+                           /* dataType:"json",
+               			   data: {
+               			       bonusId : bonusId,
+               				   marketId : marketId
+               			   } , */
+                           success: function(data) {
+
+                                d_bm_011_grid.addRows(data.rows);
+                                liger.get("marketId").setValue(marketId);
+            	               }
+                           });
+            	        </#if>
+                   }
+               });
+   })
+</script>
+</html>

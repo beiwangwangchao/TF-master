@@ -1,0 +1,118 @@
+<#--
+ * description: 接口模拟器查询界面
+ * version: 1.0
+ * author: linyuheng
+ * Copyright LKK Health Products Group Limited.  
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?autoRespFlag=SYS.YES_NO" type="text/javascript"></script>
+<body style="padding: 10px; overflow: hidden;">
+    <div id="isg_emulator_grid"></div>
+    <script type="text/javascript">
+    $(function() {
+        window['isg_emulator_grid'] = $("#isg_emulator_grid").ligerGrid({
+            columns : [ 
+                        
+                {
+                    type : 'text',
+                    display : 'serviceName',
+                    name : 'serviceName',
+                    align : 'middle',
+                    width : 100
+                },
+                {
+                    type : 'text',
+                    display : 'methodName',
+                    name : 'methodName',
+                    align : 'middle',
+                    width : 200
+                } ,
+                {
+                    type : 'text',
+                    display : 'description',
+                    align : 'middle',
+                    width : 320,
+                    name : 'description'
+                },
+                {
+                    type : 'text',
+                    display : 'request',
+                    align : 'middle',
+                    width : 90,
+                    name : 'requestData'
+                },
+                {
+                    type : 'text',
+                    display : 'response',
+                    align : 'middle',
+                    width : 450,
+                    name : 'response',
+                    editor:{
+                    	type: 'text'
+                    }
+                },
+                {
+                    display : 'autoResp',
+                    align : 'middle',
+                    width : 100,
+                    name : 'autoResp',
+                    type: 'select',
+                    editor: {
+                        type: 'select',
+                        valueField: 'value',
+                        textField: 'meaning',
+                        data: autoRespFlag
+                    },
+                    render: function(item) {
+                    	for (var i in autoRespFlag) {
+                            if (autoRespFlag[i].value == item.autoResp) {
+                                return autoRespFlag[i].meaning;
+                            }
+                        }
+                        return '';
+                    }
+                }],
+            url : '${base.contextPath}/distributors/queryIsgEmulator',
+            delayLoad  : false,
+             toolbar : {
+                items : [{
+                    text : '<@spring.message "sys.hand.btn.save"/>',
+                    click : function() {
+                            $.ligerDialog.waitting('<@spring.message "sys.hand.tip.processing"/>');
+                            $.ajax({
+                                type:"POST",
+                                dataType:"json",
+                                contentType: "application/json",
+                                url: '${base.contextPath}/distributors/updateIsgEmulator',
+                                data: JSON2.stringify(isg_emulator_grid.getSelectedRows()),
+                                success : function(data) {
+                                    if(data.success){
+                                    	isg_emulator_grid.reload();
+                                        $.ligerDialog.success('<@spring.message "msg.info.sys.save_successful"/>');
+                                        
+                                    }else{
+                                        $.ligerDialog.error('<@spring.message "msg.info.sys.save_false"/>');
+                                    }
+                                    
+                                },
+                                error : function(data) {
+                                    $.ligerDialog.error('<@spring.message "msg.info.sys.save_false"/>');
+                                }
+                            })
+                            $.ligerDialog.closeWaitting();
+                    },
+                    icon : 'save'
+                }]
+            }, 
+            width : '99%',
+            height : '98%',
+            checkbox : true,
+            enabledEdit: true,
+            pageSizeOptions:[10,20,30,40,50],
+            pageSize:'30'
+        });
+    });
+    </script>
+</body>
+</html>

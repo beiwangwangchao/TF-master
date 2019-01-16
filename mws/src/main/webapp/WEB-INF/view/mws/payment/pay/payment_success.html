@@ -1,0 +1,108 @@
+<#include "/mws/include/header.html">
+<!-- ========== MENU END ========== -->
+<!-- ========== CONTENT START ========== -->
+<style>
+    .auto-height {
+        height:auto !important;
+        height:320px;
+        min-height:320px;
+    }
+</style>
+    <script>
+        //跟踪订单
+
+        function redirectOrder(){
+//            var orderNumber = $("#orderNumber").text();
+//            console.log(orderNumber);
+//            debugger;
+//            $.ajax({
+//                type : "POST",
+//                dataType : "json",
+//                url : "${base.contextPath}/account/orderNumber/selectHeaderId",
+//                data : {orderNumber:orderNumber },
+//                success : function(data) {
+//                    if(data.success){
+//
+//                    }else{
+//                        $.dialog.error("<@spring.message 'mws.dialog.error'/>", data.message, function(){location.reload(true);});
+//                    }
+//                }
+//            });
+//            console.log($("#sourceKey").text())
+//            var hid ;
+//             $("#sourceKey1").text()=='61001922';
+//            console.log("======="+hid);
+         //   if (hid == null ){
+//                window.location.href = "${base.contextPath}/account/account-order-history.html?headerId=" + $("#sourceKey").text();
+//            }
+//            else {
+//                window.location.href = "${base.contextPath}/account/account-order-history.html?headerId=" + $("#sourceKey1").text();
+//            }
+            window.location.href = "${base.contextPath}/account/account-order-history.html?headerId=" + $("#sourceKey").text();
+        }
+    </script>
+<body >
+<section id="content" >
+    <div class="container">
+        <#if sourceType??>
+            <span style="display: none;" id="sourceType">${sourceType}</span>
+        </#if>
+        <!--<#if headerId??>-->
+            <!--<span style="display: none;" id="sourceKey">${headerId}</span>-->
+        <!--</#if>-->
+        <#if sourceKey??>
+            <span style="display: none;" id="sourceKey">${sourceKey}</span>
+        </#if>
+
+        <#if marketCode??>
+            <span style="display: none;" id="marketCode">${marketCode}</span>
+        </#if>
+        <#if orderStatus??>
+            <span style="display: none;" id="orderStatus">${orderStatus}</span>
+        </#if>
+        <div class="row auto-height" style="margin-top: 50px;">
+            <div class="col-md-2 col-sm-2" style="margin-top: 30px">
+                <div class="col-md-offset-6"><img src="${base.contextPath}/resources/img/u100.png"></div>
+            </div>
+            <div class="col-md-6 col-sm-6" style="margin-top: 35px">
+                <div class="row">
+                    <div class="col-sm-6 form-group" style="font-weight: bolder;font-size:20px;color: black">
+                        支付成功
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+                        <label><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>:</label>
+                        <span id="orderNumber">${orderNumber}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+                        <label>实付款:</label>
+                        <#if actrualPayAmt??>
+                            <span style="color: red;" id="actrualPayAmt">${actrualPayAmt?string('0.00')}</span>
+                        </#if>
+                    </div>
+                </div>
+
+                <div class="row" >
+                    <div class="col-sm-3 form-group" style="font-weight: bolder;font-size:20px;color: black">
+                        你可以
+                    </div>
+
+                    <div class="col-sm-9 form-group" style="color: black;border-right: 1px solid #E8E8E8;height: 24px;">
+                        <div style='font-size: 20px;' class="col-md-6"><a href='${base.contextPath}/index.html'> 返回继续购物 </a></div>
+                        <div style='font-size: 20px;' class="col-md-6"><a href='#' onclick="redirectOrder()"> 查看交易详情</a></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+<!-- ========== CONTENT END ========== -->
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

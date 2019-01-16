@@ -1,0 +1,655 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.admin.integration.gds.mapper.IsgMemberSyncMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberSync" >
+    <id column="INTERFACE_ID" property="interfaceId" jdbcType="DECIMAL" />
+    <result column="OPERATION_TYPE" property="operationType" jdbcType="VARCHAR" />
+    <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+    <result column="DEALER_TYPE" property="dealerType" jdbcType="VARCHAR" />
+    <result column="DEALER_SUB_TYPE" property="dealerSubType" jdbcType="VARCHAR" />
+    <result column="DEALER_POST_CODE" property="dealerPostCode" jdbcType="VARCHAR" />
+    <result column="SPONSOR_NO" property="sponsorNo" jdbcType="VARCHAR" />
+    <result column="DEALER_NAME" property="dealerName" jdbcType="VARCHAR" />
+    <result column="REGISTER_SPOUSE" property="registerSpouse" jdbcType="VARCHAR" />
+    <result column="TYPE_EFFECTIVE_DATE" property="typeEffectiveDate" jdbcType="TIMESTAMP" />
+    <result column="TYPE_INACTIVE_DATE" property="typeInactiveDate" jdbcType="TIMESTAMP" />
+    <result column="POST_EFFECTIVE_DATE" property="postEffectiveDate" jdbcType="TIMESTAMP" />
+    <result column="POST_INACTIVE_DATE" property="postInactiveDate" jdbcType="TIMESTAMP" />
+    <result column="SALE_ORG_CODE" property="saleOrgCode" jdbcType="VARCHAR" />
+    <result column="SALE_BRANCH_NO" property="saleBranchNo" jdbcType="VARCHAR" />
+    <result column="SALE_ZONE_NO" property="saleZoneNo" jdbcType="VARCHAR" />
+    <result column="APP_PERIOD" property="appPeriod" jdbcType="VARCHAR" />
+    <result column="APP_FIRST_SO_NO" property="appFirstSoNo" jdbcType="VARCHAR" />
+    <result column="APP_FOR_INTERNATIONAL" property="appForInternational" jdbcType="VARCHAR" />
+    <result column="SEX" property="sex" jdbcType="VARCHAR" />
+    <result column="ENGLISH_NAME" property="englishName" jdbcType="VARCHAR" />
+    <result column="COMMENTS" property="comments" jdbcType="VARCHAR" />
+    <result column="OP_LOCK_STATUS" property="opLockStatus" jdbcType="VARCHAR" />
+    <result column="TAX_CUST_CODE" property="taxCustCode" jdbcType="VARCHAR" />
+    <result column="ADVISE_NO" property="adviseNo" jdbcType="VARCHAR" />
+    <result column="PROCESS_STATUS" property="processStatus" jdbcType="VARCHAR" />
+    <result column="PROCESS_DATE" property="processDate" jdbcType="TIMESTAMP" />
+    <result column="PROCESS_MESSAGE" property="processMessage" jdbcType="VARCHAR" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    INTERFACE_ID, OPERATION_TYPE, DEALER_NO, DEALER_TYPE, DEALER_SUB_TYPE, DEALER_POST_CODE, 
+    SPONSOR_NO, DEALER_NAME, REGISTER_SPOUSE, TYPE_EFFECTIVE_DATE, TYPE_INACTIVE_DATE, 
+    POST_EFFECTIVE_DATE, POST_INACTIVE_DATE, SALE_ORG_CODE, SALE_BRANCH_NO, SALE_ZONE_NO, 
+    APP_PERIOD, APP_FIRST_SO_NO, APP_FOR_INTERNATIONAL, SEX, ENGLISH_NAME, COMMENTS, 
+    OP_LOCK_STATUS, TAX_CUST_CODE, ADVISE_NO, PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from ISG_MEMBER_SYNC
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from ISG_MEMBER_SYNC
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberSync" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      select ISG_MEMBER_SYNC_S.nextval from dual
+    </selectKey>
+    insert into ISG_MEMBER_SYNC (INTERFACE_ID, OPERATION_TYPE, DEALER_NO, 
+      DEALER_TYPE, DEALER_SUB_TYPE, DEALER_POST_CODE, 
+      SPONSOR_NO, DEALER_NAME, REGISTER_SPOUSE, 
+      TYPE_EFFECTIVE_DATE, TYPE_INACTIVE_DATE, 
+      POST_EFFECTIVE_DATE, POST_INACTIVE_DATE, 
+      SALE_ORG_CODE, SALE_BRANCH_NO, SALE_ZONE_NO, 
+      APP_PERIOD, APP_FIRST_SO_NO, APP_FOR_INTERNATIONAL, 
+      SEX, ENGLISH_NAME, COMMENTS, 
+      OP_LOCK_STATUS, TAX_CUST_CODE, ADVISE_NO, 
+      PROCESS_STATUS, PROCESS_DATE, PROCESS_MESSAGE, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15)
+    values (#{interfaceId,jdbcType=DECIMAL}, #{operationType,jdbcType=VARCHAR}, #{dealerNo,jdbcType=VARCHAR}, 
+      #{dealerType,jdbcType=VARCHAR}, #{dealerSubType,jdbcType=VARCHAR}, #{dealerPostCode,jdbcType=VARCHAR}, 
+      #{sponsorNo,jdbcType=VARCHAR}, #{dealerName,jdbcType=VARCHAR}, #{registerSpouse,jdbcType=VARCHAR}, 
+      #{typeEffectiveDate,jdbcType=TIMESTAMP}, #{typeInactiveDate,jdbcType=TIMESTAMP}, 
+      #{postEffectiveDate,jdbcType=TIMESTAMP}, #{postInactiveDate,jdbcType=TIMESTAMP}, 
+      #{saleOrgCode,jdbcType=VARCHAR}, #{saleBranchNo,jdbcType=VARCHAR}, #{saleZoneNo,jdbcType=VARCHAR}, 
+      #{appPeriod,jdbcType=VARCHAR}, #{appFirstSoNo,jdbcType=VARCHAR}, #{appForInternational,jdbcType=VARCHAR}, 
+      #{sex,jdbcType=VARCHAR}, #{englishName,jdbcType=VARCHAR}, #{comments,jdbcType=VARCHAR}, 
+      #{opLockStatus,jdbcType=VARCHAR}, #{taxCustCode,jdbcType=VARCHAR}, #{adviseNo,jdbcType=VARCHAR}, 
+      #{processStatus,jdbcType=VARCHAR}, current_timestamp, #{processMessage,jdbcType=VARCHAR}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, #{creationDate,jdbcType=TIMESTAMP}, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, #{lastUpdateDate,jdbcType=TIMESTAMP}, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberSync" >
+    <selectKey resultType="java.lang.Long" keyProperty="interfaceId" order="BEFORE" >
+      select ISG_MEMBER_SYNC_S.nextval from dual
+    </selectKey>
+    insert into ISG_MEMBER_SYNC
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      INTERFACE_ID,
+      <if test="operationType != null" >
+        OPERATION_TYPE,
+      </if>
+      <if test="dealerNo != null" >
+        DEALER_NO,
+      </if>
+      <if test="dealerType != null" >
+        DEALER_TYPE,
+      </if>
+      <if test="dealerSubType != null" >
+        DEALER_SUB_TYPE,
+      </if>
+      <if test="dealerPostCode != null" >
+        DEALER_POST_CODE,
+      </if>
+      <if test="sponsorNo != null" >
+        SPONSOR_NO,
+      </if>
+      <if test="dealerName != null" >
+        DEALER_NAME,
+      </if>
+      <if test="registerSpouse != null" >
+        REGISTER_SPOUSE,
+      </if>
+      <if test="typeEffectiveDate != null" >
+        TYPE_EFFECTIVE_DATE,
+      </if>
+      <if test="typeInactiveDate != null" >
+        TYPE_INACTIVE_DATE,
+      </if>
+      <if test="postEffectiveDate != null" >
+        POST_EFFECTIVE_DATE,
+      </if>
+      <if test="postInactiveDate != null" >
+        POST_INACTIVE_DATE,
+      </if>
+      <if test="saleOrgCode != null" >
+        SALE_ORG_CODE,
+      </if>
+      <if test="saleBranchNo != null" >
+        SALE_BRANCH_NO,
+      </if>
+      <if test="saleZoneNo != null" >
+        SALE_ZONE_NO,
+      </if>
+      <if test="appPeriod != null" >
+        APP_PERIOD,
+      </if>
+      <if test="appFirstSoNo != null" >
+        APP_FIRST_SO_NO,
+      </if>
+      <if test="appForInternational != null" >
+        APP_FOR_INTERNATIONAL,
+      </if>
+      <if test="sex != null" >
+        SEX,
+      </if>
+      <if test="englishName != null" >
+        ENGLISH_NAME,
+      </if>
+      <if test="comments != null" >
+        COMMENTS,
+      </if>
+      <if test="opLockStatus != null" >
+        OP_LOCK_STATUS,
+      </if>
+      <if test="taxCustCode != null" >
+        TAX_CUST_CODE,
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO,
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS,
+      </if>
+        PROCESS_DATE,
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{interfaceId,jdbcType=DECIMAL},
+      <if test="operationType != null" >
+        #{operationType,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerNo != null" >
+        #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerType != null" >
+        #{dealerType,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerSubType != null" >
+        #{dealerSubType,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerPostCode != null" >
+        #{dealerPostCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sponsorNo != null" >
+        #{sponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerName != null" >
+        #{dealerName,jdbcType=VARCHAR},
+      </if>
+      <if test="registerSpouse != null" >
+        #{registerSpouse,jdbcType=VARCHAR},
+      </if>
+      <if test="typeEffectiveDate != null" >
+        #{typeEffectiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="typeInactiveDate != null" >
+        #{typeInactiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="postEffectiveDate != null" >
+        #{postEffectiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="postInactiveDate != null" >
+        #{postInactiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="saleOrgCode != null" >
+        #{saleOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="saleBranchNo != null" >
+        #{saleBranchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleZoneNo != null" >
+        #{saleZoneNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appPeriod != null" >
+        #{appPeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="appFirstSoNo != null" >
+        #{appFirstSoNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appForInternational != null" >
+        #{appForInternational,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="englishName != null" >
+        #{englishName,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="opLockStatus != null" >
+        #{opLockStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="taxCustCode != null" >
+        #{taxCustCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        #{processStatus,jdbcType=VARCHAR},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="processMessage != null" >
+        #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberSync" >
+    update ISG_MEMBER_SYNC
+    <set >
+      <if test="operationType != null" >
+        OPERATION_TYPE = #{operationType,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerNo != null" >
+        DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerType != null" >
+        DEALER_TYPE = #{dealerType,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerSubType != null" >
+        DEALER_SUB_TYPE = #{dealerSubType,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerPostCode != null" >
+        DEALER_POST_CODE = #{dealerPostCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sponsorNo != null" >
+        SPONSOR_NO = #{sponsorNo,jdbcType=VARCHAR},
+      </if>
+      <if test="dealerName != null" >
+        DEALER_NAME = #{dealerName,jdbcType=VARCHAR},
+      </if>
+      <if test="registerSpouse != null" >
+        REGISTER_SPOUSE = #{registerSpouse,jdbcType=VARCHAR},
+      </if>
+      <if test="typeEffectiveDate != null" >
+        TYPE_EFFECTIVE_DATE = #{typeEffectiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="typeInactiveDate != null" >
+        TYPE_INACTIVE_DATE = #{typeInactiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="postEffectiveDate != null" >
+        POST_EFFECTIVE_DATE = #{postEffectiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="postInactiveDate != null" >
+        POST_INACTIVE_DATE = #{postInactiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="saleOrgCode != null" >
+        SALE_ORG_CODE = #{saleOrgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="saleBranchNo != null" >
+        SALE_BRANCH_NO = #{saleBranchNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleZoneNo != null" >
+        SALE_ZONE_NO = #{saleZoneNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appPeriod != null" >
+        APP_PERIOD = #{appPeriod,jdbcType=VARCHAR},
+      </if>
+      <if test="appFirstSoNo != null" >
+        APP_FIRST_SO_NO = #{appFirstSoNo,jdbcType=VARCHAR},
+      </if>
+      <if test="appForInternational != null" >
+        APP_FOR_INTERNATIONAL = #{appForInternational,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        SEX = #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="englishName != null" >
+        ENGLISH_NAME = #{englishName,jdbcType=VARCHAR},
+      </if>
+      <if test="comments != null" >
+        COMMENTS = #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="opLockStatus != null" >
+        OP_LOCK_STATUS = #{opLockStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="taxCustCode != null" >
+        TAX_CUST_CODE = #{taxCustCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adviseNo != null" >
+        ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processStatus != null" >
+        PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processDate != null" >
+        PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processMessage != null" >
+        PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.admin.integration.gds.dto.IsgMemberSync" >
+    update ISG_MEMBER_SYNC
+    set OPERATION_TYPE = #{operationType,jdbcType=VARCHAR},
+      DEALER_NO = #{dealerNo,jdbcType=VARCHAR},
+      DEALER_TYPE = #{dealerType,jdbcType=VARCHAR},
+      DEALER_SUB_TYPE = #{dealerSubType,jdbcType=VARCHAR},
+      DEALER_POST_CODE = #{dealerPostCode,jdbcType=VARCHAR},
+      SPONSOR_NO = #{sponsorNo,jdbcType=VARCHAR},
+      DEALER_NAME = #{dealerName,jdbcType=VARCHAR},
+      REGISTER_SPOUSE = #{registerSpouse,jdbcType=VARCHAR},
+      TYPE_EFFECTIVE_DATE = #{typeEffectiveDate,jdbcType=TIMESTAMP},
+      TYPE_INACTIVE_DATE = #{typeInactiveDate,jdbcType=TIMESTAMP},
+      POST_EFFECTIVE_DATE = #{postEffectiveDate,jdbcType=TIMESTAMP},
+      POST_INACTIVE_DATE = #{postInactiveDate,jdbcType=TIMESTAMP},
+      SALE_ORG_CODE = #{saleOrgCode,jdbcType=VARCHAR},
+      SALE_BRANCH_NO = #{saleBranchNo,jdbcType=VARCHAR},
+      SALE_ZONE_NO = #{saleZoneNo,jdbcType=VARCHAR},
+      APP_PERIOD = #{appPeriod,jdbcType=VARCHAR},
+      APP_FIRST_SO_NO = #{appFirstSoNo,jdbcType=VARCHAR},
+      APP_FOR_INTERNATIONAL = #{appForInternational,jdbcType=VARCHAR},
+      SEX = #{sex,jdbcType=VARCHAR},
+      ENGLISH_NAME = #{englishName,jdbcType=VARCHAR},
+      COMMENTS = #{comments,jdbcType=VARCHAR},
+      OP_LOCK_STATUS = #{opLockStatus,jdbcType=VARCHAR},
+      TAX_CUST_CODE = #{taxCustCode,jdbcType=VARCHAR},
+      ADVISE_NO = #{adviseNo,jdbcType=VARCHAR},
+      PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR},
+      PROCESS_DATE = #{processDate,jdbcType=TIMESTAMP},
+      PROCESS_MESSAGE = #{processMessage,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where INTERFACE_ID = #{interfaceId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select <include refid="Base_Column_List" />
+      from ISG_MEMBER_SYNC
+    <where>
+        PROCESS_DATE &gt; #{processDateFrom,jdbcType=TIMESTAMP}
+        <if test="requestDateTo != null" >
+            AND PROCESS_DATE &lt; #{processDateTo,jdbcType=TIMESTAMP}
+        </if>
+        <if test="processStatus != null" >
+            AND PROCESS_STATUS = #{processStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="advoiseNo != null" >
+            AND ADVISE_NO = #{advoiseNo,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by interface_id desc
+  </select>
+</mapper>

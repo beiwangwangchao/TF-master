@@ -1,0 +1,435 @@
+<#--
+ * description: 会员审计
+ * version: 1.0
+ * author: shengyang.zhou
+ * .
+ *
+-->
+
+<#include "../../include/head.html">
+
+<body style="padding: 10px; overflow: hidden;">
+<style>
+    .audit_update {
+        height: 30px;
+        width: 100%;
+        background: yellow;
+        text-align: center;
+    }
+
+/*     .audit_insert {
+        color: green;
+    }
+
+    .audit_delete {
+        color: grey;
+        text-decoration: line-through;
+    } */
+</style>
+<form id="member_audit_detail_form"></form>
+<div id="member_audit_detail_grid">
+</div>
+<script>
+
+    function markRender(item, index, value, col) {
+        // TODO: 针对文本的效果,无法体现在空字符串上
+        value = value == undefined ? "" : value;
+        /* if (item.auditTransactionType == 'INSERT') {
+            return "<span class='audit_insert'>" + value + "</span>"
+        } else if (item.auditTransactionType == 'DELETE') {
+            return "<span class='audit_delete'>" + value + "</span>"
+        } */
+        if (!item.__changes || item.__changes.indexOf(col.columnname) < 0)
+            return value;
+        return "<div class='audit_update'>" + value + "</div>";
+    }
+
+    function viewHomeSite(memberId, auditSessionId) {
+	    var pa = [['memberId', memberId],['auditSessionId', auditSessionId]];
+	    var para = $.each(pa,function(i,r){pa[i]=r.join('=')}).join('&');
+        window.popWin_site = $.ligerDialog.open({
+            title : '<@spring.message "sys.hand.common.audit.site"/>',
+            width : 967,
+            height: 500,
+            url   : '${base.contextPath}/mm/audit/mm_member_site_audit.html?' + para
+        });
+    }
+    
+    function viewHomeRelationship(memberId, auditSessionId) {
+        var pa = [['memberId', memberId],['auditSessionId', auditSessionId]];
+        var para = $.each(pa,function(i,r){pa[i]=r.join('=')}).join('&');
+        window.popWin_site = $.ligerDialog.open({
+            title : '<@spring.message "sys.hand.common.audit.relationship"/>',
+            width : 967,
+            height: 500,
+            url   : '${base.contextPath}/mm/audit/mm_member_relationship_audit.html?' + para
+        });
+    }
+        
+    function viewHomeCard(memberId, auditSessionId) {
+        var pa = [['memberId', memberId],['auditSessionId', auditSessionId]];
+        var para = $.each(pa,function(i,r){pa[i]=r.join('=')}).join('&');
+        window.popWin_site = $.ligerDialog.open({
+            title : '<@spring.message "sys.hand.common.audit.card"/>',
+            width : 967,
+            height: 500,
+            url   : '${base.contextPath}/mm/audit/mm_member_card_audit.html?' + para
+        });
+    }
+    
+    window['member_audit_detail_form'] = $("#member_audit_detail_form").ligerForm({
+        fields : [ {
+            type : 'select',
+            label : '<@spring.message "sys.hand.common.audittype"/>',
+            name : 'auditTransactionType',
+            options: {
+                valueField: 'value',
+                textField: 'meaning',
+                data: [{value:'UPDATE',meaning:'UPDATE'},{value:'INSERT',meaning:'INSERT'},{value:'DELETE',meaning:'DELETE'}]
+            },
+        }, {
+            type : 'text',
+            label : '<@spring.message "sys.hand.common.auditby"/>',
+            name : 'auditBy',
+            newline : false
+        }, {
+            type : 'date',
+            label : '<@spring.message "sys.hand.common.audittimestamp"/>',
+            name : 'auditTimestampFrom',
+            options: {
+                format: 'yyyy-MM-dd hh:mm:ss',
+                showTime : true
+            }
+        }, {
+            type : 'date',
+            label : 'To',
+            name : 'auditTimestampTo',
+            newline : false,
+            options: {
+                format: 'yyyy-MM-dd hh:mm:ss',
+                showTime : true
+            }
+        } ],
+        buttons : [ {
+            text : '<@spring.message "sys.hand.btn.query"/>',
+            disabled : false,
+            width : 60,
+            click : function() {
+                    Hap.gridQuery({
+                        form : member_audit_detail_form,
+                        grid : member_audit_detail_grid
+                    })
+            }
+        } ]
+    });
+
+    window['member_audit_detail_grid'] = $("#member_audit_detail_grid").ligerGrid({
+        columns   : [
+            {
+                display: '<@spring.message "sys.hand.common.audittimestamp"/>',
+                name   : 'auditTimestamp',
+                width  : 120,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "sys.hand.common.auditby"/>',
+                name   : 'auditBy',
+                width  : 60,
+                frozen : true
+            },
+            {
+                display: 'Id(test)',
+                name   : 'auditSessionId',
+                width  : 60,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "sys.hand.common.audittype"/>',
+                name   : 'auditTransactionType',
+                width  : 60,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.status"/>',
+                name   : 'status_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.remarks"/>',
+                name   : 'remark',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.crc"/>',
+                name   : 'brNumber',
+                width  : 80,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.gender"/>',
+                name   : 'gender_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.dob"/>',
+                name   : 'dob',
+                width  : 70,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.idtype"/>',
+                name   : 'idType_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.idnumber"/>',
+                name   : 'idNumber',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.nationality"/>',
+                name   : 'nationality_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.country"/>',
+                name   : 'country_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.language"/>',
+                name   : 'language_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.race"/>',
+                name   : 'race_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.education"/>',
+                name   : 'education_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.citizentype"/>',
+                name   : 'citizenType_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.nhitaxexcluded"/>',
+                name   : 'nhiTaxExcluded',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.gstid"/>',
+                name   : 'gstIdNumber',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.adoptin"/>',
+                name   : 'adOptIn_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.sysmsgin"/>',
+                name   : 'sysMsgIn_',
+                width  : 80,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.bonusreceive"/>',
+                name   : 'acceptBonus_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.phoneno"/>',
+                name   : 'phoneNo',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.othphoneno"/>',
+                name   : 'othPhoneNo',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.email"/>',
+                name   : 'email',
+                width  : 140,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberwarninginfo"/>',
+                name   : 'warningMsg',
+                width  : 80,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.tourplaneffectmonth"/>',
+                name   : 'travelPlanMonth',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.englishfirstname"/>',
+                name   : 'englishFirstName',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.englishlastname"/>',
+                name   : 'englishLastName',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.chinesefirstname"/>',
+                name   : 'chineseFirstName',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.chineselastname"/>',
+                name   : 'chineseLastName',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.bonusrcvmethod"/>',
+                name   : 'bonusRcvMethod_',
+                width  : 80,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.areacode"/>',
+                name   : 'areaCode',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.companyenname"/>',
+                name   : 'refCompanyEn',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.homeaddress"/>',
+                name   : 'homeAddress',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.contactaddress"/>',
+                name   : 'ctactAddress',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.bankcode"/>',
+                name   : 'bankName',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.accountnumber"/>',
+                name   : 'accountNumber',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.accountholder"/>',
+                name   : 'accountHolder',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.idnumber"/>',
+                name   : 'accountIdNumber',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.idcopy"/>',
+                name   : 'idCopyV',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.application"/>',
+                name   : 'applicationFormV',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.bankaccountcopy"/>',
+                name   : 'banckAccountCopyV',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.secrecyagreement"/>',
+                name   : 'confidentialityAgreementV',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: 'card_pass',
+                name   : 'cardPassV',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "sys.hand.common.audit.site"/>',
+                name   : 'auditSessionId',
+                width  : 60,
+                render : function (item, idx, value) {
+                    var js = 'viewHomeSite(' + item.memberId + ',"' + item.auditSessionId + '")';
+                    return "<a href='javascript:void(0)' onclick='" + js + "'>View</a>";
+                }
+            },
+            {
+                display: '<@spring.message "sys.hand.common.audit.relationship"/>',
+                name   : 'auditSessionId',
+                width  : 60,
+                render : function (item, idx, value) {
+                    var js = 'viewHomeRelationship(' + item.memberId + ',"' + item.auditSessionId + '")';
+                    return "<a href='javascript:void(0)' onclick='" + js + "'>View</a>";
+                }
+            },
+            {
+                display: '<@spring.message "sys.hand.common.audit.card"/>',
+                name   : 'auditSessionId',
+                width  : 60,
+                render : function (item, idx, value) {
+                    var js = 'viewHomeCard(' + item.memberId + ',"' + item.auditSessionId + '")';
+                    return "<a href='javascript:void(0)' onclick='" + js + "'>View</a>";
+                }
+            }
+        ],
+        url       : '${base.contextPath}/mm/member/audit?memberId=${RequestParameters.memberId!0}',
+        //url       : '${base.contextPath}/mm/member/audit',
+        delayLoad : false,
+        width     : '99%',
+        height    : '98%',
+        rownumbers: true
+    });
+</script>
+</body>
+</html>

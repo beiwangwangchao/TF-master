@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.delivery.mapper.ShippingTierSegMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.delivery.dto.ShippingTierSeg">
+        <id column="TIER_SEG_ID" property="tierSegId" jdbcType="DECIMAL" />
+        <result column="SHIPPING_TIER_ID" property="shippingTierId" jdbcType="DECIMAL" />
+        <result column="COUNTRY_CODE" property="countryCode" jdbcType="VARCHAR" />
+        <result column="STATE_CODE" property="stateCode" jdbcType="VARCHAR" />
+        <result column="CITY_CODE" property="cityCode" jdbcType="VARCHAR" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+        <result column="COUNTRY_NAME" property="countryName" jdbcType="VARCHAR" />
+        <result column="STATE_NAME" property="stateName" jdbcType="VARCHAR" />
+        <result column="CITY_NAME" property="cityName" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        dsts.TIER_SEG_ID, dsts.SHIPPING_TIER_ID, dsts.COUNTRY_CODE, dsts.STATE_CODE, dsts.CITY_CODE,
+        dsts.OBJECT_VERSION_NUMBER,
+        dsts.REQUEST_ID, dsts.PROGRAM_ID, dsts.CREATION_DATE, dsts.CREATED_BY,
+        dsts.LAST_UPDATED_BY,
+        dsts.LAST_UPDATE_DATE,
+        dsts.LAST_UPDATE_LOGIN, dsts.ATTRIBUTE_CATEGORY, dsts.ATTRIBUTE1,
+        dsts.ATTRIBUTE2, dsts.ATTRIBUTE3, dsts.ATTRIBUTE4,
+        dsts.ATTRIBUTE5, dsts.ATTRIBUTE6, dsts.ATTRIBUTE7,
+        dsts.ATTRIBUTE8, dsts.ATTRIBUTE9, dsts.ATTRIBUTE10, dsts.ATTRIBUTE11,
+        dsts.ATTRIBUTE12, dsts.ATTRIBUTE13,
+        dsts.ATTRIBUTE14, dsts.ATTRIBUTE15
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from DM_SHIPPING_TIER_SEG
+        where TIER_SEG_ID = #{tierSegId,jdbcType=DECIMAL}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierSeg">
+        delete from DM_SHIPPING_TIER_SEG
+        where TIER_SEG_ID =
+        #{tierSegId,jdbcType=DECIMAL}
+    </delete>
+   <insert id="insert" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierSeg" >
+    <selectKey resultType="java.lang.Long" keyProperty="tierSegId" order="BEFORE" >
+      SELECT DM_SHIPPING_TIER_SEG_S.NEXTVAL FROM DUAL
+    </selectKey>
+    insert into DM_SHIPPING_TIER_SEG (TIER_SEG_ID, SHIPPING_TIER_ID, COUNTRY_CODE, 
+      STATE_CODE, CITY_CODE, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15)
+    values (#{tierSegId,jdbcType=DECIMAL}, #{shippingTierId,jdbcType=DECIMAL}, #{countryCode,jdbcType=VARCHAR}, 
+      #{stateCode,jdbcType=VARCHAR}, #{cityCode,jdbcType=VARCHAR},
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, current_timestamp,
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, current_timestamp,
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR})
+  </insert>
+
+
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierSeg" >
+    update DM_SHIPPING_TIER_SEG
+    set SHIPPING_TIER_ID = #{shippingTierId,jdbcType=DECIMAL},
+      COUNTRY_CODE = #{countryCode,jdbcType=VARCHAR},
+      STATE_CODE = #{stateCode,jdbcType=VARCHAR},
+      CITY_CODE = #{cityCode,jdbcType=VARCHAR},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where TIER_SEG_ID = #{tierSegId,jdbcType=DECIMAL}
+  </update>
+
+    <select id="selectShippingTierDtlSegs" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierSeg">
+        select
+        <include refid="Base_Column_List" />,
+        sct.name as country_name,sst.name as state_name,syt.name as city_name
+  FROM dm_shipping_tier_seg dsts
+  LEFT OUTER JOIN dm_shipping_tier dst
+    ON (dsts.shipping_tier_id = dst.shipping_tier_id)
+  LEFT OUTER JOIN(spm_country_b sc
+  LEFT OUTER JOIN spm_country_tl sct
+    ON sc.country_code = sct.country_code
+   AND sct.lang = #{request.locale,jdbcType=VARCHAR}) ON (dsts.country_code = sc.country_code)
+  LEFT OUTER JOIN(spm_state_b ss
+  LEFT OUTER JOIN spm_state_tl sst
+    ON ss.state_code = sst.state_code
+   AND sst.lang = #{request.locale,jdbcType=VARCHAR}) ON (dsts.state_code = ss.state_code)
+  LEFT OUTER JOIN(spm_city_b sy
+  LEFT OUTER JOIN spm_city_tl syt
+    ON sy.city_code = syt.city_code
+   AND syt.lang = #{request.locale,jdbcType=VARCHAR}) ON (dsts.city_code = sy.city_code)
+        <where>
+            <if test="shippingTierId != null">
+                dsts.SHIPPING_TIER_ID = #{shippingTierId,jdbcType=DECIMAL}
+            </if>
+        </where>
+    </select>
+    <select id="queryCount" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierSeg">
+        select count(1) from DM_SHIPPING_TIER_SEG sdts
+        <where> 
+                sdts.SHIPPING_TIER_ID=#{shippingTierId,jdbcType=DECIMAL}
+               and sdts.COUNTRY_CODE=#{countryCode,jdbcType=VARCHAR}
+            <if test="stateCode != null">
+               and sdts.STATE_CODE=#{stateCode,jdbcType=VARCHAR}
+            </if>
+            <if test="stateCode == null">
+               and sdts.STATE_CODE is null
+            </if>
+            <if test="cityCode != null">
+               and sdts.CITY_CODE=#{cityCode,jdbcType=VARCHAR}
+            </if>
+            <if test="cityCode == null">
+               and sdts.CITY_CODE is null
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

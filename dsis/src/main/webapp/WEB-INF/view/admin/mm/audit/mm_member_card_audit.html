@@ -1,0 +1,113 @@
+<#--
+ * description: 会员信用卡审计
+ * version: 1.0
+ * author: xiawang.liu
+ * .
+ *
+-->
+<#include "../../include/head.html">
+
+<body style="padding: 10px; overflow: hidden;">
+<style>
+    .audit_update {
+        height: 30px;
+        width: 100%;
+        background: yellow;
+        text-align: center;
+    }
+</style>
+<div id="site_audit_grid">
+</div>
+<script>
+    function markRender(item, index, value, col) {
+	    // TODO: 针对文本的效果,无法体现在空字符串上
+        value = value == undefined ? "" : value;
+        if (!item.__changes || item.__changes.indexOf(col.columnname) < 0)
+            return value;
+        return "<div class='audit_update'>" + value + "</div>";
+    }
+    function markRender1(item, index, value, col) {
+        // TODO: 针对文本的效果,无法体现在空字符串上
+        value = value == undefined ? "" : value;
+        if (!item.__changes || item.__changes.indexOf("cardNumber") < 0)
+            return value;
+        return "<div class='audit_update'>" + value + "</div>";
+    }
+    window['site_audit_grid'] = $("#site_audit_grid").ligerGrid({
+        columns   : [
+            {
+                display: '<@spring.message "sys.hand.common.audittimestamp"/>',
+                name   : 'auditTimestamp',
+                width  : 90,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "sys.hand.common.auditby"/>',
+                name   : 'auditBy',
+                width  : 75,
+                frozen : true
+            },
+            {
+                display: 'Id(test)',
+                name   : 'auditSessionId',
+                width  : 103,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "sys.hand.common.audittype"/>',
+                name   : 'auditTransactionType',
+                width  : 65,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.bankcode"/>',
+                name   : 'bankCode',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.bankcardnumber"/>',
+                name   : 'maskedCardNumber',
+                width  : 110,
+                render : markRender1
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.cardtype"/>',
+                name   : 'cardType_',
+                width  : 80,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.cardsubtype"/>',
+                name   : 'cardSubType_',
+                width  : 90,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.bankardstatus"/>',
+                name   : 'status_',
+                width  : 75,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.defaultcard"/>',
+                name   : 'defaultFlag_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.effectdate"/>',
+                name   : 'expiryDate',
+                width  : 80,
+                render : markRender
+            }
+        ],
+        url       : '${base.contextPath}/mm/member/card/audit?auditSessionId=${RequestParameters.auditSessionId!0}',
+        width     : '99%',
+        height    : '98%',
+        usePager  : false,
+        rownumbers: true
+    });
+</script>
+</body>
+</html>

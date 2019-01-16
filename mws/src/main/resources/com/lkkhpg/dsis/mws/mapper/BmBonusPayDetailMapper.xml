@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.mws.mapper.BmBonusPayDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.mws.dto.BmBonusPayDetail" >
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+    <result column="PERIOD" property="period" jdbcType="VARCHAR" />
+    <result column="PERIOD_MARK" property="periodMark" jdbcType="VARCHAR" />
+    <result column="CLEAR_PRE_TAX_AMT_INCOME" property="preTaxAmtIncome" jdbcType="DECIMAL" />
+    <result column="CLEAR_PRE_TAX_AMT_DIFFER" property="preTaxAmtDiffer" jdbcType="DECIMAL" />
+    <result column="CLEAR_PRE_TAX_AMT_ADJUST" property="preTaxAmtAdjust" jdbcType="DECIMAL" />
+    <result column="TAX" property="tax" jdbcType="DECIMAL" />
+    <result column="CLEAR_AFTER_TAX_AMT" property="afterTaxAmt" jdbcType="DECIMAL" />
+    <result column="CLEAR_AFTER_TAX_AMT_ADJUST" property="afterTaxAmtAdjust" jdbcType="DECIMAL" />
+    <result column="REMIT_NET_AMT" property="remitNetAmt" jdbcType="DECIMAL" />
+    <result column="REMIT_BANK_ACCOUNT" property="remitNetAccount" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    DEALER_NO, PERIOD, PERIOD_MARK, CLEAR_PRE_TAX_AMT_INCOME, CLEAR_PRE_TAX_AMT_DIFFER, 
+    CLEAR_PRE_TAX_AMT_ADJUST, CLEAR_TAX_AMT_01+CLEAR_TAX_AMT_02 AS TAX, CLEAR_AFTER_TAX_AMT, CLEAR_AFTER_TAX_AMT_ADJUST, REMIT_NET_AMT, REMIT_BANK_ACCOUNT
+  </sql>
+  <select id="selectByMemberAndPeriod" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.mws.dto.BmBonusPayDetail" >
+    SELECT
+        DEALER_NO,
+		PERIOD,
+		PERIOD_MARK,
+		CASE
+		WHEN PERIOD_MARK = '*M1' THEN
+		    'LOCAL'
+		ELSE
+		    'INTER'
+		END AS TYPE,
+		CLEAR_PRE_TAX_AMT_INCOME,
+		CLEAR_PRE_TAX_AMT_DIFFER,
+		CLEAR_PRE_TAX_AMT_ADJUST,
+		CLEAR_TAX_AMT_01 + CLEAR_TAX_AMT_02 AS TAX,
+		CLEAR_AFTER_TAX_AMT,
+		CLEAR_AFTER_TAX_AMT_ADJUST,
+		REMIT_NET_AMT,
+		REMIT_BANK_ACCOUNT
+	FROM
+	    OMK.GDS_SALARY_PAY_DETAIL
+	WHERE
+	    PERIOD_MARK IN ('*M1','*M2')
+	AND DEALER_NO = (SELECT
+                        MEMBER_CODE
+                    FROM
+                        MM_MEMBER
+                    WHERE
+                        MEMBER_ID = #{memberId,jdbcType=DECIMAL})
+	AND PERIOD = #{period,jdbcType=VARCHAR}
+  </select>
+  
+</mapper>

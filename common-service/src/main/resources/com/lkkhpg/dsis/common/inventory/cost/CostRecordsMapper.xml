@@ -1,0 +1,1009 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.inventory.cost.mapper.CostRecordsMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+        <id column="COST_RECORD_ID" property="costRecordId" jdbcType="DECIMAL" />
+        <result column="COST_RECORD_NUMBER" property="costRecordNumber" jdbcType="VARCHAR" />
+        <result column="INV_ORG_ID" property="invOrgId" jdbcType="DECIMAL" />
+        <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL" />
+        <result column="LOT_NUMBER" property="lotNumber" jdbcType="VARCHAR" />
+        <result column="EXPIRY_DATE" property="expiryDate" jdbcType="TIMESTAMP" />
+        <result column="QUANTITY" property="quantity" jdbcType="DECIMAL" />
+        <result column="UNIT_COST" property="unitCost" jdbcType="DECIMAL" />
+        <result column="BALANCE" property="balance" jdbcType="DECIMAL" />
+        <result column="STATUS" property="status" jdbcType="VARCHAR" />
+        <result column="YEAR" property="year" jdbcType="DECIMAL" />
+        <result column="MONTH" property="month" jdbcType="DECIMAL" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+        <result column="COST_ORG_ID" property="costOrgId" jdbcType="DECIMAL" />
+        <result column="ITEM_NAME" property="itemName" jdbcType="VARCHAR" />
+        <result column="ITEM_NUMBER" property="itemNumber" jdbcType="VARCHAR" />
+        <!-- 库存组织名称 -->
+        <result column="INV_ORG_NAME" property="invOrgName" jdbcType="VARCHAR" />
+        <!-- 上月结余_数量 -->
+        <result column="LAST_MONTH_QTY" property="lastMonthQty" jdbcType="DECIMAL" />
+        <!-- 上月结余_单价 -->
+        <result column="LAST_MONTH_UNIT_COST" property="lastMonthUnitCost" jdbcType="DECIMAL" />
+        <!-- 上月结余_总额 -->
+        <result column="LAST_MONTH_BALANCE" property="lastMonthBalance" jdbcType="DECIMAL" />
+        <!-- 本期进货_数量 -->
+        <result column="CURRENT_STKIN_QTY" property="currentStkinQty" jdbcType="DECIMAL" />
+        <!-- 本期进货_单价 -->
+        <result column="CURRENT_UNIT_COST" property="currentUnitCost" jdbcType="DECIMAL" />
+        <!-- 本月换入_数量 -->
+        <result column="CURRENT_COMCP_QTY" property="currentComcpQty" jdbcType="DECIMAL" />
+        <!-- 本月成本_数量 -->
+        <result column="CURRENT_COST_QTY" property="currentCostQty" jdbcType="DECIMAL" />
+        <!-- 商品_事务处理数量 -->
+        <result column="TRX_QTY" property="trxQty" jdbcType="DECIMAL" />
+        <!-- 子商品_成本单价 -->
+        <result column="UNIT_COST_SUB" property="unitCostSub" jdbcType="DECIMAL" />
+        
+    </resultMap>
+    <sql id="Base_Column_List">
+        COST_RECORD_ID, COST_RECORD_NUMBER, INV_ORG_ID, ITEM_ID, 
+        NVL(LOT_NUMBER, 'NONE') LOT_NUMBER, NVL(EXPIRY_DATE, SYSDATE) EXPIRY_DATE,
+        QUANTITY, UNIT_COST,
+        BALANCE, STATUS, YEAR, MONTH, OBJECT_VERSION_NUMBER, REQUEST_ID,
+        PROGRAM_ID, CREATION_DATE, CREATED_BY,
+        LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN,
+        ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3,
+        ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, COST_ORG_ID
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from INV_COST_RECORDS
+        where COST_RECORD_ID = #{costRecordId,jdbcType=DECIMAL}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from INV_COST_RECORDS
+        where COST_RECORD_ID =
+        #{costRecordId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+        <selectKey resultType="java.lang.Long" keyProperty="costRecordId" order="BEFORE">
+            select
+            INV_COST_RECORDS_S.nextval from dual
+        </selectKey>
+        insert into INV_COST_RECORDS (COST_RECORD_ID, COST_RECORD_NUMBER, INV_ORG_ID,
+        ITEM_ID, LOT_NUMBER, EXPIRY_DATE,
+        QUANTITY, UNIT_COST, BALANCE,
+        STATUS, YEAR, MONTH,
+        OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID,
+        CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1, ATTRIBUTE2,
+        ATTRIBUTE3,
+        ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11,
+        ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, COST_ORG_ID
+        )
+        values (#{costRecordId,jdbcType=DECIMAL},
+        #{costRecordNumber,jdbcType=VARCHAR}, #{invOrgId,jdbcType=DECIMAL},
+        #{itemId,jdbcType=DECIMAL},
+        #{lotNumber,jdbcType=VARCHAR}, #{expiryDate,jdbcType=TIMESTAMP},
+        #{quantity,jdbcType=DECIMAL},
+        #{unitCost,jdbcType=DECIMAL}, #{balance,jdbcType=DECIMAL},
+        #{status,jdbcType=VARCHAR}, #{year,jdbcType=DECIMAL},
+        #{month,jdbcType=DECIMAL},
+        1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},
+        CURRENT_TIMESTAMP, -1,
+        -1,
+        CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR},
+        #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR},
+        #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR},
+        #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR},
+        #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR},
+        #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR},
+        #{costOrgId,jdbcType=DECIMAL}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+        <selectKey resultType="java.lang.Long" keyProperty="costRecordId" order="BEFORE">
+            select
+            INV_COST_RECORDS_S.nextval from dual
+        </selectKey>
+        insert into INV_COST_RECORDS
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            COST_RECORD_ID,
+            <if test="costRecordNumber != null">
+                COST_RECORD_NUMBER,
+            </if>
+            <if test="invOrgId != null">
+                INV_ORG_ID,
+            </if>
+            <if test="itemId != null">
+                ITEM_ID,
+            </if>
+            <if test="lotNumber != null">
+                LOT_NUMBER,
+            </if>
+            <if test="expiryDate != null">
+                EXPIRY_DATE,
+            </if>
+            <if test="quantity != null">
+                QUANTITY,
+            </if>
+            <if test="unitCost != null">
+                UNIT_COST,
+            </if>
+            <if test="balance != null">
+                BALANCE,
+            </if>
+            <if test="status != null">
+                STATUS,
+            </if>
+            <if test="year != null">
+                YEAR,
+            </if>
+            <if test="month != null">
+                MONTH,
+            </if>
+            OBJECT_VERSION_NUMBER,
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            CREATION_DATE,
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            LAST_UPDATE_DATE,
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY,
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1,
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2,
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3,
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4,
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5,
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6,
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7,
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8,
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9,
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10,
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11,
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12,
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13,
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14,
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15,
+            </if>
+            <if test="costOrgId != null">
+                COST_ORG_ID,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{costRecordId,jdbcType=DECIMAL},
+            <if test="costRecordNumber != null">
+                #{costRecordNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="invOrgId != null">
+                #{invOrgId,jdbcType=DECIMAL},
+            </if>
+            <if test="itemId != null">
+                #{itemId,jdbcType=DECIMAL},
+            </if>
+            <if test="lotNumber != null">
+                #{lotNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="expiryDate != null">
+                #{expiryDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="quantity != null">
+                #{quantity,jdbcType=DECIMAL},
+            </if>
+            <if test="unitCost != null">
+                #{unitCost,jdbcType=DECIMAL},
+            </if>
+            <if test="balance != null">
+                #{balance,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="year != null">
+                #{year,jdbcType=DECIMAL},
+            </if>
+            <if test="month != null">
+                #{month,jdbcType=DECIMAL},
+            </if>
+            1,
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            CURRENT_TIMESTAMP,
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            CURRENT_TIMESTAMP,
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                #{attribute15,jdbcType=VARCHAR},
+            </if>
+            <if test="costOrgId != null">
+                #{costOrgId,jdbcType=DECIMAL},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+        update INV_COST_RECORDS
+        <set>
+            <if test="costRecordNumber != null">
+                COST_RECORD_NUMBER = #{costRecordNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="invOrgId != null">
+                INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+            </if>
+            <if test="itemId != null">
+                ITEM_ID = #{itemId,jdbcType=DECIMAL},
+            </if>
+            <if test="lotNumber != null">
+                LOT_NUMBER = #{lotNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="expiryDate != null">
+                EXPIRY_DATE = #{expiryDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="quantity != null">
+                QUANTITY = #{quantity,jdbcType=DECIMAL},
+            </if>
+            <if test="unitCost != null">
+                UNIT_COST = #{unitCost,jdbcType=DECIMAL},
+            </if>
+            <if test="balance != null">
+                BALANCE = #{balance,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="year != null">
+                YEAR = #{year,jdbcType=DECIMAL},
+            </if>
+            <if test="month != null">
+                MONTH = #{month,jdbcType=DECIMAL},
+            </if>
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="creationDate != null">
+                CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+            <if test="costOrgId != null">
+                COST_ORG_ID = #{costOrgId,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where COST_RECORD_ID = #{costRecordId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+        update INV_COST_RECORDS
+        set COST_RECORD_NUMBER =
+        #{costRecordNumber,jdbcType=VARCHAR},
+        INV_ORG_ID = #{invOrgId,jdbcType=DECIMAL},
+        ITEM_ID =
+        #{itemId,jdbcType=DECIMAL},
+        LOT_NUMBER = #{lotNumber,jdbcType=VARCHAR},
+        EXPIRY_DATE =
+        #{expiryDate,jdbcType=TIMESTAMP},
+        QUANTITY = #{quantity,jdbcType=DECIMAL},
+        UNIT_COST =
+        #{unitCost,jdbcType=DECIMAL},
+        BALANCE = #{balance,jdbcType=DECIMAL},
+        STATUS = #{status,jdbcType=VARCHAR},
+        YEAR =
+        #{year,jdbcType=DECIMAL},
+        MONTH = #{month,jdbcType=DECIMAL},
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+        CREATION_DATE =
+        #{creationDate,jdbcType=TIMESTAMP},
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+        LAST_UPDATED_BY =
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        LAST_UPDATE_LOGIN =
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+        ATTRIBUTE1 =
+        #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+        ATTRIBUTE3 =
+        #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 =
+        #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 =
+        #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 =
+        #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 =
+        #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 =
+        #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 =
+        #{attribute15,jdbcType=VARCHAR},
+        COST_ORG_ID = #{costOrgId,jdbcType=DECIMAL}
+        where COST_RECORD_ID = #{costRecordId,jdbcType=DECIMAL}
+    </update>
+    <!-- 成本-先进先出计算 -->
+    <select id="getCostRecordsByFIFO" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+       	SELECT 
+       		ICD.INV_ORG_ID											INV_ORG_ID
+	        ,ICD.ITEM_ID											ITEM_ID
+	        ,ICD.LOT_NUMBER											LOT_NUMBER
+	        ,ICD.EXPIRY_DATE										EXPIRY_DATE
+	        ,NVL(SUM(ICD.QUANTITY), 0) 								QUANTITY
+	        ,SUM(ICD.UNIT_COST) 									UNIT_COST
+	        ,SUM(NVL(ICD.QUANTITY,0) * NVL(ICD.UNIT_COST,0))		BALANCE
+	        ,ICD.YEAR
+	        ,ICD.MONTH
+        FROM INV_COST_DETAILS ICD
+       	WHERE ICD.INV_ORG_ID IN (
+       			SELECT SODB.INV_ORG_ID
+	          	FROM SPM_ORG_DEFINATION_B SODB
+	          	WHERE SODB.COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+       		)
+       		AND ICD.STATUS = 'N'
+	        AND ICD.YEAR = #{year,jdbcType=DECIMAL}
+	        AND ICD.MONTH = #{month,jdbcType=DECIMAL}
+	   GROUP BY ICD.INV_ORG_ID,ICD.ITEM_ID,ICD.YEAR,ICD.MONTH,ICD.LOT_NUMBER,ICD.EXPIRY_DATE
+    </select>
+    <!-- 成本记录查询(FIFO) -->
+    <select id="queryCostRecordsByFIFO" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+        select
+        	min(ICR.COST_RECORD_ID) COST_RECORD_ID,
+	        min(ICR.COST_RECORD_NUMBER) COST_RECORD_NUMBER,
+       		iib.ITEM_NUMBER,
+       		tl.ITEM_NAME,
+			ICR.LOT_NUMBER,
+       		ICR.EXPIRY_DATE,
+       		ICR.UNIT_COST,
+       		sum(ICR.QUANTITY) QUANTITY,
+       		sum(ICR.BALANCE) BALANCE,
+       		ICR.YEAR,
+       		ICR.MONTH
+        from INV_COST_RECORDS ICR
+        	left outer join INV_ITEM_B iib on iib.item_id = ICR.item_id 
+        	left outer join INV_ITEM_TL tl on (iib.ITEM_ID = tl.ITEM_ID AND tl.LANG = #{request.locale, jdbcType=VARCHAR})
+        <where>
+            ICR.STATUS = 'P'
+            AND ICR.COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+            <if test="year != null">
+                AND ICR.YEAR = #{year,jdbcType=DECIMAL}
+            </if>
+            <if test="month != null">
+                AND ICR.MONTH = #{month,jdbcType=DECIMAL}
+            </if>
+            <if test="itemId != null">
+                AND ICR.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+            </if>
+            <if test="costRecordNumber != null">
+                AND Upper(ICR.COST_RECORD_NUMBER) like concat('%',concat(Upper(
+                #{costRecordNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="itemNumber != null">
+                AND Upper(iib.ITEM_NUMBER) like concat('%',concat(Upper( #{itemNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="itemName != null">
+                AND Upper(tl.ITEM_NAME) like concat('%',concat(Upper( #{itemName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="lotNumber != null">
+                AND Upper(ICR.LOT_NUMBER) like concat('%',concat(Upper( #{lotNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="beforeexpiryDate != null">
+                AND ICR.EXPIRY_DATE &gt;= #{beforeexpiryDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="afterexpiryDate != null">
+                AND ICR.EXPIRY_DATE &lt;= #{afterexpiryDate,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        group by (ICR.LOT_NUMBER, ICR.EXPIRY_DATE, ICR.YEAR, ICR.MONTH, tl.ITEM_NAME, iib.ITEM_NUMBER, ICR.UNIT_COST)
+        order by COST_RECORD_NUMBER
+    </select>
+    <!-- 成本记录查询(Avrag) -->
+    <select id="queryCostRecordsByAvrag" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+        select
+        	icd.COST_RECORD_ID,
+	        icd.COST_RECORD_NUMBER,
+       		iib.ITEM_NUMBER,
+       		tl.ITEM_NAME,
+			icd.LOT_NUMBER,
+       		icd.EXPIRY_DATE,
+       		icd.QUANTITY,
+       		icd.UNIT_COST,
+       		icd.BALANCE,
+       		icd.YEAR,
+       		icd.MONTH
+        from INV_COST_RECORDS icd
+        	left outer join INV_ITEM_B iib on iib.item_id = icd.item_id 
+        	left outer join INV_ITEM_TL tl on (iib.ITEM_ID = tl.ITEM_ID AND tl.LANG = #{request.locale, jdbcType=VARCHAR})
+        <where>
+            icd.STATUS = 'P'
+            AND icd.COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+            <if test="year != null">
+                AND icd.YEAR = #{year,jdbcType=DECIMAL}
+            </if>
+            <if test="month != null">
+                AND icd.MONTH = #{month,jdbcType=DECIMAL}
+            </if>
+            <if test="itemId != null">
+                AND icd.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+            </if>
+            <if test="costRecordNumber != null">
+                AND Upper(icd.COST_RECORD_NUMBER) like concat('%',concat(Upper(
+                #{costRecordNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="itemNumber != null">
+                AND Upper(iib.ITEM_NUMBER) like concat('%',concat(Upper( #{itemNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="itemName != null">
+                AND Upper(tl.ITEM_NAME) like concat('%',concat(Upper( #{itemName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="lotNumber != null">
+                AND Upper(icd.LOT_NUMBER) like concat('%',concat(Upper( #{lotNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="expiryDate != null">
+            	AND icd.EXPIRY_DATE = #{beforeexpiryDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="beforeexpiryDate != null">
+                AND icd.EXPIRY_DATE <![CDATA[ >= #{beforeexpiryDate,jdbcType=TIMESTAMP} ]]>
+            </if>
+            <if test="afterexpiryDate != null">
+                AND icd.EXPIRY_DATE <![CDATA[ <= #{beforeexpiryDate,jdbcType=TIMESTAMP} ]]>
+            </if>
+        </where>
+        order by COST_RECORD_NUMBER
+    </select>
+    <!-- add 2016-09-03 成本-加权平均计算 -->
+    <select id="getCostRecordsByAvragForTW" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+		SELECT DISTINCT 
+				ICD.ITEM_ID,
+				ICD.COST_ORG_ID AS INV_ORG_ID,
+                ICD.YEAR,
+                ICD.MONTH,
+                (NVL(CURRENT_STKIN.QTY_SUM, 0)) AS CURRENT_STKIN_QTY, --商品_本期进货_数量2 STKIN
+                (NVL(CURRENT_STKIN.UNIT_COST_SUM, 0)) AS CURRENT_UNIT_COST, --商品_本期进货_单价 STKIN(还要/数量)
+                (NVL(LAST_UNIT_COST.QTY_SUM, 0)) AS LAST_MONTH_QTY, --商品_上月结余_数量1
+                (NVL(LAST_UNIT_COST.UNIT_COST_SUM, 0)) AS LAST_MONTH_UNIT_COST, --商品_上月结余_单价
+                (NVL(LAST_UNIT_COST.BALANCE_SUM, 0)) AS LAST_MONTH_BALANCE, --商品_上月结余_总额
+                (NVL(CURRENT_COMCP.NOW_MONTH_QTY, 0)) AS CURRENT_COMCP_QTY, --商品_本月换入数量3 COMCP
+                (NVL(CURRENT_UNIT_COST.NOW_MONTH_QTY, 0)) AS CURRENT_COST_QTY, --商品_本月成本数量4
+                (NVL(INV_ITEM_SUB.UNIT_COST_SUB_SUM, 0)) AS UNIT_COST_SUB --子商品_成本单价
+	  FROM INV_COST_DETAILS ICD
+	  LEFT OUTER JOIN ( --本月进货
+	                   SELECT ICD.ITEM_ID,
+	                           ICD.COST_ORG_ID,
+	                           ICD.YEAR,
+	                           ICD.MONTH,
+	                           SUM(ICD.QUANTITY) QTY_SUM,
+	                           SUM(ICD.QUANTITY * ICD.UNIT_COST) UNIT_COST_SUM
+	                     FROM INV_COST_DETAILS ICD
+	                    WHERE ICD.STATUS = 'N'
+	                      AND ICD.TRX_TYPE = 'STKIN'
+	                    GROUP BY (ICD.ITEM_ID, ICD.COST_ORG_ID, ICD.YEAR,
+	                               ICD.MONTH)) CURRENT_STKIN
+	    ON ICD.ITEM_ID = CURRENT_STKIN.ITEM_ID
+	   AND ICD.COST_ORG_ID = CURRENT_STKIN.COST_ORG_ID
+	   AND ICD.YEAR = CURRENT_STKIN.YEAR
+	   AND ICD.MONTH = CURRENT_STKIN.MONTH
+	  LEFT OUTER JOIN ( --上月结余
+	                   SELECT ICR.ITEM_ID,
+	                           ICR.COST_ORG_ID,
+	                           ICR.YEAR,
+	                           ICR.MONTH,
+	                           NVL(SUM(ICR.UNIT_COST), 0) AS UNIT_COST_SUM, --上月结余-单价
+	                           NVL(SUM(ICR.QUANTITY), 0) AS QTY_SUM, --上月结余-数量
+	                           NVL(SUM(ICR.BALANCE), 0) AS BALANCE_SUM --上月结余-总额
+	                     FROM INV_COST_RECORDS ICR
+	                    WHERE ICR.STATUS = 'P'
+	                    GROUP BY (ICR.ITEM_ID, ICR.YEAR, ICR.MONTH,
+	                               ICR.COST_ORG_ID)) LAST_UNIT_COST
+	    ON ICD.ITEM_ID = LAST_UNIT_COST.ITEM_ID
+	   AND ICD.COST_ORG_ID = LAST_UNIT_COST.COST_ORG_ID
+	   <if test="month == 1">
+		AND ICD.YEAR -1 = LAST_UNIT_COST.YEAR
+		AND ICD.MONTH + 11 = LAST_UNIT_COST.MONTH
+	   </if>
+	   <if test="month > 1">
+	   	AND ICD.YEAR = LAST_UNIT_COST.YEAR
+		AND ICD.MONTH - 1 = LAST_UNIT_COST.MONTH
+	   </if>
+	  LEFT OUTER JOIN ( --本月换入数量
+	                   SELECT INV_TRX.ITEM_ID,
+	                           SODB.COST_ORG_ID,
+	                           TO_CHAR(INV_TRX.TRX_DATE, 'YYYY') TRX_DATE_YEAR,
+	                           TO_CHAR(INV_TRX.TRX_DATE, 'MM') TRX_DATE_MONTH,
+	                           SUM(INV_TRX.TRX_QTY) NOW_MONTH_QTY
+	                     FROM INV_TRANSACTION INV_TRX
+	                     LEFT OUTER JOIN SPM_ORG_DEFINATION_B SODB
+	                       ON INV_TRX.ORGANIZATION_ID = SODB.INV_ORG_ID
+	                    WHERE INV_TRX.TRX_TYPE = 'COMCP'
+	                    GROUP BY (INV_TRX.ITEM_ID, SODB.COST_ORG_ID,
+	                               TO_CHAR(INV_TRX.TRX_DATE, 'YYYY'),
+	                               TO_CHAR(INV_TRX.TRX_DATE, 'MM'))) CURRENT_COMCP
+	    ON ICD.ITEM_ID = CURRENT_COMCP.ITEM_ID
+	   AND ICD.COST_ORG_ID = CURRENT_COMCP.COST_ORG_ID
+	   AND ICD.YEAR = CURRENT_COMCP.TRX_DATE_YEAR
+	   AND ICD.MONTH = CURRENT_COMCP.TRX_DATE_MONTH
+	  LEFT OUTER JOIN ( --本月成本数量
+	                   SELECT INV_TRX.ITEM_ID,
+	                           SODB.COST_ORG_ID,
+	                           TO_CHAR(INV_TRX.TRX_DATE, 'YYYY') TRX_DATE_YEAR,
+	                           TO_CHAR(INV_TRX.TRX_DATE, 'MM') TRX_DATE_MONTH,
+	                           SUM(INV_TRX.TRX_QTY) NOW_MONTH_QTY
+	                     FROM INV_TRANSACTION INV_TRX
+	                     LEFT OUTER JOIN SPM_ORG_DEFINATION_B SODB
+	                       ON INV_TRX.ORGANIZATION_ID = SODB.INV_ORG_ID
+	                    WHERE INV_TRX.TRX_TYPE NOT IN ('COMCP', 'STKIN')
+	                    GROUP BY (INV_TRX.ITEM_ID, SODB.COST_ORG_ID,
+	                               TO_CHAR(INV_TRX.TRX_DATE, 'YYYY'),
+	                               TO_CHAR(INV_TRX.TRX_DATE, 'MM'))) CURRENT_UNIT_COST
+	    ON ICD.ITEM_ID = CURRENT_UNIT_COST.ITEM_ID
+	   AND ICD.COST_ORG_ID = CURRENT_UNIT_COST.COST_ORG_ID
+	   AND ICD.YEAR = CURRENT_UNIT_COST.TRX_DATE_YEAR
+	   AND ICD.MONTH = CURRENT_UNIT_COST.TRX_DATE_MONTH
+	  LEFT OUTER JOIN ( --子商品期末单价
+	                   SELECT INV_ITEM.PACKAGE_ITEM_ID,
+	                           NVL(SUM(INV_ITEM.UNIT_COST_SUB), 0) UNIT_COST_SUB_SUM
+	                     FROM (SELECT DISTINCT INV_TRX_SUB.ITEM_ID,
+	                                            LAST_UNIT_COST_SUB.COST_ORG_ID,
+	                                            INV_TRX_SUB.PACKAGE_ITEM_ID,
+	                                            LAST_UNIT_COST_SUB.YEAR AS LAST_YEAR,
+	                                            LAST_UNIT_COST_SUB.MONTH AS LAST_MONTH,
+	                                            CURRENT_UNIT_COST_SUB.YEAR AS CURRENT_YEAR,
+	                                            CURRENT_UNIT_COST_SUB.MONTH AS CURRENT_MONTH,
+	                                            (CASE
+	                                              WHEN (NVL(LAST_UNIT_COST_SUB.QTY_SUM,
+	                                                        0) + NVL(CURRENT_UNIT_COST_SUB.QTY_SUM,
+	                                                                  0)) = 0 THEN
+	                                               0
+	                                              ELSE
+	                                               (NVL(LAST_UNIT_COST_SUB.BALANCE_SUM,
+	                                                    0) + NVL(CURRENT_UNIT_COST_SUB.UNIT_COST_SUM,
+	                                                              0)) /
+	                                               (NVL(LAST_UNIT_COST_SUB.QTY_SUM,
+	                                                    0) + NVL(CURRENT_UNIT_COST_SUB.QTY_SUM,
+	                                                              0))
+	                                            END) AS UNIT_COST_SUB --子商品_期末单价
+	                              FROM INV_TRANSACTION INV_TRX_SUB
+	                              LEFT OUTER JOIN ( --子商品上月结余
+	                                              SELECT IT_TRX_SUB.ITEM_ID,
+	                                                      IT_TRX_SUB.PACKAGE_ITEM_ID,
+	                                                      ICR_SUB.COST_ORG_ID,
+	                                                      ICR_SUB.YEAR,
+	                                                      ICR_SUB.MONTH,
+	                                                      NVL(SUM(ICR_SUB.QUANTITY),
+	                                                          0) QTY_SUM, --子商品上月结余-数量
+	                                                      NVL(SUM(ICR_SUB.BALANCE), 0) BALANCE_SUM --子商品上月结余-总额
+	                                                FROM INV_TRANSACTION IT_TRX_SUB
+	                                                LEFT OUTER JOIN INV_COST_RECORDS ICR_SUB
+	                                                  ON ICR_SUB.ITEM_ID =
+	                                                     IT_TRX_SUB.ITEM_ID
+	                                                 AND ICR_SUB.INV_ORG_ID =
+	                                                     IT_TRX_SUB.ORGANIZATION_ID
+	                                                 AND ICR_SUB.YEAR =
+	                                                     TO_CHAR(IT_TRX_SUB.TRX_DATE,
+	                                                             'YYYY')
+	                                                 AND ICR_SUB.MONTH =
+	                                                     TO_CHAR(IT_TRX_SUB.TRX_DATE,
+	                                                             'MM')
+	                                               WHERE ICR_SUB.STATUS = 'P'
+	                                                 AND (IT_TRX_SUB.ITEM_ID !=
+	                                                     IT_TRX_SUB.PACKAGE_ITEM_ID OR
+	                                                     IT_TRX_SUB.PACKAGE_ITEM_ID IS NULL)
+	                                               GROUP BY (IT_TRX_SUB.ITEM_ID,
+	                                                          IT_TRX_SUB.PACKAGE_ITEM_ID,
+	                                                          ICR_SUB.YEAR,
+	                                                          ICR_SUB.MONTH,
+	                                                          ICR_SUB.COST_ORG_ID)) LAST_UNIT_COST_SUB
+	                                ON (LAST_UNIT_COST_SUB.PACKAGE_ITEM_ID =
+	                                   INV_TRX_SUB.PACKAGE_ITEM_ID OR
+	                                   INV_TRX_SUB.PACKAGE_ITEM_ID IS NULL)
+	                               AND LAST_UNIT_COST_SUB.ITEM_ID =
+	                                   INV_TRX_SUB.ITEM_ID
+	                               <if test="month == 1">
+	                               	AND LAST_UNIT_COST_SUB.YEAR + 1 = TO_CHAR(INV_TRX_SUB.TRX_DATE, 'YYYY')
+	                               	AND LAST_UNIT_COST_SUB.MONTH - 11 = TO_CHAR(INV_TRX_SUB.TRX_DATE, 'MM')
+	                               </if>
+	                               <if test="month > 1">
+		                               AND LAST_UNIT_COST_SUB.YEAR = TO_CHAR(INV_TRX_SUB.TRX_DATE, 'YYYY')
+		                               AND LAST_UNIT_COST_SUB.MONTH + 1 = TO_CHAR(INV_TRX_SUB.TRX_DATE, 'MM')
+	                               </if>
+	                              LEFT OUTER JOIN ( --子商品当月进货 STKIN
+	                                              SELECT INV_TRX_SUB.ITEM_ID,
+	                                                      INV_TRX_SUB.PACKAGE_ITEM_ID,
+	                                                      ICD_SUB.COST_ORG_ID,
+	                                                      ICD_SUB.YEAR,
+	                                                      ICD_SUB.MONTH,
+	                                                      SUM(ICD_SUB.QUANTITY) QTY_SUM,
+	                                                      SUM(ICD_SUB.QUANTITY *
+	                                                          ICD_SUB.UNIT_COST) UNIT_COST_SUM
+	                                                FROM INV_TRANSACTION INV_TRX_SUB
+	                                                LEFT OUTER JOIN INV_COST_DETAILS ICD_SUB
+	                                                  ON ICD_SUB.ITEM_ID =
+	                                                     INV_TRX_SUB.ITEM_ID
+	                                                 AND ICD_SUB.YEAR =
+	                                                     TO_CHAR(INV_TRX_SUB.TRX_DATE,
+	                                                             'YYYY')
+	                                                 AND ICD_SUB.MONTH =
+	                                                     TO_CHAR(INV_TRX_SUB.TRX_DATE,
+	                                                             'MM')
+	                                               WHERE ICD_SUB.STATUS = 'N'
+	                                                 AND ICD_SUB.TRX_TYPE = 'STKIN'
+	                                                 AND (INV_TRX_SUB.ITEM_ID !=
+	                                                     INV_TRX_SUB.PACKAGE_ITEM_ID OR
+	                                                     INV_TRX_SUB.PACKAGE_ITEM_ID IS NULL)
+	                                               GROUP BY (INV_TRX_SUB.ITEM_ID,
+	                                                          INV_TRX_SUB.PACKAGE_ITEM_ID,
+	                                                          ICD_SUB.COST_ORG_ID,
+	                                                          ICD_SUB.YEAR,
+	                                                          ICD_SUB.MONTH)) CURRENT_UNIT_COST_SUB
+	                                ON (CURRENT_UNIT_COST_SUB.PACKAGE_ITEM_ID = INV_TRX_SUB.PACKAGE_ITEM_ID OR
+	                                   INV_TRX_SUB.PACKAGE_ITEM_ID IS NULL)
+	                               AND CURRENT_UNIT_COST_SUB.ITEM_ID = INV_TRX_SUB.ITEM_ID
+	                               AND CURRENT_UNIT_COST_SUB.YEAR = TO_CHAR(INV_TRX_SUB.TRX_DATE, 'YYYY')
+	                               AND CURRENT_UNIT_COST_SUB.MONTH = TO_CHAR(INV_TRX_SUB.TRX_DATE, 'MM')
+	                             WHERE TO_NUMBER(TO_CHAR(INV_TRX_SUB.TRX_DATE, 'YYYY')) = #{year,jdbcType=DECIMAL}
+	                               AND TO_NUMBER(TO_CHAR(INV_TRX_SUB.TRX_DATE, 'MM')) = #{month,jdbcType=DECIMAL}
+	                               AND INV_TRX_SUB.ORGANIZATION_ID IN
+	                                   (SELECT SODB.INV_ORG_ID
+	                                      FROM SPM_ORG_DEFINATION_B SODB
+	                                     WHERE SODB.COST_ORG_ID = #{invOrgId, jdbcType=DECIMAL})
+	                               AND EXISTS
+	                             		(SELECT 'x'
+	                                      FROM INV_TRANSACTION IT
+	                                     WHERE IT.ITEM_ID = INV_TRX_SUB.PACKAGE_ITEM_ID
+	                                       AND IT.ORGANIZATION_ID IN
+	                                           (SELECT SODB.INV_ORG_ID
+	                                              FROM SPM_ORG_DEFINATION_B SODB
+	                                             WHERE SODB.COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL})
+	                                       AND TO_CHAR(IT.TRX_DATE, 'YYYY-MM') = TO_CHAR(INV_TRX_SUB.TRX_DATE, 'YYYY-MM')
+	                                       AND IT.TRX_TYPE = 'COMCP')) INV_ITEM
+	                    GROUP BY INV_ITEM.PACKAGE_ITEM_ID) INV_ITEM_SUB
+	    ON INV_ITEM_SUB.PACKAGE_ITEM_ID = ICD.ITEM_ID
+	 WHERE ICD.COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+	   AND ICD.YEAR = #{year,jdbcType=DECIMAL}
+	   AND ICD.MONTH = #{month,jdbcType=DECIMAL}
+	   AND (ICD.ITEM_ID = LAST_UNIT_COST.ITEM_ID OR
+	       ICD.ITEM_ID = CURRENT_STKIN.ITEM_ID OR
+	       ICD.ITEM_ID = CURRENT_COMCP.ITEM_ID OR
+	       ICD.ITEM_ID = CURRENT_UNIT_COST.ITEM_ID)
+	 --GROUP BY (ICD.COST_ORG_ID,ICD.ITEM_ID,ICD.YEAR,ICD.MONTH)
+	 ORDER BY ICD.ITEM_ID
+    </select>
+    <!-- 更新成本记录状态 -->
+    <update id="updateCostRecords" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+        UPDATE INV_COST_RECORDS
+        SET STATUS = #{status,jdbcType=VARCHAR}
+        WHERE COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+        	AND YEAR = #{year,jdbcType=DECIMAL}
+        	AND MONTH = #{month,jdbcType=DECIMAL}
+    </update>
+    <!-- 获取归集中心最近一次,状态为"P"的成本记录 -->
+    <select id="getNewCostRecords" resultMap="BaseResultMap">
+       	SELECT 
+       		MAX(ICR.YEAR) YEAR, 
+       		MAX(ICR.MONTH) MONTH, 
+       		ICR.INV_ORG_ID, 
+       		INV_ORG_NAME.NAME INV_ORG_NAME
+  		FROM INV_COST_RECORDS ICR
+  			LEFT OUTER JOIN (
+	     		SELECT SIOB.INV_ORG_ID, TL.NAME
+       			FROM SPM_INV_ORGANIZATION_B SIOB
+            		LEFT OUTER JOIN SPM_INV_ORGANIZATION_TL TL
+                 		ON SIOB.INV_ORG_ID = TL.INV_ORG_ID
+                 		AND TL.LANG = #{request.locale,jdbcType=VARCHAR}
+		) INV_ORG_NAME ON ICR.INV_ORG_ID = INV_ORG_NAME.INV_ORG_ID
+		WHERE ICR.INV_ORG_ID IN (
+			SELECT SODB.INV_ORG_ID
+            FROM SPM_ORG_DEFINATION_B SODB
+            WHERE SODB.COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL})
+   		AND STATUS = 'P'
+ 		GROUP BY ICR.INV_ORG_ID, INV_ORG_NAME.NAME
+    </select>
+    <!-- 2016-09-03 获取成本记录 -->
+    <select id="queryCostRecords" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+        SELECT
+        	ICR.INV_ORG_ID,
+        	INV_ORG_NAME.NAME INV_ORG_NAME
+        FROM INV_COST_RECORDS ICR
+        	LEFT OUTER JOIN (
+			      	SELECT SIOB.INV_ORG_ID, TL.NAME
+					FROM SPM_INV_ORGANIZATION_B SIOB
+						LEFT OUTER JOIN SPM_INV_ORGANIZATION_TL TL 
+							ON SIOB.INV_ORG_ID = TL.INV_ORG_ID AND TL.LANG=#{request.locale,jdbcType=VARCHAR}
+			 ) INV_ORG_NAME ON ICR.INV_ORG_ID = INV_ORG_NAME.INV_ORG_ID
+        WHERE
+	        ICR.INV_ORG_ID IN (
+	        	SELECT SODB.INV_ORG_ID
+				FROM SPM_ORG_DEFINATION_B SODB
+				WHERE SODB.COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+	        )
+	        AND ICR.YEAR = #{year,jdbcType=DECIMAL}
+	        AND ICR.MONTH = #{month,jdbcType=DECIMAL}
+	        AND ICR.STATUS = #{status, jdbcType=VARCHAR}
+	    GROUP BY ICR.INV_ORG_ID, INV_ORG_NAME.NAME
+    </select>
+    <select id="getCostRecordsByParams" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords">
+        SELECT
+        	<include refid="Base_Column_List" />
+        FROM INV_COST_RECORDS ICR
+        WHERE
+	        ICR.INV_ORG_ID IN (
+	        	SELECT SODB.INV_ORG_ID
+				FROM SPM_ORG_DEFINATION_B SODB
+				WHERE SODB.COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+	        )
+	        AND ICR.YEAR = #{year,jdbcType=DECIMAL}
+	        AND ICR.MONTH = #{month,jdbcType=DECIMAL}
+	        AND ICR.STATUS = #{status, jdbcType=VARCHAR}
+    </select>
+    <!-- 校验上个自然月是否已经生成成本 -->
+    <select id="queryTheMaxMonthOfInvOrgId" resultMap="BaseResultMap">
+   		SELECT 
+   			ICR.INV_ORG_ID,
+   			MAX(ICR.YEAR) 		YEAR, 
+   			MAX(ICR.MONTH) 		MONTH,
+   			INV_ORG_NAME.NAME	INV_ORG_NAME
+ 		FROM INV_COST_RECORDS ICR
+ 			LEFT OUTER JOIN (
+			    SELECT SIOB.INV_ORG_ID, TL.NAME
+				FROM SPM_INV_ORGANIZATION_B SIOB
+					LEFT OUTER JOIN SPM_INV_ORGANIZATION_TL TL 
+						ON SIOB.INV_ORG_ID = TL.INV_ORG_ID AND TL.LANG=#{request.locale,jdbcType=VARCHAR}
+			 ) INV_ORG_NAME ON ICR.INV_ORG_ID = INV_ORG_NAME.INV_ORG_ID
+		WHERE ICR.INV_ORG_ID IN (
+				SELECT SODB.INV_ORG_ID
+				FROM SPM_ORG_DEFINATION_B SODB
+				WHERE SODB.COST_ORG_ID = #{costOrgId,jdbcType=DECIMAL}
+			)
+      		AND ICR.STATUS = 'P'
+      	GROUP BY ICR.INV_ORG_ID, INV_ORG_NAME.NAME
+ 		ORDER BY YEAR, MONTH
+    </select>
+    <!-- 2016-10-10 比较records表与transaction表中，获取上月存在record但本月事务表中不存在的item记录 -->
+    <select id="getLastRecordsAndNonCurrentTrx" resultMap="BaseResultMap" >
+    	SELECT 
+    		<include refid="Base_Column_List" />
+		FROM INV_COST_RECORDS ICR
+		WHERE ICR.INV_ORG_ID IN (
+				SELECT SODB.INV_ORG_ID
+				FROM SPM_ORG_DEFINATION_B SODB
+				WHERE SODB.COST_ORG_ID = #{invOrgId,jdbcType=DECIMAL}
+			)
+			AND ICR.STATUS = #{status,jdbcType=VARCHAR}
+			AND ICR.YEAR= #{year,jdbcType=DECIMAL}
+			AND ICR.MONTH = #{month,jdbcType=DECIMAL}
+			AND NOT EXISTS (
+		       	SELECT 'X'
+		       	FROM INV_TRANSACTION IT
+		       	WHERE IT.ORGANIZATION_ID = ICR.INV_ORG_ID
+		        	AND TO_CHAR(IT.TRX_DATE,'YYYYMM') = #{trxDateName, jdbcType=VARCHAR}
+		        	AND IT.LOT_NUMBER = ICR.LOT_NUMBER OR (ICR.LOT_NUMBER IS NULL AND IT.LOT_NUMBER IS NULL)
+					AND IT.EXPIRY_DATE = ICR.EXPIRY_DATE OR (IT.EXPIRY_DATE IS NULL AND ICR.EXPIRY_DATE IS NULL)
+					AND IT.ITEM_ID = ICR.ITEM_ID
+			)
+    </select>
+    <!-- records记录查询 -->
+    <select id="getRecordsInfoByCostRecords" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.inventory.cost.dto.CostRecords" >
+    	select
+        	icd.COST_RECORD_ID,
+	        icd.COST_RECORD_NUMBER,
+			icd.LOT_NUMBER,
+       		icd.EXPIRY_DATE,
+       		icd.QUANTITY,
+       		icd.UNIT_COST,
+       		icd.BALANCE,
+       		icd.YEAR,
+       		icd.MONTH
+        from INV_COST_RECORDS icd
+        <trim prefix="WHERE" prefixOverrides="AND|OR" >
+        	<if test="status != null">
+	           AND icd.STATUS = #{status, jdbcType=VARCHAR}
+        	</if>
+        	<if test="costOrgId != null">
+	            AND icd.COST_ORG_ID = #{costOrgId,jdbcType=DECIMAL}
+        	</if>
+            <if test="year != null">
+                AND icd.YEAR = #{year,jdbcType=DECIMAL}
+            </if>
+            <if test="month != null">
+                AND icd.MONTH = #{month,jdbcType=DECIMAL}
+            </if>
+            <if test="itemId != null">
+                AND icd.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+            </if>
+            <if test="lotNumber != null">
+                AND icd.LOT_NUMBER = #{lotNumber,jdbcType=VARCHAR}
+            </if>
+            <if test="expiryDate != null">
+            	AND icd.EXPIRY_DATE = #{expiryDate,jdbcType=TIMESTAMP}
+            </if>
+        </trim>	
+    </select>
+</mapper>

@@ -1,0 +1,394 @@
+<#include "/mws/include/header.html">
+<style>
+    @media only screen and (max-width: 800px) {
+
+        /* Force table to not be like tables anymore */
+        .cart table,
+        .cart thead,
+        .cart tbody,
+        .cart th,
+        .cart td,
+        .cart tr {
+            display: block;
+        }
+
+        /* Hide table headers (but not display: none;, for accessibility) */
+        table.cart thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        table.cart tr {
+            border: 1px solid #ddd;
+            border-bottom: none;
+        }
+
+        table.cart tr:last-child {
+            border-bottom: 1px solid #ddd;
+        }
+
+        table.cart td {
+            /* Behave  like a "row" */
+            border: none;
+            /* border-bottom: 1px solid #eee;  */
+            position: relative;
+            /* padding-left: 50%;  */
+            white-space: normal;
+            text-align:left;
+            width:100%;
+            padding:10px;
+        }
+        table.cart td:before {
+            content: attr(data-title);
+        }
+        /*   table.cart td:before {
+            /* Now like a table header
+            position: absolute;
+            /* Top/left values mimic padding
+            top: 6px;
+            left: 6px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align:left;
+            font-weight: bold;
+          } */
+        /*
+        Label the data
+        */
+    }
+    
+    .product-name a:hover{TEXT-DECORATION:underline !important}
+</style>
+
+<!-- ========== MENU END ========== -->
+
+<!-- ========== CONTENT START ========== -->
+<script src="${base.contextPath}/common/code?orderType=OM.ORDER_TYPE"
+        type="text/javascript"></script>
+<script src="${base.contextPath}/resources/js/spinner${resource_suffix!}.js"></script>
+<script type="text/javascript">
+$(function(){
+    checkAll();
+    $(".qty").spinner({
+    	step:1,
+    	min:1,
+    	max:null
+    	}).change(function(){
+        var thisQty = $(this),
+	    	qty = thisQty.val(),
+	    	name = thisQty.attr("name");
+        updateQuantity(qty,name);
+    });
+    hidePV();
+});
+
+var vipFlag = "";
+
+function hidePV() {
+	vipFlag = "${Session.isDisplay}";
+	if ("N" == vipFlag) {
+		$(".product-pv").hide();
+		$("#totalPvHide").hide();
+	}
+}
+
+function checkAll(){
+    $("input[name='chk_list']").prop("checked",true);
+    total();
+}
+
+function checkallByBox(param){
+    $("input[name='chk_list']").prop("checked",param.checked);
+    total();
+}
+
+var totalPrice = 0;
+var totalPV = 0;
+function total() {
+    totalPrice = 0;
+    totalPV = 0;
+    var allChk=$("input[name='chk_list']:not(:first):checked");
+    $(allChk).each(function(){
+       var id = this.value;
+       var priceStr = $('#price_'+id).text();
+       var price = parseFloat(priceStr);
+       totalPrice = totalPrice + price * parseInt($('#quantity_'+id).val());
+       totalPV = totalPV + parseFloat($('#pv_'+id).text()) * parseInt($('#quantity_'+id).val());
+    });
+    $('#totalPV').text(totalPV);
+    $('#totalPrice').text(totalPrice.toFixed(2));
+}
+
+function updateQuantity(value,name){
+    var index = name.indexOf("_");
+    var id  = name.substring(index + 1);
+    var checkRule = /^([1-9]\d{0,4})$/;
+    if(!checkRule.test(value)){
+        $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", '<@spring.message "mws.shopcart.number.range"/>');
+        $('#quantity_'+id).val(1);
+    }
+    value = $('#quantity_'+id).val();
+    if($('#checkbox_'+id).prop("checked")){
+        total();        
+    }
+    $.ajax({
+        url: "${base.contextPath}/shopcart/update",
+        type:"POST",
+        dataType:"json",
+        data : {
+            "productId" : id,
+            "quantity" : value,
+        },
+        success : function(data) {
+            if(data.success){
+                return true;
+            }
+        },
+        error : function() {
+        	$.dialog.error("<@spring.message 'mws.dialog.error'/>", 'error');
+        }
+    });
+}
+
+function deleteShopCart(){
+    var list = [];
+    var allChk=$("input[name='chk_list']:not(:first):checked");
+    $(allChk).each(function(){
+        list.push({"productId" : this.value});
+    });
+    if (list.length < 1) {
+        $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", '<@spring.message "msg.warning.dto.inventory.stockio.no_item_selected"/>');
+        return false;
+    }
+    $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", '<@spring.message "msg.alert.pub.delete_or_not"/>',
+    	function(){
+	    	$.ajax({
+	            url: "${base.contextPath}/shopcart/delete",
+	            type:"POST",
+	            dataType:"json",
+	            contentType : "application/json; charset=UTF-8",
+	            data : JSON2.stringify(list),
+	            success : function(data) {
+	                if(data.success){
+	                    location.reload();
+	                }
+	            },
+	            error : function() {
+	            	$.dialog.error("<@spring.message 'mws.dialog.error'/>", 'error');
+	            }
+	        });   
+    	}
+    );
+}
+
+function confirmOrder(){
+    var list = [];
+    var allChk=$("input[name='chk_list']:not(:first):checked");
+    $(allChk).each(function(){
+        list.push({"productId" : this.value});
+    });
+    if (list.length < 1) {
+    	$.dialog.warning("<@spring.message 'mws.dialog.warning'/>", '<@spring.message "msg.warning.dto.inventory.stockio.no_item_selected"/>');
+        return false;
+    }
+    $.ajax({
+        url: "${base.contextPath}/shopcart/confirm",
+        type:"POST",
+        dataType:"json",
+        contentType : "application/json; charset=UTF-8",
+        data : JSON2.stringify(list),
+        success : function(data) {
+            if(data.success){
+                if ("success" == data.rows[0]){
+                    $("input[name='token']").val(data.rows[1]);
+                    $("#tokenForm").submit();
+                } else {
+                    var errorStr = "";
+                    for (var i = 0; i < data.rows.length; i++) {
+                        var errorProduct = data.rows[i];
+                        var index = errorProduct.indexOf("_");
+                        var errorProductName = errorProduct.substring(0,index);
+                        var errorProductMin = errorProduct.substring(index - 0 +1);
+                        errorStr = errorStr + errorProductName + '<@spring.message "mws.shopcart.min.number"/>' + errorProductMin + ","; 
+                    }
+                    $.dialog.warning("<@spring.message 'mws.dialog.warning'/>", errorStr.substring(0,errorStr.length-1));
+                }
+            }
+        },
+        error : function() {
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", 'error');
+        }
+    });
+}
+
+
+//显示快码对应值
+function showCode(value,lookCode){
+    for(var i = 0 ; i < lookCode.length ; i++){
+        if(lookCode[i].value == value){
+            return lookCode[i].meaning;
+        }
+    }
+}
+
+function changeType(value){
+    $("#payType").html(showCode(value,orderType)+'<span class="caret"></span>');
+    $.ajax({
+        url: "${base.contextPath}/shopcart/changeOrderType",
+        type:"POST",
+        dataType:"json",
+        data : {
+            "orderType" : value,
+        },
+        success : function(data) {
+            if(data.success){
+                location.reload();
+            }
+        },
+        error : function() {
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", 'error');
+        }
+    });
+}
+</script>
+<section id="content">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+			<li><@spring.message "mws.shopcart.title"/></li>
+        </ol>
+
+        <h1 class="page-title"><@spring.message "mws.shopcart.title" /></h1>
+        
+        <!-- <div class = "row">
+            <div class="btn-group col-md-2 col-sm-4 col-xs-5">
+                <button id="payType" type="button"
+                    class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    <#if orderType??>
+                        <#if orderType == 'RDEM'>
+                            积分兑换
+                        <#else>
+                            标准购买
+                        </#if>
+                    <#else>
+                        标准购买
+                    </#if>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" onclick="changeType('STDP')">标准购买</a></li>
+                    <li><a href="#" onclick="changeType('RDEM')">积分兑换</a></li>
+                </ul>
+            </div>
+        </div> -->
+
+        <table class="shop_table cart table-striped" style="width:100%">
+            <thead>
+            <tr>
+                <th class="product-remove"><input type="checkbox" name = "chk_list" onclick="checkallByBox(this)"/></th>
+                <th class="product-desc"><@spring.message "mws.orderhistory.tabletitle_productdescription" /></th>
+                <th class="product-price"><@spring.message "mws.orderlist.tableitem_unitprice" /></th>
+                <th class="product-qty"><@spring.message "mws.orderlist.tableitem_quantity" /></th>
+            </tr>
+            </thead>
+            <tbody>
+            <#if products??>
+            <#list products as product>
+            <tr class="cart_item">
+                <td class="product-remove"><input type="checkbox" value = "${product.itemId}" id ="checkbox_${product.itemId}" name = "chk_list" onchange="total()"/></a></td>
+                <td class="product-desc">
+                    <dl>
+                        <#if product.itemImg??>
+                            <#if product.itemImg[0]??>
+                                <dt class="hidden-xs"><img width="150px" height="150px" src="${base.contextPath}/sys/image/view?fileId=${product.itemImg[0].fileId}&compressLevel=M" onerror="javascript:this.src = '${base.contextPath}/resources/img/360-360.png'" alt=""></dt>
+                            <#else>
+                                <dt class="hidden-xs"><img width="150px" height="150px" src='${base.contextPath}/resources/img/NOT_IMAGE.png' alt=""></dt>
+                            </#if>
+                        <#else>
+                            <dt class="hidden-xs"><img width="150px" height="150px" src='${base.contextPath}/resources/img/NOT_IMAGE.png' alt=""></dt>
+                        </#if>
+                        <dd>
+                            <h3 class = "product-name"><a href="${base.contextPath}/product/product.html?categoryId=&itemId=${product.itemId}">${product.itemName}</a><p class="product-pv" style="display:inline;margin-left:15px;">
+                                   <span style="background-color:#008f55;color: white;font-size: 12px">库存量</span><span id = "pv_${product.itemId}" style="font-size: 12px">${product.pvAmt}&nbsp;&nbsp;${product.uomName}</span>
+                            </p></h3>
+                            <p >
+                            <#if product.description??>
+                                ${product.description}
+                            </#if>
+                            <br/>
+                            <#if product.ggcsContent??>
+                                ${product.ggcsContent}
+                            </#if>
+                            </p>
+                        </dd>
+                    </dl>
+                </td>
+                <td class="product-price">
+                    <h3><span>${currencyCode}</span>&nbsp;<span id = "price_${product.itemId}">${product.disAmt?string("0.00")}</span></h3>
+                </td>
+                <td class="product-qty">
+                    <div class="buttons_added">
+                        <!-- <button class="minus" onclick="minusQuantity(this)" name = "minus_${product.itemId}"><i class="fa fa-minus"></i></button> -->
+                        <input type="text" maxlength="5" class="qty text form-control" value="${product.itemAmount}" 
+                        name="quantity_${product.itemId}"  id = "quantity_${product.itemId}" >
+                        <!-- <button class="plus" onclick="plusQuantity(this)" name = "plus_${product.itemId}"><i class="fa fa-plus"></i></button> -->
+                    </div>
+                </td>
+            </tr>
+            </#list>
+            </#if>
+            </tbody>
+        </table>
+
+        <div>
+            <a class="btn" onclick="checkAll()"><strong><@spring.message "mws.shopcart.checkall"/></strong></a>&nbsp;|&nbsp;<a class="btn" onclick="deleteShopCart()"><strong><@spring.message "sys.hand.btn.delete"/></strong></a>
+        </div>
+
+        <!-- <div class="coupon" style="float:left;">
+            <h3>Have Coupon?</h3>
+            <input type="text" placeholder="Coupon code" value="" class="form-control input-lg" name="coupon_code">
+            <button name="apply_coupon" class="btn btn-primary btn-lg"><i class="fa fa-refresh"></i></button>
+        </div>
+ -->
+        <div class="gap-20 visible-xs"></div>
+        <div class="cart-collaterals">
+            <table class="totals">
+                <tbody>
+                <!-- <tr class="cart-subtotal">
+                    <th>购物车总金额</th>
+                    <td><span class="amount" id = "totalPrice">0.00</span></td>
+                </tr> -->
+                <!-- <tr class="shipping">
+                    <th>Shipping and Handling</th>
+                    <td>Free Shipping</td>
+                </tr> -->
+                <!--modified by furong.tang-->
+                <!-- <tr class="order-total" id = "totalPvHide">
+                    <th><@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.pvsummary"/></th>
+                    <td style="color:#008f55" id = "totalPV">0</td>
+                </tr>-->
+                <!--modified by furong.tang-->
+                <tr class="order-total">
+                    <th><@spring.message "mws.shopcart.totalamount"/></th>
+                    <td><span class="amount">${currencyCode}</span>&nbsp;<span class="amount" id = "totalPrice">0.00</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="clear:both;float:right" >
+            <a class="btn btn-primary btn-lg" style="border-radius:5px;" onclick="confirmOrder()"><@spring.message "mws.shopcart.confirm"/></a>
+            
+        </div>
+        <form id="tokenForm" method="post" action="${base.contextPath}/order/order-confirm">
+            <input name="token" type="hidden" value="">
+        </form>
+    </div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.mws.mapper.BmBonusDetailMapper" >
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.mws.dto.BmBonusDetail" >
+        <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+        <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+        <result column="DEALER_NO" property="dealerNo" jdbcType="VARCHAR" />
+        <result column="PERIOD" property="period" jdbcType="VARCHAR" />
+        <result column="ORG_CODE" property="orgCode" jdbcType="VARCHAR" />
+        <result column="MK_CODE" property="mkCode" jdbcType="VARCHAR" />
+        <result column="ORG_GDCAMT" property="orgGdcamt" jdbcType="DECIMAL" />
+        <result column="ORG_LBAMT" property="orgLbamt" jdbcType="DECIMAL" />
+        <result column="ORG_PBAMT" property="orgPbamt" jdbcType="DECIMAL" />
+        <result column="ORG_BBAMT" property="orgBbamt" jdbcType="DECIMAL" />
+        <result column="ORG_EX450AMT" property="orgEx450amt" jdbcType="DECIMAL" />
+        <result column="ORG_OUT10AMT" property="orgOut10amt" jdbcType="DECIMAL" />
+        <result column="ORG_ABAMT" property="orgAbamt" jdbcType="DECIMAL" />
+        <result column="ORG_TOPAMT" property="orgTopamt" jdbcType="DECIMAL" />
+        <result column="ORG_STD_BONUS" property="orgStdBonus" jdbcType="DECIMAL" />
+        <result column="ORG_STD_BONUS_PV_RATE" property="orgStdBonusPvRate" jdbcType="DECIMAL" />
+        <result column="ORG_LCL_BONUS_ORIGIN" property="orgLclBonusOrigin" jdbcType="DECIMAL" />
+        <result column="ORG_REBATE_AMT" property="orgRebateAmt" jdbcType="DECIMAL" />
+        <result column="ORG_LCL_BONUS_ADJUST" property="orgLclBonusAdjust" jdbcType="DECIMAL" />
+        <result column="ORG_PAY_EX_RATE" property="orgPayExRate" jdbcType="DECIMAL" />
+        <result column="ORG_PRE_TAX_AMT_INCOME" property="orgPreTaxAmtIncome" jdbcType="DECIMAL" />
+    </resultMap>
+    
+    <sql id="Detail_Column_List" >
+      DEALER_NO, PERIOD, ORG_CODE, ORG_GDCAMT, ORG_LBAMT, ORG_PBAMT, 
+      ORG_BBAMT, ORG_EX450AMT, ORG_OUT10AMT, ORG_ABAMT, ORG_TOPAMT, ORG_STD_BONUS, ORG_STD_BONUS_PV_RATE, 
+      ORG_LCL_BONUS_ORIGIN, ORG_REBATE_AMT, ORG_LCL_BONUS_ADJUST, ORG_PAY_EX_RATE, ORG_PRE_TAX_AMT_INCOME
+    </sql>
+
+    <select id="selectDetailsByMemberAndPeriod" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.mws.dto.BmBonusDetail" >
+        select 
+			DEALER_NO,
+			PERIOD,
+			ORG_CODE,
+			(SELECT
+			    SCVB.MEANING
+			FROM
+			    SYS_CODE_B SYCB,
+			    SYS_CODE_VALUE_B SCVB
+			WHERE
+			    SYCB.CODE = 'SPM.MARKET_MAPPING'
+			AND SYCB.CODE_ID = SCVB.CODE_ID
+			AND SCVB."VALUE" = ORG_CODE) AS MK_CODE,
+			(SELECT
+			    SMB.MARKET_ID
+			FROM
+			    SYS_CODE_B SYCB,
+			    SYS_CODE_VALUE_B SCVB,
+			    SPM_MARKET_B SMB
+			WHERE
+			    SYCB.CODE = 'SYS.MWS_BONUS_MARKET_MAPPING'
+			AND SYCB.CODE_ID = SCVB.CODE_ID
+			AND SMB.CODE = SCVB.MEANING
+			AND SCVB."VALUE" = ORG_CODE) AS MARKET_ID,
+			ORG_GDCAMT,
+			ORG_LBAMT,
+			ORG_PBAMT,
+			ORG_BBAMT,
+			ORG_EX450AMT,
+			ORG_OUT10AMT,
+			ORG_ABAMT,
+			ORG_TOPAMT,
+			ORG_STD_BONUS,
+			ORG_STD_BONUS_PV_RATE,
+			ORG_LCL_BONUS_ORIGIN,
+			ORG_REBATE_AMT,
+			ORG_LCL_BONUS_ADJUST,
+			ORG_PAY_EX_RATE,
+			ORG_PRE_TAX_AMT_INCOME
+        from OMK.GDS_SALARY_DETAIL
+        where
+            DEALER_NO = (SELECT
+						    MEMBER_CODE
+						FROM
+						    MM_MEMBER
+						WHERE
+						    MEMBER_ID = #{memberId,jdbcType=DECIMAL})
+            AND PERIOD = #{period,jdbcType=VARCHAR}
+            AND ORG_CODE IN ('HKG','CHN','TPE','MAS','SIN','CAN')
+    </select>
+
+</mapper>

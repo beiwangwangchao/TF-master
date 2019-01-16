@@ -1,0 +1,878 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.promotion.mapper.VoucherMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.promotion.dto.Voucher" >
+    <id column="VOUCHER_ID" property="voucherId" jdbcType="DECIMAL" />
+    <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+    <result column="SALES_ORG_ID" property="salesOrgId" jdbcType="DECIMAL" />
+    <result column="VOUCHER_CODE" property="voucherCode" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+    <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+    <result column="CATEGORY" property="category" jdbcType="VARCHAR" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+    <result column="QUANTITY" property="quantity" jdbcType="DECIMAL" />
+    <result column="MAX_USE_QTY" property="maxUseQty" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="VARCHAR" />
+    <result column="APP_SCOPE" property="appScope" jdbcType="VARCHAR" />
+    <result column="USAGE_MODE" property="usageMode" jdbcType="VARCHAR" />
+    <result column="APPLY_CRITERIA" property="applyCriteria" jdbcType="VARCHAR" />
+    <result column="ITEM_QUANTITY" property="itemQuantity" jdbcType="DECIMAL" />
+    <result column="GIFT_QUANTITY" property="giftQuantity" jdbcType="DECIMAL" />
+    <result column="APP_TAX" property="appTax" jdbcType="VARCHAR" />
+    <result column="OPERATION" property="operation" jdbcType="VARCHAR" />
+    <result column="ORDER_AMOUNT" property="orderAmount" jdbcType="DECIMAL" />
+    <result column="USE_CRITERIA" property="useCriteria" jdbcType="VARCHAR" />
+    <result column="DISCOUNT_TYPE" property="discountType" jdbcType="VARCHAR" />
+    <result column="DISCOUNT_VALUE" property="discountValue" jdbcType="DECIMAL" />
+    <result column="SOURCE_ORDER_ID" property="sourceOrderId" jdbcType="DECIMAL" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="MARKET_CODE" property="marketCode" jdbcType="VARCHAR" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR" />
+    <result column="ORDER_NUMBER" property="orderNumber" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    VOUCHER_ID, MARKET_ID, SALES_ORG_ID, VOUCHER_CODE, NAME, DESCRIPTION, ENABLED_FLAG, 
+    START_ACTIVE_DATE, END_ACTIVE_DATE, CATEGORY, TYPE, QUANTITY, MAX_USE_QTY, STATUS, 
+    APP_SCOPE, USAGE_MODE, APPLY_CRITERIA, ITEM_QUANTITY, GIFT_QUANTITY, APP_TAX, OPERATION, 
+    ORDER_AMOUNT, USE_CRITERIA, DISCOUNT_TYPE, DISCOUNT_VALUE, OBJECT_VERSION_NUMBER, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, SOURCE_ORDER_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from PDM_VOUCHER
+    where VOUCHER_ID = #{voucherId,jdbcType=DECIMAL} for update
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from PDM_VOUCHER
+    where VOUCHER_ID = #{voucherId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.promotion.dto.Voucher" >
+    <selectKey resultType="java.lang.Long" keyProperty="voucherId" order="BEFORE" >
+      select PDM_VOUCHER_S.nextval from dual
+    </selectKey>
+    insert into PDM_VOUCHER (VOUCHER_ID, MARKET_ID, SALES_ORG_ID, 
+      VOUCHER_CODE, NAME, DESCRIPTION, 
+      ENABLED_FLAG, START_ACTIVE_DATE, END_ACTIVE_DATE, 
+      CATEGORY, TYPE, QUANTITY, 
+      MAX_USE_QTY, STATUS, APP_SCOPE, 
+      USAGE_MODE, APPLY_CRITERIA, ITEM_QUANTITY, 
+      GIFT_QUANTITY, APP_TAX, OPERATION, 
+      ORDER_AMOUNT, USE_CRITERIA, DISCOUNT_TYPE, 
+      DISCOUNT_VALUE, OBJECT_VERSION_NUMBER, REQUEST_ID, 
+      PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+      LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
+      ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+      ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, 
+      ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+      ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+      ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+      ATTRIBUTE15)
+    values (#{voucherId,jdbcType=DECIMAL}, #{marketId,jdbcType=DECIMAL}, #{salesOrgId,jdbcType=DECIMAL}, 
+      #{voucherCode,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{enabledFlag,jdbcType=VARCHAR}, #{startActiveDate,jdbcType=TIMESTAMP}, #{endActiveDate,jdbcType=TIMESTAMP}, 
+      #{category,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{quantity,jdbcType=DECIMAL}, 
+      #{maxUseQty,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{appScope,jdbcType=VARCHAR}, 
+      #{usageMode,jdbcType=VARCHAR}, #{applyCriteria,jdbcType=VARCHAR}, #{itemQuantity,jdbcType=DECIMAL}, 
+      #{giftQuantity,jdbcType=DECIMAL}, #{appTax,jdbcType=VARCHAR}, #{operation,jdbcType=VARCHAR}, 
+      #{orderAmount,jdbcType=DECIMAL}, #{useCriteria,jdbcType=VARCHAR}, #{discountType,jdbcType=VARCHAR}, 
+      #{discountValue,jdbcType=DECIMAL}, 1, #{requestId,jdbcType=DECIMAL}, 
+      #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, -1, 
+      -1, CURRENT_TIMESTAMP, #{lastUpdateLogin,jdbcType=DECIMAL}, 
+      #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, 
+      #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, 
+      #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, 
+      #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, 
+      #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.promotion.dto.Voucher" >
+    <selectKey resultType="java.lang.Long" keyProperty="voucherId" order="BEFORE" >
+      select PDM_VOUCHER_S.nextval from dual
+    </selectKey>
+    insert into PDM_VOUCHER
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      VOUCHER_ID,
+      <if test="marketId != null" >
+        MARKET_ID,
+      </if>
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID,
+      </if>
+      <if test="voucherCode != null" >
+        VOUCHER_CODE,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="description != null" >
+        DESCRIPTION,
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG,
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE,
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE,
+      </if>
+      <if test="category != null" >
+        CATEGORY,
+      </if>
+      <if test="type != null" >
+        TYPE,
+      </if>
+      <if test="quantity != null" >
+        QUANTITY,
+      </if>
+      <if test="maxUseQty != null" >
+        MAX_USE_QTY,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="appScope != null" >
+        APP_SCOPE,
+      </if>
+      <if test="usageMode != null" >
+        USAGE_MODE,
+      </if>
+      <if test="applyCriteria != null" >
+        APPLY_CRITERIA,
+      </if>
+      <if test="itemQuantity != null" >
+        ITEM_QUANTITY,
+      </if>
+      <if test="giftQuantity != null" >
+        GIFT_QUANTITY,
+      </if>
+      <if test="appTax != null" >
+        APP_TAX,
+      </if>
+      <if test="operation != null" >
+        OPERATION,
+      </if>
+      <if test="orderAmount != null" >
+        ORDER_AMOUNT,
+      </if>
+      <if test="useCriteria != null" >
+        USE_CRITERIA,
+      </if>
+      <if test="discountType != null" >
+        DISCOUNT_TYPE,
+      </if>
+      <if test="discountValue != null" >
+        DISCOUNT_VALUE,
+      </if>
+        OBJECT_VERSION_NUMBER,
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{voucherId,jdbcType=DECIMAL},
+      <if test="marketId != null" >
+        #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="salesOrgId != null" >
+        #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="voucherCode != null" >
+        #{voucherCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledFlag != null" >
+        #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="endActiveDate != null" >
+        #{endActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="category != null" >
+        #{category,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="quantity != null" >
+        #{quantity,jdbcType=DECIMAL},
+      </if>
+      <if test="maxUseQty != null" >
+        #{maxUseQty,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="appScope != null" >
+        #{appScope,jdbcType=VARCHAR},
+      </if>
+      <if test="usageMode != null" >
+        #{usageMode,jdbcType=VARCHAR},
+      </if>
+      <if test="applyCriteria != null" >
+        #{applyCriteria,jdbcType=VARCHAR},
+      </if>
+      <if test="itemQuantity != null" >
+        #{itemQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="giftQuantity != null" >
+        #{giftQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="appTax != null" >
+        #{appTax,jdbcType=VARCHAR},
+      </if>
+      <if test="operation != null" >
+        #{operation,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmount != null" >
+        #{orderAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="useCriteria != null" >
+        #{useCriteria,jdbcType=VARCHAR},
+      </if>
+      <if test="discountType != null" >
+        #{discountType,jdbcType=VARCHAR},
+      </if>
+      <if test="discountValue != null" >
+        #{discountValue,jdbcType=DECIMAL},
+      </if>
+      1,
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.promotion.dto.Voucher" >
+    update PDM_VOUCHER
+    <set >
+      <if test="marketId != null" >
+        MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="salesOrgId != null" >
+        SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      </if>
+      <if test="voucherCode != null" >
+        VOUCHER_CODE = #{voucherCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="category != null" >
+        CATEGORY = #{category,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        TYPE = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="quantity != null" >
+        QUANTITY = #{quantity,jdbcType=DECIMAL},
+      </if>
+      <if test="maxUseQty != null" >
+        MAX_USE_QTY = #{maxUseQty,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="appScope != null" >
+        APP_SCOPE = #{appScope,jdbcType=VARCHAR},
+      </if>
+      <if test="usageMode != null" >
+        USAGE_MODE = #{usageMode,jdbcType=VARCHAR},
+      </if>
+      <if test="applyCriteria != null" >
+        APPLY_CRITERIA = #{applyCriteria,jdbcType=VARCHAR},
+      </if>
+      <if test="itemQuantity != null" >
+        ITEM_QUANTITY = #{itemQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="giftQuantity != null" >
+        GIFT_QUANTITY = #{giftQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="appTax != null" >
+        APP_TAX = #{appTax,jdbcType=VARCHAR},
+      </if>
+      <if test="operation != null" >
+        OPERATION = #{operation,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmount != null" >
+        ORDER_AMOUNT = #{orderAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="useCriteria != null" >
+        USE_CRITERIA = #{useCriteria,jdbcType=VARCHAR},
+      </if>
+      <if test="discountType != null" >
+        DISCOUNT_TYPE = #{discountType,jdbcType=VARCHAR},
+      </if>
+      <if test="discountValue != null" >
+        DISCOUNT_VALUE = #{discountValue,jdbcType=DECIMAL},
+      </if>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where VOUCHER_ID = #{voucherId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.promotion.dto.Voucher" >
+    update PDM_VOUCHER
+    set MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      SALES_ORG_ID = #{salesOrgId,jdbcType=DECIMAL},
+      VOUCHER_CODE = #{voucherCode,jdbcType=VARCHAR},
+      NAME = #{name,jdbcType=VARCHAR},
+      DESCRIPTION = #{description,jdbcType=VARCHAR},
+      ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      CATEGORY = #{category,jdbcType=VARCHAR},
+      TYPE = #{type,jdbcType=VARCHAR},
+      QUANTITY = #{quantity,jdbcType=DECIMAL},
+      MAX_USE_QTY = #{maxUseQty,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=VARCHAR},
+      APP_SCOPE = #{appScope,jdbcType=VARCHAR},
+      USAGE_MODE = #{usageMode,jdbcType=VARCHAR},
+      APPLY_CRITERIA = #{applyCriteria,jdbcType=VARCHAR},
+      ITEM_QUANTITY = #{itemQuantity,jdbcType=DECIMAL},
+      GIFT_QUANTITY = #{giftQuantity,jdbcType=DECIMAL},
+      APP_TAX = #{appTax,jdbcType=VARCHAR},
+      OPERATION = #{operation,jdbcType=VARCHAR},
+      ORDER_AMOUNT = #{orderAmount,jdbcType=DECIMAL},
+      USE_CRITERIA = #{useCriteria,jdbcType=VARCHAR},
+      DISCOUNT_TYPE = #{discountType,jdbcType=VARCHAR},
+      DISCOUNT_VALUE = #{discountValue,jdbcType=DECIMAL},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where VOUCHER_ID = #{voucherId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="queryVouchersByMemberId" resultMap="BaseResultMap">
+  select 
+  pva.VOUCHER_ID,
+  pv.CATEGORY,
+  pv.DISCOUNT_TYPE,
+  pv.DISCOUNT_VALUE,
+  pv.DESCRIPTION,
+  pv.START_ACTIVE_DATE,
+  pv.END_ACTIVE_DATE,
+  pv.APP_SCOPE,
+  pv.APPLY_CRITERIA,
+  pv.USAGE_MODE,
+  pv.TYPE,
+  pv.VOUCHER_CODE,
+  pv.NAME
+  from PDM_VOUCHER_ASSIGN pva left outer join PDM_VOUCHER pv on pva.VOUCHER_ID = pv.VOUCHER_ID 
+  where pva.MEMBER_ID = #{memberId,jdbcType=DECIMAL} 
+  <if test="isUsed == 'UNUSE' || isUsed == null" >
+       and pv.ENABLED_FLAG = 'Y'
+       and pv.START_ACTIVE_DATE &lt;= CURRENT_TIMESTAMP
+       and pv.END_ACTIVE_DATE &gt;= CURRENT_TIMESTAMP
+  </if>
+  <if test="isUsed == 'EXPRI'" >
+       and pv.ENABLED_FLAG = 'Y'
+       and pv.END_ACTIVE_DATE &lt;= CURRENT_TIMESTAMP
+  </if>
+  <if test="isUsed == 'USED'" >
+       and pv.ENABLED_FLAG = 'N'
+  </if>
+  <if test="scope == 'INVOI' || scope == 'PRODU'" >
+       and pv.APPLY_CRITERIA = #{scope,jdbcType=VARCHAR}
+  </if>
+  </select>
+  
+  <select id="getVoucherByCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select <include refid="Base_Column_List" /> from PDM_VOUCHER p
+	where  p.VOUCHER_CODE = #{voucherCode,jdbcType=VARCHAR}
+	and p.ENABLED_FLAG = 'Y'
+       and p.START_ACTIVE_DATE &lt;= CURRENT_TIMESTAMP
+       and p.END_ACTIVE_DATE &gt;= CURRENT_TIMESTAMP
+  </select>
+  <!-- 查询优惠券 -->
+  <select id="queryVouchers" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.promotion.dto.Voucher">
+    select
+    VOUCHER_ID, MARKET_ID, SALES_ORG_ID, VOUCHER_CODE, NAME, DESCRIPTION, ENABLED_FLAG, 
+    START_ACTIVE_DATE, END_ACTIVE_DATE, CATEGORY, TYPE, QUANTITY, MAX_USE_QTY, STATUS, 
+    APP_SCOPE, USAGE_MODE, APPLY_CRITERIA, ITEM_QUANTITY, GIFT_QUANTITY, APP_TAX, OPERATION, 
+    ORDER_AMOUNT, USE_CRITERIA, DISCOUNT_TYPE, DISCOUNT_VALUE, OBJECT_VERSION_NUMBER, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+    from PDM_VOUCHER
+    <where>
+      <if test="voucherId != null" >
+        VOUCHER_ID = #{voucherId,jdbcType=DECIMAL}
+      </if>
+        AND SALES_ORG_ID=#{salesOrgId,jdbcType=DECIMAL}
+      <if test="voucherCode != null" >
+        AND Upper(VOUCHER_CODE)like concat('%',concat(Upper(#{voucherCode,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="name != null" >
+        AND Upper(NAME)like concat('%',concat(Upper(#{name,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="description != null" >
+        AND Upper(DESCRIPTION)like concat('%',concat(Upper(#{description,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="enabledFlag != null" >
+        AND ENABLED_FLAG = #{enabledFlag,jdbcType=DECIMAL}
+      </if>
+      <if test="applyCriteria != null" >
+        AND APPLY_CRITERIA = #{applyCriteria,jdbcType=VARCHAR}
+      </if>
+      <if test="startActiveDate != null" >
+        AND START_ACTIVE_DATE <![CDATA[ >= #{startActiveDate,jdbcType=TIMESTAMP}]]>
+      </if>
+      <if test="endActiveDate != null" >
+        AND END_ACTIVE_DATE <![CDATA[ <= #{endActiveDate,jdbcType=TIMESTAMP}]]>
+      </if>
+    </where>
+    <if test="sortname == null and sortorder == null">
+        order by VOUCHER_CODE desc
+    </if>
+    <if test="sortname == 'voucherCode' and sortorder == 'desc'">
+        order by VOUCHER_CODE desc
+    </if>
+    <if test="sortname =='voucherCode' and sortorder == 'asc'">
+        order by VOUCHER_CODE asc
+    </if>
+    <if test="sortname =='startActiveDate' and sortorder == 'asc'">
+        order by START_ACTIVE_DATE asc
+    </if>
+    <if test="sortname =='startActiveDate' and sortorder == 'desc'">
+        order by START_ACTIVE_DATE desc
+    </if>
+    <if test="sortname =='endActiveDate' and sortorder == 'asc'">
+        order by END_ACTIVE_DATE asc
+    </if>
+    <if test="sortname =='endActiveDate' and sortorder == 'desc'">
+        order by END_ACTIVE_DATE desc
+    </if>
+    
+  </select>
+  <!-- 根据优惠券代码查询 用于检查优惠券代码的唯一性 -->
+    <select id="selectByVoucherCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from PDM_VOUCHER
+    where VOUCHER_CODE = #{voucherCode,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 查询已启用且在有效期内的优惠券 -->
+  <select id="selectEnableVoucher" resultMap="BaseResultMap" 
+    parameterType="com.lkkhpg.dsis.common.promotion.dto.Voucher">
+  	select <include refid="Base_Column_List" />
+  	from PDM_VOUCHER p
+  	<where>
+  		p.ENABLED_FLAG = 'Y' 
+  		and p.START_ACTIVE_DATE &lt;= CURRENT_TIMESTAMP
+  		and (p.END_ACTIVE_DATE &gt;= CURRENT_TIMESTAMP OR p.END_ACTIVE_DATE IS NULL) 
+  		<if test="voucherId != null">
+  			and VOUCHER_ID = #{voucherId,jdbcType=DECIMAL} for update
+  		</if>
+  	</where>
+  </select>
+  
+  <resultMap type="com.lkkhpg.dsis.common.promotion.dto.Voucher" id="voucherWithItem" extends="BaseResultMap">
+    <collection property="pdmVoucherItems" ofType="com.lkkhpg.dsis.common.promotion.dto.PdmVoucherItem">
+        <id column="VOUCHER_ITEM_ID" property="voucherItemId" jdbcType="DECIMAL" />
+        <result column="VOUCHER_ID" property="voucherId" jdbcType="DECIMAL" />
+        <result column="ITEM_ID" property="itemId" jdbcType="DECIMAL" />
+        <result column="V_QUANTITY" property="quantity" jdbcType="DECIMAL" />
+    </collection>
+  </resultMap>
+  
+  <select id="getMemberVouchers" resultMap="voucherWithItem">
+    SELECT v.VOUCHER_ID,v.MARKET_ID,v.SALES_ORG_ID,v.VOUCHER_CODE,
+    v.NAME,v.DESCRIPTION,v.ENABLED_FLAG,v.START_ACTIVE_DATE,v.END_ACTIVE_DATE,
+    v.CATEGORY,v.TYPE,va.QUANTITY,v.MAX_USE_QTY,v.STATUS,v.APP_SCOPE,
+    v.USAGE_MODE,v.APPLY_CRITERIA,v.ITEM_QUANTITY,v.GIFT_QUANTITY,
+    v.APP_TAX,v.OPERATION,v.ORDER_AMOUNT,v.USE_CRITERIA,v.DISCOUNT_TYPE,
+    v.DISCOUNT_VALUE,vi.QUANTITY as V_QUANTITY,vi.ITEM_ID,vi.VOUCHER_ITEM_ID
+    FROM (PDM_VOUCHER v LEFT OUTER JOIN PDM_VOUCHER_ITEM vi ON(VI.VOUCHER_ID=v.VOUCHER_ID))
+    LEFT OUTER JOIN PDM_VOUCHER_ASSIGN va ON(va.VOUCHER_ID=v.VOUCHER_ID)
+    <where>
+        v.ENABLED_FLAG='Y' AND v.START_ACTIVE_DATE &lt;= CURRENT_TIMESTAMP
+        AND (v.END_ACTIVE_DATE>=CURRENT_TIMESTAMP OR v.END_ACTIVE_DATE IS NULL)
+        AND ((va.SALES_ORG_ID=#{salesOrgId,jdbcType=DECIMAL} AND va.ASSIGN_TYPE='SALES') 
+        <if test="memberId !=null">
+        OR (va.MEMBER_ID=#{memberId,jdbcType=DECIMAL} AND va.ASSIGN_TYPE='MEM') 
+        </if>
+        ) AND va.QUANTITY>0 AND v.CATEGORY != 'VIP'
+    </where>
+  </select>
+  
+  <update id="updateEcouponInvalid" parameterType="com.lkkhpg.dsis.common.promotion.dto.Voucher">
+      update PDM_VOUCHER 
+        set ENABLED_FLAG = 'N', 
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP 
+      <where>
+          CATEGORY = 'VIP'
+          <if test="voucherId != null">
+              AND VOUCHER_ID = #{voucherId,jdbcType=DECIMAL}
+          </if>
+          <if test="voucherCode != null">
+              AND VOUCHER_CODE = #{voucherCode,jdbcType=VARCHAR}
+          </if>
+      </where>
+  </update>
+  <select id="selectBySourceOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+      select 
+        <include refid="Base_Column_List" />
+        from PDM_VOUCHER
+        where SOURCE_ORDER_ID = #{sourceOrderId,jdbcType=DECIMAL}
+  </select>
+    <select id="getMemberVouchersForVIP" resultMap="voucherWithItem">
+    SELECT v.VOUCHER_ID,v.MARKET_ID,v.SALES_ORG_ID,v.VOUCHER_CODE,
+    v.NAME,v.DESCRIPTION,v.ENABLED_FLAG,v.START_ACTIVE_DATE,v.END_ACTIVE_DATE,
+    v.CATEGORY,v.TYPE,va.QUANTITY,v.MAX_USE_QTY,v.STATUS,v.APP_SCOPE,
+    v.USAGE_MODE,v.APPLY_CRITERIA,v.ITEM_QUANTITY,v.GIFT_QUANTITY,
+    v.APP_TAX,v.OPERATION,v.ORDER_AMOUNT,v.USE_CRITERIA,v.DISCOUNT_TYPE,
+    v.DISCOUNT_VALUE,vi.QUANTITY as V_QUANTITY,vi.ITEM_ID,vi.VOUCHER_ITEM_ID
+    FROM (PDM_VOUCHER v LEFT OUTER JOIN PDM_VOUCHER_ITEM vi ON(VI.VOUCHER_ID=v.VOUCHER_ID))
+    LEFT OUTER JOIN PDM_VOUCHER_ASSIGN va ON(va.VOUCHER_ID=v.VOUCHER_ID)
+    <where>
+        v.ENABLED_FLAG='Y' AND v.START_ACTIVE_DATE &lt;= CURRENT_TIMESTAMP
+        AND (v.END_ACTIVE_DATE>=CURRENT_TIMESTAMP OR v.END_ACTIVE_DATE IS NULL)
+        AND ((va.SALES_ORG_ID=#{request.salesOrgId,jdbcType=DECIMAL} AND va.ASSIGN_TYPE='SALES') 
+        <if test="memberId !=null">
+        OR (va.MEMBER_ID=#{memberId,jdbcType=DECIMAL} AND va.ASSIGN_TYPE='MEM') 
+        </if>
+        ) AND va.QUANTITY > 0 AND v.STATUS = 'RELD' AND v.CATEGORY = 'VIP'
+        AND not exists
+        (select oso.order_status
+           from om_sales_order oso, om_mws_order_payment op
+         where oso.header_id = op.order_header_id
+           and op.payment_method='ECUP'
+           AND OP.VOUCHER_ID=V.VOUCHER_ID
+           AND OP.STATUS='NEW'
+           and oso.order_status in ('WPAY', 'PAYIN', 'COMP'))
+    </where>
+  </select>
+  
+  <sql id="Base_Column_List_Dapp" >
+    VOUCHER_ID, MARKET_ID, SALES_ORG_ID, VOUCHER_CODE, NAME, DESCRIPTION, ENABLED_FLAG, 
+    START_ACTIVE_DATE, END_ACTIVE_DATE, CATEGORY, TYPE, QUANTITY, MAX_USE_QTY, STATUS, 
+    APP_SCOPE, USAGE_MODE, APPLY_CRITERIA, ITEM_QUANTITY, GIFT_QUANTITY, APP_TAX, OPERATION, 
+    ORDER_AMOUNT, USE_CRITERIA, DISCOUNT_TYPE, DISCOUNT_VALUE, OBJECT_VERSION_NUMBER, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, SOURCE_ORDER_ID,MARKET_CODE,MEMBER_CODE,ORDER_NUMBER
+  </sql>
+  <select id="selectVIPForDapp" parameterType="java.util.Map" resultMap="BaseResultMap">
+      SELECT sm.code market_code,
+       mm.member_code,
+       pv.category,
+       pv.voucher_code,
+       pv.name,
+       pv.enabled_flag,
+       pv.start_active_date,
+       pv.end_active_date,
+       pva.quantity,
+       pv.order_amount,
+       pv.APP_TAX,
+       (
+		SELECT
+		max(osoo.order_number)
+	FROM
+		om_sales_order osoo,
+		om_mws_order_payment op
+
+	WHERE
+		osoo.header_id = op.order_header_id
+	AND op.payment_method = 'ECUP'
+	AND OP.VOUCHER_ID = pv.VOUCHER_ID
+	AND OP.STATUS = 'NEW'
+	AND osoo.order_status IN ('WPAY', 'PAYIN', 'COMP')
+	) order_number
+  FROM spm_market_b       sm,
+       mm_member          mm,
+       pdm_voucher_assign pva,
+       pdm_voucher        pv
+ WHERE sm.market_id = mm.market_id
+   AND mm.member_id = pva.member_id
+   AND pva.voucher_id = pv.voucher_id
+   <!--分配类型是会员 -->
+   AND pva.assign_type = 'MEM' 
+   <!-- 优惠券类别是VIP -->
+   AND pv.category = 'VIP' 
+   <!--  市场，必输 -->
+   AND sm.code = #{market,jdbcType=VARCHAR}
+   <if test="memberCode !=null">
+        AND mm.member_code = #{memberCode,jdbcType=VARCHAR}
+   </if>
+   <if test="voucherCodes !=null">
+        AND pv.voucher_code IN 
+   <foreach collection="voucherCodes" item="voucherCode"
+            open="(" close=")" separator=",">
+            #{voucherCode}
+        </foreach> 
+   </if>
+   AND pv.STATUS = 'RELD'
+	and Pv.ENABLED_FLAG = 'Y'
+	AND pv.START_ACTIVE_DATE &lt;= CURRENT_TIMESTAMP
+	AND (
+		pv.END_ACTIVE_DATE >= CURRENT_TIMESTAMP
+		OR pv.END_ACTIVE_DATE IS NULL
+	)
+  </select>
+  <select id="updateFlagByEndActiveDate">
+    update pdm_voucher pv
+       set pv.enabled_flag = 'N'
+     where trunc(pv.end_active_date, 'mi') &lt; sysdate
+  </select>
+</mapper>

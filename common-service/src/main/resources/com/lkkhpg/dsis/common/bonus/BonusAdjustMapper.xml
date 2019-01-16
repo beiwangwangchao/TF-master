@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.common.bonus.mapper.BonusAdjustMapper">
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.bonus.dto.BonusAdjust">
+    <id column="ADJ_ID" property="adjId" jdbcType="DECIMAL" />
+    <result column="ADJ_CODE" property="adjCode" jdbcType="VARCHAR" />
+    <result column="MEMBER_ID" property="memberId" jdbcType="DECIMAL" />
+    <result column="PERIOD_ID" property="periodId" jdbcType="DECIMAL" />
+    <result column="ADJ_STATUS" property="adjStatus" jdbcType="VARCHAR" />
+    <result column="ADJ_TYPE" property="adjType" jdbcType="VARCHAR" />
+    <result column="ADJ_REASON" property="adjReason" jdbcType="VARCHAR" />
+    <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="SYNC_FLAG" property="syncFlag" jdbcType="VARCHAR" />
+    <result column="ADJ_AMT" property="adjAmt" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+    <result column="CURRENCY_CODE" property="currencyCode" jdbcType="VARCHAR" />
+    <result column="COMPANY_NAME" jdbcType="VARCHAR" property="companyName" />
+    <result column="MEMBER_CODE" jdbcType="VARCHAR" property="memberCode" />
+    <result column="MARKET_NAME" jdbcType="VARCHAR" property="marketName" />
+    <result column="PERIOD_NAME" jdbcType="VARCHAR" property="periodName" />
+    <result column="ADJ_CATEGORY" jdbcType="VARCHAR" property="adjCategory" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ADJ_ID, ADJ_CODE, MEMBER_ID, PERIOD_ID, ADJ_STATUS, ADJ_TYPE, ADJ_REASON, DESCRIPTION, 
+    OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+    LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, 
+    ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+    ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE14, ATTRIBUTE15, SYNC_FLAG, ADJ_AMT, 
+    ATTRIBUTE13, MARKET_ID, CURRENCY_CODE,ADJ_CATEGORY
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from BM_BONUS_ADJ
+    where ADJ_ID = #{adjId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusAdjust">
+    delete from BM_BONUS_ADJ
+    where ADJ_ID = #{adjId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusAdjust">
+    <selectKey keyProperty="adjId" order="BEFORE" resultType="java.lang.Long">
+      select BM_BONUS_ADJ_S.nextval from dual
+    </selectKey>
+    insert into BM_BONUS_ADJ (ADJ_ID, ADJ_CODE, MEMBER_ID, 
+      PERIOD_ID, ADJ_STATUS, ADJ_TYPE, 
+      ADJ_REASON, DESCRIPTION, OBJECT_VERSION_NUMBER, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE14, 
+      ATTRIBUTE15, SYNC_FLAG, ADJ_AMT, 
+      ATTRIBUTE13, MARKET_ID, CURRENCY_CODE,ADJ_CATEGORY
+      )
+    values (#{adjId,jdbcType=DECIMAL}, #{adjCode,jdbcType=VARCHAR}, #{memberId,jdbcType=DECIMAL}, 
+      #{periodId,jdbcType=DECIMAL}, #{adjStatus,jdbcType=VARCHAR}, #{adjType,jdbcType=VARCHAR}, 
+      #{adjReason,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 1, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, current_timestamp, 
+      -1, #{lastUpdatedBy,jdbcType=DECIMAL}, current_timestamp, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, 
+      #{attribute15,jdbcType=VARCHAR}, #{syncFlag,jdbcType=VARCHAR}, #{adjAmt,jdbcType=DECIMAL}, 
+      #{attribute13,jdbcType=VARCHAR}, #{marketId,jdbcType=DECIMAL}, #{currencyCode,jdbcType=VARCHAR},
+      #{adjCategory,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusAdjust">
+    <selectKey keyProperty="adjId" order="BEFORE" resultType="java.lang.Long">
+      select BM_BONUS_ADJ_S.nextval from dual
+    </selectKey>
+    insert into BM_BONUS_ADJ
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      ADJ_ID,
+      <if test="adjCode != null" >
+        ADJ_CODE,
+      </if>
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="periodId != null" >
+        PERIOD_ID,
+      </if>
+      <if test="adjStatus != null" >
+        ADJ_STATUS,
+      </if>
+      <if test="adjType != null" >
+        ADJ_TYPE,
+      </if>
+      <if test="adjReason != null" >
+        ADJ_REASON,
+      </if>
+      <if test="description != null" >
+        DESCRIPTION,
+      </if>
+        OBJECT_VERSION_NUMBER,
+        
+        
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+        
+        
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+        
+        
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="syncFlag != null" >
+        SYNC_FLAG,
+      </if>
+      <if test="adjAmt != null" >
+        ADJ_AMT,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID,
+      </if>
+      <if test="currencyCode != null" >
+        CURRENCY_CODE,
+      </if>
+      <if test="adjCategory != null" >
+        ADJ_CATEGORY,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{adjId,jdbcType=DECIMAL},
+      <if test="adjCode != null" >
+        #{adjCode,jdbcType=VARCHAR},
+      </if>
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="periodId != null" >
+        #{periodId,jdbcType=DECIMAL},
+      </if>
+      <if test="adjStatus != null" >
+        #{adjStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="adjType != null" >
+        #{adjType,jdbcType=VARCHAR},
+      </if>
+      <if test="adjReason != null" >
+        #{adjReason,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+        1,
+        
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+        
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="syncFlag != null" >
+        #{syncFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="adjAmt != null" >
+        #{adjAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="marketId != null" >
+        #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="currencyCode != null" >
+        #{currencyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adjCategory != null" >
+        #{adjCategory,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusAdjust">
+    update BM_BONUS_ADJ
+     <set >
+      <if test="adjCode != null" >
+        ADJ_CODE = #{adjCode,jdbcType=VARCHAR},
+      </if>
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="periodId != null" >
+        PERIOD_ID = #{periodId,jdbcType=DECIMAL},
+      </if>
+      <if test="adjStatus != null" >
+        ADJ_STATUS = #{adjStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="adjType != null" >
+        ADJ_TYPE = #{adjType,jdbcType=VARCHAR},
+      </if>
+      <if test="adjReason != null" >
+        ADJ_REASON = #{adjReason,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="syncFlag != null" >
+        SYNC_FLAG = #{syncFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="adjAmt != null" >
+        ADJ_AMT = #{adjAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="currencyCode != null" >
+        CURRENCY_CODE = #{currencyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="adjCategory != null" >
+        ADJ_CATEGORY = #{adjCategory,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ADJ_ID = #{adjId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusAdjust">
+    update BM_BONUS_ADJ
+    set ADJ_CODE = #{adjCode,jdbcType=VARCHAR},
+      MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      PERIOD_ID = #{periodId,jdbcType=DECIMAL},
+      ADJ_STATUS = #{adjStatus,jdbcType=VARCHAR},
+      ADJ_TYPE = #{adjType,jdbcType=VARCHAR},
+      ADJ_REASON = #{adjReason,jdbcType=VARCHAR},
+      DESCRIPTION = #{description,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      SYNC_FLAG = #{syncFlag,jdbcType=VARCHAR},
+      ADJ_AMT = #{adjAmt,jdbcType=DECIMAL},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      CURRENCY_CODE = #{currencyCode,jdbcType=VARCHAR},
+      ADJ_CATEGORY = #{adjCategory,jdbcType=VARCHAR}
+    where ADJ_ID = #{adjId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="queryBonusAdjust" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusAdjust">
+SELECT bba.adj_id,
+       bba.adj_code,
+       mm.company_id,
+       sct.name          AS company_name,
+       mm.market_id,
+       smt.name          AS market_name,
+       bba.member_id,
+       mm.member_code    AS member_code,
+       bba.period_id,
+       sp.period_name    AS period_name,
+       bba.adj_status,
+       bba.adj_type,
+       bba.adj_reason,
+       bba.description,
+       bba.creation_date,
+       bba.adj_amt,
+       BBA.ADJ_CATEGORY
+  FROM bm_bonus_adj  bba,
+       mm_member     mm,
+       spm_period    sp,
+       spm_company_b scb
+  LEFT OUTER JOIN spm_company_tl sct
+    ON (scb.company_id = sct.company_id AND sct.lang = #{request.locale,jdbcType=VARCHAR}), spm_market_b smb
+  LEFT OUTER JOIN spm_market_tl smt
+    ON (smb.market_id = smt.market_id AND smt.lang = #{request.locale,jdbcType=VARCHAR})
+ WHERE mm.member_id = bba.member_id
+   AND sp.period_id = bba.period_id
+   AND sp.period_type = 'BM'
+   AND sp.org_id = bba.market_id
+   AND mm.company_id = scb.company_id
+   AND smb.market_id = bba.market_id
+   <if test="marketId != null">
+        and bba.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+   </if>
+   <if test="marketId == null">
+        and bba.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}
+   </if>
+    <if test="adjType != null">
+        AND  BBA.ADJ_TYPE = #{adjType,jdbcType=VARCHAR}
+    </if>
+    <if test="periodId != null">
+        AND  BBA.PERIOD_ID = #{periodId,jdbcType=DECIMAL}
+    </if>
+    <if test="adjReason != null">
+        AND  BBA.ADJ_REASON = #{adjReason,jdbcType=VARCHAR}
+    </if>
+    <if test="adjStatus != null">
+        AND  BBA.ADJ_STATUS = #{adjStatus,jdbcType=VARCHAR}
+    </if>
+    <if test="creationDate != null">
+        AND BBA.CREATION_DATE &gt;= #{creationDate,jdbcType=TIMESTAMP}
+    </if>
+    <if test="adjCategory != null">
+        AND  BBA.ADJ_CATEGORY = #{adjCategory,jdbcType=VARCHAR}
+    </if>
+    <if test="memberCode != null">
+        AND  MM.member_code like concat('%',concat(#{memberCode,jdbcType=VARCHAR},'%'))
+    </if>
+    ORDER BY BBA.ADJ_ID
+  </select>
+
+
+  <update id="deleteBonusAdjust" parameterType="java.util.Map">
+  update bm_bonus_adj set adj_status ='NULL' where adj_id IN 
+  <foreach item="bonusAdjust" index="index" collection="bonusAdjusts" open="(" separator=","
+                    close=")">
+                    #{bonusAdjust.adjId}
+                </foreach>
+  </update>
+
+    
+    <update id="updateBonusStatus" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusAdjust">
+    UPDATE BM_BONUS_ADJ SET ADJ_STATUS ='NULL' WHERE ADJ_ID = #{adjId,jdbcType=DECIMAL}
+    </update>
+
+</mapper>

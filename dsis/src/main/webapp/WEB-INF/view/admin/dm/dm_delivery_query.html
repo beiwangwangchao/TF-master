@@ -1,0 +1,417 @@
+<#--
+ * description: 查询发运单
+ * version: 1.0
+ * author: li.peng
+ * .
+ *
+-->
+
+<#include "../include/head.html">
+<style>
+
+a:link {
+	color: blue;
+}
+
+a:visited {
+	color: red;
+}
+</style>
+<script src="${base.contextPath}/common/code?deliveryType=DM.DELIVERY_TYPE&deliveryStatus=DM.DELIVERY_STATUS"
+		type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+
+<body  style="padding: 10px;">
+	
+	<div id="d_dm_003_form"></div>
+	<div id="d_dm_003_grid"></div>
+	<script type="text/javascript">
+	var invOrgOp = {id:_invOrgId, value:_invOrgName};
+	$(function() {
+	    initForm();
+	    initGrid();
+	    liger.get('deliveryStatus').setValue("NEW;PDDL");
+	    liger.get('orderNumber').setValue('${RequestParameters.orderNumber!}');
+       /*  liger.get('orderNumber').setText('${RequestParameters.orderNumber!}'); */
+        /* d_dm_003_form.setData({'invOrgId':_invOrgId, 'invOrgName':_invOrgName}); */
+        
+      <#if RequestParameters.invOrgId?exists>
+        liger.get("invOrgId").setValue(${RequestParameters.invOrgId});
+        liger.get("invOrgId").setText('${RequestParameters.invOrgName}');
+        
+        <#else>
+        liger.get("invOrgId").setValue(_invOrgId);
+        liger.get("invOrgId").setText(_invOrgName);
+        </#if>
+      
+	    Hap.gridQuery({
+	        form: d_dm_003_form,
+	        grid: d_dm_003_grid
+	    })
+	});
+
+	function initForm() {
+	    window["d_dm_003_form"] = $("#d_dm_003_form").ligerForm({
+	        fields: [{
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.ordernumber"/>',
+	            name: "orderNumber",
+	            newline: false,
+	            type : 'text'
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.deliverynumber"/>',
+	            name: "deliveryNumber",
+	            newline: false,
+	            type: "text"
+	        },
+	        /* {
+	        	name: 'invOrgId',
+	        	type : 'hidden',
+                newline: false
+	        }, */
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.invorgid"/>',
+	            name: "invOrgId",
+	            newline: false,
+	            type: "combobox",
+	            options: {
+	            	valueField : 'invOrgId',
+	                textField  : 'name',
+	            	url   : '${base.contextPath}/sys/invOrg/queryOrg',
+	            	cancelable : false,
+	                onBeforeSelect :function (value,text){
+	            		var curId = liger.get("invOrgId").getValue();
+	            		
+	            		$.ligerDialog.confirm('<@spring.message "dsis.lkkhpg.tip.refresh_page"/>',$l('sys.hand.tip.info'),
+                                function(yes) {
+                                    if(yes){
+                                          var tabid = window.top.tab.selectedTabId;
+                                          var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                          window.top.f_removeTab(tabid);
+                                          window.top.f_addTab(tabid, tabname, "dm/dm_delivery_query.html?invOrgId="+value+"&invOrgName=" +text);
+                                    }else{
+                                    	liger.get("invOrgId").setValue(curId);
+                                    }
+                                });
+	            	}
+	            },
+	            validate: {
+	            	required : true
+	            }
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.memberid"/>',
+	            name: "memberId",
+	            textField:'memberCode', 
+                newline : false,
+                type : "popup",
+                editor : $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member_pick")},{ 
+                  
+                })
+	        },
+
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.deliverytype"/>',
+	            name: "deliveryType",
+	            newline: false,
+	            type: "combobox",
+	            options: {
+	                valueField: 'value',
+	                textField: 'meaning',
+	                data: deliveryType
+	            }
+	        }, 
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.deliverystatus"/>',
+	            name: "deliveryStatus",
+	            newline: false,
+	            type: "combobox",
+	            editor: {
+	                valueField: 'value',
+	                textField: 'meaning',
+	                isMultiSelect: true,
+	                data: deliveryStatus
+	            }
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.creationdatef"/>',
+	            name: "creationBegin",
+	            newline: true,
+	            type: "date",
+	            format: "yyyy-MM-dd",
+	            editor : {
+	            	type: "date",
+	                format: "yyyy-MM-dd"
+	            }
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.creationdatet"/>',
+	            name: "creationEnd",
+	            newline: false,
+	            type: "date",
+	            format: "yyyy-MM-dd",
+                editor : {
+                    type: "date",
+                    format: "yyyy-MM-dd"
+                }
+
+	        },        
+	        {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.logisticscompany"/>',
+                name: "logisticsCompany",
+                newline: false,
+                type: "text"
+            },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.deliverydatef"/>',
+	            name: "deliveryDateBegin",
+	            newline: true,
+	            type: "date",
+	            format: "yyyy-MM-dd",
+                editor : {
+                    type: "date",
+                    format: "yyyy-MM-dd"
+                }
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.deliverydatet"/>',
+	            name: "deliveryDateEnd",
+	            newline: false,
+	            type: "date",
+	            format: "yyyy-MM-dd",
+                editor : {
+                    type: "date",
+                    format: "yyyy-MM-dd"
+                }
+	        },
+	        {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.trackernumber"/>',
+                name: "trackerNumber",
+                newline: false,
+                type: "text"
+            },],
+	        buttons: [{
+	            text: '<@spring.message "sys.hand.btn.query"/>',
+	            disabled: false,
+	            width: 60,
+	            click: function() {
+	                Hap.gridQuery({
+	                    form: d_dm_003_form,
+	                    grid: d_dm_003_grid
+	                })
+	            }
+	        }]
+	    })
+	}
+
+	function initGrid() {
+	    window["d_dm_003_grid"] = $("#d_dm_003_grid").ligerGrid({
+	        columns: [{
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.deliverynumber"/>',
+	            name: 'deliveryNumber',isSort : true,
+	            render: function(rowdata) {
+	                return "<a href='javascript:void(0);' onclick='deliveryDetail(" + rowdata.deliveryId + ")'>" + rowdata.deliveryNumber + "</a> "
+	            }
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.invorgid"/>',
+	            name: 'invOrgName'
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.ordernumber"/>',
+	            name: 'orderNumber',isSort : true,width:180
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.memberid"/>',
+	            name: 'memberCode'
+	        },
+	        {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.membername"/>',
+                name: 'memberName'
+            },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.deliverytype"/>',
+	            name: 'deliveryType',
+	            render: function(item) {
+	                for (var i = 0; i < deliveryType.length; i++) {
+	                    if (deliveryType[i].value == item.deliveryType) {
+	                        return deliveryType[i].meaning;
+	                    }
+	                }
+	            }
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.deliverystatus"/>',
+	            name: 'deliveryStatus',
+	            render: function(item) {
+	                for (var i = 0; i < deliveryStatus.length; i++) {
+	                    if (deliveryStatus[i].value == item.deliveryStatus) {
+	                        return deliveryStatus[i].meaning;
+	                    }
+	                }
+	            }
+	        },
+	        {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.logisticscompany"/>',
+                name: 'logisticsCompany'
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.trackernumber"/>',
+                name: 'trackerNumber'
+            },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.creationdate"/>',
+	            name: 'creationDate',isSort : true,
+	            type: "date"
+	        },
+	        {
+	            display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.delivery.dto.deliveryforquery.deliverydate"/>',
+	            name: 'deliveryDate',isSort : true,
+	            type: "date"
+	        }],
+	        url: '${base.contextPath}/dm/delivery/query',
+	        delayLoad: true,
+	        width: '99%',
+	        height: '98%',
+	        checkbox: true,
+	        rownumbers: true,
+	        toolbar : {
+                items : [
+//                        {
+//                            text : '<@spring.message "msg.info.order.printlist"/>',
+//                            click : function() {
+//                            	var selectrows = d_dm_003_grid.getSelectedRows();
+//                                if(selectrows.length == 0){
+//                                    return;
+//                                }
+//                                f_printList(selectrows);
+//                            },
+//                            icon : 'print'
+//                        },{
+//                            text : '<@spring.message "msg.info.order.printorderlist"/>',
+//                            click : function() {
+//                            	var selectrows = d_dm_003_grid.getSelectedRows();
+//                            	if(selectrows.length == 0){
+//                            		return;
+//                            	}
+//                            	f_printOrderList(selectrows);
+//                            },
+//                            icon : 'print'
+//                        },
+                        { line: true },
+                        {                   
+                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                            menu:{ width: 120, items:
+                                    [
+                                        {                   
+                                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                            click:   function (){exportSelected("d_dm_003_form","d_dm_003_grid",{"deliveryType":deliveryType,"deliveryStatus":deliveryStatus},_basePath);}
+                                        },
+                                        { line: true },
+                                        {                   
+                                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                            click: function (){exportDirectAll("d_dm_003_form","d_dm_003_grid",{"deliveryType":deliveryType,"deliveryStatus":deliveryStatus},_basePath);}
+                                            
+                                        }
+                                  ]
+                            }                        
+                        }
+                        
+                        ]
+            }
+	    });
+	}
+
+	function deliveryDetail(id) {
+	    window.top.f_removeTab('dm_delivery_detail_' + id);
+	    window.top.f_addTab('dm_delivery_detail_' + id, '<@spring.message "sys.hand.tab.delivery"/>', 'dm/dm_delivery_detail.html?deliveryId=' + id);
+	}
+	
+	 /**
+     * 打印订单清单.
+     */
+    function f_printOrderList(rows){
+        $.ligerDialog.open({
+            title: '<@spring.message "type.com.lkkhpg.dsis.report.type.choosing"/>',
+            width:400,
+            height:300,
+            slide: false,
+            url: _basePath + "/sys/report/sys_report_type_dialog.html",
+            buttons: [{
+                text: $l("sys.hand.btn.ok" ),
+                onclick: function(i, d) {
+                   
+                    var   marketCode = _marketCode;
+                    var form = d.frame.report_type_form;
+                    var docType= form.getData().docType;
+                    if (form.valid()) {
+                         d.close();
+                         var orderNumbers = '';
+                         var deliveryNumbers= ''
+                         for(var t=0; t<rows.length; t++){
+                        	 if(t< rows.length -1){
+                        	    orderNumbers += rows[t].orderNumber + ",";
+                        	    deliveryNumbers += rows[t].deliveryNumber + ",";
+                        	 }else{
+                        		 orderNumbers += rows[t].orderNumber;
+                                 deliveryNumbers += rows[t].deliveryNumber;
+                        	 }
+                         }
+                         /* if(marketCode == 'HK'){
+                         window.open(_basePath+'/report/run?docType='+ docType +'&reportProgramCode=RPT-PACKING-LIST-'+marketCode+'&orderNumber='+orderNumbers + '&deliveryNumber='+deliveryNumbers);
+                     }else{
+                         
+                     } */
+                         window.open(_basePath+'/report/run?docType='+ docType +'&reportProgramCode=RPT-BATCH-PACKING-LIST-'+marketCode+'&orderNumber='+orderNumbers + '&deliveryNumber='+deliveryNumbers);
+                     
+                    }
+               } 
+            },
+            {
+                text: $l("sys.hand.btn.cancel"),
+                onclick: function(i, d) {
+                    d.hide();
+                }
+            }]
+        });
+    }
+	 
+    function f_printList(rows){
+        $.ligerDialog.open({
+            title: '<@spring.message "type.com.lkkhpg.dsis.report.type.choosing"/>',
+            width:400,
+            height:300,
+            slide: false,
+            url: "${base.contextPath}/sys/report/sys_report_type_dialog.html",
+            buttons: [{
+                text: '<@spring.message "sys.hand.btn.ok" />',
+                onclick: function(i, d) {
+                    var marketCode = _marketCode;
+                    var form = d.frame.report_type_form;
+                    if (form.valid()) {
+                        d.close();
+                        var deliveryIds ='';
+                        for(var t=0; t<rows.length; t++){
+                        	if(t <  rows.length - 1){
+                                 deliveryIds += rows[t].deliveryId + ',';
+                        	}else{
+                        		 deliveryIds += rows[t].deliveryId;
+                        	}
+                        }
+                        window.open('${base.contextPath}/report/run?docType='+ form.getData().docType +'&reportProgramCode=RPT-PRINT-DELIVERY-RECORD-'+marketCode+'&deliveryId='+deliveryIds );
+                        
+                   }
+                }
+            },
+            {
+                text: '<@spring.message "sys.hand.btn.cancel" />',
+                onclick: function(i, d) {
+                    d.hide();
+                }
+            }]
+        });
+    }
+	</script>
+</body>
+</html>

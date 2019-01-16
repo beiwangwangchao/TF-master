@@ -1,0 +1,205 @@
+<#--
+ * description: 申请角色变更界面
+ * version: 1.0
+ * author: linyuheng
+ * .
+ *
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+    <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+	<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+	<script src="${base.contextPath}/common/code?approvalStatus=SYS.REVIEW_STATUS&changeRoleApproveStatus=MM.CHANGE_ROLE_APPROVE_STATUS&memberRole=MM.MEMBER_ROLE" type="text/javascript"></script>
+	<form id="query_form" method="post"></form>  
+    <div id="apply_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+    var markets = [];
+    var openTime = 1;
+    function queryMarkets(){
+    	$.ajax({
+ 			url: '${base.contextPath}/spm/period/queryByMarket',
+ 			type:"POST",
+ 			dataType:"json",
+ 			contentType : "application/json",
+             data : '',
+             async: false,
+             success : function(json) {
+                 if(json.success){
+                	 $(json.rows).each(function(i,o){
+                		 markets.push({"id":o.marketId,"text":o.name})
+                	 })
+                 }
+             },
+             error : function() {
+             }
+ 		})
+    	 
+    }
+    queryMarkets();
+    <#assign marketId = (RequestParameters._marketId ! ) />
+    <#if marketId != ''>
+    currentMarket = ${RequestParameters._marketId};
+    </#if>
+    <#if marketId == ''>
+    currentMarket = _marketId;
+    </#if>
+    	$(function(){
+    		window['query_form'] = $("#query_form").ligerForm({
+                fields: [
+				{ type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>', newline:false, name: 'marketId',valueField : 'text',
+				    options : {
+				    	    value:currentMarket,
+							data:markets,
+							onSelected:function(o){
+				                if(openTime == 1){
+				                    $.ligerDialog.confirm('<@spring.message "dsis.lkkhpg.tip.refresh_page"/>',$l('sys.hand.tip.info'),
+				                              function(yes) {
+				                                  if(yes){
+				                                        var tabid = window.top.tab.selectedTabId;
+				                                        var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+				                                        window.top.f_removeTab(tabid);
+				                                        window.top.f_addTab(tabid, tabname, "mm/mm_member_apply_role.html?_marketId="+o);
+				                                  }else{
+				                                        openTime = openTime + 1;
+				                                        liger.get('marketId').setValue(currentMarket);
+				                                  }
+				                              });
+				                }else{
+				                    openTime = 1;
+				                }
+				                    
+				            },
+				            cancelable : false
+				    },
+				    validate:{required:true}
+				},
+                { 
+                	label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+                	type: 'popup', newline:true, name: 'memberId',textField: 'memberCode',readonly:false,
+                    options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+                    	onLoadData: function(){
+                            this.setParm('marketId',$.ligerui.get('marketId').getValue());
+                        }
+                    })
+                }, { 
+                	label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername"/>',
+                	type: 'text', newline:false, name: 'memberName'
+                }, { 
+                	label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.applyNumber"/>',
+                	type: 'text', newline:false, name: 'applyNumber' 
+                }, { 
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.approvedatefrom"/>',
+                    type: 'date', newline:true, name: 'approveDateFrom' 
+                }, { 
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.approvedateto"/>',
+                    type: 'date', newline:false, name: 'approveDateTo' 
+                } , { 
+                	label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvalstatus"/>',
+                	type: 'combobox', newline:false, name: 'status',
+                	options : {
+                        data : getStatus(changeRoleApproveStatus)
+                    }
+                } ], 
+                buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){                       
+                        Hap.gridQuery({
+                            form:query_form,
+                            grid:apply_grid
+                        })
+                    }} ]
+            });
+        
+            window['apply_grid'] = $("#apply_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [
+					/* 会员ID */
+					{ 
+						display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+						hide: true,
+						name: 'memberId', align: 'left', width: 100
+					},
+				   { 
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.applyNumber"/>',
+                        name: 'applyNumber', align: 'center', width: 140
+                   },
+                   /* 会员Code */
+                   { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.memberid"/>',
+	                	name: 'memberCode', align: 'center', width: 100,
+	                	isSort: true,
+	                	render:function(rowData){
+	                        return "<a href='javascript:void(0)' onclick=link("+ rowData.memberId +")>" +  rowData.memberCode + "</a>";
+	                    }
+                  },
+                  /* 会员姓名 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.membername"/>',
+	                	name: 'memberName', align: 'center', width: 140
+                  },
+                  /* 原角色 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.oldRole"/>',
+	                	name: 'oldRole', align: 'center', width: 160,
+                        render: function(item) {
+                            return getCodeDesc(memberRole, item.oldRole);
+                        }
+                  },
+                  /* 新角色 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.newRole"/>',
+	                	name: 'newRole', align: 'center', width: 180,
+                        render: function(item) {
+                            return getCodeDesc(memberRole, item.newRole);
+                        }
+                  },
+                  /* 审核状态 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvalstatus"/>',
+	                	name: 'status', align: 'center', width: 180,
+	                	isSort: false,
+	                    render: function(item) {
+	                        return getCodeDesc(changeRoleApproveStatus, item.status);
+	                    }
+                  }, 
+                  /* 审核日期 */
+                  { 
+	                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.approvaldate"/>',
+	                	name: 'approveDate', align: 'center', width: 140,
+	                	isSort: true
+                  }
+                ], 
+                url:'${base.contextPath}/mm/member/applyRole',
+                enabledEdit: false,
+                width: '100%', 
+                height: '99%', 
+                checkbox: true,
+                delayLoad: true,
+                pageSize: 20
+            }); 
+    	
+    	function getStatus(statusList){
+            var datas = [];
+            for(var i = 0;i<statusList.length;i++){
+                var o = {};
+                o.id = statusList[i].value;
+                o.text = statusList[i].meaning;
+                datas.push(o);
+            }
+            return datas;
+        }
+        $.extend(liger.get('memberId').options,{parms:{"marketId":$.ligerui.get('marketId').getValue()}});
+    })
+
+    function link(memberId){
+            var path = "${base.contextPath}/mm/mm_member_edit.html?isedit=1&memberId=" + memberId;
+            if (window.parent.f_addTab != undefined) {
+                window.top.f_removeTab("MEMBER_DETAIL");
+                window.top.f_addTab("MEMBER_DETAIL", 
+                        '<@spring.message "type.com.lkkhpg.dsis.common.member.memberdetail"/>', path);
+            } else {
+                window.open(path)
+            }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.integration.recorder.mapper.InterfaceRecordMapper" >
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.integration.recorder.dto.InterfaceRecord" >
+        <id column="RECORD_ID" property="recordId" jdbcType="DECIMAL" />
+        <result column="URL" property="url" jdbcType="VARCHAR" />
+        <result column="QUERY_STRING" property="queryString" jdbcType="VARCHAR" />
+        <result column="BODY" property="body" jdbcType="VARCHAR" />
+        <result column="RESULT" property="result" jdbcType="VARCHAR" />
+        <result column="SUCCESS" property="success" jdbcType="VARCHAR" />
+        <result column="EXCEPTION" property="exception" jdbcType="VARCHAR" />
+        <result column="REQUEST_DATE" property="requestDate" jdbcType="TIMESTAMP" />
+        <result column="ELAPSE" property="elapse" jdbcType="DECIMAL" />
+    </resultMap>
+    <sql id="Base_Column_List" >
+        RECORD_ID, URL, QUERY_STRING, BODY, RESULT, SUCCESS, EXCEPTION, REQUEST_DATE, ELAPSE
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+        select 
+        <include refid="Base_Column_List" />
+        from SYS_INTERFACE_RECORD
+        where RECORD_ID = #{recordId,jdbcType=DECIMAL}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+        delete from SYS_INTERFACE_RECORD
+        where RECORD_ID = #{recordId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.integration.recorder.dto.InterfaceRecord"  >
+        <selectKey resultType="java.lang.Long" keyProperty="recordId" order="BEFORE" >
+            select sys_interface_record_s.nextval from dual
+        </selectKey>
+        insert into SYS_INTERFACE_RECORD (RECORD_ID, URL, QUERY_STRING, 
+            BODY, RESULT, SUCCESS, 
+            EXCEPTION, REQUEST_DATE, ELAPSE
+            )
+        values (#{recordId,jdbcType=DECIMAL}, #{url,jdbcType=VARCHAR}, #{queryString,jdbcType=VARCHAR}, 
+            #{body,jdbcType=VARCHAR}, #{result,jdbcType=VARCHAR}, #{success,jdbcType=VARCHAR}, 
+            #{exception,jdbcType=VARCHAR}, #{requestDate,jdbcType=TIMESTAMP}, #{elapse,jdbcType=DECIMAL}
+            )
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.integration.recorder.dto.InterfaceRecord" >
+        update SYS_INTERFACE_RECORD
+        <set >
+            <if test="url != null" >
+                URL = #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="queryString != null" >
+                QUERY_STRING = #{queryString,jdbcType=VARCHAR},
+            </if>
+            <if test="body != null" >
+                BODY = #{body,jdbcType=VARCHAR},
+            </if>
+            <if test="result != null" >
+                RESULT = #{result,jdbcType=VARCHAR},
+            </if>
+            <if test="success != null" >
+                SUCCESS = #{success,jdbcType=VARCHAR},
+            </if>
+            <if test="exception != null" >
+                EXCEPTION = #{exception,jdbcType=VARCHAR},
+            </if>
+            <if test="requestDate != null" >
+                REQUEST_DATE = #{requestDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="elapse != null" >
+                ELAPSE = #{elapse,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where RECORD_ID = #{recordId,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.integration.recorder.dto.InterfaceRecord" >
+        update SYS_INTERFACE_RECORD
+        set URL = #{url,jdbcType=VARCHAR},
+            QUERY_STRING = #{queryString,jdbcType=VARCHAR},
+            BODY = #{body,jdbcType=VARCHAR},
+            RESULT = #{result,jdbcType=VARCHAR},
+            SUCCESS = #{success,jdbcType=VARCHAR},
+            EXCEPTION = #{exception,jdbcType=VARCHAR},
+            REQUEST_DATE = #{requestDate,jdbcType=TIMESTAMP},
+            ELAPSE = #{elapse,jdbcType=DECIMAL}
+        where RECORD_ID = #{recordId,jdbcType=DECIMAL}
+    </update>
+
+    <select id="getFakeData" parameterType="java.lang.String" resultType="java.lang.String">
+        select response from isg_emulator
+        where method_name = #{method_name} and auto_resp = 'Y'
+    </select>
+    <select id="getFakeRequestData" resultType="java.lang.String" parameterType="java.lang.String">
+        select request from isg_emulator
+        where method_name = #{method_name}
+    </select>
+
+    <select id="selectByRequestDate" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select 
+          <include refid="Base_Column_List" />
+        from SYS_INTERFACE_RECORD
+        <where>
+            REQUEST_DATE &gt; #{requestDateFrom,jdbcType=TIMESTAMP}
+            <if test="requestDateTo != null" >
+                AND REQUEST_DATE &lt; #{requestDateTo,jdbcType=TIMESTAMP}
+            </if>
+            <if test="success != null" >
+                AND SUCCESS = #{success,jdbcType=VARCHAR}
+            </if>
+            <if test="url != null" >
+                AND URL like CONCAT(CONCAT('%', #{url,jdbcType=VARCHAR}), '%')
+            </if>
+            <if test="body != null" >
+                AND BODY like CONCAT(CONCAT('%', #{body,jdbcType=VARCHAR}), '%')
+            </if>
+            <if test="result != null" >
+                AND RESULT like CONCAT(CONCAT('%', #{result,jdbcType=VARCHAR}), '%')
+            </if>
+        </where>
+        order by record_id DESC
+    </select>
+</mapper>

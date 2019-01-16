@@ -1,0 +1,102 @@
+<#--
+        * description: 城市查询界面.
+        * version: 1.0
+        * author: huanghanrui
+        * Copyright LKK Health Products Group Limited.
+        *
+        -->
+    <#include "../include/head.html">
+
+        <body style="padding: 10px;">
+        <form id="spm_zip_form" ></form>
+
+        <div id="spm_zip_grid"></div>
+        <script type="text/javascript">
+            <#assign isedit = (RequestParameters.isedit!'0')/>
+            $(function(){
+                window['spm_zip_form'] = $("#spm_zip_form").ligerForm({
+                    fields: [
+                        {name : "__status",type : "hidden",options:{value:"<#if isedit =='1'>update<#else>add</#if>"},newline : false},
+                        {
+                            type: 'text', label: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmzip.zipcode"/>', newline:false, name: 'zipCode',
+                            group : "<@spring.message 'type.com.lkkhpg.dsis.common.config.spmzip.query.zip'/>"
+                        },
+                        {
+                            type: 'combobox',
+                            name: 'countryCode',
+                            textField : "countryCodeName",
+                            label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.country"/>',
+                            options : {
+                                valueField : 'countryCode',
+                                textField : 'name',
+                                url:"${base.contextPath}/spm/country/selectAllCountry",
+                            },
+                            newline: false,
+                        },
+                    ],
+                    buttons: [
+                        { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, click: function(){
+                            var datas = spm_zip_form.getData();
+                            var is_empty = true;
+
+                            Hap.gridQuery({
+                                form:spm_zip_form,
+                                grid:spm_zip_grid
+                            })
+
+                        }},{
+                            text : '<@spring.message "sys.hand.btn.reset"/>',
+                            disabled : false,
+                            width : 60,
+                            click : function() {
+                                spm_zip_form.reset();
+                            }
+                        }
+                    ]
+                });
+
+                window['spm_zip_grid'] = $("#spm_zip_grid").ligerGrid({
+                    unSetValidateAttr:false,
+                    columns: [ {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmzip.zipcode"/>',
+                        name: 'zipCode', align: 'left', width: '150',
+                        render : function (data)
+                        {
+                            var html = "<a href='#' onClick='zipClick(\"" + data.zipCode +"\""+",\""+data.countryCode+ "\")'>" + data.zipCode + "</a>";
+                            return html;
+                        }
+                    }, {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcountry.name"/>',
+                        name: 'countryName', align: 'left', width: '150'
+                    },
+                        , {
+                            name: 'countryCode', align: 'left', width: '150',hide:"true"
+                        },
+                    ],
+                    url:'${base.contextPath}/spm/zip/query',
+                    toolbar: {
+                        items: [
+                            {
+                                text: '<@spring.message "sys.hand.btn.new"/>',
+                                disable:false,
+                                click: function(){
+                                    window.top.f_removeTab('spm_zip_edit');
+                                    parent.f_addTab("spm_zip_edit","<@spring.message 'type.com.lkkhpg.dsis.common.config.spmzip.zip.details'/>","${base.contextPath}/spm/spm_zipcode_edit.html");
+                                }, icon: 'add'
+                            }
+                        ]
+                    },
+                    enabledEdit: true,
+                    width: '99%',
+                    height: '98%',
+                    rownumbers: true
+                });
+            });
+            function zipClick(zipCode,countryCode)
+            {
+                window.top.f_removeTab("spm_zip_"+zipCode);
+                parent.f_addTab("spm_zip_"+zipCode,"<@spring.message 'type.com.lkkhpg.dsis.common.config.spmzip.zip.details'/>","${base.contextPath}/spm/spm_zipcode_edit.html?isedit=1&zipCode="+zipCode+"&countryCode="+countryCode);
+            };
+        </script>
+        </body>
+        </html>

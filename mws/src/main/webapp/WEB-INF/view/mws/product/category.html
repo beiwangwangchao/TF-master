@@ -1,0 +1,366 @@
+<#include "/mws/include/header.html">
+<!-- ========== MENU END ========== -->
+<link href="${base.contextPath}/resources/css/bootstrap-combobox${resource_suffix!}.css" rel="stylesheet">
+<script src="${base.contextPath}/resources/js/bootstrap-combobox${resource_suffix!}.js"></script>
+<script src="${base.contextPath}/resources/js/navbar${resource_suffix!}.js"></script>
+
+<style>
+.add-to-cart, .add-to-cart:hover {
+    color: #008f55;
+}
+@media only screen and ( max-width : 800px) {
+    .no-more-tables td {
+        border: none;
+        padding-left: 0% !important;
+        border-bottom: 0px solid #eee;
+        position: relative;
+        text-align: center !important;
+        white-space: normal;
+        min-height: 0px;
+    }
+}
+</style>
+
+<!-- ========== CONTENT START ========== -->
+<section id="category-bar">
+    <a href="${indexImageService.getHeadersImageUrl('CATEGORY')}">
+        <img style="width: 100%" class="img-responsive"
+             src="${base.contextPath}/sys/attach/file/view?fileId=${indexImageService.getHeadersImageId('CATEGORY')}"
+             onerror="javascript:this.src='${base.contextPath}/resources/img/1600-208.png';"/>
+        <!--<img class="img-responsive" src="${base.contextPath}/sys/attach/file/view?fileId=${indexImageService.getHeadersImageId('CATEGORY')}" />-->
+    </a>
+</section>
+
+<section id="content">
+    <div class="container">
+
+        <ol class="breadcrumb">
+            <li><a href="../index.html"><@spring.message "mws.product.navigationbar.index"/></a></li>
+            <li name="categoryName"></li>
+        </ol>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <!-- 商品列表頂部工具條 -->
+                <div class="row portlet">
+                    <div class="col-sm-3">
+                        <select name="sortBy" id="sortBy" class="form-control">
+                            <option value="">排序</option>
+                            <option value="price-ascending"><@spring.message "mws.product.toolbar.sort.priceasc"/></option>
+                            <option value="price-descending"><@spring.message "mws.product.toolbar.sort.pricedesc"/></option>
+                            <!--modified to 2018.3.9 10:15 by furong.tang -->
+                            <!--<option value="pv-descending"><@spring.message "mws.product.toolbar.sort.pvdesc"/></option>
+                            <option value="pv-ascending"><@spring.message "mws.product.toolbar.sort.pvasc"/></option>-->
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+<!--                         <input id="redeem_ability" type="checkbox"/>
+                        <label for="redeem_ability"><@spring.message "mws.product.toolbar.redeem"/></label>
+                        &nbsp;
+                        <input id="sales_aid" type="checkbox"/>
+                        <label for="sales_aid"><@spring.message "mws.product.toolbar.membershipsuit"/></label> -->
+
+
+                            <input id="priceFrom" type="number" step="0.01" style="width: 35%;border:1px solid #ccc;" placeholder="¥">
+
+                            <em style="width: 10%">-</em>
+
+                            <input id="priceTo" type="number" step="0.01" style="width: 35%;border:1px solid #ccc;" placeholder="¥">
+
+                            <button id="priceSet" style="border:1px solid #ccc;">确定</button>
+
+                    </div>
+                    <div class="col-sm-2 collection-view pull-right">
+                        <a id="gridViewBtn" title="平铺" class="btn btn-primary change-view active-filter" data-view="grid">
+                            <i class="fa fa-lg fa-th"></i>
+                        </a>
+                        <a id="listViewBtn" title="列表" class="btn btn-primary change-view" data-view="list">
+                            <i class="fa fa-lg fa-list"></i>
+                        </a>
+                    </div>
+                    <div class="col-sm-3 input-group">
+                        <input id="searchProduct" type="search" name="searchProduct" placeholder="搜索" class="form-control" aria-label="Search Site" />
+                        <div class="input-group-btn">
+                            <button id="search" class="btn btn-primary" type="submit" value="Search">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 商品展示list -->
+                <div id="list_view" class="products"><div class="no-more-tables"><table style="border-collapse:separate; border-spacing:6px;"></table></div></div>
+                <!-- 商品展示grid -->
+                <ul id="grid_view" class="products row"></ul>
+                <!-- 分页栏 -->
+                <div class="row col-sm-offset-9 col-md-offset-9 col-md-3 col-sm-3"><nav id="pageBar"></nav></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    //全局视图类型，默认为grid视图
+    var global_view = "grid";
+    var memberRole = "";
+    var isDisplay = "";
+    <#if memberRole??>
+        memberRole = "${memberRole}";
+    </#if>
+    <#if isDisplay??>
+    isDisplay = "${isDisplay}";
+    </#if>
+    $(function() {
+        $("#gridViewBtn").attr("disabled", "true");
+        $("#sortBy").combobox();
+        $("#pageBar").navbar({
+            url : "${base.contextPath}/product/querySimpleProductsByWhereClause",
+            pagesize : 12,
+            autoQuery : true,
+            parms : function() {
+                return getSearchCriteria();
+            },
+            onLoad : function(data) {
+                if (data.total > 0) {
+                    initData(data);
+                } else {
+                    if (global_view == "grid") {
+                        $("table").not(".showShopTable").html(" ");
+                        $("#grid_view").html("<h2 style='padding-top:2%;padding-left:2%;'><@spring.message 'mws.product.view.notproducts'/></h2>");
+                    } else {
+                        $("#grid_view").html(" ");
+                        $("table").not(".showShopTable").html("<h2 style='padding-top:2%;'><@spring.message 'mws.product.view.notproducts'/></h2>");
+                    }
+                }
+            }
+        })
+
+        //grid视图按钮触发事件
+        $("#gridViewBtn").click(function() {
+            if (global_view == "grid") {
+                return;
+            }
+            global_view = "grid";
+            $("#gridViewBtn").attr("disabled", "true");
+            $("#listViewBtn").removeAttr("disabled");
+            $('nav#pageBar').query();
+        });
+
+        //list视图按钮触发事件        
+        $("#listViewBtn").click(function() {
+            if (global_view == "list") {
+                return;
+            }
+            global_view = "list";
+            $("#listViewBtn").attr("disabled", "true");
+            $("#gridViewBtn").removeAttr("disabled");
+            $('nav#pageBar').query();
+        });
+
+        //搜索按钮触发事件
+        $("#search").click(function() {
+            if ($.trim($("#searchProduct").val()) == "") {
+                return;
+            }
+            $('nav#pageBar').query();
+        });
+
+        //排序组件值改变触发事件
+        $("#sortBy").change(function() {
+            $('nav#pageBar').query();
+        });
+
+        //积分兑换复选框改变值触发事件
+        $("#redeem_ability").change(function() {
+            $('nav#pageBar').query();
+        });
+
+        //入会套装复选框改变值触发事件
+        $("#sales_aid").change(function() {
+            $('nav#pageBar').query();
+        });
+
+        //价格区间事件
+        $("#priceSet").click(function(){
+            var pre_from=$("#priceFrom").val();
+            var pre_to=$("#priceTo").val();
+
+            if (pre_to != ''  && pre_from > pre_to){
+                return ;
+
+            };
+            $('nav#pageBar').query();
+        });
+
+        //获得页面搜索条件
+        function getSearchCriteria() {
+            var redeemAbilityIs = "N";
+            var salesAidIs = "N";
+            if ($("#redeem_ability").is(':checked')) {
+                redeemAbilityIs = "Y";
+            }
+            if ($("#sales_aid").is(':checked')) {
+                salesAidIs = "Y";
+            }
+            var data = new Object();
+            data.categoryId = "${RequestParameters.categoryId}";
+            data.redeemAbility = redeemAbilityIs;
+            data.salesAid = salesAidIs;
+            data.itemName = $("#searchProduct").val();
+            data.sortBy = $("#sortBy").val();
+
+            data.priceFrom = $("#priceFrom").val();
+            data.priceTo = $("#priceTo").val();
+            return data;
+        }
+    });
+
+    //添加到购物车
+    function addToCart(itemId) {
+        var data = new Object();
+        data.quantity = 1;
+        data.productId = itemId;
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            data : data,
+            url : "${base.contextPath}/product/addToCart",
+            success : function(data) {
+                $("#shopCartNumber").text(data.rows[0]);
+                $.dialog.success('<@spring.message "mws.dialog.success"/>','<@spring.message "mws.product.promptinfo"/>',function(){return true;});
+            }
+        });
+    }
+
+    /*******************************************************/
+    /* 页面初始化 -                                            /
+    /*******************************************************/
+    function initData(data) {
+        if (data.rows[0].categoryName == null) {
+            $("li[name=categoryName]").text("<@spring.message 'mws.product.allproducts'/>");
+        }else {
+            $("li[name=categoryName]").text(data.rows[0].categoryName);
+        }
+        $("table").not(".showShopTable").html(" ");
+        $("#grid_view").html(" ");
+        if (global_view == "list") {
+            for (var i = 0; i < data.rows.length; i++) {
+                var list_view = null; 
+                list_view = "<tr class='cart_item portlet' style='border-left: none;'>"
+                                + "<td>"
+                                + "<div class='post-image'>";
+                                if (("itemImg" in data.rows[i])) {
+                                    if (data.rows[i].itemImg[0].fileId) {
+                                    	list_view += "<img src='${base.contextPath}/resources/"+ data.rows[i].itemImg[0].filePath +"${IMG_M}' onerror='javascript:this.src=\"${base.contextPath}/resources/img/360-360.png\";' ";
+                                    }else {
+                                        list_view += "<img src='${base.contextPath}/resources/img/NOT_IMAGE.png'";
+                                    }
+                                } else {
+                                    list_view += "<img src='${base.contextPath}/resources/img/NOT_IMAGE.png'";
+                                }              
+                                list_view += "style='width: 180px;'>"
+                                + "</div>"
+                                + "</td>"
+                                + "<td>"
+                                + "<h3><a href='product.html?categoryId=${RequestParameters.categoryId}&itemId="
+                                + data.rows[i].itemId
+                                + "'>";
+                                var itemName = data.rows[i].itemName == null ? " " : data.rows[i].itemName
+                                list_view += itemName + "</a></h3>"
+                                + "<span>";
+                                var desc = data.rows[i].description == null ? " " : data.rows[i].description;
+                                list_view += desc + "</span>"
+                                + "</td>";
+                                if(isDisplay == "Y"){
+                                    list_view += "<td>"
+                                    + "<div class='product-pv' style='width: 100%; height: 100%;'>"
+                                    + "<strong>库存</strong><span>"
+                                    + data.rows[i].pvAmt + " " + data.rows[i].uomName
+                                    + "</span>"
+                                    + "</div>"
+                                    + "</td>";
+                                }
+                                list_view += "<td><div class='price'>"
+                                + "<small>"+ data.rows[i].currencySymbol +"</small>"
+                                + data.rows[i].disAmt.toFixed(2)
+                                + "</div></td>"
+                                + "<td>"
+                                + "<button title='Add to Cart' type='button' class='btn btn-primary btn-icon' onclick='addToCart("+ data.rows[i].itemId +")'><@spring.message 'mws.product.addtocart'/></button>"
+                                + "</td>" + "</tr>";
+                $("table").append(list_view);
+            }
+        } else {
+            for (var i = 0; i < data.rows.length; i++) {
+                if (i % 4 == 0) {
+                    $("#grid_view").append("<div class='row portlet'></div>");
+                }
+                var grid_view = null;
+                grid_view = "<li class='col-sm-3'>"
+                        + "<div class='product'>"
+                        + "<div class='thumbnail'>"
+                        + "<a href='product.html?categoryId=${RequestParameters.categoryId}&itemId="
+                        + data.rows[i].itemId
+                        + "'>";
+                        if (("itemImg" in data.rows[i])) {
+                            if(data.rows[i].itemImg[0].fileId && data.rows[i].itemImg.length>0){
+                                grid_view += "<img src='${base.contextPath}/resources/"+ data.rows[i].itemImg[0].filePath +"${IMG_M}' onerror='javascript:this.src=\"${base.contextPath}/resources/img/360-360.png\";' >"; 
+                            } else {
+                                grid_view += "<img src='${base.contextPath}/resources/img/NOT_IMAGE.png'>";
+                            }
+                        } else {
+                            grid_view += "<img src='${base.contextPath}/resources/img/NOT_IMAGE.png'>";
+                         }  
+                        grid_view += "</a>"
+                        + "<a href='javascript:void(0);' class='add-to-cart' title='Add to Cart' onclick='addToCart("
+                        + data.rows[i].itemId
+                        + ")'>"
+                        + "<span class='fa-stack fa-2x'>"
+                        + "<i class='fa fa-circle fa-stack-2x'></i>"
+                        + "<i class='fa fa-shopping-cart  fa-stack-1x fa-inverse'></i>"
+                        + "</span>"
+                        + "</a>"
+                        + "</div>"
+                        + "<hr style='margin-top: 3px'>"
+                        + "<div class='price'>"
+                        + "<small>"+ data.rows[i].currencySymbol +"</small>"+" "
+                        + data.rows[i].disAmt.toFixed(2)
+                        + "</div>";
+                        if(isDisplay == "Y"){
+                            grid_view += "<div class='product-pv'>"
+                            + "<strong>库存</strong><span>"
+                            + data.rows[i].pvAmt + " " + data.rows[i].uomName
+                            + "</span>"
+                            + "</div>";
+                        }
+                        grid_view += "<div class='clearfix'></div>"
+                        + "<div class='title'>"
+                        + "<h3>"
+                        + "<a href='product.html?categoryId=${RequestParameters.categoryId}&itemId="
+                        + data.rows[i].itemId
+                        + "'>";
+                        var itemName = data.rows[i].itemName == null ? " " : data.rows[i].itemName;
+                        grid_view += itemName 
+                        + "</a>"
+                        + "</h3>"
+                        + "<span name='hideSpecifications'>&nbsp;&nbsp;<@spring.message 'mws.product.specifications'/>:";
+                        var ggcsContent = data.rows[i].ggcsContent == null ? " " : data.rows[i].ggcsContent;
+                        grid_view += ggcsContent.replace(/<[^>]+>/g,'') + "</span>" + "</div>" + "</div>" + "</li>";
+                if (i < 4) {
+                    $("#grid_view").children("div").eq(0).append(grid_view);
+                } else if (i < 8) {
+                    $("#grid_view").children("div").eq(1).append(grid_view);
+                } else if (i < 12) {
+                    $("#grid_view").children("div").eq(2).append(grid_view);
+                }
+                // 隐藏商品参数
+                if("Y" == data.rows[i].hideStandardParam || data.rows[i].ggcsContent==null){
+                    $("span[name='hideSpecifications']").hide();
+                }
+            }
+        }
+    }
+</script>
+<!-- ========== CONTENT END ========== -->
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">
+<!-- ========== FOOTER END ========== -->

@@ -1,0 +1,1213 @@
+<#include "/mws/include/header.html">
+
+<head>
+    <link href="${base.contextPath}/resources/css/orderPayment.css" rel="stylesheet">
+
+    <style type="text/css">
+        .tab-img {
+            margin: 1px;
+            padding:0;
+            width: 80px;
+            height: 27px;
+        }
+        .wrapper label {
+            border: 1px solid #ddd;
+            padding-left: 5px;
+            padding-bottom: 1px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            width: 100px;
+            height: 32px;
+        }
+
+        .wrapper label:hover {
+            border: 2px solid #f60;
+            padding-left: 5px;
+            padding-bottom: 1px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            width: 100px;
+            height: 32px;
+        }
+
+
+        .wrapper label:active {
+            border: 2px solid #f89;
+            padding-left: 5px;
+            padding-bottom: 1px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            width: 100px;
+            height: 32px;
+        }
+        #myDisplayDiv  label{
+            border: 1px solid #d4d4d4;
+            background-position: center center;
+            background-repeat: no-repeat;
+            width: 100px;
+            height: 32px;
+        }
+
+        #myDisplayDiv label:hover {
+            border: 2px solid #f60;
+            padding-left: 5px;
+            padding-bottom: 1px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            width: 100px;
+            height: 32px;
+        }
+
+
+        #myDisplayDiv label:active {
+            border: 2px solid #f89;
+            padding-left: 5px;
+            padding-bottom: 1px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            width: 100px;
+            height: 32px;
+        }
+
+        #myDisplayDiv label .on{
+            border: 2px solid #000;
+        }
+
+        .hover {
+            color: #000000;
+            background: #F4EFCF;
+        }
+
+    </style>
+
+    <style type="text/css">
+        .wrapper {
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        p {
+            margin: 0;
+            padding: 0;
+            color: #333333;
+            font-family: 宋体;
+            font-size: 8px;
+        }
+
+        #ul_b {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+            width: 100%;
+            height: 55px;
+            /*border-bottom: #DDDDDD solid 1px;*/
+        }
+
+        #id0, #id3 , #id2, #id1 {
+            margin: 0;
+            padding: 0;
+            height: 35px;
+            width: 50%;
+            text-align: center;
+            float: left;
+            font-family: Verdana, Geneva, sans-serif;
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #F4F4F4;
+        }
+
+        .one {
+            width: 100%;
+            padding-top: 10px;
+            display: none;
+        }
+
+        .blue {
+            color: #58A200;
+            background-color: #8C5C5C;
+        }
+
+        .white {
+            color: #000000;
+            background-color: #F4F4F4;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        //此处会默认调用对私支付；
+         showTab(0);
+
+        function showTab(num) {
+            if(num==0){
+//                if($("#privateSubPartner").text()!=""){
+//                    $("#subpartner").val($("#privateSubPartner").text());
+                    $("#bankcode").val("b2c");
+//                }
+            }else if(num==1){
+//                if($("#publicSubPartner").text()!=""){
+//                    $("#subpartner").val($("#publicSubPartner").text());
+                    $("#bankcode").val("b2b");
+//                }
+            }else{
+                $.dialog.error("<@spring.message '暂不支持此支付类型请选择正确的支付类型'/>",
+                    "<@spring.message'please select the right type of payment!'/>");
+                return;
+            }
+            for (i = 0; i < 2; i++) {
+                document.getElementById("tab" + i).style.display = "none";
+                document.getElementById("id" + i).className = "white";
+            }
+            document.getElementById("tab" + num).style.display = "block";
+            document.getElementById("id" + num).className = "blue";
+        }
+    </script>
+
+</head>
+
+
+<script type="text/javascript">
+    //继续购物
+    function shopping() {
+        window.location.href = "${base.contextPath}/product/category.html?categoryId=";
+    }
+
+    //跟踪订单
+    function redirectOrder() {
+        window.location.href = "${base.contextPath}/account/account-order-history.html?headerId=" + $("#sourceKey").text();
+    }
+
+    function orderPay(orderNumber, orderAmt) {
+        var orderNumber = $("#orderNumber").text();
+        var actrualPayAmt = $("#actrualPayAmt").text();
+        var sourceKey = $("#sourceKey").text();
+        var sourceType = $("#sourceType").text();
+        var bankFlag= $("input[name='radios']:checked").val();
+
+        var bankName= $("input[name='radios']:checked").attr("id");
+
+        var tmpBankCode;
+
+
+        if(bankFlag==null){
+            $.dialog.error('<@spring.message "msg.order.payment.selectpayment"/>');
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "${base.contextPath}/pay/getBankCode",
+            dataType: "json",
+            data: {bankName: bankName},
+            success: function (data) {
+                tmpBankCode=data.rows[0].value;
+            }
+        });
+
+
+//        if($("#publicSubPartner").text()=="" || $("#privateSubPartner").text()==""){
+//            $.dialog.error("<@spring.message 'you can not pay this order'/>",
+//                "<@spring.message'请维护公有或者私有商户号!'/>");
+//            return;
+//        }
+        switch (bankFlag){
+            case "unionPrivate":
+                var bankPaymentCode = "TWUNN";
+                $("#total_fee").val(actrualPayAmt * 1);
+                break;
+            case "aliPay":
+                var bankPaymentCode = "TWNON";
+                $("#total_fee").val(actrualPayAmt * 1);
+                break;
+            case "wx_pay":
+                var bankPaymentCode = "MYHOL";
+                $("#total_fee").val(actrualPayAmt * 1);
+                break;
+            case "unionPublic":
+                var bankPaymentCode = "PUBUN";
+                $("#total_fee").val(actrualPayAmt * 1);
+                break;
+            default:
+                $.dialog.error("<@spring.message'暂不支持此类型的支付！！！！'/>");
+                return;
+
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "${base.contextPath}/order-generate-payment-trans",
+            dataType: "json",
+            data: {orderNumber:orderNumber,sourceKey: sourceKey, sourceType: sourceType, bankPaymentCode: bankPaymentCode},
+            success: function (data) {
+                if(data.success==false) {
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                    return;
+                }
+                $("#payBtnDiv").hide();
+                var product_fee = 0.00;
+                var transport_fee = 0.00;
+
+                for(var i=0;i<data.lines.length;i++) {
+                    product_fee=product_fee+data.lines[i].amount;
+                }
+                product_fee=toDecimal(product_fee-data.discountAmt);
+                if(data.logistics!=null) {
+                    transport_fee= data.logistics.shippingFee;
+                }else{
+                    transport_fee=toDecimal(actrualPayAmt-product_fee);
+                }
+
+
+                if(parseFloat(transport_fee)<0){
+                    $.dialog.error("<@spring.message 'you can not pay this order'/>",
+                        "<@spring.message'订单数据错误'/>");
+                    return;
+                }
+
+                var subject="";
+                for(var i=0,j=0;i<data.lines.length;i++,j++) {
+                    subject =subject+data.lines[i].itemNumber;
+                    if(j<data.lines.length-1){
+                       subject+="^";
+                    }
+                }
+
+                if (bankPaymentCode == "TWUNN") {
+                    $("#setPayForm").attr("action", "${base.contextPath}/payment/pay/unionpay");
+                    $("#trans_channel").val("b2c");
+                    $("#trans_pattern").val("0");
+                    $("#bankcode").val(tmpBankCode);
+                } else if (bankPaymentCode == "TWNON") {
+                    $("#setPayForm").attr("action", "${base.contextPath}/payment/pay/alipay");
+                    $("#trans_channel").val("alipay_qr_p");
+                    $("#trans_pattern").val("0");
+                    $("#bankcode").val("496");
+                } else if (bankPaymentCode == "MYHOL") {
+                    $("#setPayForm").attr("action", "${base.contextPath}/payment/pay/weixinpay");
+                    $("#trans_channel").val("wx_qr_p");
+                    $("#trans_pattern").val("0");
+                    $("#bankcode").val("496");
+                }else{
+                    $("#setPayForm").attr("action", "${base.contextPath}/payment/pay/tfpay");
+                    $("#trans_channel").val("b2b");
+                    $("#trans_pattern").val("0");
+                    $("#bankcode").val(tmpBankCode);
+                }
+                //$("#bankcode").val("496");
+                $("#trade_mode").val("0002");
+                $("#fee_type").val("1");
+                $("#store_id").val(data.salesOrgId);
+                $("#body").val(subject);
+                $("#mobile").val(data.salesSites[0].phone);
+                $("#out_trade_no").val(orderNumber);
+                $("#product_fee").val(product_fee);
+                $("#spbill_create_ip").val(data.ip);
+                $("#subject").val(subject);
+                $("#total_fee").val(actrualPayAmt);
+                $("#trade_details").val(subject+"^"+actrualPayAmt+"^0.00^"+orderNumber);
+                $("#transport_fee").val(transport_fee);
+                $("#headerId").val($("#sourceKey").text());
+                $("#token").val(data._token);
+                $('#setPayForm').submit();
+
+            }
+        });
+    }
+
+    function toDecimal(x) {
+        var f = parseFloat(x);
+        if (isNaN(f)) {
+            return false;
+        }
+        var f = Math.round(x*100)/100;
+        var s = f.toString();
+        var rs = s.indexOf('.');
+        if (rs < 0) {
+            rs = s.length;
+            s += '.';
+        }
+        while (s.length <= rs + 2) {
+            s += '0';
+        }
+        return s;
+    }
+
+    function fomatFloat(src,pos){
+        return Math.round(src*Math.pow(10, pos))/Math.pow(10, pos);
+    }
+
+
+    $(function () {
+        var sourceKey= $("#sourceKey").text();
+        $.ajax({
+            type: 'POST',
+            url: "${base.contextPath}/order/order-query-payment" ,
+            data: {headerId: sourceKey},
+            success: function (data) {
+                if (data.code == "PAYIN" || data.code == "COMP") {
+                    $("#payBtnDiv").hide();
+                    $("#twDisplayDiv").hide();
+                    $("#myDisplayDiv").hide();
+                }
+            }
+        });
+
+        $("#ul_b").append('<li id="id0" onclick="showTab(0)">储蓄卡</li>');
+//        $("#ul_b").append('<li id="id1" onclick="showTab(1)">信用卡</li>');
+//        $("#ul_b").append('<li id="id2" onclick="showTab(2)">信用卡分期</li>');
+        $("#ul_b").append('<li id="id1" onclick="showTab(1)">企业网银</li>');
+
+    });
+
+
+    function listeningSalesOrder() {
+        $.ajax({
+            type: 'POST',
+            url: "${base.contextPath}/salesorder/listening",
+            dataType: "json",
+            success: function (data) {
+            }
+        });
+    }
+
+
+
+    $('.mask-checkbox').click(function() {
+        if($(this).hasClass('on')) {
+            $(this).removeClass('on');
+            return false;
+        } else {
+            $(this).addClass('on');
+            return false;
+        }
+    });
+
+
+</script>
+<section id="content">
+
+    <div class="container">
+        <#if sourceType??>
+        <span style="display: none;" id="sourceType">${sourceType}</span>
+    </#if>
+    <#if sourceKey??>
+    <span style="display: none;" id="sourceKey">${sourceKey}</span>
+</#if>
+<#if marketCode??>
+<span style="display: none;" id="marketCode">${marketCode}</span>
+</#if>
+<#if orderStatus??>
+<span style="display: none;" id="orderStatus">${orderStatus}</span>
+</#if>
+        <div class="main"style="height: 100%;">
+            <div class="w" style="height: 100%;">
+
+                <div  style="position:relative;height:100px ; ">
+
+                    <div class="col-md-2 col-sm-2" >
+                        <!--<div class="col-md-offset-6"><img src="${base.contextPath}/resources/img/u100.png"></div>-->
+                        <div style="width: 100px;height: 100px;"><img src="${base.contextPath}/resources/img/u100.png"></div>
+                    </div>
+
+                    <div class="col-md-10 col-sm-10" style="position:absolute;left: 100px;top:0px">
+                        <div class="row">
+                            <div class="col-sm-6 form-group" style="font-weight: bolder;font-size:20px;color: black">
+                                <@spring.message "mws.autoship.submit.success"/>
+                            </div>
+                        </div>
+
+                        <div class="row" style="position: absolute;">
+
+                            <div class="col-sm-6 form-group" style="position:absolute; left:10px;color: black;border-right: 1px solid #E8E8E8;width:400px;height: 24px;">
+                                <span style="font-size: 16px"><strong><@spring.message "mws.orderhistory.orderinfo_ordernumber"/>:</strong></span>
+                                <#if orderNumber??>
+                                    <span id="orderNumber" >${orderNumber}</span>
+                                </#if>
+                            </div>
+
+                            <div class="col-sm-6 form-group" style="position:absolute; left:400px;color: black; width: 300px;height: 24px;">
+                                <span style="font-size: 16px"><strong><@spring.message "mws.myaccount.accountinfo.waiting_payment"/>:</strong></span>
+                                <#if actrualPayAmt??>
+                                    <span style="color: red;" id="actrualPayAmt">${actrualPayAmt?string('0.00')}</span>
+                                </#if>
+                            </div>
+
+                        </div>
+                </div>
+
+                </div>
+
+                <div class="payment pay-load">
+
+                    <div class="wrapper" >
+
+
+                        <ul id="ul_b">
+                        </ul>
+
+                        <div class="one" id="tab0" style="display:block">
+
+
+                            <div  class="row" style="position: relative;">
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;">
+                                    <input type="radio" value="unionPrivate" id="unionpay" name="radios"/>
+                                    <label for="unionpay"  class="mask-checkbox">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/tt.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left:150px;">
+                                    <input type="radio" value="unionPrivate" id="youzheng" name="radios"/>
+                                    <label for="youzheng">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/youzheng.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left:300px;">
+                                    <input type="radio" value="unionPrivate" id="gongshang" name="radios"/>
+                                    <label for="gongshang">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/gongshang.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left:450px;">
+                                    <input type="radio" value="unionPrivate" id="nongye" name="radios"/>
+                                    <label for="nongye">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/nongye.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left:600px;">
+                                    <input type="radio" value="unionPrivate" id="zhongguo" name="radios"/>
+                                    <label for="zhongguo">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/zhongguo.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left:750px;">
+                                    <input type="radio" value="unionPrivate" id="jianshe" name="radios"/>
+                                    <label for="jianshe">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/jianshe.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                            </div>
+
+                            <div class="row" style="margin-top: 15px;position: relative;top: 50px;">
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;">
+                                    <input type="radio" value="unionPrivate" id="jiaotong" name="radios"/>
+                                    <label for="jiaotong">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/jiaotong.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position:absolute;left: 150px;">
+                                    <input type="radio" value="unionPrivate" id="zhongxin" name="radios"/>
+                                    <label for="zhongxin">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/zhongxin.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position:absolute;left: 300px;">
+                                    <input type="radio" value="unionPrivate" id="guangda" name="radios"/>
+                                    <label for="guangda">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/guangda.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position:absolute;left: 450px;">
+                                    <input type="radio" value="unionPrivate" id="huaxia" name="radios"/>
+                                    <label for="huaxia">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/huaxia.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position:absolute;left: 600px;">
+                                    <input type="radio" value="unionPrivate" id="minsheng" name="radios"/>
+                                    <label for="minsheng">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/minsheng.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position:absolute;left: 750px;">
+                                    <input type="radio" value="unionPrivate" id="guangfa" name="radios"/>
+                                    <label for="guangfa">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/guangfa.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                            </div>
+
+                            <div class="row" style="margin-top:15px;position: relative;top: 90px;">
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;">
+                                    <input type="radio" value="unionPrivate" id="xingye" name="radios"/>
+                                    <label for="xingye">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/xingye.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 150px;">
+                                    <input type="radio" value="unionPrivate" id="pufa" name="radios"/>
+                                    <label for="pufa">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/pufa.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 300px;">
+                                    <input type="radio" value="unionPrivate" id="zheshang" name="radios"/>
+                                    <label for="zheshang">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/zheshang.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 450px;">
+                                    <input type="radio" value="unionPrivate" id="shanghai" name="radios"/>
+                                    <label for="shanghai">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/shanghai.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 600px;">
+                                    <input type="radio" value="unionPrivate" id="ningbo" name="radios"/>
+                                    <label for="ningbo">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/ningbo.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 750px;">
+                                    <input type="radio" value="unionPrivate" id="qilu" name="radios"/>
+                                    <label for="qilu">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/qilu.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row"style="margin-top: 15px;position: relative;top:130px">
+
+                                <div class="col-md-2" class="div-img" style="position:absolute;">
+                                    <input type="radio" value="unionPrivate" id="hangzhou" name="radios"/>
+                                    <label for="hangzhou">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/hangzhou.png"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 150px;">
+                                    <input type="radio" value="unionPrivate" id="nanjing" name="radios"/>
+                                    <label for="nanjing">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/nanjing.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 300px;">
+                                    <input type="radio" value="unionPrivate" id="tianjin" name="radios"/>
+                                    <label for="tianjin">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/tianjin.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 450px;">
+                                    <input type="radio" value="unionPrivate" id="huishang" name="radios"/>
+                                    <label for="huishang">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/huishang.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 600px;">
+                                    <input type="radio" value="unionPrivate" id="lanzhou" name="radios"/>
+                                    <label for="lanzhou">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/lanzhou.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 750px;">
+<!--                                    <input type="radio" value="unionPrivate" id="jiangxi" name="radios"/>
+                                    <label for="jiangxi">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/jiangxi.jpg"
+                                             style="cursor: pointer;">
+                                    </label>-->
+                                    <input type="radio" value="unionPrivate" id="qingdao" name="radios"/>
+                                    <label for="qingdao">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/qingdao.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            <div class="row" style="margin-top: 15px;position: relative;top:170px">
+
+                                <div class="col-md-2" class="div-img" style="position:absolute;">
+<!--                                    <input type="radio" value="unionPrivate" id="qingdao" name="radios"/>
+                                    <label for="qingdao">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/qingdao.jpg"
+                                             style="cursor: pointer;">
+                                    </label>-->
+
+                                    <input type="radio" value="unionPrivate" id="guilin" name="radios"/>
+                                    <label for="guilin">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/guilin.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 150px;">
+<!--                                    <input type="radio" value="unionPrivate" id="guilin" name="radios"/>
+                                    <label for="guilin">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/guilin.jpg"
+                                             style="cursor: pointer;">
+                                    </label>-->
+
+                                    <input type="radio" value="unionPrivate" id="guangshang" name="radios"/>
+                                    <label for="guangshang">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/guangshang.png"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 300px;">
+<!--                                    <input type="radio" value="unionPrivate" id="guangshang" name="radios"/>
+                                    <label for="guangshang">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/guangshang.png"
+                                             style="cursor: pointer;">
+                                    </label>-->
+
+                                    <input type="radio" value="unionPrivate" id="pingan" name="radios"/>
+                                    <label for="pingan">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/pingan.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 450px;" >
+<!--                                    <input type="radio" value="unionPrivate" id="hunchun" name="radios"/>
+                                    <label for="hunchun">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/hunchun.jpg"
+                                             style="cursor: pointer;">
+                                    </label>-->
+
+                                    <input type="radio" value="unionPrivate" id="zhaoshang" name="radios"/>
+                                    <label for="zhaoshang">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/zhaoshang.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 600px;">
+<!--                                    <input type="radio" value="unionPrivate" id="yinghuai" name="radios"/>
+                                    <label for="yinghuai">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/yinghuai.jpg"
+                                             style="cursor: pointer;">
+                                    </label>-->
+
+                                    <input type="radio" value="unionPrivate" id="beijing" name="radios"/>
+                                    <label for="beijing">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/beijing.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 750px;">
+<!--                                    <input type="radio" value="unionPrivate" id="yanbian" name="radios"/>
+                                    <label for="yanbian">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/yanbian.png"
+                                             style="cursor: pointer;">
+                                    </label>-->
+                                </div>
+                            </div>
+
+<!--                            <div class="row"style="margin-top: 15px;position:relative;top:210px">
+                                <div class="col-md-2" class="div-img" style="position:absolute;">
+                                    <input type="radio" value="unionPrivate" id="pingan" name="radios"/>
+                                    <label for="pingan">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/pingan.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 150px;">
+                                    <input type="radio" value="unionPrivate" id="zhaoshang" name="radios"/>
+                                    <label for="zhaoshang">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/zhaoshang.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 300px;">
+                                    <input type="radio" value="unionPrivate" id="beijing" name="radios"/>
+                                    <label for="beijing">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/beijing.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+                            </div>-->
+
+
+                        </div>
+
+                        <div class="one" id="tab3">
+
+                            <div  class="row" style="margin-top: 10px; position: relative;">
+                                <div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;">
+                                        <input type="radio" value="zhaoshang1" id="zhaoshang1" name="radios"/>
+                                        <label for="zhaoshang1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/zhaoshang.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="one" id="tab2">
+
+                            <div class="row" style="margin-top: 10px;position: relative;">
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;">
+                                        <input type="radio" value="zhaoshang2" id="zhaoshang2" name="radios"/>
+                                        <label for="zhaoshang2">
+                                                <img class="tab-img"
+                                                     src="${base.contextPath}/resources/image/bank_payment/zhaoshang.jpg"
+                                                     style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left:150px;">
+                                        <input type="radio" value="beijing1" id="beijing1" name="radios"/>
+                                        <label for="beijing1">
+                                                <img class="tab-img"
+                                                     src="${base.contextPath}/resources/image/bank_payment/beijing.jpg"
+                                                     style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                </div>
+
+                        </div>
+
+                        <div class="one" id="tab1">
+
+                            <div  class="row" style="position: relative;">
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;">
+                                        <input type="radio" value="unionPublic" id="unionpay1" name="radios"/>
+                                        <label for="unionpay1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/tt.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left:150px;">
+                                        <input type="radio" value="unionPublic" id="youzheng1" name="radios"/>
+                                        <label for="youzheng1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/youzheng.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left:300px;">
+                                        <input type="radio" value="unionPublic" id="gongshang1" name="radios"/>
+                                        <label for="gongshang1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/gongshang.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left:450px;">
+                                        <input type="radio" value="unionPublic" id="nongye1" name="radios"/>
+                                        <label for="nongye1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/nongye.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left:600px;">
+                                        <input type="radio" value="unionPublic" id="zhongguo1" name="radios"/>
+                                        <label for="zhongguo1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/zhongguo.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left:750px;">
+                                        <input type="radio" value="unionPublic" id="jianshe1" name="radios"/>
+                                        <label for="jianshe1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/jianshe.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                               </div>
+
+                            <div class="row" style="margin-top: 20px;position: relative;top: 50px;">
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;">
+                                        <input type="radio" value="unionPublic" id="jiaotong1" name="radios"/>
+                                        <label for="jiaotong1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/jiaotong.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position:absolute;left: 150px;">
+                                        <input type="radio" value="unionPublic" id="zhongxin1" name="radios"/>
+                                        <label for="zhongxin1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/zhongxin.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position:absolute;left: 300px;">
+                                        <input type="radio" value="unionPublic" id="guangda1" name="radios"/>
+                                        <label for="guangda1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/guangda.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position:absolute;left: 450px;">
+                                        <input type="radio" value="unionPublic" id="huaxia1" name="radios"/>
+                                        <label for="huaxia1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/huaxia.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position:absolute;left: 600px;">
+                                        <input type="radio" value="unionPublic" id="minsheng1" name="radios"/>
+                                        <label for="minsheng1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/minsheng.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position:absolute;left: 750px;">
+                                        <input type="radio" value="unionPublic" id="guangfa1" name="radios"/>
+                                        <label for="guangfa1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/guangfa.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                </div>
+
+                            <div class="row" style="margin-top:20px;position: relative;top: 90px;">
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;">
+                                        <input type="radio" value="unionPublic" id="xingye1" name="radios"/>
+                                        <label for="xingye1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/xingye.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left: 150px;">
+                                        <input type="radio" value="unionPublic" id="pufa1" name="radios"/>
+                                        <label for="pufa1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/pufa.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left: 300px;">
+                                        <input type="radio" value="unionPublic" id="beijing3" name="radios"/>
+                                        <label for="beijing3">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/beijing.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left: 450px;">
+                                        <input type="radio" value="unionPublic" id="ningbo1" name="radios"/>
+                                        <label for="ningbo1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/ningbo.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left: 600px;">
+                                        <input type="radio" value="unionPublic" id="qilu1" name="radios"/>
+                                        <label for="qilu1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/qilu.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left: 750px;">
+                                        <input type="radio" value="unionPublic" id="hangzhou1" name="radios"/>
+                                        <label for="hangzhou1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/hangzhou.png"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+                                </div>
+
+                            <div class="row"style="margin-top: 20px;position: relative;top:130px">
+
+                                    <div class="col-md-2" class="div-img" style="position:absolute;">
+                                        <input type="radio" value="unionPublic" id="tianjin1" name="radios"/>
+                                        <label for="tianjin1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/tianjin.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left: 150px;">
+                                        <input type="radio" value="unionPublic" id="huishang1" name="radios"/>
+                                        <label for="huishang1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/huishang.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left: 300px;">
+                                        <!--<input type="radio" value="unionPublic" id="jiangxi1" name="radios"/>
+                                        <label for="jiangxi1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/jiangxi.jpg"
+                                             style="cursor: pointer;">
+                                        </label>-->
+
+                                        <input type="radio" value="unionPublic" id="zhaoshang3" name="radios"/>
+                                        <label for="zhaoshang3">
+                                            <img class="tab-img"
+                                                 src="${base.contextPath}/resources/image/bank_payment/zhaoshang.jpg"
+                                                 style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left: 450px;">
+                                        <input type="radio" value="unionPublic" id="qingdao1" name="radios"/>
+                                        <label for="qingdao1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/qingdao.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left: 600px;">
+                                        <input type="radio" value="unionPublic" id="guangshang1" name="radios"/>
+                                        <label for="guangshang1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/guangshang.png"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-2" class="div-img" style="position: absolute;left: 750px;">
+                                        <input type="radio" value="unionPublic" id="zheshang1" name="radios"/>
+                                        <label for="zheshang1">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/zheshang.jpg"
+                                             style="cursor: pointer;">
+                                        </label>
+                                    </div>
+
+                                </div>
+
+                            <div class="row"style="margin-top: 20px;position:relative;top:170px">
+                                <div class="col-md-2" class="div-img" style="position:absolute;">
+                                    <input type="radio" value="unionPublic" id="pingan3" name="radios"/>
+                                    <label for="pingan3">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/pingan.jpg"
+                                             style="cursor: pointer;">
+                                    </label>
+                                </div>
+
+                                <div class="col-md-2" class="div-img" style="position: absolute;left: 150px;">
+                                    <!--<input type="radio" value="unionPublic" id="zhaoshang3" name="radios"/>
+                                    <label for="zhaoshang3">
+                                        <img class="tab-img"
+                                             src="${base.contextPath}/resources/image/bank_payment/zhaoshang.jpg"
+                                             style="cursor: pointer;">
+                                    </label>-->
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="myDisplayDiv">
+                    <h3 style="background-color: #91DDF3;margin-top: 30px; height:30px ;font-size: 12px;
+                   font-family: Verdana, Geneva, sans-serif;font-size: 20px; color: #58A200 ">
+                        其他支付方式:</h3>
+                    <!--<@spring.message"mws.myaccount.accountinfo.method_payment"/>:</h4>-->
+                    <div class="row" style="margin-top: 5px;margin-left:2px;width:100%;height:40px;background-color: snow;position: relative;">
+
+                        <div class="col-md-6 col-offset-2" style="position: absolute;width:165px;height: 46px">
+                            <input type="radio" value="wx_pay" id="wx_pay" name="radios" style="position: absolute;left:0px;top:8px"/>
+                            <label for="wx_pay"  style="position: absolute;left:20px;padding-left:5px;padding-bottom: 5px"><img class="tab-img"
+                                                           src="${base.contextPath}/resources/image/bank_payment/wx.jpg"
+                                                           style="cursor: pointer;"></label>
+                        </div>
+
+                        <div class="col-md-6" style="position: absolute;left: 500px;width:165px;height: 46px">
+                            <input type="radio" value="aliPay" id="aliPay" name="radios"style="position: absolute;left:0px;top:8px"/>
+                            <label for="aliPay"style="position: absolute;left:20px;padding-left:5px;padding-bottom: 2px"><img class="tab-img"
+                                                           src="${base.contextPath}/resources/image/bank_payment/alipay1.gif"
+                                                           style="cursor: pointer;"></label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+         </div>
+
+        <div class="row" style="margin-top: 20px; margin-left:1px;text-align: center;position: relative;">
+
+            <div class="col-md-4 form-group" id="payBtnDiv" style="position: absolute;left:0px;">
+                <button class="btn btn-primary btn-lg" type="button" onclick="orderPay()" id="payBtn"
+                        style="width:150px;"><@spring.message "mws.payment.selector.determine_payment"/>
+                </button>
+
+            </div>
+            <div class="col-md-4 form-group"style="position: absolute;left:300px;">
+                <button class="btn btn-info btn-lg" type="button" onclick="shopping()" id="shoppingBtn"
+                        style="width:150px;"><@spring.message "mws.payment.selector.shopping"/>
+                </button>
+            </div>
+
+            <div class="col-md-4 form-group" style="position: absolute;left:600px;">
+                <button class="btn btn-default btn-lg" type="button" onclick="redirectOrder()" id="orderBtn"
+                        style="width:150px;"><@spring.message "mws.payment.selector.followorder"/>
+                </button>
+            </div>
+
+        </div>
+
+
+<div style="margin-top: 80px;text-align: center" >
+    <@spring.message "mws.payment.selector.relatecustomer"/>
+</div>
+
+<form id="setPayForm" method="post" action="">
+    <input id="bankcode" type="hidden" name="bankcode"/>
+    <input id="body" type="hidden" name="body"/>
+    <!--<input id="buyer_id" type="hidden" name="buyer_id"/>-->
+    <!--<input id="discount" name="discount" type="hidden">-->
+    <input id="fee_type" type="hidden" name="fee_type"/>
+    <!--<input id="input_charset" type="hidden" name="input_charset"/>-->
+    <input id="mobile" type="hidden" name="mobile"/>
+    <!--<input id="notify_url" type="hidden" name="notify_url"/>-->
+    <input id="out_trade_no" type="hidden" name="out_trade_no"/>
+    <!--<input id="partner" type="hidden" name="partner"/>-->
+    <input id="product_fee" type="hidden" name="product_fee"/>
+    <!--<input id="return_url" type="hidden" name="return_url"/>-->
+    <!--<input id="service" type="hidden" name="service"/>-->
+    <!--<input id="service_version" type="hidden" name="service_version"/>-->
+    <!--<input id="show_url" type="hidden" name="show_url"/>-->
+    <input id="token"  type="hidden" name="token" />
+    <input id="spbill_create_ip" type="hidden" name="spbill_create_ip"/>
+    <input id="store_id" name="store_id" type="hidden">
+    <input id="subject" type="hidden" name="subject"/>
+    <!--<input id="subpartner" type="hidden" name="subpartner"/>-->
+    <input id="total_fee" type="hidden" name="total_fee"/>
+    <input id="trade_mode" name="trade_mode" type="hidden">
+    <input id="trade_details" name="trade_details" type="hidden">
+    <input id="trans_channel" type="hidden" name="trans_channel"/>
+    <input id="trans_pattern" type="hidden" name="trans_pattern"/>
+    <input id="transport_fee" type="hidden" name="transport_fee"/>
+    <input id="headerId" type="hidden" name="headerId"/>
+</form>
+
+</div>
+
+</section>
+<!-- ========== CONTENT END ========== -->
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

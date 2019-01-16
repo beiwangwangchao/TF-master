@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   
+	     http://www.springframework.org/schema/beans/spring-beans.xsd   
+	          http://code.alibabatech.com/schema/dubbo     
+	             http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+	<!-- �򵥷��������� -->
+	<bean class="com.lkkhpg.dsis.platform.dubbo.ext.DubboSimpleProvider">
+		<property name="packagePath" value="com.hand.**.service.impl.**"/>
+	</bean>     
+	             
+	<!-- ɨ�� -->
+	<dubbo:annotation package="com.hand" />	
+	<!-- �ṩ��Ӧ����Ϣ�����ڼ���������ϵ -->
+    <dubbo:application  name="provider-hand-app"/>
+    <!-- ʹ��zookeeperע�����ı�¶�����ַ -->
+    <dubbo:registry address="zookeeper://192.168.126.130:2181" />
+ 
+    <!-- ��dubboЭ����20880�˿ڱ�¶���� -->
+    <dubbo:protocol name="dubbo" port="20880" />
+</beans>	

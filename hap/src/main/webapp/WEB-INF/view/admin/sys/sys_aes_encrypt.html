@@ -1,0 +1,59 @@
+<#include "../include/head.html">
+<body style="padding: 3px;">
+	<form id="mainform" method="post"></form>
+	<script type="text/javascript">
+        // 批量加密，以换行符分割
+        var mainform = window['mainform'] = $("#mainform").ligerForm({
+            fields : [ {
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.aes.text"/>',
+                type : 'textarea',
+                name : 'text',
+                width : 400,
+                newline : true,
+                options : {
+                    height : 400
+                }
+            }, {
+
+                label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.aes.encrypt.text"/>',
+                type : 'textarea',
+                name : 'decrypt',
+                width : 500,
+                newline : false,
+                readonly : true,
+                options : {
+                    height : 400
+                }
+            } ],
+            buttons : [ {
+                text : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.aes.encrypt.button.batchencrypt"/>',
+                width : 200,
+                click : function() {
+                    var obj = mainform.getData();
+                    if (!obj.text) {
+                        var vv = {
+                            decrypt : 'TEXT IS NULL.'
+                        }
+                        mainform.setData(vv);
+                        return;
+                    }
+                    $.ajax({
+                        type : "POST",
+                        dataType : "json",
+                        contentType : "application/json",
+                        url : "${base.contextPath}/aes/encrypt",
+                        data : JSON2.stringify(obj),
+                        success : function(data) {
+                            var vv = {
+                                decrypt : data
+                            };
+                            mainform.setData(vv);
+
+                        }
+                    });
+                }
+            } ]
+        });
+	</script>
+</body>
+</html>

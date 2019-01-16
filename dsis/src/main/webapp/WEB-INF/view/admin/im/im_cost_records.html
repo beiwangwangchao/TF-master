@@ -1,0 +1,262 @@
+<#--
+ * description: 成本记录查询页面
+ * version: 1.0 
+ * author: hanrui.huang && houmin
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?periodYear=SPM.PERIOD_YEAR&periodMonth=SPM.PERIOD_MONTH&costAttributeData=INV.COST_RECORD_DETAILS" type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.min.js?v=20161026" type="text/javascript"></script>
+<body style="padding: 10px;">
+    <form id="cost_records_form"></form>
+    <div id="cost_records_grid"></div>
+    <!-- 成本属性值录入grid -->
+	<div id="cost_attribute_input_grid" style="display:none;"></div>
+    <script type="text/javascript">
+ 	//成本属性录入
+    function f_inputCostAttribute(costRecordId, unitCost) {
+    	window.popWin = $.ligerDialog.open({
+    		url : "im_cost_records_attr.html?costRecordId="+costRecordId+"&unitCost="+unitCost,
+            width : 500,
+            height : 400
+        });
+    }
+    $(function() {
+    	/*切换后库存组织*/
+    	var currentInvOrgId = _invOrgId;
+    	window['cost_records_form'] = $("#cost_records_form").ligerForm({
+    		fields : [{ 
+    			name : 'invOrgId', 
+    			label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.lot.dto.invlot.organizationname"/>', 
+    			newline : false ,
+    			type:'combobox',
+    			options:{
+    				value : _invOrgId,
+    				valueField : 'invOrgId',
+					textField : 'name',
+					url : _basePath + "/spm/invOrganization/queryCostOrgsByRole",
+					isMultiSelect : false,
+					isShowCheckBox : false,
+					onSelected : function(value,text) {
+						if (!value) {
+							return false;
+						}
+						if (value != currentInvOrgId) {
+							currentInvOrgId = value;
+							f_clearForm(currentInvOrgId);
+							f_query();
+						}
+					},
+					onSuccess : function(data) {
+	                	this.setValue(currentInvOrgId);
+	                }
+    			},
+    			validate : {
+    				required : true
+    			}
+    		},{
+    			label : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.costrecordnumber"/>',
+    			name : 'costRecordNumber',
+    			type : 'text',
+    			newline : false
+    		},{
+    			name:'itemNumber',
+    			label:'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.itemid"/>',
+    			newline:false,
+    			type:'text'
+    		},{
+    			name : 'currency',
+    			label : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcountry.currencycode"/>',
+    			readonly : true,
+    			newline : true
+    		},{
+    			name:'lotNumber',
+    			label:'<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotnum"/>',
+    			newline:false,
+    			type:'text'
+    		},{
+    			name:'itemName',
+    			label:'<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+    			newline:false,
+    			type:'text'
+    		},{
+    			type: 'date',
+    			label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.date.from"/>',
+    			name: 'beforeexpiryDate',
+    			newline: true,
+    			options: {
+    				format: 'yyyy-MM-dd'
+    			}
+    		},{
+    			type: 'date',
+    			label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.date.to"/>',
+    			name: 'afterexpiryDate',
+    			newline: false,
+    			options: {
+    				format: 'yyyy-MM-dd'
+    			}
+    		}],
+    		buttons : [{
+    			text : '<@spring.message "sys.hand.btn.query"/>',
+    			disabled : false,
+    			width : 60,
+    			click : function() {
+    				f_query();
+    			}
+    		},
+    		{
+    			text : '<@spring.message "sys.hand.btn.cancel"/>',
+                <#if accessService.access("CANCEL_EDITABLE") == false>
+    			disabled : true,
+                </#if>
+    			width : 60,
+    			click : function(){
+    				f_cancel(currentInvOrgId);
+    			}
+    		}]
+    	});
+    	window['cost_records_grid'] = $('#cost_records_grid').ligerGrid({
+    		unSetValidateAttr : false, 
+    		delayLoad : true, 
+    		columns : [{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.costrecordnumber"/>',
+    			name: 'costRecordNumber', 
+    			align: 'left'
+    		},{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesline.itemid"/>',
+    			name: 'itemNumber', 
+    			align: 'left'
+    		},{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+    			name: 'itemName', 
+    			align: 'left'
+    		},{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.lotnum"/>',
+    			name: 'lotNumber', 
+    			align: 'left'
+    		},{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.lot.expiration.date"/>',
+    			name: 'expiryDate', 
+    			align: 'left'
+    		},{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.quantity"/>',
+    			name: 'quantity', 
+    			align: 'left'
+    		},{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.unitprice"/>',
+    			name: 'unitCost', 
+    			align: 'left'
+    		},{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.ending.balance"/>',
+    			name: 'balance', 
+    			align: 'left'
+    		},{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.year"/>',
+    			name: 'year', 
+    			align: 'left'
+    		},{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.month"/>',
+    			name: 'month', 
+    			align: 'left'
+    		},{
+    			display:'<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.cost_detail" />',
+    			name: 'edit',
+    			align: 'center',
+    			render : function(rowData, rowindex, value, column) {
+    				return '<a href="javascript:void(0)" onclick="f_inputCostAttribute('+rowData.costRecordId+','+rowData.unitCost+')" >'+
+    				'<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.cost_detail" /></a>';
+    			}
+    		}],
+    		toolbar: { 
+                items: [
+                    {                	
+                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                        menu:{ width: 120, items:
+	                            [
+		                 			{
+		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+		                 			    click:   function (){exportSelected("cost_records_form","cost_records_grid",{},_basePath);}
+		                 			},
+		                 			{ line: true },
+		                 			{                	
+		                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+		                 			    click: function (){exportDirectAll("cost_records_form","cost_records_grid",{},_basePath);}
+		                 			    
+		                 			}
+	                          ]
+                     	}                        
+                    }
+                ]
+            },
+    		url: '${base.contextPath}/inv/cost/query',
+    		enabledEdit: false,
+    		width: '99%', 
+    		height: '98%', 
+    		rownumbers: true,
+    		checkbox : true
+    	});
+    	/*本位币初始化*/
+    	invOrgIdCurrency(_invOrgId);
+    });
+    
+    //获取本位币,invOrgId-库存组织ID
+    function invOrgIdCurrency(invOrgId) {
+        var params = [{orgType: 'INV', orgId: invOrgId, paramNames: ['SPM.CURRENCY']}];
+        Hap.ajax({
+                url : '${base.contextPath}/spm/orgParam/get',
+                data : params,
+                success : function(json) {
+                    var currency = json.rows[0].paramValues['SPM.CURRENCY'] == undefined ? null : json.rows[0].paramValues['SPM.CURRENCY'][0];
+                    Hap.ajax({
+                        url : '${base.contextPath}/spm/currency/query?currencyCode='+currency,
+                        data : [],
+                        success : function(json) {
+                            var currencyName = json.rows[0].currencyName;
+                            if(currencyName != null){
+                                liger.get('currency').setValue(currencyName);
+                            } else {
+                                liger.get('currency').setValue(null);
+                            }
+                        }
+                    });
+                }
+        });
+    }
+    /*查询*/
+    function f_query() {
+    	if(!Hap.validateForm(cost_records_form))
+			return false;
+		Hap.gridQuery({
+			form : cost_records_form,
+			grid : cost_records_grid
+		})
+    }
+    /*取消*/
+    function f_cancel(invOrgId) {
+    	$.ligerDialog.open({
+			height : 300,
+			width : 380,
+			title : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.cost.dto.cancel.cost.tile"/>',
+			url : 'im_cost_records_del.html?invOrgId=' + invOrgId,
+			showMax : false,
+			showToggle : true,
+			showMin : false,
+			isResize : true,
+			slide : false,
+			center : 0
+		});
+    }
+    /*切换组织后Form数据清空*/
+    function f_clearForm(invOrgId) {
+    	liger.get("costRecordNumber").setValue('');
+    	liger.get("itemNumber").setValue('');
+    	liger.get("lotNumber").setValue('');
+    	liger.get("itemNumber").setValue('');
+    	liger.get("itemName").setValue('');
+    	invOrgIdCurrency(invOrgId);
+    }
+</script>
+</body>
+</html>

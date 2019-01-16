@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>天府电商</title>
+<link rel="shortcut icon" href="${base.contextPath}/resources/img/favicon.ico" />
+<!-- Bootstrap -->
+<link href="${base.contextPath}/resources/css/bootstrap${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.carousel${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.theme${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/owl.transitions${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/style${resource_suffix!}.css" rel="stylesheet">
+<link href="${base.contextPath}/resources/css/config${resource_suffix!}.css" rel="stylesheet">
+<!-- HTML5 Shim and Respond${resource_suffix!}.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond${resource_suffix!}.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="${base.contextPath}/resources/js/html5shiv${resource_suffix!}.js"></script>
+  <![endif]-->
+<script src="${base.contextPath}/resources/js/jquery-1.11.3${resource_suffix!}.js"></script>
+
+        </head>
+<body>
+    <header id="header">
+        <div>
+            <img src="${base.contextPath}/resources/img/top-line.jpg" style="width: 100%; height: 24px"/>
+        </div>
+        <!-- / #top-bar -->
+
+        <!-- ========== TOP BAR START ========== -->
+
+        <!-- ========== MENU START ========== -->
+
+        <nav id="main-nav">
+            <div class="navbar">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle"
+                            data-toggle="collapse"
+                            data-target=".main-nav">
+                            <span class="icon-bar"></span> <span
+                                class="icon-bar"></span> <span
+                                class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#"><img
+                            src="${base.contextPath}/resources/img/logo.png" alt="Infinitus"
+                            class="img-responsive"></a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+<style>
+    .span-css{
+        background-color: red;
+        color: white;
+    }
+    .market-li{
+        margin-top: 50px;
+        text-align: center;
+        color: #737373;
+    }
+    .market-td{
+        border: 2px solid #858585;
+        height: 35px;
+        width: 120px;
+        line-height: 35px;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .gradient-line-top{
+        background: -webkit-linear-gradient(#FFFFFF, #E4E4E4); /* Safari 5.1 - 6.0 */
+        background: -o-linear-gradient(#FFFFFF, #E4E4E4); /* Opera 11.1 - 12.0 */
+        background: -moz-linear-gradient(#FFFFFF, #E4E4E4); /* Firefox 3.6 - 15 */
+        background: linear-gradient(#FFFFFF, #E4E4E4);  /*标准的语法 */
+        height:150px;
+        width:2px;
+        margin-left:300px;
+        margin-top: 60px;
+    }
+    .gradient-line-bottom{
+        background: -webkit-linear-gradient(#E4E4E4, #FFFFFF); /* Safari 5.1 - 6.0 */
+        background: -o-linear-gradient(#E4E4E4, #FFFFFF); /* Opera 11.1 - 12.0 */
+        background: -moz-linear-gradient(#E4E4E4, #FFFFFF); /* Firefox 3.6 - 15 */
+        background: linear-gradient(#E4E4E4, #FFFFFF);  /*标准的语法 */
+        height:150px;
+        width:2px;
+        margin-left:300px;
+    }
+</style>
+<script src="${base.contextPath}/common/code?igiMapping=SYS.IGI_MAPPING" type="text/javascript"></script>
+<script type="text/javascript">
+    var  memberId= ${Session.memberId};
+       console.log(memberId);
+       console.log("--------------------------------");
+    var marketId = ${Session._marketId};
+    console.log(marketId);
+    $(function(){
+    	//var marketList = $("li[name='marketList']").text();
+        $("#${Session._marketId}").css({ "color": "white", "background": "#E00300"});
+        queryMarketName("${Session._marketCode}");
+    	$("li[name='marketList']").on("click",function(){
+            $("li[name='marketList']").css({ "color": "", "background": ""});
+            $(this).css({ "color": "white", "background": "#E00300"});
+        });
+        $("li[name='marketList']").hover(
+                  function () {
+                    $(this).css({"cursor": "pointer"});
+                  },
+                  function () {
+                    $(this).css();
+                  }
+        )
+    });
+    function _cheak(){
+        $("span[name='spanName']").hover(
+        		  function () {
+        		    $(this).css({"cursor": "pointer", "color": "white", "background": "#E00300"});
+        		  },
+        		  function () {
+        		    $(this).css({ "color": "", "background": ""});
+        		  }
+        );
+        $("span[name='spanName']").on("click",function(){
+            $("span[name='spanName']").css({ "color": "", "background": ""});
+            $(this).css({ "color": "white", "background": "#E00300"});
+        });
+    };
+    function queryMarketName(code){
+    	var igiCode = "";
+        for(var i=0;i<igiMapping.length;i++){
+            if(code == igiMapping[i]['value']){
+                igiCode = igiMapping[i]['meaning']
+                break;
+            }
+        }
+    	$.ajax({
+    		type : "POST",
+            url:"${base.contextPath}/account/selectByMarketName",
+            data:{igiCode:igiCode,memberId:memberId},
+            dataType : "json",
+            success : function(data) {
+                if(data.success){
+                	var html = [];
+                    var data = data.rows;
+                    if(data.length>0){
+                        for(var i=0;i<data.length;i++){
+                        	var item = data[i];
+                        	html.push("<li class='col-md-3' style='color: #737373;width:240px;margin-top:20px;'>\
+                        	         <span class='col-md-4 col-md-offset-4 market-td' name='spanName' title='"+ item.name +"' onclick='selectShop("+ item.salesOrgId +",\""+ item.name +"\")' id='"+ item.salesOrgId +"'>"+ item.name +" </span>\
+                        	     </li>");
+                        }
+                        $("#showShopTD").html(html.join(''));
+                	}
+                    _cheak();
+                }
+            }
+    	});
+    }
+    
+    function selectShop(orgId,name){
+    	if($("input[name='defaultShop']").is(':checked')){
+    		$("#checkOrgId").val(orgId);
+            $("#name").val(name);
+            $("#sign").val('Y');
+            $("#checkForm").submit();
+        }else{
+        	$("#checkOrgId").val(orgId);
+            $("#name").val(name);
+            $("#checkForm").submit();
+        }
+    }
+</script>
+</header>
+<div style="display: none">
+<#if Session._marketId?exists>
+   ${Session._marketId}
+</#if> 
+<#if Session._salesOrgId?exists>
+   ${Session._salesOrgId}
+</#if> 
+</div>
+<section id="content">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.myaccount.accountinfo.my_shop"/></li>
+        </ol>
+        <div class="col-sm-12">
+        <div class="row" style="height: 538px;">
+            <div style="border: 2px solid #E1E1E1;height: 90%;width: 90%;margin: 3% 0% 0% 5%;">
+            <div class="col-sm-offset-3" style="height:350px;margin-top: 80px; position:absolute;width:2px;top:0;bottom:0;background:-webkit-gradient(linear, center top, center bottom, from(#fff), color-stop(0.45, #ccc),color-stop(0.55, #ccc), to(#fff));"></div>
+                <!-- <label><img src="${base.contextPath}/resources/img/shop.png"></label> -->
+                <div class="col-md-12">
+                    <div class="col-md-10" style="font-size: 16px;font-weight: 600;color: #737373;margin-top: 2%;"><img src="${base.contextPath}/resources/img/shop.png"><@spring.message "mws.myaccount.accountinfo.my_shop"/></div>
+                    <div style="float: left;margin: 22px 0px 0px 20px;"><input type="checkbox" id="defaultShop" name="defaultShop"/></div>
+                    <label style="margin: 20px 0px 0px 5px;cursor: pointer;float: left;" for="defaultShop">设为默认店铺</label> 
+                </div>
+                <div class="col-sm-4 col-md-3 sidebar">
+		            <aside class="widget widget_recent_posts" id="ul">
+		                <!-- <h4 class="widget-title">我的店铺</h4> -->
+		                <#list market as list>
+			                <ul class="submenu nav-pills nav-stacked" style="font-weight: bolder">
+			                    <li class="col-md-offset-3 market-li" name="marketList" value="${list.code}" onclick='queryMarketName("${list.code}")'>${list.name}</li>
+			                </ul>
+		                </#list> 
+		            </aside>
+                </div>
+<!--                 <div class="gradient-line-top"></div>
+                <div class="gradient-line-bottom"></div> -->
+                <div class="col-sm-8 col-md-9" style="height: 90%;vertical-align:middle;">
+	                <!-- <table class="table" style="text-align: center;margin: 15% 0% 0% 0%">
+	                    <thead>
+	                        
+	                    </thead>
+	                    <tbody id="showShopTD">
+	                    </tbody>
+	                </table> -->
+	                
+	                <ul class="nav nav-pills" id="showShopTD">
+	                   
+	                </ul>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    <form action="${base.contextPath}/account/checkShop" id="checkForm" method="post">
+        <input type="hidden" value="" id="checkOrgId" name="salesOrgId"/>
+        <input type="hidden" value="" id="name" name="name"/>
+        <input type="hidden" value="" id="sign" name="sign"/>
+    </form>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

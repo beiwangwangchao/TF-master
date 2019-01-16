@@ -1,0 +1,2178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lkkhpg.dsis.common.product.mapper.InvItemMapper">
+    <resultMap id="ItemCategoryResultMap" type="com.lkkhpg.dsis.common.product.dto.InvItem" extends="BaseResultMap">
+        <collection property="invCategory" ofType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+            <id property="categoryItemId" column="CATEGORY_ITEM_ID" />
+            <result property="categoryName" column="CATEGORY_NAME" />
+            <result property="categoryId" column="CATEGORY_ID" />
+        </collection>
+    </resultMap>
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.product.dto.InvItem">
+        <id column="ITEM_ID" jdbcType="DECIMAL" property="itemId" />
+        <result column="ITEM_NUMBER" jdbcType="VARCHAR" property="itemNumber" />
+        <result column="BAR_CODE" jdbcType="VARCHAR" property="barCode" />
+        <result column="ITEM_NAME" jdbcType="VARCHAR" property="itemName" />
+        <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+        <result column="STARTER_AID" jdbcType="VARCHAR" property="starterAid" />
+        <result column="COUNT_STOCK_FLAG" jdbcType="VARCHAR" property="countStockFlag" />
+        <result column="QUANTITY_COUNT_TYPE" jdbcType="VARCHAR" property="quantityCountType" />
+        <result column="COUNT_ITEM_ID" jdbcType="DECIMAL" property="countItemId" />
+        <result column="REDEEM_FLAG" jdbcType="VARCHAR" property="redeemFlag" />
+        <result column="QUANTITY_ALERT" jdbcType="DECIMAL" property="quantityAlert" />
+        <result column="EXPIRY_ALERT" jdbcType="VARCHAR" property="expiryAlert" />
+        <result column="MIN_ORDER_QUANTITY" jdbcType="DECIMAL" property="minOrderQuantity" />
+        <result column="VALIDATE_FROM" jdbcType="TIMESTAMP" property="validateFrom" />
+        <result column="VALIDATE_TO" jdbcType="TIMESTAMP" property="validateTo" />
+        <result column="ORDER_FLAG" jdbcType="VARCHAR" property="orderFlag" />
+        <result column="INVENTORY_FLAG" jdbcType="VARCHAR" property="inventoryFlag" />
+        <result column="ITEM_TYPE" jdbcType="VARCHAR" property="itemType" />
+        <result column="UOM_CODE" jdbcType="VARCHAR" property="uomCode" />
+        <result column="PUBLISH_STATUS" jdbcType="VARCHAR" property="publishStatus" />
+        <result column="OBJECT_VERSION_NUMBER" jdbcType="DECIMAL" property="objectVersionNumber" />
+        <result column="REQUEST_ID" jdbcType="DECIMAL" property="requestId" />
+        <result column="PROGRAM_ID" jdbcType="DECIMAL" property="programId" />
+        <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+        <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+        <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+        <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+        <result column="LAST_UPDATE_LOGIN" jdbcType="DECIMAL" property="lastUpdateLogin" />
+        <result column="ATTRIBUTE_CATEGORY" jdbcType="VARCHAR" property="attributeCategory" />
+        <result column="ATTRIBUTE1" jdbcType="VARCHAR" property="attribute1" />
+        <result column="ATTRIBUTE2" jdbcType="VARCHAR" property="attribute2" />
+        <result column="ATTRIBUTE3" jdbcType="VARCHAR" property="attribute3" />
+        <result column="ATTRIBUTE4" jdbcType="VARCHAR" property="attribute4" />
+        <result column="ATTRIBUTE5" jdbcType="VARCHAR" property="attribute5" />
+        <result column="ATTRIBUTE6" jdbcType="VARCHAR" property="attribute6" />
+        <result column="ATTRIBUTE7" jdbcType="VARCHAR" property="attribute7" />
+        <result column="ATTRIBUTE8" jdbcType="VARCHAR" property="attribute8" />
+        <result column="ATTRIBUTE9" jdbcType="VARCHAR" property="attribute9" />
+        <result column="ATTRIBUTE10" jdbcType="VARCHAR" property="attribute10" />
+        <result column="ATTRIBUTE11" jdbcType="VARCHAR" property="attribute11" />
+        <result column="ATTRIBUTE12" jdbcType="VARCHAR" property="attribute12" />
+        <result column="ATTRIBUTE13" jdbcType="VARCHAR" property="attribute13" />
+        <result column="ATTRIBUTE14" jdbcType="VARCHAR" property="attribute14" />
+        <result column="ATTRIBUTE15" jdbcType="VARCHAR" property="attribute15" />
+        <!-- 市场，超库存订单 -->
+        <result column="MARKET_ID" jdbcType="DECIMAL" property="marketId" />
+        <result column="BACK_ORDER" jdbcType="VARCHAR" property="backOrder" />
+        <result column="MARKET_NAME" jdbcType="VARCHAR" property="marketName" />
+        <result column="LOT_CTRL_FLAG" jdbcType="VARCHAR" property="lotCtrlFlag" />
+        <result column="PUBLISH_STATUS_DESC" jdbcType="VARCHAR" property="publishStatusDesc" />
+        <result column="package_quantity" property="packageQuantity" jdbcType="DECIMAL"/>
+        <!-- 库存组织ID -->
+        <result column="ORGANIZATION_ID" jdbcType="DECIMAL" property="organizationId" />
+        <result column="UOM_NAME" jdbcType="VARCHAR" property="uomName" />
+        <result column="QUANTITY" jdbcType="VARCHAR" property="quantity" />
+        <!-- 计算商品名称 -->
+        <result column="COUNT_ITEM_NAME" jdbcType="VARCHAR" property="countItemName" />
+        <result column="COUNT_ITEM_NUMBER" jdbcType="VARCHAR" property="countItemNumber" />
+        
+        <result column="SORT_NUM" property="sortNum" jdbcType="DECIMAL"/>
+        <result column="function_area" property="functionArea" jdbcType="VARCHAR"/>
+        
+        <collection property="invCategory" ofType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+            <id property="categoryItemId" column="CATEGORY_ITEM_ID" />
+            <result property="categoryName" column="CATEGORY_NAME" />
+            <result property="categoryId" column="CATEGORY_ID" />
+        </collection>
+        
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ITEM_ID, ITEM_NUMBER, BAR_CODE, ITEM_NAME, DESCRIPTION, STARTER_AID, COUNT_STOCK_FLAG,LOT_CTRL_FLAG,
+        QUANTITY_COUNT_TYPE, COUNT_ITEM_ID, REDEEM_FLAG, QUANTITY_ALERT, EXPIRY_ALERT, MIN_ORDER_QUANTITY,
+        VALIDATE_FROM, VALIDATE_TO, ORDER_FLAG, INVENTORY_FLAG, ITEM_TYPE, UOM_CODE, PUBLISH_STATUS,
+        OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2,
+        ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, MARKET_ID, BACK_ORDER,SORT_NUM
+    </sql>
+
+    <!-- 根据id查询 -->
+       <select id="getItemById" resultMap="ItemCategoryResultMap">
+       SELECT i.item_id,
+       i.item_number,
+       i.bar_code,
+       i.starter_aid,
+       i.count_stock_flag,
+       i.quantity_count_type,
+       i.count_item_id,
+       (SELECT ib.item_number
+          FROM inv_item_b ib
+         WHERE ib.item_id = i.count_item_id) AS count_item_number,
+       (SELECT itl.item_name
+          FROM inv_item_tl itl
+         WHERE itl.item_id = i.count_item_id and itl.lang = #{request.locale,jdbcType=VARCHAR}) AS count_item_name,
+       i.redeem_flag,
+       i.quantity_alert,
+       i.expiry_alert,
+       i.min_order_quantity,
+       i.validate_from,
+       i.validate_to,
+       i.order_flag,
+       i.inventory_flag,
+       i.item_type,
+       i.uom_code,
+       i.publish_status,
+       (SELECT scvt.meaning
+              FROM sys_code_b       scb,
+                   sys_code_value_b scvb,
+                   sys_code_value_tl scvt
+             WHERE scb.code = 'PM.PUBLISH_STATUS'
+               AND scb.code_id = scvb.code_id
+               AND scvb.code_value_id = scvt.code_value_id
+               AND scvb.value = i.publish_status
+               AND scvt.lang = #{request.locale,jdbcType=VARCHAR}) publish_status_desc,
+       i.quantity_alert,
+       i.expiry_alert,
+       i.lot_ctrl_flag,
+       i.market_id, 
+       smt.name as market_name,
+       i.back_order,
+       it.item_name,
+       it.description,
+       ct.category_name,
+       ic.category_id,
+       ic.category_item_id,
+       mt.name as uom_name,
+       i.sort_num
+  FROM inv_item_b i
+  LEFT JOIN inv_item_category ic
+    ON ic.item_id = i.item_id
+  LEFT JOIN inv_item_tl it
+    ON (it.item_id = i.item_id AND it.lang = #{request.locale,jdbcType=VARCHAR})
+  left join inv_category_tl ct 
+    ON (ct.category_id = ic.category_id and ct.lang = #{request.locale,jdbcType=VARCHAR})  
+  left join inv_unit_of_measure_tl mt
+    ON (mt.uom_code = i.uom_code and mt.lang = #{request.locale,jdbcType=VARCHAR})
+  left join spm_market_tl smt
+    ON (smt.market_id = i.market_id and smt.lang = #{request.locale,jdbcType=VARCHAR})  
+ WHERE i.item_id = #{itemId,jdbcType=DECIMAL}
+    </select>
+
+    <!--w0119-->
+    <select id="getItemByIdByOrg" resultMap="ItemCategoryResultMap">
+        SELECT i.item_id,
+        i.item_number,
+        i.bar_code,
+        i.starter_aid,
+        i.count_stock_flag,
+        i.quantity_count_type,
+        i.count_item_id,
+        (SELECT ib.item_number
+        FROM inv_item_b ib
+        WHERE ib.item_id = i.count_item_id) AS count_item_number,
+        (SELECT itl.item_name
+        FROM inv_item_tl itl
+        WHERE itl.item_id = i.count_item_id and itl.lang = #{request.locale,jdbcType=VARCHAR}) AS count_item_name,
+        i.redeem_flag,
+        i.quantity_alert,
+        i.expiry_alert,
+        i.min_order_quantity,
+        i.validate_from,
+        i.validate_to,
+        i.order_flag,
+        i.inventory_flag,
+        i.item_type,
+        i.uom_code,
+        i.publish_status,
+        (SELECT scvt.meaning
+        FROM sys_code_b       scb,
+        sys_code_value_b scvb,
+        sys_code_value_tl scvt
+        WHERE scb.code = 'PM.PUBLISH_STATUS'
+        AND scb.code_id = scvb.code_id
+        AND scvb.code_value_id = scvt.code_value_id
+        AND scvb.value = i.publish_status
+        AND scvt.lang = #{request.locale,jdbcType=VARCHAR}) publish_status_desc,
+        i.quantity_alert,
+        i.expiry_alert,
+        i.lot_ctrl_flag,
+        i.market_id,
+        smt.name as market_name,
+        i.back_order,
+        it.item_name,
+        it.description,
+        ct.category_name,
+        ic.category_id,
+        ic.category_item_id,
+        mt.name as uom_name,
+        i.sort_num
+        FROM inv_item_b i
+        LEFT JOIN inv_item_category ic
+        ON ic.item_id = i.item_id
+        LEFT JOIN inv_item_tl it
+        ON (it.item_id = i.item_id AND it.lang = #{request.locale,jdbcType=VARCHAR})
+        left join inv_category_tl ct
+        ON (ct.category_id = ic.category_id and ct.lang = #{request.locale,jdbcType=VARCHAR})
+        left join inv_unit_of_measure_tl mt
+        ON (mt.uom_code = i.uom_code and mt.lang = #{request.locale,jdbcType=VARCHAR})
+        left join spm_market_tl smt
+        ON (smt.market_id = i.market_id and smt.lang = #{request.locale,jdbcType=VARCHAR})
+        WHERE i.item_id = #{itemId,jdbcType=DECIMAL}
+    </select>
+    
+    <select id="getItemByIdForOrder" resultMap="ItemCategoryResultMap">
+       SELECT i.item_id,
+       i.item_number,
+       i.bar_code,
+       i.starter_aid,
+       i.count_stock_flag,
+       i.quantity_count_type,
+       i.count_item_id,
+       (SELECT ib.item_number
+          FROM inv_item_b ib
+         WHERE ib.item_id = i.count_item_id) AS count_item_number,
+       (SELECT itl.item_name
+          FROM inv_item_tl itl
+         WHERE itl.item_id = i.count_item_id and itl.lang = #{request.locale,jdbcType=VARCHAR}) AS count_item_name,
+       i.redeem_flag,
+       i.quantity_alert,
+       i.expiry_alert,
+       i.min_order_quantity,
+       i.validate_from,
+       i.validate_to,
+       i.order_flag,
+       i.inventory_flag,
+       i.item_type,
+       i.uom_code,
+       i.publish_status,
+       (SELECT scvb.meaning
+              FROM sys_code_b       scb,
+                   sys_code_value_b scvb
+             WHERE scb.code = 'PM.PUBLISH_STATUS'
+               AND scb.code_id = scvb.code_id
+               AND scvb.value = i.publish_status) publish_status_desc,
+       i.quantity_alert,
+       i.expiry_alert,
+       i.lot_ctrl_flag,
+       i.market_id, 
+       smt.name as market_name,
+       i.back_order,
+       it.item_name,
+       it.description,
+       ct.category_name,
+       ic.category_id,
+       ic.category_item_id,
+       mt.name as uom_name,
+       i.sort_num
+  FROM inv_item_b i
+  LEFT JOIN inv_item_category ic
+    ON ic.item_id = i.item_id
+  LEFT JOIN inv_item_tl it
+    ON (it.item_id = i.item_id AND it.lang = #{request.locale,jdbcType=VARCHAR})
+  left join inv_category_tl ct 
+    ON (ct.category_id = ic.category_id and ct.lang = #{request.locale,jdbcType=VARCHAR})  
+  left join inv_unit_of_measure_tl mt
+    ON (mt.uom_code = i.uom_code and mt.lang = #{request.locale,jdbcType=VARCHAR})
+  left join spm_market_tl smt
+    ON (smt.market_id = i.market_id and smt.lang = #{request.locale,jdbcType=VARCHAR})  
+ WHERE i.item_id = #{itemId,jdbcType=DECIMAL}
+    </select>
+
+
+    <!-- 发布商品 -->
+    <update id="publishItem" parameterType="java.lang.Long">
+        update INV_ITEM_B i
+        set i.publish_status = 'Y'
+        where
+        i.item_id = #{itemId,jdbcType=DECIMAL}
+    </update>
+
+    <!-- 撤销发布 -->
+    <update id="unPublishItem" parameterType="java.lang.Long">
+        update INV_ITEM_B i
+        set i.publish_status = 'N'
+        where i.item_id = #{itemId,jdbcType=DECIMAL}
+    </update>
+    
+    <!-- 查出新建商品的itemId -->
+    <select id="getNextItemKey" resultType="java.lang.Long">
+        select inv_item_b_s.nextval from dual
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from INV_ITEM_B
+        where ITEM_ID = #{itemId,jdbcType=DECIMAL}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from INV_ITEM_B
+        where ITEM_ID =
+        #{itemId,jdbcType=DECIMAL}
+    </delete>
+    
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        insert into INV_ITEM_B (ITEM_ID, ITEM_NUMBER, BAR_CODE,
+        ITEM_NAME, DESCRIPTION, STARTER_AID,
+        COUNT_STOCK_FLAG,
+        QUANTITY_COUNT_TYPE, COUNT_ITEM_ID,
+        REDEEM_FLAG, LOT_CTRL_FLAG, QUANTITY_ALERT, EXPIRY_ALERT,
+        MIN_ORDER_QUANTITY, VALIDATE_FROM,
+        VALIDATE_TO,
+        ORDER_FLAG, INVENTORY_FLAG, ITEM_TYPE,
+        UOM_CODE, PUBLISH_STATUS, OBJECT_VERSION_NUMBER,
+        REQUEST_ID,
+        PROGRAM_ID, CREATION_DATE,
+        CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1,
+        ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4,
+        ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7,
+        ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10,
+        ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13,
+        ATTRIBUTE14, ATTRIBUTE15, MARKET_ID, BACK_ORDER, SORT_NUM)
+        values (#{itemId,jdbcType=DECIMAL},
+        #{itemNumber,jdbcType=VARCHAR}, #{barCode,jdbcType=VARCHAR},
+        #{itemName,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR}, #{starterAid,jdbcType=VARCHAR},
+        #{countStockFlag,jdbcType=VARCHAR},
+        #{quantityCountType,jdbcType=VARCHAR}, #{countItemId,jdbcType=DECIMAL},
+        #{redeemFlag,jdbcType=VARCHAR},#{lotCtrlFlag,jdbcType=VARCHAR},
+        #{quantityAlert,jdbcType=DECIMAL}, #{expiryAlert,jdbcType=DECIMAL},
+        #{minOrderQuantity,jdbcType=DECIMAL},
+        #{validateFrom,jdbcType=TIMESTAMP}, #{validateTo,jdbcType=TIMESTAMP},
+        #{orderFlag,jdbcType=VARCHAR},
+        #{inventoryFlag,jdbcType=VARCHAR}, #{itemType,jdbcType=VARCHAR},
+        #{uomCode,jdbcType=VARCHAR},
+        #{publishStatus,jdbcType=VARCHAR}, 1,
+        #{requestId,jdbcType=DECIMAL},
+        #{programId,jdbcType=DECIMAL},CURRENT_TIMESTAMP,
+        #{createdBy,jdbcType=DECIMAL}, 
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+         CURRENT_TIMESTAMP,
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR},
+        (select company_id from spm_market_b where market_id = #{request.marketId,jdbcType=VARCHAR}),
+        #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR},
+        #{attribute5,jdbcType=VARCHAR},
+        #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR},
+        #{attribute8,jdbcType=VARCHAR},
+        #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR},
+        #{attribute11,jdbcType=VARCHAR},
+        #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR},
+        #{attribute14,jdbcType=VARCHAR},
+        #{attribute15,jdbcType=VARCHAR}, #{marketId,jdbcType=DECIMAL},
+        #{backOrder,jdbcType=VARCHAR}, #{sortNum,jdbcType=DECIMAL})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        insert into INV_ITEM_B
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            ITEM_ID,
+            <if test="itemNumber != null">
+                ITEM_NUMBER,
+            </if>
+            <if test="barCode != null">
+                BAR_CODE,
+            </if>
+            <if test="itemName != null">
+                ITEM_NAME,
+            </if>
+            <if test="description != null">
+                DESCRIPTION,
+            </if>
+            <if test="starterAid != null">
+                STARTER_AID,
+            </if>
+            <if test="countStockFlag != null">
+                COUNT_STOCK_FLAG,
+            </if>
+            <if test="quantityCountType != null">
+                QUANTITY_COUNT_TYPE,
+            </if>
+            <if test="countItemId != null">
+                COUNT_ITEM_ID,
+            </if>
+            <if test="redeemFlag != null">
+                REDEEM_FLAG,
+            </if>
+            <if test="lotCtrlFlag != null">
+                LOT_CTRL_FLAG,
+            </if>
+            
+            <if test="quantityAlert != null">
+                QUANTITY_ALERT,
+            </if>
+            <if test="expiryAlert != null">
+                EXPIRY_ALERT,
+            </if>
+            <if test="minOrderQuantity != null">
+                MIN_ORDER_QUANTITY,
+            </if>
+            <if test="validateFrom != null">
+                VALIDATE_FROM,
+            </if>
+            <if test="validateTo != null">
+                VALIDATE_TO,
+            </if>
+            <if test="orderFlag != null">
+                ORDER_FLAG,
+            </if>
+            <if test="inventoryFlag != null">
+                INVENTORY_FLAG,
+            </if> 
+            <if test="itemType != null">
+                ITEM_TYPE,
+            </if>
+            <if test="uomCode != null">
+                UOM_CODE,
+            </if>
+            <if test="publishStatus != null">
+                PUBLISH_STATUS,
+            </if>
+            OBJECT_VERSION_NUMBER,
+
+
+            <if test="requestId != null">
+                REQUEST_ID,
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID,
+            </if>
+            CREATION_DATE,
+
+
+            <if test="createdBy != null">
+                CREATED_BY,
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY,
+            </if>
+            LAST_UPDATE_DATE,
+
+
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN,
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY,
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1,
+            </if>
+            <if test="attribute2 != null">
+                ATTRIBUTE2,
+            </if>
+            <if test="attribute3 != null">
+                ATTRIBUTE3,
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4,
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5,
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6,
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7,
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8,
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9,
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10,
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11,
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12,
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13,
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14,
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15,
+            </if>
+            <if test="marketId != null">
+                MARKET_ID,
+            </if>
+            <if test="backOrder != null">
+                BACK_ORDER,
+            </if>
+            <if test="sortNum != null">
+                SORT_NUM,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{itemId,jdbcType=DECIMAL},
+            <if test="itemNumber != null">
+                #{itemNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="barCode != null">
+                #{barCode,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null">
+                #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="starterAid != null">
+                #{starterAid,jdbcType=VARCHAR},
+            </if>
+            <if test="countStockFlag != null">
+                #{countStockFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="quantityCountType != null">
+                #{quantityCountType,jdbcType=VARCHAR},
+            </if>
+            <if test="countItemId != null">
+                #{countItemId,jdbcType=DECIMAL},
+            </if>
+            <if test="redeemFlag != null">
+                #{redeemFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="lotCtrlFlag != null">
+                 #{lotCtrlFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="quantityAlert != null">
+                #{quantityAlert,jdbcType=DECIMAL},
+            </if>
+            <if test="expiryAlert != null">
+                #{expiryAlert,jdbcType=DECIMAL},
+            </if>
+            <if test="minOrderQuantity != null">
+                #{minOrderQuantity,jdbcType=DECIMAL},
+            </if>
+            <if test="validateFrom != null">
+                #{validateFrom,jdbcType=TIMESTAMP},
+            </if>
+            <if test="validateTo != null">
+                #{validateTo,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orderFlag != null">
+                #{orderFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="inventoryFlag != null">
+                #{inventoryFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="itemType != null">
+                #{itemType,jdbcType=VARCHAR},
+            </if>
+            <if test="uomCode != null">
+                #{uomCode,jdbcType=VARCHAR},
+            </if>
+            <if test="publishStatus != null">
+                #{publishStatus,jdbcType=VARCHAR},
+            </if>
+            1,
+
+
+            <if test="requestId != null">
+                #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                #{programId,jdbcType=DECIMAL},
+            </if>
+            CURRENT_TIMESTAMP,
+
+
+            <if test="createdBy != null">
+                #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            CURRENT_TIMESTAMP,
+
+
+            <if test="lastUpdateLogin != null">
+                #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                #{attribute1,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute2 != null">
+                #{attribute2,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute3 != null">
+                #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                #{attribute15,jdbcType=VARCHAR},
+            </if>
+            <if test="marketId != null">
+                #{marketId,jdbcType=DECIMAL},
+            </if>
+            <if test="backOrder != null">
+                #{backOrder,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNum != null">
+                #{sortNum,jdbcType=DECIMAL},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        update INV_ITEM_B
+        <set>
+            <if test="itemNumber != null">
+                ITEM_NUMBER = #{itemNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="barCode != null">
+                BAR_CODE = #{barCode,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null">
+                ITEM_NAME = #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                DESCRIPTION = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="starterAid != null">
+                STARTER_AID = #{starterAid,jdbcType=VARCHAR},
+            </if>
+            <if test="countStockFlag != null">
+                COUNT_STOCK_FLAG = #{countStockFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="quantityCountType != null">
+                QUANTITY_COUNT_TYPE = #{quantityCountType,jdbcType=VARCHAR},
+            </if>
+            <if test="countItemId != null">
+                COUNT_ITEM_ID = #{countItemId,jdbcType=DECIMAL},
+            </if>
+            <if test="redeemFlag != null">
+                REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR},
+            </if>
+             <if test="lotCtrlFlag != null">
+                LOT_CTRL_FLAG = #{lotCtrlFlag,jdbcType=VARCHAR},
+            </if>
+            
+            <if test="quantityAlert != null">
+                QUANTITY_ALERT = #{quantityAlert,jdbcType=DECIMAL},
+            </if>
+            <if test="expiryAlert != null">
+                EXPIRY_ALERT = #{expiryAlert,jdbcType=VARCHAR},
+            </if>
+            <if test="minOrderQuantity != null">
+                MIN_ORDER_QUANTITY = #{minOrderQuantity,jdbcType=DECIMAL},
+            </if>
+            <if test="validateFrom != null">
+                VALIDATE_FROM = #{validateFrom,jdbcType=TIMESTAMP},
+            </if>
+            <if test="validateTo != null">
+                VALIDATE_TO = #{validateTo,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orderFlag != null">
+                ORDER_FLAG = #{orderFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="inventoryFlag != null">
+                INVENTORY_FLAG = #{inventoryFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="itemType != null">
+                ITEM_TYPE = #{itemType,jdbcType=VARCHAR},
+            </if>
+            <if test="uomCode != null">
+                UOM_CODE = #{uomCode,jdbcType=VARCHAR},
+            </if>
+            <if test="publishStatus != null">
+                PUBLISH_STATUS = #{publishStatus,jdbcType=VARCHAR},
+            </if>
+            OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+
+            <if test="requestId != null">
+                REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+            </if>
+            <if test="programId != null">
+                PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+            </if>
+            <if test="createdBy != null">
+                CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+            </if>
+            <if test="lastUpdatedBy != null">
+                LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+            </if>
+            LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+
+            <if test="lastUpdateLogin != null">
+                LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+            </if>
+            <if test="attributeCategory != null">
+                ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute1 != null">
+                ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+            </if>
+
+            <if test="1=1">
+                ATTRIBUTE2 =(select company_id from spm_market_b where market_id = #{request.marketId , jdbcType=VARCHAR}),
+            </if>
+
+            <if test="attribute3 != null">
+                ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute4 != null">
+                ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute5 != null">
+                ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute6 != null">
+                ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute7 != null">
+                ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute8 != null">
+                ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute9 != null">
+                ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute10 != null">
+                ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute11 != null">
+                ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute12 != null">
+                ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute13 != null">
+                ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute14 != null">
+                ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+            </if>
+            <if test="attribute15 != null">
+                ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+            </if>
+            <if test="marketId != null">
+                MARKET_ID = #{marketId,jdbcType=DECIMAL},
+            </if>
+            <if test="backOrder != null">
+                BACK_ORDER = #{backOrder,jdbcType=VARCHAR},
+            </if>
+            <if test="sortNum != null">
+                SORT_NUM = #{sortNum,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where ITEM_ID = #{itemId,jdbcType=DECIMAL}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        update INV_ITEM_B
+        set ITEM_NUMBER =
+        #{itemNumber,jdbcType=VARCHAR},
+        BAR_CODE = #{barCode,jdbcType=VARCHAR},
+        ITEM_NAME = #{itemName,jdbcType=VARCHAR},
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+        STARTER_AID = #{starterAid,jdbcType=VARCHAR},
+        COUNT_STOCK_FLAG =
+        #{countStockFlag,jdbcType=VARCHAR},
+        QUANTITY_COUNT_TYPE = #{quantityCountType,jdbcType=VARCHAR},
+        LOT_CTRL_FLAG = #{lotCtrlFlag,jdbcType=VARCHAR},
+        COUNT_ITEM_ID =
+        #{countItemId,jdbcType=DECIMAL},
+        REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR},
+        QUANTITY_ALERT =
+        #{quantityAlert,jdbcType=DECIMAL},
+        EXPIRY_ALERT = #{expiryAlert,jdbcType=VARCHAR},
+        MIN_ORDER_QUANTITY =
+        #{minOrderQuantity,jdbcType=DECIMAL},
+        VALIDATE_FROM = #{validateFrom,jdbcType=TIMESTAMP},
+        VALIDATE_TO =
+        #{validateTo,jdbcType=TIMESTAMP},
+        ORDER_FLAG = #{orderFlag,jdbcType=VARCHAR},
+        INVENTORY_FLAG =
+        #{inventoryFlag,jdbcType=VARCHAR},
+        ITEM_TYPE = #{itemType,jdbcType=VARCHAR},
+        UOM_CODE =
+        #{uomCode,jdbcType=VARCHAR},
+        PUBLISH_STATUS = #{publishStatus,jdbcType=VARCHAR},
+        OBJECT_VERSION_NUMBER =
+        OBJECT_VERSION_NUMBER + 1,
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+
+        LAST_UPDATED_BY = -1,
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        LAST_UPDATE_LOGIN = -1,
+        ATTRIBUTE_CATEGORY =
+        #{attributeCategory,jdbcType=VARCHAR},
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 =
+        (select company_id from spm_market_b where market_id = #{request.marketId,jdbcType=VARCHAR}),
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 =
+        #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 =
+        #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 =
+        #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 =
+        #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 =
+        #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 =
+        #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+        MARKET_ID = #{marketId,jdbcType=DECIMAL},
+        BACK_ORDER = #{backOrder,jdbcType=VARCHAR},
+        SORT_NUM = #{sortNum,jdbcType=DECIMAL}
+        where ITEM_ID =
+        #{itemId,jdbcType=DECIMAL}
+    </update>
+
+    <select id="queryItemAndPrice" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem" resultMap="BaseResultMap">
+        SELECT b.ITEM_ID,
+        b.ITEM_NUMBER,
+        b.ITEM_NAME,
+        b.DESCRIPTION,
+        b.UOM_CODE AS UOM_CODE,
+        pld.UNIT_PRICE,
+        pld.CURRENCY,
+        pld.PRICE_TYPE,
+        pld.ENABLED_FLAG,
+        pld.UOM_CODE AS P_UOM_CODE,
+        pld.ITEM_ID AS P_ITEM_ID
+        FROM (select b.ITEM_ID,
+        b.ITEM_NUMBER, b.UOM_CODE, t.ITEM_NAME, t.DESCRIPTION
+        from INV_ITEM_B b
+        LEFT OUTER JOIN INV_ITEM_TL t
+        ON (t.ITEM_ID
+        = b.item_id AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+        <where>
+            <if test="categoryId != null">
+                AND b.item_id in (select ig.item_id
+                from INV_ITEM_CATEGORY ig
+                where ig.category_id =
+                #{categoryId,jdbcType=INTEGER})
+            </if>
+            <if test="itemNumber != null">
+                AND b.ITEM_NUMBER = #{itemNumber,jdbcType=VARCHAR}
+            </if>
+            <if test="itemName != null">
+                AND t.ITEM_NAME like concat('%',concat(#{itemName,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="redeemFlag != null">
+                AND b.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="starterAid != null">
+                AND b.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+            </if>
+            <if test="itemType != null">
+                AND b.ITEM_TYPE = #{itemType,jdbcType=VARCHAR}
+            </if>
+            
+        </where>
+        ) b
+        LEFT JOIN OM_PRICE_LIST_DETAIL pld
+        ON (b.ITEM_ID = pld.ITEM_ID)
+    </select>
+
+    <select id="queryItemFilterByCategory" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem" resultMap="BaseResultMap">
+        SELECT
+        b.ITEM_ID,
+        b.ITEM_NUMBER,
+        T .ITEM_NAME,
+        T .DESCRIPTION
+        FROM
+        INV_ITEM_B b
+        LEFT OUTER JOIN INV_ITEM_TL T ON (
+        T.ITEM_ID = b.ITEM_ID
+        AND T .LANG = #{request.locale,jdbcType=VARCHAR})
+
+        <where>
+
+            NOT EXISTS (
+            SELECT
+            1
+            FROM
+            INV_ITEM_CATEGORY G
+            WHERE
+            G .ITEM_ID = b.ITEM_ID
+            AND G.CATEGORY_ID =
+            #{categoryId,jdbcType=INTEGER}
+            )
+            <if test="1==1">
+                and b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId , jdbcType=VARCHAR})
+            </if>
+            <if test="itemNumber != null">
+                AND upper(b.ITEM_NUMBER) like concat('%',concat(upper(#{itemNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="itemName != null">
+                AND t.ITEM_NAME like concat('%',concat(#{itemName,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="redeemFlag != null">
+                AND b.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="starterAid != null">
+                AND b.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+            </if>
+            <if test="itemType != null">
+                AND b.ITEM_TYPE = #{itemType,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryProductByCategory" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvCategoryB">
+        SELECT
+        item.ITEM_ID,
+        item.ITEM_NUMBER,
+        item.BAR_CODE,
+        item.ITEM_NAME,
+        item.DESCRIPTION,
+        item.ITEM_TYPE,
+        item.MARKET_ID,
+        item.SORT_NUM
+        FROM
+        INV_ITEM_B item
+        INNER JOIN INV_ITEM_CATEGORY
+        cate ON item.item_id = cate.item_id
+        WHERE cate.category_id =
+        #{categoryId,jdbcType=INTEGER}
+    </select>
+
+    <select id="querySelective" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        select
+        <include refid="Base_Column_List" />
+        from INV_ITEM_B
+
+        <where>
+            <if test="itemNumber != null">
+                AND Upper(ITEM_NUMBER) LIKE CONCAT('%',CONCAT(Upper(#{itemNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="barCode != null">
+                AND BAR_CODE = #{barCode,jdbcType=VARCHAR}
+            </if>
+            <if test="itemName != null">
+                AND ITEM_NAME LIKE CONCAT('%',CONCAT(#{itemName,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="description != null">
+                AND DESCRIPTION = #{description,jdbcType=VARCHAR}
+            </if>
+            <if test="starterAid != null">
+                AND STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+            </if>
+            <if test="countStockFlag != null">
+                AND COUNT_STOCK_FLAG = #{countStockFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="quantityCountType != null">
+                AND QUANTITY_COUNT_TYPE = #{quantityCountType,jdbcType=VARCHAR}
+            </if>
+            <if test="countItemId != null">
+                AND COUNT_ITEM_ID = #{countItemId,jdbcType=DECIMAL}
+            </if>
+            <if test="redeemFlag != null">
+                AND REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="quantityAlert != null">
+                AND QUANTITY_ALERT = #{quantityAlert,jdbcType=DECIMAL}
+            </if>
+            <if test="expiryAlert != null">
+                AND EXPIRY_ALERT = #{expiryAlert,jdbcType=VARCHAR}
+            </if>
+            <if test="minOrderQuantity != null">
+                AND MIN_ORDER_QUANTITY = #{minOrderQuantity,jdbcType=DECIMAL}
+            </if>
+            <if test="validateFrom != null">
+                AND VALIDATE_FROM = #{validateFrom,jdbcType=TIMESTAMP}
+            </if>
+            <if test="validateTo != null">
+                AND VALIDATE_TO = #{validateTo,jdbcType=TIMESTAMP}
+            </if>
+            <if test="orderFlag != null">
+                AND ORDER_FLAG = #{orderFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="inventoryFlag != null">
+                AND INVENTORY_FLAG = #{inventoryFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="itemType != null">
+                AND ITEM_TYPE = #{itemType,jdbcType=VARCHAR}
+            </if>
+            <if test="uomCode != null">
+                AND UOM_CODE = #{uomCode,jdbcType=VARCHAR}
+            </if>
+            <if test="publishStatus != null">
+                AND PUBLISH_STATUS = #{publishStatus,jdbcType=VARCHAR}
+            </if>
+        </where>
+        <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+       
+
+    </select>
+
+    <select id="queryItemsByParams" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select i.ITEM_NUMBER ,i.ITEM_NAME from INV_ITEM_B i
+        <where>
+            <choose>
+                <when test="conditionType == '141'">
+                    i.ITEM_NUMBER like concat('%',concat(#{codeCondition,jdbcType=VARCHAR},'%'))
+                </when>
+                <when test="conditionType == '142'">
+                    and i.ITEM_NAME like concat('%',concat(#{codeCondition,jdbcType=VARCHAR},'%'))
+                </when>
+                <otherwise>
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+    <!-- 根据库存组织ID查询该组织下的商品包 -->
+    <select id="queryItemsByOrganizationId" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+    SELECT
+        ii.item_id,
+        ii.item_number,
+        ii.bar_code,
+        ii.item_name,
+        ii.description,
+        ii.starter_aid,
+        ii.count_stock_flag,
+        ii.quantity_count_type,
+        ii.count_item_id,
+        ii.redeem_flag,
+        ii.quantity_alert,
+        ii.expiry_alert,
+        ii.min_order_quantity,
+        ii.validate_from,
+        ii.validate_to,
+        ii.order_flag,
+        ii.inventory_flag,
+        ii.item_type,
+        ii.uom_code,
+        ii.publish_status,
+        ii.object_version_number,
+        ii.request_id,
+        ii.program_id,
+        ii.creation_date,
+        ii.created_by,
+        ii.last_updated_by,
+        ii.last_update_date,
+        ii.last_update_login,
+        ii.attribute_category,
+        ii.attribute1,
+        ii.attribute2,
+        ii.attribute3,
+        ii.attribute4,
+        ii.attribute5,
+        ii.attribute6,
+        ii.attribute7,
+        ii.attribute8,
+        ii.attribute9,
+        ii.attribute10,
+        ii.attribute11,
+        ii.attribute12,
+        ii.attribute13,
+        ii.attribute14,
+        ii.attribute15,
+        ii.market_id,
+        ii.back_order
+        FROM inv_item_property_v iip,
+        inv_item_b ii
+        <where>
+        iip.item_id = ii.item_id
+        AND iip.organization_id = #{organizationId,jdbcType=DECIMAL}
+        AND iip.COUNT_STOCK_FLAG ='Y'
+        AND ii.QUANTITY_COUNT_TYPE ='PACKG'
+        AND ii.ITEM_TYPE ='PACKG'
+        AND iip.ENABLED_FLAG = 'Y'
+        <if test="categoryId != null">
+          AND  ii.item_id in (select ig.item_id
+            from INV_ITEM_CATEGORY ig
+            where ig.category_id =
+            #{categoryId,jdbcType=INTEGER})
+        </if>
+        <if test="itemNumber != null">
+            AND Upper(ii.ITEM_NUMBER) like concat('%',concat(Upper(#{itemNumber,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="itemName != null">
+            AND ii.ITEM_NAME like concat('%',concat(#{itemName,jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="redeemFlag != null">
+            AND ii.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+        </if>
+        <if test="starterAid != null">
+            AND ii.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+        </if>
+        </where>
+         <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        
+    </select>
+    <!-- 商品名名自动完成 sql -->
+    <select id="getItemNameLov" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        select tl.ITEM_NAME from INV_ITEM_B b
+        LEFT JOIN INV_ITEM_TL tl
+        ON (tl.ITEM_ID = b.ITEM_ID AND tl.LANG =
+        #{request.locale,jdbcType=VARCHAR})
+        <where>
+            <if test="itemName != null">
+                AND lower(tl.ITEM_NAME)  like concat('%',concat(lower(#{itemName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="itemType != null">
+                AND b.ITEM_TYPE = #{itemType,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryItem" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem" resultMap="BaseResultMap">
+        SELECT distinct
+        b.ITEM_ID,
+        b.ITEM_NUMBER,
+        b.ITEM_NAME,
+        b.DESCRIPTION,
+        b.UOM_CODE,
+        b.sort_num,
+        (select ut.name from inv_unit_of_measure_tl ut
+        where ut.uom_code = b.uom_code and ut.lang = #{request.locale,jdbcType=VARCHAR}) uom_name,
+        b.ITEM_TYPE,b.MIN_ORDER_QUANTITY,
+        b.COUNT_STOCK_FLAG,b.QUANTITY_COUNT_TYPE
+        FROM (select b.ITEM_ID, b.ITEM_NUMBER, t.ITEM_NAME,b.MIN_ORDER_QUANTITY,
+        t.DESCRIPTION, b.UOM_CODE,b.ITEM_TYPE,b.COUNT_STOCK_FLAG,b.QUANTITY_COUNT_TYPE,b.sort_num
+        from INV_ITEM_B b
+        LEFT OUTER JOIN INV_ITEM_TL t
+        ON (t.ITEM_ID = b.item_id AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+        LEFT OUTER JOIN inv_item_availability iia
+        ON iia.item_id = b.item_id
+        <where>
+            b.market_id = #{request.marketId,jdbcType=DECIMAL}
+            <if test="categoryId != null">
+                AND b.item_id in (select ig.item_id
+                from INV_ITEM_CATEGORY ig
+                where ig.category_id =
+                #{categoryId,jdbcType=INTEGER})
+            </if>
+            <if test="itemNumber != null">
+                AND Upper(b.ITEM_NUMBER) like concat('%',concat(Upper(#{itemNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="channel !=null">
+                AND b.item_id in (select ita.item_id
+                from INV_ITEM_AVAILABILITY ita
+                where ita.FUNCTION_AREA = #{channel,jdbcType=VARCHAR}
+                <if test="isActive !=null">
+                    AND ita.ENABLED_FLAG=#{isActive,jdbcType=VARCHAR}
+                </if>
+                )
+            </if>
+            <if test="itemName != null">
+                AND Upper(t.ITEM_NAME) like concat('%',concat(Upper(#{itemName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="salesOrgId!=null ">
+                AND b.ITEM_ID in (SELECT DISTINCT OPLD.ITEM_ID
+                FROM OM_PRICE_LIST opl LEFT OUTER JOIN OM_PRICE_LIST_DETAIL opld ON(OPLD.PRICE_LIST_ID=OPL.PRICE_LIST_ID)
+                WHERE OPL.SALES_ORG_ID=#{salesOrgId,jdbcType=DECIMAL}
+                <if test="priceType !=null ">
+                    AND OPLD.PRICE_TYPE=#{priceType,jdbcType=VARCHAR}
+                </if>
+                AND OPLD.START_ACTIVE_DATE &lt;= CURRENT_TIMESTAMP
+                AND (CURRENT_TIMESTAMP &lt;= OPLD.END_ACTIVE_DATE OR OPLD.END_ACTIVE_DATE IS NULL)
+                )
+            </if>
+            <if test="redeemFlag != null">
+                AND b.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="starterAid != null">
+                AND b.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+            </if>
+            <if test="itemType != null">
+                AND b.ITEM_TYPE = #{itemType,jdbcType=VARCHAR}
+            </if>
+            <if test="itemId != null">
+                AND b.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+            </if>
+            <if test="countStockFlag != null">
+                AND b.COUNT_STOCK_FLAG = #{countStockFlag,jdbcType=DECIMAL}
+            </if>
+            <if test="lotCtrlFlag != null">
+                and b.LOT_CTRL_FLAG = #{lotCtrlFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="publishStatus != null">
+                AND b.PUBLISH_STATUS = #{publishStatus,jdbcType=VARCHAR}
+            </if>
+            <if test ='organizationId != null'>
+                ANd exists (select 1 from inv_item_assign iia where iia.item_id = b.item_id and assign_type ='INV' and assign_value = #{organizationId,jdbcType=DECIMAL} and enabled_flag ='Y' )
+            </if>
+            <if test="validateFrom != null and validateTo != null">
+                AND (<!-- (b.VALIDATE_FROM <![CDATA[>= #{validateFrom,jdbcType=TIMESTAMP}]]> and b.VALIDATE_TO <![CDATA[<= #{validateTo,jdbcType=TIMESTAMP}]]>) -->
+                (b.VALIDATE_FROM <![CDATA[<= #{validateTo,jdbcType=TIMESTAMP}]]>) and (b.VALIDATE_TO <![CDATA[>= #{validateFrom,jdbcType=TIMESTAMP}]]> or b.validate_to IS NULL))
+            </if>
+            <if test="validateFrom != null and validateTo == null">
+                AND (<!-- b.VALIDATE_FROM <![CDATA[>= #{validateFrom,jdbcType=TIMESTAMP}]]> -->
+                b.VALIDATE_TO <![CDATA[>= #{validateFrom,jdbcType=TIMESTAMP}]]> or b.validate_to IS NULL)
+            </if>
+            <if test="validateFrom == null and validateTo != null ">
+                AND (b.VALIDATE_TO <![CDATA[<= #{validateTo,jdbcType=TIMESTAMP}]]>
+                or b.VALIDATE_FROM <![CDATA[<= #{validateTo,jdbcType=TIMESTAMP}]]>)
+            </if>
+            <if test="functionAreas != null ">
+                AND iia.function_area in
+                <foreach item="functionAreas" index="index" collection="functionAreas" open="(" separator="," close=")">
+                    #{functionAreas}
+                </foreach>
+            </if>
+        </where>
+        ) b
+        <if test="sortname =='sortNum'">
+            order by b.sort_num ${sortorder}
+        </if>
+        <if test="sortname == null">
+            order by b.sort_num
+        </if>
+        <if test="sortname != null and sortname !='sortNum'">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+            ORDER BY b.sort_num ,b.${_colName} ${sortorder}
+        </if>
+
+    </select>
+
+    <!-- w0117-->
+    <select id="queryItemByOrg" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem" resultMap="BaseResultMap">
+        SELECT distinct
+        b.ITEM_ID,
+        b.ITEM_NUMBER,
+        b.ITEM_NAME,
+        b.DESCRIPTION,
+        b.UOM_CODE,
+        b.sort_num,
+        (select ut.name from inv_unit_of_measure_tl ut 
+        where ut.uom_code = b.uom_code and ut.lang = #{request.locale,jdbcType=VARCHAR}) uom_name,
+        b.ITEM_TYPE,b.MIN_ORDER_QUANTITY,
+        b.COUNT_STOCK_FLAG,b.QUANTITY_COUNT_TYPE
+        FROM (select b.ITEM_ID, b.ITEM_NUMBER, t.ITEM_NAME,b.MIN_ORDER_QUANTITY,
+        t.DESCRIPTION, b.UOM_CODE,b.ITEM_TYPE,b.COUNT_STOCK_FLAG,b.QUANTITY_COUNT_TYPE,b.sort_num
+        from INV_ITEM_B b
+        LEFT OUTER JOIN INV_ITEM_TL t
+        ON (t.ITEM_ID = b.item_id AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+        LEFT OUTER JOIN inv_item_availability iia
+        ON iia.item_id = b.item_id
+        <where>
+            <!--w0118-->
+            b.ITEM_ID in(
+            select DISTINCT IAS.ITEM_ID
+            from INV_ITEM_B IB left outer join INV_ITEM_ASSIGN IAS ON IAS.ITEM_ID = IB.ITEM_ID
+            where IAS.ASSIGN_TYPE = 'INV' and IAS.ENABLED_FLAG= 'Y'
+            AND IAS.ASSIGN_VALUE IN(
+            SELECT DISTINCT sura.ASSIGN_VALUE
+            FROM SYS_USER_ROLE_ASSIGN sura
+            LEFT OUTER JOIN SPM_INV_ORGANIZATION_TL siol
+            ON (sura.ASSIGN_VALUE = siol.INV_ORG_ID AND siol.LANG = #{request.locale,jdbcType=VARCHAR})
+            <where>
+                <!--sura.USER_ID = #{userId}
+                AND sura.ROLE_ID = #{roleId}
+                AND sura.ASSIGN_TYPE = 'INV'-->
+
+                sura.USER_ID = #{request.attributeMap.userId,jdbcType=DECIMAL}
+                AND sura.ROLE_ID =#{request.roleId,jdbcType=DECIMAL}
+                AND sura.ASSIGN_TYPE = 'INV'
+                )
+            </where>
+            )
+                <!--w0117  b.market_id = #{request.marketId,jdbcType=DECIMAL}-->
+           <!-- b.ITEM_ID in(
+            select DISTINCT IAS.ITEM_ID
+            from INV_ITEM_B IB left outer join INV_ITEM_ASSIGN IAS ON IAS.ITEM_ID = IB.ITEM_ID
+            where IAS.ASSIGN_TYPE = 'INV' and IAS.ENABLED_FLAG= 'Y'
+            AND IAS.ASSIGN_VALUE IN(
+            SELECT DISTINCT SP.INV_ORG_ID FROM SPM_SUPPLY sp WHERE SP.DEFAULT_FLAG ='Y' and  SP.SALES_ORG_ID
+            IN(SELECT sura.ASSIGN_VALUE FROM SYS_USER_ROLE_ASSIGN sura LEFT OUTER JOIN SPM_SALES_ORGANIZATION_TL ssol
+            ON(sura.ASSIGN_VALUE = ssol.SALES_ORG_ID AND ssol.LANG = #{request.locale,jdbcType=VARCHAR})
+            <where>
+                sura.USER_ID = #{userId}
+                AND sura.ROLE_ID = #{roleId}
+                AND sura.ASSIGN_TYPE = 'SALES')
+            </where>
+            ))
+-->
+            <if test="categoryId != null">
+                AND b.item_id in (select ig.item_id
+                from INV_ITEM_CATEGORY ig
+                where ig.category_id =
+                #{categoryId,jdbcType=INTEGER})
+            </if>
+            <if test="itemNumber != null">
+                AND Upper(b.ITEM_NUMBER) like concat('%',concat(Upper(#{itemNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="channel !=null">
+                AND b.item_id in (select ita.item_id
+                from INV_ITEM_AVAILABILITY ita
+                where ita.FUNCTION_AREA = #{channel,jdbcType=VARCHAR}
+                <if test="isActive !=null">
+                    AND ita.ENABLED_FLAG=#{isActive,jdbcType=VARCHAR}
+                </if>
+                )
+            </if>
+            <if test="itemName != null">
+                AND Upper(t.ITEM_NAME) like concat('%',concat(Upper(#{itemName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="salesOrgId!=null ">
+                AND b.ITEM_ID in (SELECT DISTINCT OPLD.ITEM_ID 
+                FROM OM_PRICE_LIST opl LEFT OUTER JOIN OM_PRICE_LIST_DETAIL opld ON(OPLD.PRICE_LIST_ID=OPL.PRICE_LIST_ID)
+                WHERE OPL.SALES_ORG_ID=#{salesOrgId,jdbcType=DECIMAL}
+                <if test="priceType !=null ">
+                 AND OPLD.PRICE_TYPE=#{priceType,jdbcType=VARCHAR}
+                 </if>
+                 AND OPLD.START_ACTIVE_DATE &lt;= CURRENT_TIMESTAMP 
+                 AND (CURRENT_TIMESTAMP &lt;= OPLD.END_ACTIVE_DATE OR OPLD.END_ACTIVE_DATE IS NULL)
+                )
+            </if>
+            <if test="redeemFlag != null">
+                AND b.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="starterAid != null">
+                AND b.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+            </if>
+            <if test="itemType != null">
+                AND b.ITEM_TYPE = #{itemType,jdbcType=VARCHAR}
+            </if>
+            <if test="itemId != null">
+                AND b.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+            </if>
+            <if test="countStockFlag != null">
+                AND b.COUNT_STOCK_FLAG = #{countStockFlag,jdbcType=DECIMAL}
+            </if>
+            <if test="lotCtrlFlag != null">
+                and b.LOT_CTRL_FLAG = #{lotCtrlFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="publishStatus != null">
+                AND b.PUBLISH_STATUS = #{publishStatus,jdbcType=VARCHAR}
+            </if>
+            <if test ='organizationId != null'>
+               ANd exists (select 1 from inv_item_assign iia where iia.item_id = b.item_id and assign_type ='INV' and assign_value = #{organizationId,jdbcType=DECIMAL} and enabled_flag ='Y' )
+            </if>
+            <if test="validateFrom != null and validateTo != null">
+                AND (<!-- (b.VALIDATE_FROM <![CDATA[>= #{validateFrom,jdbcType=TIMESTAMP}]]> and b.VALIDATE_TO <![CDATA[<= #{validateTo,jdbcType=TIMESTAMP}]]>) -->
+                    (b.VALIDATE_FROM <![CDATA[<= #{validateTo,jdbcType=TIMESTAMP}]]>) and (b.VALIDATE_TO <![CDATA[>= #{validateFrom,jdbcType=TIMESTAMP}]]> or b.validate_to IS NULL))
+            </if>
+            <if test="validateFrom != null and validateTo == null">
+                AND (<!-- b.VALIDATE_FROM <![CDATA[>= #{validateFrom,jdbcType=TIMESTAMP}]]> -->
+                    b.VALIDATE_TO <![CDATA[>= #{validateFrom,jdbcType=TIMESTAMP}]]> or b.validate_to IS NULL)
+            </if>
+            <if test="validateFrom == null and validateTo != null ">
+                AND (b.VALIDATE_TO <![CDATA[<= #{validateTo,jdbcType=TIMESTAMP}]]>
+                    or b.VALIDATE_FROM <![CDATA[<= #{validateTo,jdbcType=TIMESTAMP}]]>)
+            </if>
+            <if test="functionAreas != null ">
+                AND iia.function_area in 
+                <foreach item="functionAreas" index="index" collection="functionAreas" open="(" separator="," close=")">
+                    #{functionAreas}
+                </foreach>
+            </if>
+        </where> 
+        ) b
+        <if test="sortname =='sortNum'">
+                order by b.sort_num ${sortorder}
+        </if>
+        <if test="sortname == null">
+                order by b.sort_num
+        </if>
+         <if test="sortname != null and sortname !='sortNum'">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY b.sort_num ,b.${_colName} ${sortorder}
+        </if>
+        
+    </select>
+    
+    
+    <select id="queryItemForOrder" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem" resultMap="BaseResultMap">
+        SELECT b.ITEM_ID,
+        b.ITEM_NUMBER,
+        b.ITEM_NAME,
+        b.DESCRIPTION,
+        b.UOM_CODE,
+        (select ut.name from inv_unit_of_measure_tl ut 
+        where ut.uom_code = b.uom_code and ut.lang = #{request.locale,jdbcType=VARCHAR}) uom_name,
+        b.ITEM_TYPE,b.MIN_ORDER_QUANTITY,
+        b.COUNT_STOCK_FLAG ,b.BACK_ORDER,b.QUANTITY_COUNT_TYPE
+        FROM (select b.ITEM_ID, b.ITEM_NUMBER, t.ITEM_NAME,b.MIN_ORDER_QUANTITY,
+        t.DESCRIPTION, b.UOM_CODE,b.ITEM_TYPE,b.COUNT_STOCK_FLAG,b.BACK_ORDER,b.QUANTITY_COUNT_TYPE
+        from INV_ITEM_B b
+        LEFT OUTER JOIN INV_ITEM_TL t
+        ON (t.ITEM_ID = b.item_id AND t.LANG = #{request.locale,jdbcType=VARCHAR})
+        <where>
+            <if test="categoryId != null">
+                b.item_id in (select ig.item_id
+                from INV_ITEM_CATEGORY ig
+                where ig.category_id =
+                #{categoryId,jdbcType=INTEGER})
+            </if>
+            <if test="itemNumber != null">
+                AND Upper(b.ITEM_NUMBER) like concat('%',concat(Upper(#{itemNumber,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="channel !=null">
+                AND b.item_id in (select ita.item_id
+                from INV_ITEM_AVAILABILITY ita
+                where ita.FUNCTION_AREA = #{channel,jdbcType=VARCHAR}
+                <if test="isActive !=null">
+                    AND ita.ENABLED_FLAG=#{isActive,jdbcType=VARCHAR}
+                </if>
+                )
+            </if>
+            <if test="itemName != null">
+                AND Upper(t.ITEM_NAME) like concat('%',concat(Upper(#{itemName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="salesOrgId!=null ">
+                AND b.ITEM_ID in (SELECT DISTINCT OPLD.ITEM_ID 
+                FROM OM_PRICE_LIST opl LEFT OUTER JOIN OM_PRICE_LIST_DETAIL opld ON(OPLD.PRICE_LIST_ID=OPL.PRICE_LIST_ID)
+                WHERE OPL.SALES_ORG_ID=#{salesOrgId,jdbcType=DECIMAL}
+                <if test="priceType !=null ">
+                 AND OPLD.PRICE_TYPE=#{priceType,jdbcType=VARCHAR}
+                 </if>
+                 <if test="currency !=null ">
+                 AND OPLD.currency=#{currency,jdbcType=VARCHAR}
+                 </if>
+                 AND OPLD.START_ACTIVE_DATE &lt;= CURRENT_TIMESTAMP 
+                 AND (CURRENT_TIMESTAMP &lt;= OPLD.END_ACTIVE_DATE OR OPLD.END_ACTIVE_DATE IS NULL)
+                )
+            </if>
+            <if test="redeemFlag != null">
+                AND b.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="starterAid != null">
+                AND b.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+            </if>
+            <if test="itemType != null">
+                AND b.ITEM_TYPE = #{itemType,jdbcType=VARCHAR}
+            </if>
+            <if test="itemId != null">
+                AND b.ITEM_ID = #{itemId,jdbcType=DECIMAL}
+            </if>
+            <if test="countStockFlag != null">
+                AND b.COUNT_STOCK_FLAG = #{countStockFlag,jdbcType=DECIMAL}
+            </if>
+            <if test="lotCtrlFlag != null">
+                and b.LOT_CTRL_FLAG = #{lotCtrlFlag,jdbcType=VARCHAR}
+            </if>
+            <if test ='organizationId != null'>
+               ANd exists (select 1 from inv_item_assign iia where iia.item_id = b.item_id and assign_type ='INV' and assign_value = #{organizationId,jdbcType=DECIMAL} and enabled_flag ='Y' )
+            </if>
+        </where> 
+        ) b
+         <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        ORDER BY b.ITEM_NUMBER
+        
+    </select>
+
+    <select id="queryItemWithOrg" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        select
+        item.ITEM_ID,
+        item.ITEM_NUMBER,
+        item.BAR_CODE,
+        item.ITEM_NAME,
+        item.DESCRIPTION,
+        item.STARTER_AID,
+        item.COUNT_STOCK_FLAG,
+        item.QUANTITY_COUNT_TYPE,
+        item.COUNT_ITEM_ID,
+        item.REDEEM_FLAG,
+        item.QUANTITY_ALERT,
+        item.EXPIRY_ALERT,
+        item.MIN_ORDER_QUANTITY,
+        item.VALIDATE_FROM,
+        item.VALIDATE_TO,
+        item.ORDER_FLAG,
+        item.INVENTORY_FLAG,
+        item.ITEM_TYPE,
+        item.UOM_CODE,
+        item.PUBLISH_STATUS,
+        item.MARKET_ID,
+        item.BACK_ORDER
+        from INV_ITEM_B item,
+        INV_ITEM_PROPERTY
+        property
+        <where>
+            item.ITEM_ID = property.ITEM_ID
+            <if test="organizationId != null">
+                AND property.ORGANIZATION_ID = #{organizationId,jdbcType=DECIMAL}
+            </if>
+            <if test="itemNumber != null">
+                AND item.ITEM_NUMBER like
+                concat('%',concat(#{itemNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="itemName != null">
+                AND item.ITEM_NAME like
+                concat('%',concat(#{itemName,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="redeemFlag != null">
+                AND item.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="starterAid != null">
+                AND item.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+            </if>
+            <if test="itemType != null">
+                AND item.ITEM_TYPE = #{itemType,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <!-- 获取计算库存商品 -->
+    <select id="getInvCountItem" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem" resultMap="BaseResultMap">
+        SELECT
+        ii.item_id,
+        ii.item_number,
+        ii.bar_code,
+        ii.item_name,
+        ii.description,
+        ii.starter_aid,
+        ii.count_stock_flag,
+        ii.quantity_count_type,
+        ii.count_item_id,
+        ii.redeem_flag,
+        ii.quantity_alert,
+        ii.expiry_alert,
+        ii.min_order_quantity,
+        ii.validate_from,
+        ii.validate_to,
+        ii.order_flag,
+        ii.inventory_flag,
+        ii.item_type,
+        ii.uom_code,
+        ii.publish_status,
+        ii.object_version_number,
+        ii.request_id,
+        ii.program_id,
+        ii.creation_date,
+        ii.created_by,
+        ii.last_updated_by,
+        ii.last_update_date,
+        ii.last_update_login,
+        ii.attribute_category,
+        ii.attribute1,
+        ii.attribute2,
+        ii.attribute3,
+        ii.attribute4,
+        ii.attribute5,
+        ii.attribute6,
+        ii.attribute7,
+        ii.attribute8,
+        ii.attribute9,
+        ii.attribute10,
+        ii.attribute11,
+        ii.attribute12,
+        ii.attribute13,
+        ii.attribute14,
+        ii.attribute15,
+        ii.market_id,
+        ii.back_order
+        FROM inv_item_property_v iip,
+        inv_item_b ii
+        WHERE iip.item_id = ii.item_id
+        AND iip.organization_id = #{organizationId, jdbcType = DECIMAL}
+        AND
+        iip.item_id = #{itemId, jdbcType = DECIMAL};
+    </select>
+    
+    <!-- 查询可移库的商品  -->
+    <select id="queryTransferItems" resultMap="BaseResultMap" >
+        SELECT
+        item.ITEM_ID, item.ITEM_NUMBER , item.BAR_CODE, t.ITEM_NAME, 
+        item.QUANTITY_COUNT_TYPE, item.COUNT_ITEM_ID,
+        item.ITEM_TYPE, item.UOM_CODE ,t.DESCRIPTION
+        ,unit.name  UOM_NAME
+        FROM
+            INV_ITEM_B item
+            LEFT OUTER JOIN INV_ITEM_TL t
+            ON (t.ITEM_ID = item.item_id )
+            LEFT OUTER JOIN INV_UNIT_OF_MEASURE_TL unit
+            ON (item.UOM_CODE = unit.UOM_CODE)
+        <where>
+            t.LANG = #{request.locale,jdbcType=VARCHAR}
+            and unit.LANG = #{request.locale,jdbcType=VARCHAR}
+             <if test="invItem.itemNumber != null">
+                AND item.ITEM_NUMBER like
+                concat('%',concat(#{invItem.itemNumber,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="invItem.itemName != null">
+                AND t.ITEM_NAME like
+                concat('%',concat(#{invItem.itemName,jdbcType=VARCHAR},'%'))
+            </if>
+            <if test="invItem.redeemFlag != null">
+                AND item.REDEEM_FLAG = #{invItem.redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="invItem.starterAid != null">
+                AND item.STARTER_AID = #{invItem.starterAid,jdbcType=VARCHAR}
+            </if>
+            <if test="invItem.itemType != null">
+                AND item.ITEM_TYPE = #{invItem.itemType,jdbcType=VARCHAR}
+            </if>
+          <if test="outOrg !=null">
+           AND EXISTS (
+              SELECT
+                 1
+              FROM
+                INV_ITEM_PROPERTY_V property
+              WHERE
+                property.ITEM_ID = item.ITEM_ID
+                AND property.ORGANIZATION_ID = #{outOrg} 
+                 AND property.ENABLED_FLAG = 'Y'
+                 AND (
+                        (
+                             property.ITEM_TYPE = 'ITEM'
+                         AND property.COUNT_STOCK_FLAG = 'O'
+                        )
+                    OR 
+                       (
+                           property.COUNT_STOCK_FLAG = 'Y'
+                       AND property.ITEM_TYPE = 'PACKG'
+                       )
+                 )
+          )
+        </if>
+        <if test="inOrg !=null">
+        AND EXISTS (
+              SELECT
+                 1
+              FROM
+                INV_ITEM_PROPERTY_V property
+             WHERE
+                 property.ITEM_ID = item.ITEM_ID
+                 AND property.ORGANIZATION_ID =  #{inOrg} 
+                 AND property.ENABLED_FLAG = 'Y'
+                 AND (
+                        (
+                             property.ITEM_TYPE = 'ITEM'
+                         AND property.COUNT_STOCK_FLAG = 'O'
+                        )
+                    OR 
+                       (
+                           property.COUNT_STOCK_FLAG = 'Y'
+                       AND property.ITEM_TYPE = 'PACKG'
+                       )
+                 )
+          )
+         </if>
+         <if test="inOrg !=null and outOrg !=null">
+         AND EXISTS (
+            SELECT
+                1
+            FROM
+            INV_ITEM_PROPERTY_V  v1
+            WHERE
+                V1.ITEM_ID = item.ITEM_ID
+                AND V1.ORGANIZATION_ID = #{outOrg} 
+                AND EXISTS(
+                    SELECT
+                        v2.ITEM_ID
+                    FROM
+                        INV_ITEM_PROPERTY_V  v2
+                    WHERE
+                        V2.ITEM_ID = item.ITEM_ID
+                        AND V2.ORGANIZATION_ID = #{inOrg}
+                        AND V2.LOT_CONTROL_FLAG = V1.LOT_CONTROL_FLAG
+                )
+           )
+         </if>
+        </where>
+   
+    </select>
+    <!-- 根据某些条件查询商品@author mclin -->
+  <select id="queryItemBs" resultMap="BaseResultMap">
+    select iipv.ITEM_ID, iipv.ITEM_NUMBER, coalesce(iitl.ITEM_NAME,iipv.ITEM_NAME) as ITEM_NAME, 
+    coalesce(iitl.DESCRIPTION, iipv.DESCRIPTION) as DESCRIPTION,
+           iipv.STARTER_AID, iipv.REDEEM_FLAG,iipv.UOM_CODE,
+           (
+              select uomct.NAME from INV_UNIT_OF_MEASURE_TL uomct
+              where uomct.UOM_CODE = iipv.UOM_CODE
+              AND uomct.LANG = #{request.locale,jdbcType=VARCHAR}
+           ) UOM_NAME
+      from inv_item_property_v iipv LEFT OUTER JOIN INV_ITEM_TL iitl
+        on (iipv.ITEM_ID = iitl.ITEM_ID AND iitl.LANG = #{request.locale,jdbcType=VARCHAR})
+     <where>
+        iipv.ORGANIZATION_ID = #{orgId, jdbcType=DECIMAL}
+        AND iipv.enabled_flag = 'Y'
+        <if test="itm.itemNumber != null">
+            AND iipv.ITEM_NUMBER = #{itm.itemNumber, jdbcType=VARCHAR}
+        </if>
+        <if test="itm.itemName != null">
+            AND iipv.ITEM_NAME like concat('%', concat(#{itm.itemName, jdbcType=VARCHAR}, '%'))
+        </if>
+        <if test="itm.redeemFlag != null">
+            AND iipv.REDEEM_FLAG = #{itm.redeemFlag, jdbcType=VARCHAR}
+        </if>
+        <if test="itm.starterAid != null">
+            AND iipv.STARTER_AID = #{itm.starterAid, jdbcType=VARCHAR}
+        </if>
+        <if test="itm.categoryId != null">
+            AND 
+            exists
+            (   select *
+                from INV_ITEM_CATEGORY iic
+                where
+                    iipv.ITEM_ID = iic.ITEM_ID
+                        AND iic.CATEGORY_ID = #{itm.categoryId, jdbcType=DECIMAL}
+            )
+        </if>
+        <!-- <if test="itm.itemType != null">
+            AND iipv.ITEM_TYPE = #{itm.itemType, jdbcType=VARCHAR}
+        </if> -->
+        <if test="trxType == 'STKIN'.toString()">
+            AND (iipv.ITEM_TYPE = 'ITEM' AND iipv.COUNT_STOCK_FLAG = 'O')
+        </if>
+        <if test="trxType == 'STKOT'.toString()">
+            AND ((iipv.ITEM_TYPE = 'ITEM' AND iipv.COUNT_STOCK_FLAG = 'O')
+                OR (iipv.ITEM_TYPE = 'PACKG' AND iipv.COUNT_STOCK_FLAG = 'Y' AND iipv.COUNT_TYPE = 'PACKG'))
+        </if>
+     </where>
+  </select>
+  <!-- 根据商品ID获取商品的单位代码@author mclin -->
+  <select id="getItemUomCode" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    select UOM_CODE from inv_item_b
+    where ITEM_ID = #{itemId, jdbcType=DECIMAL}
+  </select>
+
+  <select id="queryItemsByOrgId" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+      SELECT
+        ii.item_id,
+        ii.item_number,
+        ii.bar_code,
+        ii.item_name,
+        ii.description,
+        ii.starter_aid,
+        ii.count_stock_flag,
+        ii.quantity_count_type,
+        ii.count_item_id,
+        ii.redeem_flag,
+        ii.quantity_alert,
+        ii.expiry_alert,
+        ii.min_order_quantity,
+        ii.validate_from,
+        ii.validate_to,
+        ii.order_flag,
+        ii.inventory_flag,
+        ii.item_type,
+        ii.uom_code,
+        ii.publish_status,
+        ii.object_version_number,
+        ii.request_id,
+        ii.program_id,
+        ii.creation_date,
+        ii.created_by,
+        ii.last_updated_by,
+        ii.last_update_date,
+        ii.last_update_login,
+        ii.attribute_category,
+        ii.attribute1,
+        ii.attribute2,
+        ii.attribute3,
+        ii.attribute4,
+        ii.attribute5,
+        ii.attribute6,
+        ii.attribute7,
+        ii.attribute8,
+        ii.attribute9,
+        ii.attribute10,
+        ii.attribute11,
+        ii.attribute12,
+        ii.attribute13,
+        ii.attribute14,
+        ii.attribute15,
+        ii.market_id,
+        ii.back_order
+        FROM INV_ITEM_ASSIGN iia,
+        inv_item_b ii
+        WHERE iia.item_id = ii.item_id
+        AND iia.ASSIGN_VALUE = #{organization,jdbcType=DECIMAL}
+        AND IIA.ENABLED_FLAG = 'Y'
+        <if test="itemNumber != null">
+            AND ii.ITEM_NUMBER = #{itemNumber, jdbcType=VARCHAR}
+        </if>
+        <if test="itemName != null">
+            AND ii.ITEM_NAME like concat('%', concat(#{itemName, jdbcType=VARCHAR}, '%'))
+        </if>
+        <if test="redeemFlag != null">
+            AND ii.REDEEM_FLAG = #{redeemFlag, jdbcType=VARCHAR}
+        </if>
+        <if test="starterAid != null">
+            AND ii.STARTER_AID = #{starterAid, jdbcType=VARCHAR}
+        </if>
+        <if test="itemType != null">
+            AND 
+            exists
+            (   select *
+                from INV_ITEM_CATEGORY iic
+                where
+                    ii.ITEM_ID = iic.ITEM_ID
+                        AND iic.CATEGORY_ID = #{itemType, jdbcType=DECIMAL}
+            )
+        </if>
+  </select>
+  
+    <!-- 商品代码lov -->
+    <select id="queryItems" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        SELECT
+            item.ITEM_ID, item.ITEM_NUMBER , item.BAR_CODE, t.ITEM_NAME, 
+            item.QUANTITY_COUNT_TYPE, item.COUNT_ITEM_ID,
+            item.ITEM_TYPE, item.UOM_CODE ,t.DESCRIPTION
+        FROM
+            INV_ITEM_B item
+            LEFT JOIN INV_ITEM_TL t
+            ON (t.ITEM_ID = item.item_id ),
+            inv_item_assign iia
+        <where>
+             t.LANG = #{request.locale,jdbcType=VARCHAR}
+             AND item.item_id = iia.item_id
+             AND iia.ENABLED_FLAG = 'Y'
+             AND iia.ASSIGN_TYPE = 'INV'
+             <if test="itemNumber != null">
+                AND item.ITEM_NUMBER = #{itemNumber,jdbcType=VARCHAR}
+            </if>
+            <if test="itemName != null">
+                AND lower(t.ITEM_NAME) like
+                concat('%',concat(lower(#{itemName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="redeemFlag != null">
+                AND item.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="starterAid != null">
+                AND item.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+            </if>
+            <if test="itemType != null">
+                AND lower(item.ITEM_TYPE) like
+                concat('%',concat(lower(#{itemType,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="organizationId != null">
+                AND IIA.ASSIGN_VALUE = #{organizationId,jdbcType=VARCHAR}
+            </if>
+        </where>
+         <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+        
+    </select>
+    
+    <!-- 商品代码lov 2 -->
+    <select id="queryItemsByOnHand" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        SELECT
+            item.ITEM_ID, item.ITEM_NUMBER , item.BAR_CODE, t.ITEM_NAME, 
+            item.QUANTITY_COUNT_TYPE, item.COUNT_ITEM_ID,
+            item.ITEM_TYPE, item.UOM_CODE ,t.DESCRIPTION
+        FROM
+            INV_ITEM_B item
+            LEFT JOIN INV_ITEM_TL t
+            ON (t.ITEM_ID = item.item_id )
+        <where>
+             t.LANG = #{request.locale,jdbcType=VARCHAR}
+             <if test="itemNumber != null">
+                AND item.ITEM_NUMBER = #{itemNumber,jdbcType=VARCHAR}
+            </if>
+            <if test="itemName != null">
+                AND lower(t.ITEM_NAME) like
+                concat('%',concat(lower(#{itemName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="redeemFlag != null">
+                AND item.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="starterAid != null">
+                AND item.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+            </if>
+            <if test="itemType != null">
+                AND lower(item.ITEM_TYPE) like
+                concat('%',concat(lower(#{itemType,jdbcType=VARCHAR}),'%'))
+            </if>
+        </where>
+         <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+    </select>
+    
+    <!-- 商品代码lov 增加了商品计算库存属性限制 -->
+    <select id="queryItemsByCountStock" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        SELECT
+            item.ITEM_ID, item.ITEM_NUMBER , t.ITEM_NAME, 
+            item.UOM_CODE ,t.DESCRIPTION
+        FROM
+            INV_ITEM_B item
+            LEFT JOIN INV_ITEM_TL t
+            ON (t.ITEM_ID = item.item_id )
+        <where>
+             t.LANG = #{request.locale,jdbcType=VARCHAR}
+             and item.count_stock_flag = 'O'
+             and item.item_id != #{itemId,jdbcType=DECIMAL}
+             and item.item_type = 'ITEM'
+            <if test="categoryId != null">
+                AND b.item_id in (select ig.item_id
+                from INV_ITEM_CATEGORY ig
+                where ig.category_id =
+                #{categoryId,jdbcType=INTEGER})
+            </if>
+             <if test="itemNumber != null">
+                AND lower(item.ITEM_NUMBER) like concat('%',concat(lower(#{itemNumber,jdbcType=VARCHAR}),'%'))   
+            </if>
+            <if test="itemName != null">
+                AND lower(t.ITEM_NAME) like
+                concat('%',concat(lower(#{itemName,jdbcType=VARCHAR}),'%'))
+            </if>
+            <if test="redeemFlag != null">
+                AND item.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+            </if>
+            <if test="starterAid != null">
+                AND item.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+    
+    <select id="queryItemByItemNumber" resultType="java.lang.Integer">
+      select count(1) from inv_item_b b where b.item_number = #{itemNumber,jdbcType=VARCHAR} 
+    </select>
+    
+  <!-- 单位维护界面Form商品名称lov(查询单位维护好的商品) -->
+  <select id="queryItemsOfUnitConvert" resultMap="BaseResultMap">
+    select iib.ITEM_ID, iitl.ITEM_NAME, iib.ITEM_NUMBER, iib.DESCRIPTION
+    from INV_ITEM_B iib
+      left outer join INV_ITEM_TL iitl
+      on (iib.ITEM_ID = iitl.ITEM_ID AND iitl.LANG = #{request.locale, jdbcType=VARCHAR})
+    <where>
+        exists (select *
+                from inv_unit_convert iuc
+                where iuc.item_id = iib.item_id)
+        <if test="itemNumber != null and itemNumber != '' ">
+            and Upper(iib.ITEM_NUMBER) like concat('%', concat(Upper(#{itemNumber, jdbcType=VARCHAR}), '%')) 
+        </if>
+        <if test="itemName != null and itemName != '' ">
+            and Upper(iitl.ITEM_NAME) like concat('%', concat(Upper(#{itemName, jdbcType=VARCHAR}), '%'))
+        </if>
+    </where>
+     <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+    
+  </select>
+  
+  <select id="queryByPoHeader" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+    select iib.item_id,
+       iib.item_number,
+       iil.item_name,
+       iil.DESCRIPTION,
+       iumt.uom_code,
+       iumt.name uom_name<!-- ,
+       (select iuc.convert_rate
+         from inv_unit_convert iuc
+        where iuc.item_id = iib.item_id
+          and iuc.from_uom = iib.uom_code
+          and iuc.to_uom = 'CAS') package_quantity -->
+  from inv_item_b iib
+ left join inv_item_tl iil
+on iib.item_id = iil.item_id
+ and iil.lang = #{request.locale, jdbcType=VARCHAR}
+ left join inv_unit_of_measure_b ium
+on ium.uom_code = iib.uom_code
+ left join inv_unit_of_measure_tl iumt
+on ium.uom_code = iumt.uom_code
+and iumt.lang = #{request.locale, jdbcType=VARCHAR}
+<where>
+    <if test="itemNumber != null">
+        AND Upper(iib.item_number) like concat('%',concat(Upper(#{itemNumber,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="itemName != null">
+        AND Upper(iil.item_name) like concat('%',concat(Upper(#{itemName,jdbcType=VARCHAR}),'%'))
+    </if>
+    <if test="categoryId != null">
+         AND iib.item_id in (select ig.item_id
+                from INV_ITEM_CATEGORY ig
+                where ig.category_id =
+                #{categoryId,jdbcType=INTEGER})
+    </if>
+    <if test="redeemFlag != null">
+        and iib.REDEEM_FLAG = #{redeemFlag,jdbcType=VARCHAR}
+    </if>
+    <if test="starterAid != null">
+        and iib.STARTER_AID = #{starterAid,jdbcType=VARCHAR}
+    </if>
+</where>
+order by iib.item_number
+   <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             , ${_colName} ${sortorder}
+    </if>
+
+  </select>
+  
+  <select id="queryItemByCodeAndId" resultType="java.lang.Integer">
+     select count(0)
+  from inv_item_b b
+ where b.item_number = #{itemNumber,jdbcType=VARCHAR}
+   and b.item_id != #{itemId, jdbcType=DECIMAL}
+  </select>
+  <!-- 新增通用lov -->
+  <select id="queryItemLov" resultMap="BaseResultMap">
+    SELECT iipv.item_id,
+           iipv.item_number,
+           coalesce(iitl.item_name, iipv.item_name) AS item_name,
+           coalesce(iitl.description, iipv.description) AS description,
+           iipv.starter_aid,
+           iipv.redeem_flag,
+           iipv.uom_code,
+           (SELECT uomct.name
+              FROM inv_unit_of_measure_tl uomct
+             WHERE uomct.uom_code = iipv.uom_code
+               AND uomct.lang = #{request.locale,jdbcType=VARCHAR}) uom_name,
+           (SELECT SUM(ioqq.quantity-ioqq.pending_qty)
+              FROM inv_onhand_quantity_qry_v ioqq
+             WHERE ioqq.item_id = iipv.item_id
+             	AND ioqq.organization_id = iipv.organization_id) quantity
+      FROM inv_item_property_v iipv
+      LEFT OUTER JOIN inv_item_tl iitl
+        ON (iipv.item_id = iitl.item_id AND iitl.lang = #{request.locale,jdbcType=VARCHAR})
+     <where>
+            <!-- iipv.organization_id = #{request.invOrgId,jdbcType=DECIMAL} -->
+        AND iipv.enabled_flag = 'Y'
+        <!-- 组织ID -->
+        <if test="organizationId != null">
+            AND iipv.organization_id = #{organizationId, jdbcType=DECIMAL}
+        </if>
+        <if test="itemNumber != null">
+            AND iipv.item_number like concat(#{itemNumber, jdbcType=VARCHAR}, '%')
+        </if>
+        <if test="itemName != null">
+            AND iipv.item_name like concat('%', concat(#{itemName, jdbcType=VARCHAR}, '%'))
+        </if>
+        <if test="redeemFlag != null">
+            AND iipv.redeem_flag = #{redeemFlag, jdbcType=VARCHAR}
+        </if>
+        <if test="starterAid != null">
+            AND iipv.starter_aid = #{starterAid, jdbcType=VARCHAR}
+        </if>
+        <if test="categoryId != null">
+            AND EXISTS (SELECT 'X'
+                  FROM inv_item_category iic
+                 WHERE iipv.item_id = iic.item_id
+                   AND iic.category_id = #{categoryId, jdbcType=DECIMAL})
+        </if>
+        <!-- 入库 -->
+        <if test='trxType == "STKIN" || trxType == "STADJ"'>
+            AND (iipv.item_type = 'ITEM' AND iipv.count_stock_flag = 'O')
+        </if>
+        <!-- 出库 -->
+        <if test='trxType == "STKOT"'>
+            AND ((iipv.item_type = 'ITEM' AND iipv.count_stock_flag = 'O') OR 
+                 (iipv.item_type = 'PACKG' AND iipv.count_stock_flag = 'Y' AND iipv.count_type = 'PACKG'))
+        </if>
+        <!-- 转入、转出 -->
+        <if test='trxType == "TRFOT" || trxType == "TRFIN"'>
+            AND ((iipv.item_type = 'ITEM' AND iipv.count_stock_flag = 'O') OR 
+                 (iipv.item_type = 'PACKG' AND iipv.count_stock_flag = 'Y' AND iipv.count_type = 'PACKG'))
+            AND EXISTS (SELECT 'X'
+                  FROM inv_item_property_v transfer
+                 WHERE transfer.item_id = iipv.item_id
+                   AND transfer.organization_id = #{transferOrgId, jdbcType=DECIMAL}
+                   AND transfer.enabled_flag = 'Y'
+                   AND ((transfer.item_type = 'ITEM' AND transfer.count_stock_flag = 'O') OR 
+                        (transfer.item_type = 'PACKG' AND transfer.count_stock_flag = 'Y' AND transfer.count_type = 'PACKG'))
+                   AND transfer.lot_control_flag = iipv.lot_control_flag)
+        </if>
+     </where>
+      <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+     
+  </select>
+  
+  	 <!-- 获取库存现有量 -->
+     <select id="getItemCountBySalesOrgId" resultType="java.lang.Integer">
+     SELECT SUM(ioq.quantity - ioq.pending_qty)
+     FROM inv_onhand_quantity_qry_v ioq
+     WHERE EXISTS (SELECT 'X'
+          FROM spm_supply ssy
+         WHERE ssy.sales_org_id = #{salesOrgId, jdbcType=DECIMAL}
+           AND ssy.inv_org_id = ioq.organization_id)
+     AND ioq.item_id = #{itemId,jdbcType=DECIMAL}
+     </select>
+     
+    <select id="queryItemInvOrgEnabled" resultType="java.lang.Long">
+	SELECT count(0)
+	FROM inv_item_assign ia,
+	inv_item_b b
+	WHERE b.item_id = ia.item_id
+	and b.count_stock_flag = 'R'
+	and b.item_type = 'ITEM'
+	and ia.enabled_flag = 'Y'
+	and ia.assign_type = 'INV'
+	and b.count_item_id = #{itemId,jdbcType=DECIMAL}
+	and ia.assign_value = #{invOrgId,jdbcType=DECIMAL}
+    </select>
+    
+    <select id="queryPackgInvOrgEnabled" resultType="java.lang.Long">
+	SELECT
+	count(0)
+	FROM inv_item_assign ia,
+	inv_item_b b,
+	inv_item_hierarchy ih
+	WHERE b.item_id = ia.item_id
+	and ih.parent_item_id = b.item_id
+	and b.item_type = 'PACKG'
+	and ia.enabled_flag = 'Y'
+	and ia.assign_type = 'INV'
+	and ih.item_id = #{itemId,jdbcType=DECIMAL}
+	and ia.assign_value = #{invOrgId,jdbcType=DECIMAL}
+    </select>
+    
+    <select id="getItemByItemNumber" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.product.dto.InvItem">
+        select
+        <include refid="Base_Column_List" />
+        from INV_ITEM_B
+
+        <where>
+            <if test="itemNumber != null">
+                AND ITEM_NUMBER = #{itemNumber,jdbcType=VARCHAR}
+            </if>
+            
+        </where>
+
+    </select>
+</mapper>

@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmBankMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.config.dto.SpmBank" >
+    <id column="BANK_ID" property="bankId" jdbcType="DECIMAL" />
+    <result column="MARKET_ID" property="marketId" jdbcType="DECIMAL" />
+    <result column="BANK_NUMBER" property="bankNumber" jdbcType="VARCHAR" />
+    <result column="BANK_NAME" property="bankName" jdbcType="VARCHAR" />
+    <result column="BANK_TYPE" property="bankType" jdbcType="VARCHAR" />
+    <result column="HEAD_OFFICE_ID" property="headOfficeId" jdbcType="DECIMAL" />
+    <result column="CONTACTS" property="contacts" jdbcType="VARCHAR" />
+    <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+    <result column="PHONE" property="phone" jdbcType="VARCHAR" />
+    <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    <result column="ADDRESS" property="address" jdbcType="VARCHAR" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+    <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+    <result column="HEAD_OFFICE_NAME" property="headOfficeName" jdbcType="VARCHAR"/>
+    <result column="MARKET_NAME" property="marketName" jdbcType="VARCHAR"/>
+    <result column="BANK_SHORT_NAME" property="bankShortName" jdbcType="VARCHAR"/>
+    <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR"/>
+   
+     <!--  <result column="BANK_CHARGES_ID" property="bankChargesId" jdbcType="DECIMAL" />
+        <result column="BONUS_FROM" property="bonusFrom" jdbcType="DECIMAL" />
+    <result column="BONUS_TO" property="bonusTo" jdbcType="DECIMAL" />
+    <result column="CHARGES" property="charges" jdbcType="DECIMAL" /> -->
+  </resultMap>
+  <sql id="Base_Column_List" >
+    BANK_ID, MARKET_ID, BANK_NUMBER, BANK_NAME, BANK_TYPE, HEAD_OFFICE_ID, CONTACTS, 
+    EMAIL, PHONE, ENABLED_FLAG, ADDRESS, REMARK, START_ACTIVE_DATE, END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, 
+    REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15,BANK_SHORT_NAME,AREA_CODE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from SPM_BANK_B
+    where BANK_ID = #{bankId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SPM_BANK_B
+    where BANK_ID = #{bankId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmBank" >
+    <selectKey resultType="java.lang.Long" keyProperty="bankId" order="BEFORE" >
+     SELECT SPM_BANK_B_S.nextval from dual
+    </selectKey>
+    insert into SPM_BANK_B (BANK_ID, MARKET_ID, BANK_NUMBER, 
+      BANK_NAME, BANK_TYPE, HEAD_OFFICE_ID, 
+      CONTACTS, EMAIL, PHONE, 
+      ENABLED_FLAG, ADDRESS, REMARK, 
+      START_ACTIVE_DATE, END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15,BANK_SHORT_NAME,AREA_CODE)
+    values (#{bankId,jdbcType=DECIMAL}, #{marketId,jdbcType=DECIMAL}, #{bankNumber,jdbcType=VARCHAR}, 
+      #{bankName,jdbcType=VARCHAR}, #{bankType,jdbcType=VARCHAR}, #{headOfficeId,jdbcType=DECIMAL}, 
+      #{contacts,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{enabledFlag,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{startActiveDate,jdbcType=TIMESTAMP}, #{endActiveDate,jdbcType=TIMESTAMP}, 1, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL},CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR},#{bankShortName,jdbcType=VARCHAR}),#{areaCode,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmBank" >
+    <selectKey resultType="java.lang.Long" keyProperty="bankId" order="BEFORE" >
+     SELECT SPM_BANK_B_S.nextval from dual
+    </selectKey>
+    insert into SPM_BANK_B
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      BANK_ID,
+       <if test="marketId != null" >
+        MARKET_ID,
+      </if>
+      <if test="bankNumber != null" >
+        BANK_NUMBER,
+      </if>
+      <if test="bankName != null" >
+        BANK_NAME,
+      </if>
+      <if test="bankType != null" >
+        BANK_TYPE,
+      </if>
+      <if test="headOfficeId != null" >
+        HEAD_OFFICE_ID,
+      </if>
+      <if test="contacts != null" >
+        CONTACTS,
+      </if>
+      <if test="email != null" >
+        EMAIL,
+      </if>
+      <if test="phone != null" >
+        PHONE,
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG,
+      </if>
+      <if test="address != null" >
+        ADDRESS,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE,
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE,
+      </if>
+        OBJECT_VERSION_NUMBER,
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+        CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+        LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="bankShortName != null" >
+        BANK_SHORT_NAME,
+      </if>
+      <if test="areaCode != null" >
+        AREA_CODE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{bankId,jdbcType=DECIMAL},
+     <if test="marketId != null" >
+        #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="bankNumber != null" >
+        #{bankNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankType != null" >
+        #{bankType,jdbcType=VARCHAR},
+      </if>
+      <if test="headOfficeId != null" >
+        #{headOfficeId,jdbcType=DECIMAL},
+      </if>
+      <if test="contacts != null" >
+        #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledFlag != null" >
+        #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endActiveDate != null" >
+        #{endActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      1,
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+        <if test="bankShortName != null" >
+        #{bankShortName,jdbcType=VARCHAR},
+      </if>
+       <if test="areaCode != null" >
+        #{areaCode,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.config.dto.SpmBank" >
+    update SPM_BANK_B
+    <set >
+      <if test="marketId != null" >
+        MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="bankNumber != null" >
+        BANK_NUMBER = #{bankNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        BANK_NAME = #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankType != null" >
+        BANK_TYPE = #{bankType,jdbcType=VARCHAR},
+      </if>
+      <if test="headOfficeId != null" >
+        HEAD_OFFICE_ID = #{headOfficeId,jdbcType=DECIMAL},
+      </if>
+      <if test="contacts != null" >
+        CONTACTS = #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        EMAIL = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        PHONE = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        ADDRESS = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      </if>
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+       <if test="bankShortName != null" >
+        BANK_SHORT_NAME = #{bankShortName,jdbcType=VARCHAR},
+      </if>
+       <if test="areaCode != null" >
+         AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where BANK_ID = #{bankId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmBank" >
+    update SPM_BANK_B
+    set MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      BANK_NUMBER = #{bankNumber,jdbcType=VARCHAR},
+      BANK_NAME = #{bankName,jdbcType=VARCHAR},
+      BANK_TYPE = #{bankType,jdbcType=VARCHAR},
+      HEAD_OFFICE_ID = #{headOfficeId,jdbcType=DECIMAL},
+      CONTACTS = #{contacts,jdbcType=VARCHAR},
+      EMAIL = #{email,jdbcType=VARCHAR},
+      PHONE = #{phone,jdbcType=VARCHAR},
+      ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      ADDRESS = #{address,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      START_ACTIVE_DATE = #{startActiveDate,jdbcType=TIMESTAMP},
+      END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      BANK_SHORT_NAME = #{bankShortName,jdbcType=VARCHAR},
+       AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+    where BANK_ID = #{bankId,jdbcType=DECIMAL}
+  </update>
+  
+   <select id="queryBySpmBank" resultMap="BaseResultMap"  parameterType="com.lkkhpg.dsis.common.config.dto.SpmBank"> 
+	     select 
+	                sbb.BANK_ID,
+                    sbb.BANK_NUMBER,
+					sbt.BANK_NAME,
+					sbb.BANK_TYPE,
+					sbb.HEAD_OFFICE_ID,
+					sbb.CONTACTS,
+					sbb.EMAIL,
+					sbb.PHONE,
+					sbb.ENABLED_FLAG,
+					sbb.ADDRESS,
+					sbb.REMARK,
+					sbb.START_ACTIVE_DATE,
+					sbb.END_ACTIVE_DATE,
+					sbb.OBJECT_VERSION_NUMBER,
+					sbb.REQUEST_ID,
+					sbb.PROGRAM_ID,
+					sbb.CREATION_DATE,
+					sbb.CREATED_BY,
+					sbb.LAST_UPDATED_BY,
+					sbb.LAST_UPDATE_DATE,
+					sbb.LAST_UPDATE_LOGIN,
+					sbb.ATTRIBUTE_CATEGORY,
+					sbb.ATTRIBUTE1,
+					sbb.MARKET_ID,
+					sbb.AREA_CODE,
+					sbb.BANK_SHORT_NAME,
+					<!-- sbc.MARKET_ID, -->
+					sbt2.BANK_NAME HEAD_OFFICE_NAME,
+					smtl.NAME MARKET_NAME
+    from SPM_BANK_B sbb
+  left outer join SPM_MARKET_B smb
+    on(sbb.MARKET_ID=smb.MARKET_ID)
+  left outer join SPM_BANK_TL sbt2
+    on(sbb.HEAD_OFFICE_ID = sbt2.BANK_ID AND sbt2.lang = #{request.locale,jdbcType=VARCHAR})
+  left outer join SPM_BANK_TL sbt
+    on(sbb.BANK_ID=sbt.BANK_ID and  sbt.LANG = #{request.locale,jdbcType=VARCHAR})
+  left outer join SPM_MARKET_TL smtl
+    on smtl.market_id = sbb.market_id and smtl.lang = #{request.locale,jdbcType=VARCHAR}
+    <where>
+         sbb.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+        <if test="headOfficeId != null">
+         AND  sbb.HEAD_OFFICE_ID=#{headOfficeId,jdbcType=DECIMAL}
+        </if>
+		<if test="bankId != null">
+         AND  sbb.BANK_ID=#{bankId,jdbcType=DECIMAL}
+        </if>
+		 <if test="bankNumber!= null">
+         AND  Upper(sbb.BANK_NUMBER) like concat('%',concat( Upper( #{bankNumber,jdbcType=VARCHAR}),'%'))
+        </if>
+		<if test="bankName!=null">
+		  AND Upper(sbt.BANK_NAME) like concat('%',concat( Upper( #{bankName,jdbcType=VARCHAR}),'%'))
+		</if>
+        <if test="bankType!=null">
+          AND sbb.BANK_TYPE = #{bankType,jdbcType=VARCHAR}
+        </if>
+        <!-- <if test="marketId != null">
+          AND sbb.MARKET_ID=#{marketId,jdbcType=DECIMAL}
+        </if> -->
+			
+		<if test="startDate!= null">
+           AND sbb.END_ACTIVE_DATE <![CDATA[ >= #{startDate,jdbcType=TIMESTAMP} ]]>
+        </if>
+        <if test="overDate != null">
+           AND sbb.END_ACTIVE_DATE <![CDATA[ <= #{overDate,jdbcType=TIMESTAMP} ]]>
+        </if>
+	</where>
+     <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+    
+</select> 
+
+<select id="queryValidBySpmBank" resultMap="BaseResultMap"  parameterType="com.lkkhpg.dsis.common.config.dto.SpmBank"> 
+         select 
+                    sbb.BANK_ID,
+                    sbb.BANK_NUMBER,
+                    sbt.BANK_NAME,
+                    sbb.BANK_TYPE,
+                    sbb.HEAD_OFFICE_ID,
+                    sbb.CONTACTS,
+                    sbb.EMAIL,
+                    sbb.PHONE,
+                    sbb.ENABLED_FLAG,
+                    sbb.ADDRESS,
+                    sbb.REMARK,
+                    sbb.START_ACTIVE_DATE,
+                    sbb.END_ACTIVE_DATE,
+                    sbb.OBJECT_VERSION_NUMBER,
+                    sbb.REQUEST_ID,
+                    sbb.PROGRAM_ID,
+                    sbb.CREATION_DATE,
+                    sbb.CREATED_BY,
+                    sbb.LAST_UPDATED_BY,
+                    sbb.LAST_UPDATE_DATE,
+                    sbb.LAST_UPDATE_LOGIN,
+                    sbb.ATTRIBUTE_CATEGORY,
+                    sbb.ATTRIBUTE1,
+                    sbb.MARKET_ID,
+                    sbb.AREA_CODE,
+                    sbb.BANK_SHORT_NAME,
+                    <!-- sbc.MARKET_ID, -->
+                    sbt2.BANK_NAME HEAD_OFFICE_NAME,
+                    smtl.NAME MARKET_NAME
+    from SPM_BANK_B sbb
+  left outer join SPM_MARKET_B smb
+    on(sbb.MARKET_ID=smb.MARKET_ID)
+  left outer join SPM_BANK_TL sbt2
+    on(sbb.HEAD_OFFICE_ID = sbt2.BANK_ID AND sbt2.lang = #{request.locale,jdbcType=VARCHAR})
+  left outer join SPM_BANK_TL sbt
+    on(sbb.BANK_ID=sbt.BANK_ID and  sbt.LANG = #{request.locale,jdbcType=VARCHAR})
+  left outer join SPM_MARKET_TL smtl
+    on smtl.market_id = sbb.market_id and smtl.lang = #{request.locale,jdbcType=VARCHAR}
+    <where>
+         sbb.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}
+        <if test="headOfficeId != null">
+         AND  sbb.HEAD_OFFICE_ID=#{headOfficeId,jdbcType=DECIMAL}
+        </if>
+        <if test="bankId != null">
+         AND  sbb.BANK_ID=#{bankId,jdbcType=DECIMAL}
+        </if>
+         <if test="bankNumber!= null">
+         AND  Upper(sbb.BANK_NUMBER) like concat('%',concat( Upper( #{bankNumber,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="bankName!=null">
+          AND Upper(sbt.BANK_NAME) like concat('%',concat( Upper( #{bankName,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="bankType!=null">
+          AND sbb.BANK_TYPE = #{bankType,jdbcType=VARCHAR}
+        </if>
+        <if test="marketId != null">
+          AND sbb.MARKET_ID=#{marketId,jdbcType=DECIMAL}
+        </if>
+            
+        AND coalesce(sbb.START_ACTIVE_DATE, trunc(current_date)) <![CDATA[ <= trunc(current_date) ]]>
+        AND coalesce(sbb.END_ACTIVE_DATE, trunc(current_date) + 1) <![CDATA[ > trunc(current_date) ]]>
+    </where>
+</select> 
+			
+    <select id="queryBySpmBankNumber" resultType="java.lang.Integer">
+      select count(1) from SPM_BANK_B sbb where sbb.BANK_NUMBER = #{bankNumber,jdbcType=VARCHAR}
+      and MARKET_ID = #{request.marketId,jdbcType=DECIMAL}
+    </select>
+    
+    <select id="queryBySpmBankDate" resultType="java.lang.Integer">
+      select sysdate from dual;
+    </select>
+    
+    <select id="queryHeadOffice" resultMap="BaseResultMap"  parameterType="com.lkkhpg.dsis.common.config.dto.SpmBank">
+    select sb.bank_id,
+           sb.bank_number,
+           st.bank_name,
+           sb.market_id
+     from spm_bank_b sb
+    left join spm_bank_tl st
+    on sb.bank_id = st.bank_id
+    and st.lang = #{request.locale,jdbcType=VARCHAR}
+    where sb.bank_type = 'HQ'
+    AND sb.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}
+     <if test="bankId != null">
+        and sb.bank_id != #{bankId,jdbcType=DECIMAL}
+     </if>
+     <if test="bankNumber != null" >
+        AND Upper(sb.BANK_NUMBER) like concat('%',concat(Upper(#{bankNumber,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="bankName != null" >
+        AND Upper(sb.BANK_NAME) like concat('%',concat(Upper(#{bankName,jdbcType=VARCHAR}),'%'))
+      </if>
+    </select>
+    
+    <select id="queryBankByNumber" parameterType="java.lang.String" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from SPM_BANK_B
+    where BANK_NUMBER = #{bankNumber,jdbcType=VARCHAR}
+    
+    </select>
+</mapper>

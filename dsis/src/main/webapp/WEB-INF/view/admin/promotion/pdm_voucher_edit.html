@@ -1,0 +1,1425 @@
+<#-- * description: 优惠券详情. * version: 1.0 *
+author:hanrui.huang@hand-china.com * Copyright LKK Health Products Group
+Limited * --> <#include "../include/head.html">
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script
+	src="${base.contextPath}/common/code?voucherType=PDM.APPLY_TYPE&pdmApplyCrieria=PDM.APPLY_CRITERIA&pdmVoucherType=PDM.VOUCHER_TYPE&appTaxs=PDM.APPLY_ON&calculateOperator=PDM.CALCULATE_OPERATOR&pdmUsageMode=PDM.USAGE_MODE&discountTypes=PDM.DISCOUNT_TYPE&pdmVoucherStatus=PDM.VOUCHER_STATUS&pdmReleaseStatus=PDM.RELEASE_STATUS&pdmVoucherCategory=PDM.VOUCHER_CATEGORY"
+	type="text/javascript"></script>
+<body style="padding: 10px;">
+	<form id="voucher_form"></form>
+	<div id="member_grid"></div>
+	<form id="rule_form"></form>
+	<div id="item_rule_grid"></div>
+	<div id="gift_grid"></div>
+	<div id="voucher_btn" style="float: left;"></div>
+	<script type="text/javascript">
+	<#assign isedit = (RequestParameters.isedit!'0')/>
+	//优惠券状态
+    var proData =[{value: 'Y', meaning: '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.reporttemplate.effective"/>'},{value: 'N', meaning: '<@spring.message "type.com.lkkhpg.dsis.common.member.btn.memberdetails.terminate"/>'}];
+	//商品赠品表格全局变量
+	var grid;
+	//优惠券Id全局变量
+	var voucherId = null;
+	//暂存商品表，赠品表分页多选数据
+	var checkedCustomer = [];
+	//会员表分页多选数据
+	var checkedCustomerMem = [];
+	//基本信息全局变量
+	var voucherFormInfo = null;
+	//优惠券会员表全局变量
+    var voucherMember = null;
+    //规则全局变量
+    var ruleFormInfo = null;
+    //商品表全局变量
+    var voucherItem = null;
+    //赠品
+    var voucherGift;
+    //
+    var applyCriteria;
+    
+    var salesOrgId = _salesOrgId;
+    
+    var oldValue = null;
+    
+   var pdmVoucherCategory1  = new Array(4);
+   
+   
+   <#if RequestParameters.category?exists>
+       var  categoryContain;
+       if('${RequestParameters.category}' == "VIP"){
+    	   categoryContain = false;
+       }else{
+    	   categoryContain = true;
+       }
+   </#if>
+	$(function() {	
+		salesOrgId = ${RequestParameters.salesOrgId!_salesOrgId};
+        for (var i = 0; i < pdmVoucherCategory.length; i++) {
+            if ("VIP" == pdmVoucherCategory[i].value && categoryContain) {
+            	pdmVoucherCategory.splice(i,1);
+            }
+        }
+        
+		//基本信息
+		window['voucher_form'] = $("#voucher_form").ligerForm({
+            fields : [
+                      /* {
+                          name: 'salesOrgId',
+                          type : "hidden",
+                          options : {
+                              value:salesOrgId
+                          }
+                      }, */
+                      {
+                          label: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition"/>',
+                          newline:false, 
+                          name: 'salesOrgId',
+                          type : "combobox",
+                          /* options : {
+                              url: '${base.contextPath}/sys/salesOrg/queryOrg',
+                              value:_salesOrgId,
+                              valueField: "salesOrgId",
+                              textField: "name"
+                          }, */
+                          options : {
+                              value : salesOrgId,
+                              valueField : 'salesOrgId',
+                              textField : 'name',
+                              url : '${base.contextPath}/sys/salesOrg/queryOrg',
+                              //data : salesOrgData,
+                              isShowCheckBox: false,
+                              isMultiSelect: false,
+                              cancelable : false,
+                              onSuccess : function(){
+                                  this.setValue(salesOrgId);
+                              },
+                              onBeforeSelect : function(){ //该事件用于将初次加载标志置false,记录原值以及将重复标记置为true
+                                  oldValue = $.ligerui.get('salesOrgId').getValue();
+                              },
+                              onSelected :function (value,text){
+                                  if (!value) {
+                                      return false;
+                                  }
+                                  if (salesOrgId != value) {
+                                      $.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.refresh_page"/>', $l('sys.hand.tip.info'),function(yes) {
+                                          if(yes){
+                                              var newSalesOrgId = $.ligerui.get('salesOrgId').getValue();
+                                              var tabid = window.top.tab.selectedTabId;
+                                              var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                              window.top.f_removeTab(tabid);
+                                              parent.f_addTab(tabid,tabname,"${base.contextPath}/promotion/pdm_voucher_edit.html?category=new&salesOrgId="+newSalesOrgId);
+                                          }else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+                                              $.ligerui.get('salesOrgId').setValue(oldValue);
+                                          }
+                                      });
+                                  }
+                              }
+                          },
+                          validate : {
+                              required : true
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.couponscode"/>',
+                          newline : false,
+                          name : 'voucherCode',
+                          type : "text",
+                          validate : {
+                              required : true
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.couponsname"/>',
+                          newline : false,
+                          name : 'name',
+                          type : "text",
+                          validate : {
+                              required : true
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.use.type"/>',
+                          newline : true,
+                          name : 'appScope',
+                          type : 'select',
+                          validate : {
+                              required : true
+                          },
+                          options : {
+                              valueField : 'value',
+                              textField : 'meaning',
+                              data : voucherType,
+                              value : 'MEM',
+                              onBeforeSelect : function(data) {
+                                  //默认是选择会员，选择销售组织是，会员表不可编辑
+                                  membergrid(data);
+                                  //刷新会员表
+                                  if(data == 'SALES'){
+                                	  var members = $.ligerui.get('member_grid').getData();
+                                      if (members != '') {
+                                    	  $.ligerDialog.confirm('<@spring.message "appscope.error"/>', function (isyes) {
+                                    		  if(isyes){
+                                    			  Hap.ajax({
+                                                      url:"${base.contextPath}/pdm/member/remove",
+                                                      data:members,
+                                                      success:function(data){
+                                                          Hap.showSuccess('<@spring.message "msg.info.sys.delete_successful"/>',
+                                                          function() {
+                                                        	  Hap.gridQuery({
+                                                                  form : voucher_form,
+                                                                  grid : member_grid
+                                                              });
+                                                          });
+                                                      }
+                                                      
+                                                  })
+                                    		  }else{
+                                    			  $.ligerui.get('appScope').set('value', 'MEM');
+                                    		  }
+                                    	  })
+                                      }
+                                  }
+                              }
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.status"/>',
+                          newline : false,
+                          name : 'enabledFlag',
+                          type : 'select',
+                          validate : {
+                              required : true
+                          },
+                          options : {
+                              valueField : 'value',
+                              textField : 'meaning',
+                              data : proData,
+                              value: 'Y',
+                              onBeforeSelect : function(data) {
+                            	  if(data == 'N'){
+                            		  var status = liger.get('status').getValue();
+                            		  if(status == 'URLD'){
+                            			  Hap.showError('<@spring.message "msg.voucher.status.error"/>');
+                                          return false;
+                            		  }
+                            	  }
+                              }
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.profile.profiledesc"/>',
+                          newline : false,
+                          name : 'description',
+                          type : 'text'
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.quantity"/>',
+                          newline : true,
+                          name : 'quantity',
+                          type : 'int',
+                          options : {
+                              onChangeValue : function(data) {
+                                  if(data < 0){
+                                      liger.get('quantity').setValue('');
+                                      Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.inventory.invrepacktrx.allocateqty.error"/>');
+                                  }
+                              }
+                          },
+                          validate : {
+                              required : true
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateFrom"/>',
+                          newline : false,
+                          name : 'startActiveDate',
+                          type : "date",
+                          validate : {
+                              required : true
+                          },
+                          options : {
+                              format : 'yyyy-MM-dd',
+                              onChangeDate : function(data){
+                            	  var endActiveDate = liger.get('endActiveDate').getValue();
+                            	  if(endActiveDate != null){
+                            		  if(new Date(endActiveDate) < new Date(data)){
+                                          Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.date.error"/>');
+                                          $.ligerui.get('startActiveDate').set('value', '');
+                                          return false;
+                                      }
+                            	  }
+                                  
+                              }
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateTo"/>',
+                          newline : false,
+                          name : 'endActiveDate',
+                          type : "date",
+                          validate : {
+                              required : true
+                          },
+                          options : {
+                              format : 'yyyy-MM-dd',
+                              onChangeDate : function(data){
+                                  var startActiveDate = liger.get('startActiveDate').getValue();
+                                  if(new Date(startActiveDate) > new Date(data)){
+                                      Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.date.error"/>');
+                                      $.ligerui.get('endActiveDate').set('value', '');
+                                      return false;
+                                  }
+                              }
+                          }
+                      }, 
+                      {
+                          label : '<@spring.message "com.lkkhpg.dsis.common.promotion.dto.voucher.category"/>',
+                          newline : true,
+                          name : 'category',
+                          id : 'category',
+                          type : 'select',
+                          validate : {
+                              required : true
+                          },
+                          options : {
+                              valueField : 'value',
+                              textField : 'meaning',
+                              data : pdmVoucherCategory,
+                              value : 'STAND'
+                          }
+                      }, 
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.status"/>',
+                          newline : false,
+                          name : 'status',
+                          readonly : true,
+                          type : 'select',
+                          options : {
+                              valueField : 'value',
+                              textField : 'meaning',
+                              data : pdmReleaseStatus,
+                              value : 'URLD'
+                          },
+                          validate : {
+                              required : true
+                          }
+                      }, 
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.residual.quantity"/>',
+                          newline : false,
+                          name : 'surplus',
+                          readonly : true,
+                          type : 'text'
+                      },
+                      {
+                            name: 'salesOrgId',
+                            type : "hidden"
+                      },
+                      {
+                          name: 'voucherId',
+                          type : "hidden"
+                      }
+                      ]
+        });
+		
+		//会员
+		window['member_grid'] = $("#member_grid").ligerGrid({
+			title : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.member"/>',
+			unSetValidateAttr:false,
+            columns : [ {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.member"/>',
+                name : 'memberCode',
+                width : '150'
+            }, 
+            {
+                display : '<@spring.message "mws.accountinfo.chinesename"/>',
+                name : 'chineseName',
+                align : 'left',
+                width : '150'
+            }, 
+            {
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.english.name"/>',
+                name : 'englishName',
+                align : 'left',
+                width : '150'
+            }, 
+            {
+                display : '<@spring.message "mws.accountinfo.phoneno"/>',
+                name : 'phoneNo',
+                align : 'left',
+                width : '150'
+            },
+            {
+                name : 'voucherMenberId',
+                hide : 'voucherMenberId'
+            }
+            ],
+            <#if isedit == '1'>
+			url:"${base.contextPath}/pdm/member/query",
+            </#if>
+			<#if isedit == '2'>
+            url:"${base.contextPath}/pdm/member/query",
+            </#if>
+            toolbar : {
+                id : 'member_grid_tool',
+                items : [
+                         {
+                             id : 'member_grid_add',
+                             text : '<@spring.message "sys.hand.btn.new"/>',
+                             disabled : true,
+                             click : function() {
+                                 f_import_province();
+                             },
+                             icon : 'add'
+                         },
+                         {
+                             line : true
+                         },
+                         {
+                             id : 'member_grid_del',
+                             text : '<@spring.message "sys.hand.btn.delete"/>',
+                             disabled : true,
+                             click : function(data) {
+                            	 Hap.gridDelete({
+                                	 url:"${base.contextPath}/pdm/member/remove",
+                                     grid : member_grid
+                                 })
+                             },
+                             icon : 'delete'
+                         },
+                         {
+                        	 id : 'member_grid_import',
+                        	 disabled : true,
+                             text: '<@spring.message "msg.info.event.btn.import"/>',
+                             click:function(){
+                            	    $.ligerDialog.open({
+                            	        height: 550,
+                            	        width: 700,
+                            	        title: '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.title.memimport"/>',
+                            	        url : '${base.contextPath}/mm/mm_member_import.html?idType=VOUCH&mentionId='+voucherId+'&marketId='+_marketId+'&maxMember=null'
+                            	    });
+                             },
+                             icon: 'add'
+                         }
+                         ]
+            },
+            delayLoad:true,
+            enabledEdit : true,
+            width : '99%',
+            height : '90%',
+            checkbox : true,
+            usePager : false
+        });
+		//liger.get('member_grid_tool').setDisabled('member_grid_import');
+		//规则
+		window['rule_form'] = $("#rule_form").ligerForm({
+            fields : [
+                      {
+                          label : '<@spring.message "type.application.conditions"/>',
+                          newline : false,
+                          name : 'applyCriteria',
+                          type : 'select',
+                          validate : {
+                              required : true
+                          },
+                          options : {
+                              data : pdmApplyCrieria,
+                              valueField : 'value',
+                              textField : 'meaning',
+                              value : 'INVOI',
+                              onSelected : function(data) {
+                                  ruleApplyCrieria(data);
+                              }
+                          },
+                          group : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.rule"/>'
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.couponstype"/>',
+                          newline : false,
+                          name : 'type',
+                          type : 'select',
+                          validate : {
+                              required : true
+                          },
+                          options : {
+                              data : pdmVoucherType,
+                              valueField : 'value',
+                              textField : 'meaning',
+                              value : 'AM',
+                              onBeforeSelect : function(data) {
+                            	  if(data == 'PD'){
+                            		  var applyCriteria = liger.get('applyCriteria').getValue();
+                            		  if(applyCriteria == 'INVOI'){
+                            			  Hap.showError('<@spring.message "msg.voucher.type.error"/>');
+                                          return false;
+                            		  }
+                            	  }
+                            	  if(data == 'AM'){
+                            		  //运算
+                            		  $.ligerui.get('operation').setReadonly(false);
+                            		  rule_form.setFieldValidate("operation", {required : true});
+                                      //订单额数必输
+                                      $.ligerui.get('orderAmount').setReadonly(false);
+                                      rule_form.setFieldValidate("orderAmount", {required : true});
+                                      liger.get('rule_grid_tool').setDisabled('rule_grid_add');
+                                      liger.get('rule_grid_tool').setDisabled('rule_grid_del');
+                                      //选择金额。是否删除商品
+                                      delItem();
+                                  }else{
+                                	  liger.get('rule_grid_tool').setEnabled('rule_grid_add');
+                                	  liger.get('rule_grid_tool').setEnabled('rule_grid_del');
+                                	  //运算
+                                	  rule_form.setFieldValidate("operation", {required : true});
+                                      $.ligerui.get('operation').set('value', '');
+                                      $.ligerui.get('operation').setReadonly(true);
+                                      //订单额数为空，不可编辑
+                                      rule_form.setFieldValidate("orderAmount", {required : true});
+                                      $.ligerui.get('orderAmount').set('value', '');
+                                      $.ligerui.get('orderAmount').setReadonly(true);
+                                  }
+                              },
+                              onSelected : function(data) {
+                                  var grid = $.ligerui.get('item_rule_grid');
+                                  if(data == 'NM'){
+                                      item_rule_grid.options.enabledEdit = true;
+                                      rule_form.setFieldValidate("operation", {required : false});
+                                      rule_form.setFieldValidate("orderAmount", {required : false});
+                                  }
+                              }
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.tax"/>',
+                          newline : false,
+                          name : 'appTax',
+                          type : 'select',
+                          readonly : true,
+                          options : {
+                              data : appTaxs,
+                              valueField : 'value',
+                              textField : 'meaning',
+                              value : appTaxs[0].value
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.useCriteria"/>',
+                          newline : true,
+                          name : 'useCriteria',
+                          type : 'select',
+                          options : {
+                              data : appTaxs,
+                              valueField : 'value',
+                              textField : 'meaning',
+                              value:'ICLD'
+                          },
+                          validate : {
+                              required : true
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.operation"/>',
+                          newline : false,
+                          name : 'operation',
+                          type : 'select',
+                          options : {
+                              data : calculateOperator,
+                              valueField : 'value',
+                              textField : 'meaning'
+                          },
+                          validate : {
+                              required : true
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.orderAmount"/>',
+                          newline : false,
+                          name : 'orderAmount',
+                          type : 'float',
+                          options : {
+                              onChangeValue : function(data) {
+                            	  var operation = liger.get('operation').getValue();
+                                  if(data < 0 && operation != ''){
+                                      liger.get('orderAmount').setValue('');
+                                      Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.orderamount.error"/>');
+                                  }
+                              }
+                          },
+                          validate : {
+                              required : true
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.usagemode"/>',
+                          newline : true,
+                          name : 'usageMode',
+                          type : 'select',
+                          options : {
+                              data : pdmUsageMode,
+                              valueField : 'value',
+                              textField : 'meaning',
+                              value : 'STACK'
+                          },
+                          validate : {
+                              required : true
+                          }
+                      },
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.discountType"/>',
+                          newline : false,
+                          name : 'discountType',
+                          type : 'select',
+                          validate : {
+                              required : true
+                          },
+                          options : {
+                              data : discountTypes,
+                              valueField : 'value',
+                              textField : 'meaning',
+                              onBeforeSelect : function(data) {
+                                  if (data == 'GIFT') {
+                                      $.ligerui.get('discountValue').set('value', '');
+                                      $.ligerui.get('discountValue').setReadonly(true);
+                                      $.ligerui.get('usageMode').setReadonly(true);
+                                      $.ligerui.get('usageMode').set('value', 'NSTAC');
+                                      liger.get('gift_grid_tool').setEnabled('gift_grid_add');
+                                      liger.get('gift_grid_tool').setEnabled('gift_grid_del');
+                                      rule_form.setFieldValidate("discountValue", {required : false});
+                                      //$.ligerui.get('discountValue').set('required', false);
+                                      gift_grid.options.enabledEdit = true;
+                                  } else {
+                                      gift_grid.options.enabledEdit = false;
+                                      liger.get('gift_grid_tool').setDisabled('gift_grid_add');
+                                      liger.get('gift_grid_tool').setDisabled('gift_grid_del');
+                                      $.ligerui.get('discountValue').setReadonly(false);
+                                      rule_form.setFieldValidate("discountValue", {required : true});
+                                      var applyCriteria = liger.get('applyCriteria').getValue();
+                                      if(applyCriteria == 'INVOI'){
+                                    	  $.ligerui.get('usageMode').setReadonly(false);
+                                      }
+                                      degift();
+                                  }
+                              }
+                          }
+                      }, 
+                      {
+                          label : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.discountValue"/>',
+                          newline : false,
+                          name : 'discountValue',
+                          type : 'float',
+                          options : {
+                              onChangeValue : function(data) {
+                                  var discountType = liger.get('discountType').getValue();
+                                  if(discountType == 'FIX'){
+                                	  if(data < 0 || parseInt(data) == 0){
+                                		  liger.get('discountValue').setValue('');
+                                          Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.discountvalue.error"/>');
+                                	  }
+                                  }
+                                  if(discountType == 'PERCE'){
+                                	  if(data < 0 || data > 100){
+                                          liger.get('discountValue').setValue('');
+                                          Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.discountvalue.range.error"/>');
+                                      }
+                                  }
+                              }
+                          }
+                      } 
+                      ]
+        });
+		//商品
+		window['item_rule_grid'] = $("#item_rule_grid").ligerGrid({
+			title : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.item"/>',
+            columns : [
+                       {
+                           display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>',
+                           name : 'itemNumber',
+                           align : 'left',
+                           width : '150'
+                       }, 
+                       {
+                           display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+                           name : 'itemName',
+                           align : 'left',
+                           width : '150'
+                       }, 
+                       {
+                           display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.quantity"/>',
+                           name : 'quantity',
+                           align : 'left',
+                           width : '150',
+                           editor : {
+                               type:'int',
+                               sign:false
+                           },
+                           validate: {
+                               required: true
+                           }
+                       } 
+                       ],
+                       <#if isedit == '1'>
+                       url:"${base.contextPath}/pdm/item/query",
+                       </#if>
+                       toolbar : {
+                    	   id : 'rule_grid_tool',
+                           items : [
+                                    {
+                                    	id : 'rule_grid_add',
+                                        text : '<@spring.message "sys.hand.btn.new"/>',
+                                        disable : true,
+                                        click : function() {
+                                            grid = item_rule_grid;
+                                            f_item_province();
+                                        },
+                                        icon : 'add'
+                                    },
+                                    {
+                                        line : true
+                                    },
+                                    {
+                                    	id : 'rule_grid_del',
+                                        text : '<@spring.message "sys.hand.btn.delete"/>',
+                                        disable : true,
+                                        click : function() {
+                                            Hap.gridDelete({
+                                            	url:"${base.contextPath}/pdm/item/remove",
+                                                grid : item_rule_grid
+                                            })
+                                        },
+                                        icon : 'delete'
+                                    } 
+                                    ]
+                       },
+                       delayLoad:true,
+                       enabledEdit : true,
+                       width : '99%',
+                       height : '60%',
+                       checkbox : true
+        });
+		//赠品
+		window['gift_grid'] = $("#gift_grid").ligerGrid({
+			title : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.gift"/>',
+            columns : [
+                       {
+                           display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>',
+                           name : 'itemNumber',
+                           align : 'left',
+                           width : '150'
+                       },
+                       {
+                           display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+                           name : 'itemName',
+                           align : 'left',
+                           width : '150'
+                       }, 
+                       {
+                           display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.quantity"/>',
+                           name : 'quantity',
+                           align : 'left',
+                           width : '150',
+                           editor : {
+                               type:'int',
+                               sign:false
+                           },
+                           validate: {
+                               required: true
+                           }
+                       } 
+                       ],
+                       <#if isedit == '1'>
+                       url:"${base.contextPath}/pdm/gift/query",
+                       </#if>
+                       toolbar : {
+                           id : 'gift_grid_tool',
+                           items : [
+                                    {
+                                        id : 'gift_grid_add',
+                                        text : '<@spring.message "sys.hand.btn.new"/>',
+                                        disable : true,
+                                        click : function() {
+                                            grid = gift_grid;
+                                            f_item_province();
+                                        },
+                                        icon : 'add'
+                                    },
+                                    {
+                                        line : true
+                                    },
+                                    {
+                                        id : 'gift_grid_del',
+                                        text : '<@spring.message "sys.hand.btn.delete"/>',
+                                        disable : true,
+                                        click : function() {
+                                            Hap.gridDelete({
+                                            	url:"${base.contextPath}/pdm/gift/remove",
+                                                grid : gift_grid
+                                            })
+                                        },
+                                        icon : 'delete'
+                                    } 
+                                    ]
+                       },
+                       delayLoad:true,
+                       enabledEdit : true,
+                       width : '99%',
+                       height : '60%',
+                       checkbox : true,
+                       rownumbers : true
+        });
+		
+        voucher_form.setData({'salesOrgId':salesOrgId});
+	//发放保存按钮
+    window['voucher_btn'] = $('#voucher_btn').ligerForm({
+        buttons : [
+                   {
+                       text : '<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.grant"/>',
+                       id : 'grant_btn',
+                       name : 'grant_btn',
+                       width : 80,
+                       click : function() {
+                    	   voucher();
+                    	   if(liger.get('applyCriteria').getValue() == 'PRODU'){
+                               rule_form.setFieldValidate("useCriteria", {required : false});
+                               rule_form.setFieldValidate("operation", {required : false});
+                               rule_form.setFieldValidate("orderAmount", {required : false});
+                           }
+                    	   var appScope = liger.get('appScope').getValue();
+                           if(Hap.validateForm(voucher_form) && Hap.validateForm(rule_form)){
+                        	   var rule = $.ligerui.get('item_rule_grid').getData();
+                               var discountType = liger.get('discountType').getValue();
+                               var giftgrid = $.ligerui.get('gift_grid').getData();
+                               if(appScope == 'MEM' && $.ligerui.get('member_grid').getData() == ''){
+                                   Hap.showError('<@spring.message "msg.voucher.member.error"/>');
+                               }else if(liger.get('type').getValue() != 'AM' && rule ==''){
+                                   Hap.showError('<@spring.message "msg.voucher.item.error"/>');
+                               }else if(discountType == 'GIFT' && giftgrid ==''){
+                                   Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.gift.error"/>');
+                               }else{
+                            	 //保存前校验数量是否输入正确
+                            	   if(Hap.validateGrid(item_rule_grid) && Hap.validateGrid(gift_grid)){
+                                       $.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.grante.ok"/>', function (isyes) {
+                                           if(isyes){
+                                               $.ajax({
+                                            	   async:false,
+                                            	   type : 'POST',
+                                            	   dataType : "json",
+                                            	   contentType : "application/json",
+                                                   url:"${base.contextPath}/pdm/assign/save",
+                                                   data:JSON2.stringify(voucherFormInfo),
+                                                   success:function(data){
+
+                                                	   if(data.success){
+                                                		   var v = data.rows[0];
+                                                	       voucherId = v.voucherId;
+                                                	       if(v.flag == "Y"){
+                                                	    	   Hap.showError('该优惠券已经发放',
+                                                                       function() {
+                                                                         var tabid = window.top.tab.selectedTabId;
+                                                                         var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                                                         window.top.f_removeTab(tabid);
+                                                                         parent.f_addTab(tabid,tabname,'${base.contextPath}/promotion/pdm_voucher_edit.html?isedit=1&voucherId='+voucherId+'&category=STAND');
+                                                                       },{allowClose : false});
+                                                	       }else{
+                                                	    	   Hap.showSuccess('<@spring.message "msg.info.dm.pickrelease.release.success"/>',
+                                                                       function() {
+                                                                           edit();
+                                                                           liger.get('member_grid_tool').setDisabled('member_grid_import');
+                                                                           voucher_form.setData({'status':'RELD'});
+                                                                           var tabid = window.top.tab.selectedTabId;
+                                                                           var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                                                           window.top.f_removeTab(tabid);
+                                                                           parent.f_addTab(tabid,tabname,'${base.contextPath}/promotion/pdm_voucher_edit.html?isedit=1&voucherId='+voucherId+'&category=STAND');
+                                                                       },{allowClose : false});
+                                                	       }
+                                                           
+                                                	   }else{
+                                                		   
+                                                	   }
+                                                   }
+                                               }) 
+                                           }
+                                       });
+                                   }
+                               }
+                           }
+                       }
+                   }, 
+                   {
+                       text : '<@spring.message "sys.hand.btn.save"/>',
+                       id : 'save_btn',
+                       name : 'save_btn',
+                       disabled : false,
+                       width : 80,
+                       click : function() {
+                    	   voucher();
+                    	   if(liger.get('applyCriteria').getValue() == 'PRODU'){
+                    		   rule_form.setFieldValidate("useCriteria", {required : false});
+                    		   rule_form.setFieldValidate("operation", {required : false});
+                    		   rule_form.setFieldValidate("orderAmount", {required : false});
+                           }
+                    	   var appScope = liger.get('appScope').getValue();
+                    	   if(Hap.validateForm(voucher_form) && Hap.validateForm(rule_form)){
+                    		   var rule = $.ligerui.get('item_rule_grid').getData();
+                    		   var discountType = liger.get('discountType').getValue();
+                    		   var giftgrid = $.ligerui.get('gift_grid').getData();
+                    		   if(liger.get('type').getValue() != 'AM' && rule ==''){
+                    			   Hap.showError('<@spring.message "msg.voucher.item.error"/>');
+                    		   }else if(discountType == 'GIFT' && giftgrid ==''){
+                    			   Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.gift.error"/>');
+                    		   }else{
+                    			   if(Hap.validateGrid(item_rule_grid) && Hap.validateGrid(gift_grid)){
+                    				   if(voucherId != null){
+                    					   voucherFormInfo.voucherId = voucherId;
+                    				   } 
+                                       $.ajax({
+                                    	   type : 'POST',
+                                           dataType : "json",
+                                           contentType : "application/json",
+                                           url:"${base.contextPath}/pdm/voucher/save",
+                                           data:JSON2.stringify(voucherFormInfo),
+                                           success:function(data){
+                                        	   if(data.success){
+                                            	   var v = data.rows[0];
+                                        		   if(v.flag == "Y"){
+                                        			   Hap.showError('该优惠券已经发放',function(){
+                                                           var tabid = window.top.tab.selectedTabId;
+                                                           var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                                           window.top.f_removeTab(tabid);
+                                                           parent.f_addTab(tabid,tabname,"${base.contextPath}/promotion/pdm_voucher_edit.html?isedit=2&category=STAND&voucherId="+voucherId);
+                                                       },{allowClose : false});
+                                        		   }else{
+                                        			   Hap.showSuccess('<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.tip.saveSuccess"/>',
+                                                               function() {
+                                                                   voucherId = v.voucherId;
+                                                                   voucher_form.setData({'voucherId':data.rows[0].voucherId});
+                                                                   var tabid = window.top.tab.selectedTabId;
+                                                                   var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+                                                                   window.top.f_removeTab(tabid);
+                                                                   parent.f_addTab(tabid,tabname,"${base.contextPath}/promotion/pdm_voucher_edit.html?isedit=1&category=STAND&voucherId="+voucherId);
+                                                               },{allowClose : false});
+                                        		   }
+                                               
+                                        	   }else{
+                                        	   }
+                                           }
+                                           
+                                       })
+                                   }
+                               }
+                    	   }
+                       }
+                   } 
+                   ],
+                   enabledEdit : false,
+                   width : '99%',
+                   height : '20%'
+    });
+	
+	// 保存成功后按钮触发.
+	<#if isedit == '2'>
+        $.ajax({
+        	type : 'POST',
+            url : "${base.contextPath}/pdm/voucher/get?voucherId="+${RequestParameters.voucherId},
+            data : {
+                voucherId : voucherId
+            },
+            success:function(data){
+            	$.ligerui.get('voucherCode').setDisabled(false);
+                $.ligerui.get('salesOrgId').setDisabled(false);
+                voucherId = data.rows[0].voucherId;
+                voucher_form.setData({'voucherId':voucherId});
+                $.ligerui.get('enabledFlag').set('value', data.rows[0].enabledFlag);
+                $.ligerui.get('startActiveDate').set('value', data.rows[0].startActiveDate);
+                $.ligerui.get('endActiveDate').set('value', data.rows[0].endActiveDate);
+                $.ligerui.get('description').set('value', data.rows[0].description);
+                $.ligerui.get('quantity').set('value', data.rows[0].quantity);
+                $.ligerui.get('status').set('value', data.rows[0].status);
+                applyCriteria = data.rows[0].applyCriteria;
+                $.ligerui.get('surplus').set('value', data.rows[0].surplus);
+                voucher_form.setData(data.rows[0]);
+                rule_form.setData(data.rows[0]);
+                refreshTable();
+                if(liger.get('status').getValue() == "RELD"){
+                    edit();
+                }
+            }
+        });
+	</#if>
+	
+	
+    <#if isedit == '1' && RequestParameters.voucherId?exists>
+    Hap.ajax({
+        url:"${base.contextPath}/pdm/voucher/get?voucherId="+${RequestParameters.voucherId},
+        success:function(data){
+        	$.ligerui.get('salesOrgId').setDisabled(false);
+            liger.get('voucherCode').setDisabled(true);
+            voucherId = data.rows[0].voucherId;
+            voucher_form.setData({'voucherId':data.rows[0].voucherId});
+            $.ligerui.get('enabledFlag').set('value', data.rows[0].enabledFlag);
+            $.ligerui.get('startActiveDate').set('value', data.rows[0].startActiveDate);
+            $.ligerui.get('endActiveDate').set('value', data.rows[0].endActiveDate);
+            $.ligerui.get('description').set('value', data.rows[0].description);
+            $.ligerui.get('quantity').set('value', data.rows[0].quantity);
+            $.ligerui.get('status').set('value', data.rows[0].status);
+            applyCriteria = data.rows[0].applyCriteria;
+            $.ligerui.get('surplus').set('value', data.rows[0].surplus);
+            voucher_form.setData(data.rows[0]);
+            rule_form.setData(data.rows[0]);
+            refreshTable();
+            if(data.rows[0].status == 'RELD'){
+                edit();
+                liger.get('grant_btn').setDisabled(true);
+                liger.get('member_grid_tool').setDisabled('member_grid_import');
+            }else{
+            	membergrid(data.rows[0].appScope);
+                liger.get('grant_btn').setEnabled(true);
+                if(data.rows[0].appScope == 'SALES'){
+                	liger.get('member_grid_tool').setDisabled('member_grid_import');
+                }else if(data.rows[0].appScope == 'MEM'){
+                	<#if accessService.access("EDITABLE") != false>
+                	liger.get('member_grid_tool').setEnabled('member_grid_import');
+                	</#if>
+                }
+            }
+            if(data.rows[0].discountType != 'GIFT'){
+            	rule_form.setFieldValidate("discountValue", {required : true});
+            }
+        }
+    })
+    </#if>
+
+    <#if accessService.access("EDITABLE") == false>
+    $.ligerui.get("voucher_form").setEditable(false); 
+    $.ligerui.get("member_grid").setEditable(false);   
+    $.ligerui.get("rule_form").setEditable(false);
+    $.ligerui.get("item_rule_grid").setEditable(false);
+    $.ligerui.get("gift_grid").setEditable(false);
+    $.ligerui.get("voucher_btn").setEditable(false);    
+
+    liger.get('member_grid_tool').setDisabled('member_grid_add');
+    liger.get('member_grid_tool').setDisabled('member_grid_del');
+    liger.get('member_grid_tool').setDisabled('member_grid_import');
+    liger.get('rule_grid_tool').setDisabled('rule_grid_add');
+    liger.get('rule_grid_tool').setDisabled('rule_grid_del');
+    liger.get('gift_grid_tool').setDisabled('gift_grid_add');
+    liger.get('gift_grid_tool').setDisabled('gift_grid_del');
+    liger.get('enabledFlag').setDisabled(true);
+    liger.get('grant_btn').setDisabled(true);    
+    liger.get('save_btn').setDisabled(true);
+    </#if> 
+    
+    liger.get('salesOrgId').setText(_salesOrgName);
+	});
+	//使用类型为销售组织时，分配会员表不可编辑
+	function membergrid(data) {
+		if (data == 'SALES') {
+			liger.get('member_grid_tool').setDisabled('member_grid_add');
+			liger.get('member_grid_tool').setDisabled('member_grid_del');
+			liger.get('member_grid_tool').setDisabled('member_grid_import');
+			//member_grid_import
+			member_grid.options.enabledEdit = false;
+		}else{
+			 <#if accessService.access("EDITABLE") != false>
+			liger.get('member_grid_tool').setEnabled('member_grid_add');
+			liger.get('member_grid_tool').setEnabled('member_grid_del');
+			if(voucherId != null){
+				liger.get('member_grid_tool').setEnabled('member_grid_import');
+			}
+			member_grid.options.enabledEdit = true;
+			</#if> 
+		}
+	}
+
+	//分配会员表，新增是弹处的选择框
+	function f_import_province() {
+		var options = ${lovService.getLov(base.contextPath,base.locale, "lov_member")};
+        options.grid.checkbox = true;
+        options.grid.isSingleCheck = false;
+        options.grid.isChecked = m_isChecked; 
+        options.grid.onCheckRow = m_onCheckRow; 
+        options.grid.onCheckAllRow = m_onCheckAllRow;
+//         options.grid.onLoadData = function(){
+//             this.options.isChecked = this.isChecked = m_isChecked;
+//         }
+		options.condition.fields.push({
+			name: 'marketId',
+			type : "text",
+			style : 'display:none',
+			options : {
+				value :_marketId
+			}
+		},{
+			name: 'status',
+            type : "text",
+            style : 'display:none',
+            options : {
+                value :'ACTV'
+            }
+		});
+		var fn = $.ligerui.getPopupFn({
+			onSelect : function(e){
+				f_select_market(e);
+			},
+			condition: options.condition,
+			grid: options.grid,
+			title: options.title,
+			delayLoad : true,
+		});
+		fn();
+	}
+	function f_select_market(e){
+		var selectRows;
+        if(e.data.length == 1){
+            selectRows = e.data;
+        }else{
+            selectRows = checkedCustomerMem;
+        }
+		if(selectRows == null || selectRows == undefined || selectRows.length < 1){
+			Hap.showError('<@spring.message "msg.error.config.country.selectrecord" />');
+		}
+		var gridRows = member_grid.getData();
+		if(gridRows.length > 0){
+			for(var i = 0; i< selectRows.length; i++){
+				var marketCodeSel = selectRows[i].memberCode;
+				for(var j=0;j<gridRows.length;j++){
+					var marketCodeGrid = gridRows[j].memberCode;
+					if(marketCodeSel == marketCodeGrid){
+						Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.member.error"/>');
+						return;
+					}
+				}
+			}
+		}
+		if(e.data.length == 1){
+			member_grid.addRows(e.data);
+// 			member_grid.addRows({
+// 				voucherMemberId : null
+// 			});
+// 			member_grid.loadData(e.data);
+		}else{
+			member_grid.addRows(checkedCustomerMem);
+		}
+		checkedCustomerMem = [];
+	}
+
+	//分配商品表，新增是弹处的选择框
+	function f_item_province() {
+		var options = ${lovService.getLov(base.contextPath,base.locale, "lov_item")};
+		options.grid.delayLoad = false;
+		options.grid.checkbox = true;
+        options.grid.isSingleCheck = false;
+        options.grid.isChecked = f_isChecked; 
+        options.grid.onCheckRow = f_onCheckRow; 
+        options.grid.onCheckAllRow = f_onCheckAllRow;
+        options.grid.onLoadData = function(){
+        	this.options.isChecked = this.isChecked = f_isChecked;
+        }
+		options.condition.fields.push({
+			name: 'salesOrgId',
+			type : "text",
+			style : 'display:none',
+			options : {
+				value:salesOrgId
+			}
+		});
+		var fn = $.ligerui.getPopupFn({
+			onSelect : function(e){
+				f_select_item(e);
+			},
+			condition: options.condition,
+			grid: options.grid,
+			title: options.title,
+			delayLoad : true,
+		});
+		fn();
+	}
+
+	function f_select_item(e){
+		var selectRows;
+		if(e.data.length == 1){
+			selectRows = e.data;
+		}else{
+			selectRows = checkedCustomer;
+		}
+		var gridRows = grid.getData();
+		if(gridRows.length > 0){
+			for(var i = 0; i< selectRows.length; i++){
+				var marketCodeSel = selectRows[i].itemNumber;
+				for(var j=0;j<gridRows.length;j++){
+					var marketCodeGrid = gridRows[j].itemNumber;
+					if(marketCodeSel == marketCodeGrid){
+						Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.item.error"/>');
+						return;
+					}
+				}
+			}
+		}
+		if(e.data.length == 1){
+			grid.addRows(e.data);
+        }else{
+        	grid.addRows(checkedCustomer);
+        }
+		checkedCustomer = [];
+	}
+	   
+	//规则应用条件事件
+	function ruleApplyCrieria(data) {
+		if (data == 'PRODU') {
+			//应用条件为商品
+			liger.get('rule_grid_tool').setEnabled('rule_grid_add');
+			liger.get('rule_grid_tool').setEnabled('rule_grid_del');
+			//使用条件为空不可编辑
+			$.ligerui.get('useCriteria').setReadonly(true);
+            $.ligerui.get('useCriteria').set('value', 'ICLD');
+            rule_form.setFieldValidate("useCriteria", {required : false});
+			//优惠券类型,可编辑
+			$.ligerui.get('type').set('value', 'PD');
+			$.ligerui.get('type').setReadonly(true);
+			//税应用不受限制
+			$.ligerui.get('appTax').setReadonly(false);
+			$.ligerui.get('appTax').set('required', true);
+			//运算不可编辑，且为空
+			rule_form.setFieldValidate("operation", {required : false});
+			$.ligerui.get('operation').set('value', '');
+			$.ligerui.get('operation').setReadonly(true);
+			//使用方式不可叠加usageMode
+			$.ligerui.get('usageMode').set('value', 'NSTAC');
+			$.ligerui.get('usageMode').setReadonly(true);
+			//订单额数不可编辑
+			rule_form.setFieldValidate("orderAmount", {required : false});
+            $.ligerui.get('orderAmount').set('value', '');
+            $.ligerui.get('orderAmount').setReadonly(true);
+		} else {//应用条件为订单
+			<#if accessService.access("EDITABLE") != false>
+			liger.get('member_grid_tool').setEnabled('member_grid_import');
+			</#if>
+			liger.get('rule_grid_tool').setDisabled('rule_grid_add');
+            liger.get('rule_grid_tool').setDisabled('rule_grid_del');
+			//使用条件必输
+			$.ligerui.get('useCriteria').setReadonly(false);
+			rule_form.setFieldValidate("useCriteria", {required : true});
+		    //税应用受限制，且为税前
+		    $.ligerui.get('appTax').setReadonly(true);
+		    $.ligerui.get('appTax').set('value', 'ICLD');
+		    //运算必输字段
+		    rule_form.setFieldValidate("operation", {required : true});
+		    $.ligerui.get('operation').setReadonly(false);
+		    //使用方式不受限制
+		    $.ligerui.get('usageMode').setReadonly(false);
+		    //优惠券类型为金额
+		    $.ligerui.get('type').set('value', 'AM');
+		    $.ligerui.get('type').setReadonly(false);
+		    //选择金额是否删除商品
+            delItem();
+		    //订单额数必输
+		    rule_form.setFieldValidate("orderAmount", {required : true});
+            $.ligerui.get('orderAmount').setReadonly(false);
+            //使用方式
+            $.ligerui.get('usageMode').set('value', 'STACK');
+		}
+	}
+	
+	//加载表格数据
+	function refreshTable(){
+		Hap.gridQuery({
+            form: voucher_form,
+            grid: member_grid
+        })
+        Hap.gridQuery({
+            form: voucher_form,
+            grid: item_rule_grid
+        })
+        Hap.gridQuery({
+            form: voucher_form,
+            grid: gift_grid
+        })
+	}
+	//发放成功不可编辑
+	function edit(){
+        liger.get('voucher_form').setEditable(false);
+        liger.get('rule_form').setEditable(false);
+        member_grid.options.enabledEdit=false;
+        item_rule_grid.options.enabledEdit=false;
+        gift_grid.options.enabledEdit=false;
+        liger.get('voucher_btn').setEditable(false);
+        liger.get('member_grid_tool').setDisabled('member_grid_add');
+        liger.get('member_grid_tool').setDisabled('member_grid_del');
+        liger.get('rule_grid_tool').setDisabled('rule_grid_add');
+        liger.get('rule_grid_tool').setDisabled('rule_grid_del');
+        liger.get('gift_grid_tool').setDisabled('gift_grid_add');
+        liger.get('gift_grid_tool').setDisabled('gift_grid_del');
+        liger.get('enabledFlag').setEnabled(false);
+        liger.get('save_btn').setEnabled(false);
+	}
+	//分配会员表多选
+    function m_onCheckAllRow(checked)
+    {
+        for (var rowid in this.records)
+        {
+            if(checked)
+                addMember(this.records[rowid]);
+            else
+                removeMember(this.records[rowid]);
+        }
+    }
+    
+    function findMember(member)
+    {
+        for(var i =0;i<checkedCustomerMem.length;i++)
+        {
+            if(checkedCustomerMem[i] == member) return i;
+        }
+        return -1;
+    }
+    function addMember(member)
+    {
+        //debugger;
+        if(findMember(member) == -1)
+            checkedCustomerMem.push(member);
+    }
+    function removeMember(member)
+    {
+        var i = findMember(member);
+        if(i==-1) return;
+        checkedCustomerMem.splice(i,1);
+    }
+    function m_isChecked(rowdata)
+    {
+        
+        if (checkedCustomerMem(rowdata) == -1)
+            return false;
+        return true;
+    }
+    function m_onCheckRow(checked, data)
+    {
+    	if (checked) addMember(data);
+        else removeMember(data);
+    }
+	//商品,赠品多选
+    function f_onCheckAllRow(checked)
+    {
+        for (var rowid in this.records)
+        {
+            if(checked)
+                addCheckedCustomer(this.records[rowid]);
+            else
+                removeCheckedCustomer(this.records[rowid]);
+        }
+    }
+    /*
+    该例子实现 表单分页多选
+    即利用onCheckRow将选中的行记忆下来，并利用isChecked将记忆下来的行初始化选中
+    */
+    
+    function findCheckedCustomer(itemNumber)
+    {
+        for(var i =0;i<checkedCustomer.length;i++)
+        {
+            if(checkedCustomer[i] == itemNumber) return i;
+        }
+        return -1;
+    }
+    function addCheckedCustomer(itemNumber)
+    {
+        if(findCheckedCustomer(itemNumber) == -1)
+            checkedCustomer.push(itemNumber);
+    }
+    function removeCheckedCustomer(itemNumber)
+    {
+        var i = findCheckedCustomer(itemNumber);
+        if(i==-1) return;
+        checkedCustomer.splice(i,1);
+    }
+    function f_isChecked(rowdata)
+    {
+        if (findCheckedCustomer(rowdata.itemNumber) == -1)
+            return false;
+        return true;
+    }
+    function f_onCheckRow(checked, data)
+    {
+    	if (checked) addCheckedCustomer(data);
+        else removeCheckedCustomer(data);
+    }
+
+    //优惠券信息，用于保存和发放
+    function voucher(){
+        if ($.ligerui.get('voucher_form') != undefined || $.ligerui.get('voucher_form') != null) {
+        	voucherFormInfo = $.ligerui.get('voucher_form').getData();
+        }
+        if ($.ligerui.get('member_grid') != undefined || $.ligerui.get('member_grid') != null) {
+            voucherFormInfo.pdmVoucherMembers = $.ligerui.get('member_grid').getData();
+        }
+        if ($.ligerui.get('rule_form') != undefined || $.ligerui.get('rule_form') != null) {
+        	ruleFormInfo = $.ligerui.get('rule_form').getData();
+            voucherFormInfo.applyCriteria = ruleFormInfo.applyCriteria;
+            voucherFormInfo.type = ruleFormInfo.type;
+            voucherFormInfo.appTax = ruleFormInfo.appTax;
+            voucherFormInfo.operation = ruleFormInfo.operation;
+            voucherFormInfo.orderAmount = ruleFormInfo.orderAmount;
+            voucherFormInfo.useCriteria = ruleFormInfo.useCriteria;
+            voucherFormInfo.usageMode = ruleFormInfo.usageMode;
+            voucherFormInfo.discountType = ruleFormInfo.discountType;
+            voucherFormInfo.discountValue = ruleFormInfo.discountValue;
+        }
+        if ($.ligerui.get('item_rule_grid') != undefined || $.ligerui.get('item_rule_grid') != null) {
+            voucherFormInfo.pdmVoucherItems = $.ligerui.get('item_rule_grid').getData();
+        }
+        if ($.ligerui.get('gift_grid') != undefined || $.ligerui.get('gift_grid') != null) {
+            voucherFormInfo.pdmVoucherGifts = $.ligerui.get('gift_grid').getData();
+        }
+    }
+    //删除商品提示
+    function delItem(){
+    	var items = $.ligerui.get('item_rule_grid').getData();
+        if (items != '') {
+            $.ligerDialog.confirm('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.item"/>', function (isyes) {
+                if(isyes){
+                    Hap.ajax({
+                        url:"${base.contextPath}/pdm/item/remove",
+                        data:items,
+                        success:function(data){
+                            Hap.showSuccess('<@spring.message "msg.info.sys.delete_successful"/>',
+                            function() {
+                                Hap.gridQuery({
+                                    form : voucher_form,
+                                    grid : item_rule_grid
+                                });
+                            });
+                        }
+                        
+                    })
+                }else{
+                    $.ligerui.get('type').set('value', 'NM');
+                    return;
+                }
+            })
+        }
+    }
+    //删除赠品提示
+    function degift(){
+    	var gifts = voucherGift = $.ligerui.get('gift_grid').getData();
+        if (gifts != '') {
+            $.ligerDialog.confirm('<@spring.message "type.voucher.discounttype.error"/>', function (isyes) {
+            	if(isyes){
+            		Hap.ajax({
+                        url:"${base.contextPath}/pdm/gift/remove",
+                        data:gifts,
+                        success:function(data){
+                            Hap.showSuccess('<@spring.message "msg.info.sys.delete_successful"/>',
+                            function() {
+                                Hap.gridQuery({
+                                    form : voucher_form,
+                                    grid : gift_grid
+                                });
+                            });
+                        }
+                    })
+            	}else{
+            		$.ligerui.get('discountType').set('value', 'GIFT');
+            		return;
+            	}
+            })
+        }
+    }
+	</script>
+</body>

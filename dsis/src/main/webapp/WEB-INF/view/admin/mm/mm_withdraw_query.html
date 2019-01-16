@@ -1,0 +1,580 @@
+<#--
+ * description: 会员冲销节余界面
+ * version: 1.0
+ * author: shenqb
+ * .
+ *
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+	<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+    <script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+	<form id="withdraw_query_form" ></form>  
+
+    <div id="withdraw_grid" style="margin: 0; padding: 0"></div>
+    
+    <script type="text/javascript">
+    var data_year_from = [];
+    var start_year = '1990';
+    /* Mclin修改 */
+    var mydate = new Date(${.now?long});
+    //var mydate = new Date();
+    var selected_from_date = '';
+    var data_year_to = [];
+    var currency_year = mydate.getFullYear();
+    for(var i = start_year;i<=currency_year;i++){
+    	data_year_from.push(get_year(i));
+    }
+    if(selected_from_date==''){
+    	data_year_to=data_year_from;
+    }
+    
+    function get_year(year){
+    	var o = {};
+    	o.id = year;
+    	o.text = year;
+    	return o;
+    }
+    
+   
+    
+    function setToYear(value){
+    	selected_from_date = $("input[ligeruiid='YearFrom']").val();
+    	data_year_to = [];
+		for(var i = selected_from_date;i<=currency_year;i++){
+	    	data_year_to.push(get_year(i));
+	    }
+		liger.get('YearTo').clear();
+		liger.get('YearTo').set('data',data_year_to);
+		
+    }
+    
+    function compare(value){
+    	if(value<selected_from_date){
+    		
+    		liger.get('YearTo').clear();
+    		liger.get('YearTo').set('data',data_year_to);
+    		liger.get('YearTo').clear();
+    	}
+    }
+    
+    function create_member(){
+    	window.location.href = 'mm_member_details.html';
+    }
+    
+    function send_msg(){}
+    
+    function f_onCheckAllRow(checked)
+    {
+        for (var rowid in this.records)
+        {
+            if(checked)
+                addCheckedCustomer(this.records[rowid]['memberId']);
+            else
+                removeCheckedCustomer(this.records[rowid]['memberId']);
+        }
+    }
+
+    /*
+    该例子实现 表单分页多选
+    即利用onCheckRow将选中的行记忆下来，并利用isChecked将记忆下来的行初始化选中
+    */
+    var checkedCustomer = [];
+    function findCheckedCustomer(memberId)
+    {
+        for(var i =0;i<checkedCustomer.length;i++)
+        {
+            if(checkedCustomer[i] == memberId) return i;
+        }
+        return -1;
+    }
+    function addCheckedCustomer(memberId)
+    {
+        if(findCheckedCustomer(memberId) == -1)
+            checkedCustomer.push(memberId);
+    }
+    function removeCheckedCustomer(memberId)
+    {
+        var i = findCheckedCustomer(memberId);
+        if(i==-1) return;
+        checkedCustomer.splice(i,1);
+    }
+    function f_isChecked(rowdata)
+    {
+        if (findCheckedCustomer(rowdata.memberId) == -1)
+            return false;
+        return true;
+    }
+    function f_onCheckRow(checked, data)
+    {
+        if (checked) addCheckedCustomer(data.memberId);
+        else removeCheckedCustomer(data.memberId);
+    }
+   
+    function mm_withdraw_query(){
+    
+    }
+    
+  //由会员详情页申请自动弹出冲销窗口
+    <#assign memberId = (RequestParameters.memberId ! ) />
+    <#assign memberCode = (RequestParameters.memberCode ! ) />
+    <#if memberId != '' && memberCode != ''>
+    	applyWithdraw(${RequestParameters.memberId});
+    	withdraw_apply_form.setData({
+    		memberCode:${RequestParameters.memberCode},memberId:${RequestParameters.memberId}
+    	})
+    	getBalanceByMemberId(${RequestParameters.memberId});
+    </#if>
+    
+    var withdraw_apply_dialog;
+    function applyWithdraw(memberId_req){
+
+		initApplyForm(memberId_req);
+    	withdraw_apply_dialog = $.ligerDialog.open({
+			target: $("#withdraw_apply_form"),
+			width: 750,
+			isResize:true,
+			isHidden:false,
+			buttons: [{
+				text: '<@spring.message "sys.hand.btn.ok"/>', 
+				onclick: function (item, dialog) {
+					var datas = withdraw_apply_form.getData();
+					var url = '${base.contextPath}/mm/withdraw/insertWithdraw?remainingBalance='+datas.remainingBalance;
+					/*Mclin 修改*/
+					if(!Hap.validateForm(withdraw_apply_form)){
+						return;
+					}
+					/* var is_empty = false;
+			       	for(var data in datas){
+			       		if(datas[data] == '' || datas[data] == null){
+			       			is_empty = true;
+			       			break;
+			       		}
+			       	}
+			       	if(is_empty){
+			       		$.ligerDialog.warn('<@spring.message "msg.warn.member.withdraw.fill_full"/>');
+			       		//$(".l-dialog-btn-inner").eq(1).parent().css({'pointer-events':'none','background':'#BBBBBB'})
+			       	}else{ */
+			       		$(".l-dialog-btn-inner").last().parent().css({'pointer-events':'','background':'white'})
+			       		$.ajax({
+			       			url: url,
+			       			type:"POST",
+			       			dataType:"json",
+			       			contentType : "application/json",
+			                   data : JSON2.stringify(datas),//'{"memberId":1,"remainingBalance":"1"}',
+			                   success : function(json) {
+			                   	options = {};
+			                       options.json = json;
+			                       options.successTip = json.message;
+			                       if(json.rows[0]=="noActive"){
+			                    	   $.ligerDialog.error('<@spring.message "msg.error.member.invalid_member"/>');
+			                       }else if(json.rows[0]=="noBalance"){
+			                    	   $.ligerDialog.error('<@spring.message "msg.error.member.no_balance"/>');
+			                       }else{
+			                    	   $.ligerDialog.confirm('<@spring.message "msg.warning.member.confirm_withdraw"/>', function (yes) {
+			                    		   if(yes){
+			                    			   url = '${base.contextPath}/mm/withdraw/insertWithdraw?remainingBalance='+datas.remainingBalance+'&isConfirm=true';
+			                    			   $.ajax({
+			                    	       			url: url,
+			                    	       			type:"POST",
+			                    	       			dataType:"json",
+			                    	       			contentType : "application/json",
+			                    	                   data : JSON2.stringify(datas),//'{"memberId":1,"remainingBalance":"1"}',
+			                    	                   success : function(json) {
+			                    	                	   if(json.rows[0]=="success"){
+			                    	                           //Hap.defaultSuccessHandler(options)
+			                    	                          
+			                    	                        	   $.ligerDialog.success('<@spring.message "msg.info.member.withdraw_success"/>',function(){
+			                    	                        		   
+			                    	                        		   withdraw_apply_dialog.close();
+			                    	                        		   
+			                    	                        	   });
+			                    	                           		withdraw_grid.reload();
+			                    	                        		//$(".l-bar-button.l-bar-btnload",window.parent.document).click();  
+			                    	                        		// setTimeout($.ligerDialog.close(),2000);
+			                    	                        		//$('.l-window-mask').css({'display':'none'});
+			                    	                        		 
+			                    	                           }
+			                    	                   }
+			                    	                   })
+			                    		   }
+			                    	   });
+			                       }
+			                       if(json.success){
+			                       	$(".l-bar-button.l-bar-btnload",window.parent.document).click();  
+			                       }
+			                   },
+			                   error : function() {
+			                       $.ligerDialog.close();
+			                   }
+			       		})//ajax   
+					/* }//else */
+				}//onclick
+      	 	},//text
+      	 { text: '<@spring.message "sys.hand.btn.cancel"/>', onclick: function (item, dialog) {dialog.close();/* $('body').append('<div id="withdraw_apply_form" style="margin:3px; ">');initApplyForm(); */ }}
+      	 ]//button
+    })//open
+    $('.l-dialog-title').text('<@spring.message "msg.info.member.withdraw.title"/>'); //设置标题
+    }//function 
+    
+    function getBalanceByMemberId(val){
+    	var o = {};
+    	o.memberId = val;
+    	//withdraw_apply_form.getEditor('memberId').val(val);
+    			$.ajax({
+			url: '${base.contextPath}/mm/withdraw/getBalanceByMemberId',
+			type:"GET",
+			dataType:"json",
+			contentType : "application/json",
+            data : o,
+            success : function(json) {
+                if(json.success){
+                	if(json.rows.length==0){
+                		withdraw_apply_form.getEditor('remainingBalance').setValue('')
+                	}else{
+                		withdraw_apply_form.getEditor('remainingBalance').setValue(json.rows[0])
+                	}
+                	
+                }
+            },
+            error : function() {
+            	$.ligerDialog.error('<@spring.message "msg.error.member.withdraw.error_to_get_remainging_account"/>') 
+            }
+		})
+    }
+    
+    function getBalanceByMemberCode(val){
+    	var o = {};
+    	o.memberCode = val;
+    	o.marketId = liger.get('marketId').getValue();
+    			$.ajax({
+			url: '${base.contextPath}/mm/member/getMemberIdByCode',
+			type:"GET",
+			dataType:"json",
+			contentType : "application/json",
+            data : o,
+            success : function(json) {
+                if(json.success){
+                	if(json.rows.length > 0){
+                		getBalanceByMemberId(json.rows[0].memberId);
+                	}
+                	
+                }
+            },
+            error : function() {
+            	//$.ligerDialog.error("获取账户余额失败") 
+            }
+		})
+    }
+    
+    $('[ligeruiid="memberCode"]').eq(1).on('onfocus',function(){
+    	
+    })
+    $('[ligeruiid="memberCode"]').eq(1).on('focus',function(){
+    	
+    })
+    
+    function test(){
+    	
+    }
+    function test2(){
+    	
+    }function test3(){
+    	
+    }
+    
+    function toDetailsHtml(data){
+    	//window.parent.f_addTab(null,"会员详情","mm/mm_member_edit.html?isedit=1&memberId="+data);
+    	window.top.f_removeTab("MEMBER_DETAIL");
+		window.top.f_addTab("MEMBER_DETAIL", '<@spring.message "type.com.lkkhpg.dsis.common.member.memberdetail"/>', "mm/mm_member_edit.html?isedit=1&memberId="+data);
+    }
+   
+    
+    function initApplyForm(memberId_req){
+		window['withdraw_apply_form'] = $('<form id="withdraw_apply_form" style="margin:3px; display:none;"></form>').appendTo('body').ligerForm({
+			fields: [
+    
+   	  {
+        display : "<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>",
+        name : "memberCode",
+        type : "popup",
+        newline : false,
+        textField:'memberCode',
+        readonly:false,
+        options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+        	onLoadData: function(){
+                 this.setParm('marketId', liger.get('marketId').selectedValue)
+             } ,
+        	onSelected:function(obj){
+            	getBalanceByMemberId(obj.value);
+            },
+            onChangeValue:function(obj){
+            	getBalanceByMemberCode(obj);
+            	
+            }
+        },{parms:{"marketId":(liger.get('marketId')===undefined?memberId_req:liger.get('marketId')).selectedValue}}),
+        validate: {
+        	required: true
+        }
+    }, 
+    
+		    { 
+				type: 'hidden', name: 'memberId', label:'memberId', newline:false, 
+				
+			}, 
+    
+			{ 
+				type: 'text', name: 'remainingBalance', label:'remaining balance', newline:false, readonly:true
+				
+			}, 
+			{ 
+				type: 'text', name: 'amount',rightToken:' ', label:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.amount"/>', newline:true,
+				validate : {
+					required: true,
+					//digits : true
+					lrunlv: true
+					}
+				/* style : 'margin-top:20px;margin-left:20px' */
+			},
+			{ 
+				type: 'text', name: 'remark', label:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.remarks"/>', newline:false,
+				/* style : 'margin-top:20px;margin-left:20px' */
+				validate: {
+					required: true
+				}
+			},
+			         ],
+			         
+			        	 onAfterSetFields:function(){
+			        		 $(".l-dialog-btn-inner").last().parent().css({'pointer-events':'none','background':'#BBBBBB'})
+			        		
+			        	 }
+			             
+		})
+	
+		}
+    
+    var markets = [];
+    function queryMarkets(){
+    	$.ajax({
+ 			url: '${base.contextPath}/spm/market/queryMarketsByRole',
+ 			type:"POST",
+ 			dataType:"json",
+ 			contentType : "application/json",
+             data : '',
+             async: false,
+             success : function(json) {
+                 if(json.success){
+                	 $(json.rows).each(function(i,o){
+                		 markets.push({"id":o.marketId,"text":o.name})
+                	 })
+                 }
+             },
+             error : function() {
+             }
+ 		})
+    	 
+    }
+    
+    var openTime = 1;
+    <#assign marketId = (RequestParameters._marketId ! ) />
+    <#if marketId != ''>
+	currentMarket = ${RequestParameters._marketId};
+	</#if>
+	<#if marketId == ''>
+	currentMarket = _marketId;
+	</#if>
+    
+    	$(function(){
+    		queryMarkets();
+  
+    		window['withdraw_query_form'] = $("#withdraw_query_form").ligerForm({
+                fields: [
+					{ type: 'combobox', label: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>', newline:false, name: 'marketId',valueField : 'text',
+						options : {
+					    	value: currentMarket,
+							data:markets,
+							onSelected:function(o){
+								if(openTime == 1){
+									$.ligerDialog.confirm('<@spring.message "dsis.lkkhpg.tip.refresh_page"/>',$l('sys.hand.tip.info'),
+					                          function(yes) {
+					                              if(yes){
+					                            	  	var tabid = window.top.tab.selectedTabId;
+						              			    	var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+						              			    	window.top.f_removeTab(tabid);
+						              					window.top.f_addTab(tabid, tabname, "mm/mm_withdraw_query.html?_marketId="+o);
+					                              }else{
+					                            	  	openTime = openTime + 1;
+					                            		liger.get('marketId').setValue(currentMarket);
+					                              }
+					                          });
+								}else{
+									openTime = 1;
+								}
+									
+							}
+					    },
+					    
+					    validate : {
+					    	required: true
+							}
+					},
+					 {
+					    display : "<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>",
+					    name : "memberId",
+					    type : "popup",
+					    newline : false,
+					    textField:'memberCode',
+					    readonly:false,
+					    options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+			                 onLoadData: function(){
+			                    this.setParm('marketId', liger.get('marketId').selectedValue)
+			                } 
+			            })
+					}, 
+					
+                    
+                    { 
+                    	type: 'date', name: 'periodFrom', label:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.periodfrom"/>', newline:true,  id : 'periodFrom',
+                    	
+                    	options:{format: "yyyy-MM"}
+					},{ 							
+						type: 'date', label:'<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.periodto"/>',name: 'periodTo',
+						
+						newline:false, rightToken : ' ',
+						options:{format: "yyyy-MM"}
+						
+					}
+                ], buttons: [
+                    { text: '<@spring.message "sys.hand.btn.query"/>', disabled:false, width: 60, 
+                    	click: function(){
+                    	var datas = withdraw_query_form.getData();
+                    		/*Mclin 修改*/
+                    		if(withdraw_query_form.getData().periodFrom != null && withdraw_query_form.getData().periodFrom != ""){
+                    		//if(!(JSON.stringify(withdraw_query_form.getData().periodFrom)=="null")){
+                    			withdraw_query_form.setData({ 
+                        			periodFrom: JSON.stringify(withdraw_query_form.getData().periodFrom).substring(1,8)
+                                });
+                        	}
+                    		/*Mclin 修改*/
+                    		if(withdraw_query_form.getData().periodTo != null && withdraw_query_form.getData().periodTo != ""){
+                    		//if(!(JSON.stringify(withdraw_query_form.getData().periodTo)=="null")){
+                    			withdraw_query_form.setData({ 
+                    				periodTo: JSON.stringify(withdraw_query_form.getData().periodTo).substring(1,8)
+                                });
+                        	}
+                    		
+                        Hap.gridQuery({
+                            form:withdraw_query_form,
+                            grid:withdraw_grid
+                        })
+                        
+                    }}, { text: '<@spring.message "sys.hand.btn.apply"/>', disabled:false, width: 60, 
+                    	   <#if accessService.access("WD_APPLY_ENABLE") == false>
+                               disabled:true,
+                           </#if>
+                    	click: applyWithdraw
+                     }
+                    ]
+              
+                   	 
+            });
+    		$.extend(liger.get('memberId').options,{parms:{"marketId":liger.get('marketId').selectedValue}})
+    		
+            window['withdraw_grid'] = $("#withdraw_grid").ligerGrid({
+                unSetValidateAttr:false,
+                columns: [{ 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.withdrawid"/>',
+                	name: 'withdrawId', align: 'middle', width: 110
+                  }, 
+                           { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+                	name: 'memberCode', align: 'middle', width: 110,
+                	isAllowHide: false,
+                     render: function (item)
+                    {
+                    	var data = item.memberId;
+                    	var html = '<a href="javascript:toDetailsHtml('+data+')">'+ item.memberCode +'</a>';
+                        return html;
+                    }, 
+    				editor : {
+    					type : 'text'
+    				}
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.membername"/>',
+                	name: 'memberName', align: 'left', width: 110
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongcompany"/>',
+                	name: 'refCompany', align: 'left', width: 100
+                  },{ 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+                	name: 'marketBelong', align: 'left', width: 100
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.period"/>',
+                	name: 'periodName', align: 'middle', width: 100
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.writeofftype"/>',
+                	name: 'writeoffType', align: 'middle', width: 110 
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.adjustmenttype"/>',
+                	name: 'adjustmentType', align: 'middle', width: 110 
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.amount"/>',
+                	name: 'amount', align: 'left', width: 100 
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.status"/>',
+                	name: 'status', align: 'middle', width: 100 
+                  }, { 
+                	display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memwithdraw.remarks"/>',
+                	name: 'remark', align: 'left', width: 130 
+                  }
+                ], 
+                url:'${base.contextPath}/mm/withdraw/queryByParams',
+                enabledEdit: false,
+                //usePager:true,
+                delayLoad:true,
+                width: '99%', 
+                height: '98%', 
+                rownumbers: true,
+                pageSizeOptions:[10,20],
+                pageSize:'10' ,
+                checkbox:true,
+                isChecked: f_isChecked, onCheckRow: f_onCheckRow, onCheckAllRow: f_onCheckAllRow,
+                toolbar: { 
+                    items: [
+                        {                   
+                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                            icon: 'save',
+                            menu:{ width: 120, items:
+                                    [
+                                        {                   
+                                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                            click:   function (){exportSelected("withdraw_query_form","withdraw_grid",{},_basePath);}
+                                        },
+                                        { line: true },
+                                        {                   
+                                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                            click: function (){exportAll("withdraw_query_form","withdraw_grid",{},_basePath);}
+                                            
+                                        }
+                                  ]
+                            }                        
+                        }
+                    ]
+                }
+            }); 
+    	
+    	});//$function
+    	
+    	jQuery.validator.addMethod("maxNum", function(value, element) {  
+    	    var tel = withdraw_apply_form.getData().amount;
+    	    return this.optional(element) || (tel<=value);  
+    	}, '<@spring.message "msg.error.member.withdraw.withdraw_account_no_more_than_remaining_account"/>'); 
+    	
+    	
+    	jQuery.validator.addMethod("lrunlv", function(value, element) {         
+    	    return this.optional(element) || /^\d+(\.\d{1,2})?$/.test(value);         
+    	}, '<@spring.message "msg.error.member.withdraw.withdraw_decimal_places_validate"/>'); 
+    </script>
+</body>
+</html>

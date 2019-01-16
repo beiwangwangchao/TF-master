@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright LKK Health Products Group Limited
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.platform.mapper.system.LovMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.platform.dto.system.Lov">
+        <id column="LOV_ID" property="lovId" jdbcType="DECIMAL" />
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+        <result column="SQL_ID" property="sqlId" jdbcType="VARCHAR" />
+        <result column="VALUE_FIELD" property="valueField" jdbcType="VARCHAR" />
+        <result column="TEXT_FIELD" property="textField" jdbcType="VARCHAR" />
+        <result column="TITLE" property="title" jdbcType="VARCHAR" />
+        <result column="WIDTH" property="width" jdbcType="SMALLINT" />
+        <result column="HEIGHT" property="height" jdbcType="SMALLINT" />
+        <result column="CODE" property="code" jdbcType="VARCHAR" />
+        <result column="PLACEHOLDER" property="placeholder" jdbcType="VARCHAR" />
+        <result column="DELAY_LOAD" property="delayLoad" jdbcType="VARCHAR"/>
+        <result column="EDITABLE" property="editable" jdbcType="VARCHAR"/>
+        <result column="CAN_POPUP" property="canPopup" jdbcType="VARCHAR"/>
+        <result column="NEED_QUERY_PARAM" property="needQueryParam" jdbcType="VARCHAR"/>
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="SORT_NAME" property="sortName" jdbcType="VARCHAR"/>
+        <result column="SORT_ORDER" property="sortOrder" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        LOV_ID, DESCRIPTION, SQL_ID, VALUE_FIELD, TEXT_FIELD, TITLE, WIDTH, HEIGHT, CODE, PLACEHOLDER,DELAY_LOAD,CAN_POPUP,EDITABLE,NEED_QUERY_PARAM, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE,SORT_NAME,SORT_ORDER
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM SYS_LOV
+        WHERE LOV_ID = #{lovId,jdbcType=DECIMAL}
+    </select>
+    <select id="selectLovs" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.platform.dto.system.Lov">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM SYS_LOV
+        <where>
+            <if test="code != null">
+                CODE LIKE concat('%', concat(#{code, jdbcType=VARCHAR}, '%'))
+            </if>
+            <if test="description != null">
+                AND DESCRIPTION LIKE concat('%', concat(#{description, jdbcType=VARCHAR}, '%')) 
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM SYS_LOV
+    </select>
+
+    <select id="selectByCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM SYS_LOV
+        WHERE CODE = #{code,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM SYS_LOV
+        WHERE LOV_ID = #{lovId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.platform.dto.system.Lov" >
+        <selectKey keyProperty="lovId" order="BEFORE" resultType="long">
+            select sys_lov_s.nextval from dual
+        </selectKey>
+        INSERT INTO SYS_LOV (LOV_ID,DESCRIPTION, SQL_ID,
+        VALUE_FIELD, TEXT_FIELD, TITLE,
+        WIDTH, HEIGHT, CODE, PLACEHOLDER, DELAY_LOAD,CAN_POPUP,EDITABLE, NEED_QUERY_PARAM, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE,SORT_NAME,SORT_ORDER
+        )
+        VALUES (#{lovId,jdbcType=DECIMAL},#{description,jdbcType=VARCHAR}, #{sqlId,jdbcType=VARCHAR},
+        #{valueField,jdbcType=VARCHAR}, #{textField,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR},
+        #{width,jdbcType=SMALLINT}, #{height,jdbcType=SMALLINT}, #{code,jdbcType=VARCHAR}, #{placeholder,jdbcType=VARCHAR}, 
+        #{delayLoad,jdbcType=VARCHAR},#{canPopup,jdbcType=VARCHAR},#{editable,jdbcType=VARCHAR}, #{needQueryParam,jdbcType=VARCHAR}, CURRENT_TIMESTAMP, #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP,#{sortName,jdbcType=VARCHAR},#{sortOrder,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.platform.dto.system.Lov">
+        UPDATE SYS_LOV
+        SET DESCRIPTION = #{description,jdbcType=VARCHAR},
+        SQL_ID = #{sqlId,jdbcType=VARCHAR},
+        VALUE_FIELD = #{valueField,jdbcType=VARCHAR},
+        TEXT_FIELD = #{textField,jdbcType=VARCHAR},
+        TITLE = #{title,jdbcType=VARCHAR},
+        WIDTH = #{width,jdbcType=SMALLINT},
+        HEIGHT = #{height,jdbcType=SMALLINT},
+        CODE = #{code,jdbcType=VARCHAR},
+        PLACEHOLDER = #{placeholder,jdbcType=VARCHAR},        
+        DELAY_LOAD = #{delayLoad,jdbcType=VARCHAR},
+        CAN_POPUP = #{canPopup,jdbcType=VARCHAR},
+        EDITABLE = #{editable,jdbcType=VARCHAR},
+        NEED_QUERY_PARAM = #{needQueryParam,jdbcType=VARCHAR},
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+        SORT_NAME = #{sortName,jdbcType=VARCHAR},
+        SORT_ORDER = #{sortOrder,jdbcType=VARCHAR}
+        WHERE LOV_ID = #{lovId,jdbcType=DECIMAL}
+    </update>
+</mapper>

@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css" >
+/*横向*/
+@page {
+    size:A4 portrait;
+    mso-page-orientation:portrait;
+    mso-header-margin:42.55pt;
+    mso-footer-margin:49.6pt;
+    mso-paper-source:0;
+    layout-grid:15.6pt;
+    margin-top:50px;
+    
+    /*页码*/
+    @bottom-right {
+        content:"Page "counter(page)" of "counter(pages);
+        padding-right: 0mm;
+        padding-bottom: 5mm;
+        font-size: 8pt;
+    }
+     /*页码*/
+    @top-right {
+        content:"Page "counter(page)" of "counter(pages);
+        padding-right: 0mm;
+        padding-top: 135mm;
+        font-size: 8pt;
+    }
+    /*@top-left {
+        content: element(pageHeader);
+    }*/
+}
+body {
+  font-family:'SimSun';
+  font-size: 13px;
+}
+td{
+    height:13px;
+}
+.bottom_line {
+    border-bottom: 1px solid #000000;
+}
+.top_line {
+    border-top: 1px solid #000000;
+}
+.font_bold {
+    font-weight: bold;
+}
+.word{  
+  overflow:hidden; 
+  text-overflow:ellipsis;  
+  white-space: nowrap;
+} 
+</style>
+</head>
+<body class=""> 
+    <#list lines as ln>
+        <#if ln_index != lines?size -1>
+        <div style="width:100%;page-break-after:always">
+        <#else>
+        <div style="width:100%;page-break-after:avoid;">
+        </#if>
+        <table width="100%">
+            <tr>
+                <td style="vertical-align:top;height:157mm">
+                    <div style="height:50%;width:100%;float:left;">
+                    <div style="width:100%;text-align:center;"><h3>Sales Receipt<h3></div>
+                    <div style="width:100%;float:left;padding-left:0px;margin-top:-20px;">
+                        <table border="0" cellspacing="0">
+                            <tr>
+                                <td style="text-align:left;width:5%;white-space:nowrap;">Distributor Name:</td>
+                                <td style="width:350px;">${head.memberName!}</td>
+                                <td style="text-align:left;white-space:nowrap;width:5%;">Receipt No.:</td>
+                                <td style="text-align:left;">${head.invoiceNumber!}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left;white-space:nowrap;">Distributor No:</td>
+                                <td>${head.memberCode!}</td>
+                                <td style="text-align:left;white-space:nowrap;">Date:</td>
+                                <td style="text-align:left;">${head.payDate?string("yyyy/MM/dd")}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left;white-space:nowrap;width:5%;" valign="top">Remark:</td>
+                                <td style="word-break:break-all;text-align:left;" colspan="3"><div style="word-wrap:break-word;word-break:break-all;width:550px;">${head.remark!}</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="margin-top:0px;width:100%;float:left;height:73mm;">
+                        <table width="100%" style="border-collapse:collapse;table-layout:fixed;" >
+                            <tr>
+                                <td class="bottom_line" style="text-align:left;width:18mm;" valign="bottom">Code No.</td>
+                                <td class="bottom_line" style="text-align:left;" valign="bottom">Description</td>
+                                <td class="bottom_line" style="text-align:right;width:10mm;" valign="bottom">PV</td>
+                                <td class="bottom_line" style="text-align:right;width:10mm" valign="bottom">Qty</td>
+                                <td class="bottom_line" style="text-align:right;width:20mm;" valign="bottom">Dist.Price</td>
+                                <td class="bottom_line" style="text-align:right;width:20mm;" valign="bottom">Amount</td>
+                                <td class="bottom_line" style="text-align:right;width:15mm;" valign="bottom">Total PV</td>
+                            </tr>
+                            <#list ln as line>
+                            <tr>
+                                <td style="text-align:left;">${line.itemNumber!}</td>
+                                <td style="text-align:left;" class="word">${line.itemName!}</td>
+                                <td style="text-align:right;">${line.pv!}</td>
+                                <td style="text-align:right;">${line.quantity!}</td>
+                                <td style="text-align:right;">${line.unitSellingPrice?string(',##0.00')}</td>
+                                <td style="text-align:right;">${line.amount?string(',##0.00')}</td>
+                                <td style="text-align:right;">#{line.pv * line.quantity}</td>
+                            </tr>
+                            </#list>
+                        </table>
+                    </div>
+                    <div style="width:100%;float:left;">
+                        <#if ln_index != lines?size -1>
+                            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                                <tr>
+                                    <td class="top_line" style="text-align:left;width:1.25in;"></td>
+                                    <td class="top_line" style="text-align: left;" colspan="3"></td>
+                                    <td class="top_line" style="text-align:right;width:0.75in;"></td>
+                                    <td class="top_line" style="text-align:right;width:0.75in;white-space:nowrap;"></td>
+                                    <td class="top_line" style="text-align:right;width:0.75in;"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" rowspan="4" >
+                                        The above products are received in good condition<br>
+                                        Distributor Signature: ________________________________________________
+                                    </td>
+                                    <td></td>
+                                    <td style="text-align: left;"></td>
+                                    <td style="text-align: right;"></td>
+                                </tr>
+                                <tr>
+                                    
+                                    <td style="text-align: left;border-left:1px " valign="top"></td>
+                                    <td style="text-align: right;border-top:1px "></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        <#else>
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td class="top_line" style="text-align:left;width:15mm;" valign="top">Payment:</td>
+                                    <td class="top_line" style="text-align: left;" colspan="3" valign="top"><#list paymentMethed as orderPayment>${orderPayment.paymentMethod!} ${orderPayment.paymethodAmtSum?string(',##0.00')!} </#list></td>
+                                    <td colspan="3" rowspan="2" class="top_line" valign="top">
+                                        <table width="100%" style="border-collapse:collapse;" class="tbword">
+                                        <#if salesVouchers != 0>
+                                            <tr>
+                                                <td style="text-align:right;width:55%;white-space:nowrap;" valign="top">Discount Amount:</td>
+                                                <td style="text-align:right;width:25%;" valign="top">${salesVouchers?string(',##0.00')!}</td>
+                                                <td style="text-align:right;width:20%;"></td>
+                                            </tr>
+                                        </#if>
+                                        <#if salesAdjustment != 0>
+                                            <tr>
+                                                <td style="text-align: right;width:50%;" valign="top">Adjustment:</td>
+                                                <td style="text-align: right;width:30%;" valign="top">${salesAdjustment?string(',##0.00')!}</td>
+                                                <td style="text-align: right;width:20%;"></td>
+                                            </tr>
+                                            </#if>
+                                            <#if SalesLogistics??>
+                                            <tr>
+                                                <td style="text-align: right;width:50%; " valign="top">Shipping Fee:</td>
+                                                <td style="text-align: right;width:30%;" valign="top">${SalesLogistics.shippingFee?string(',##0.00')!}</td>
+                                                <td style="text-align: right;width:20%;"></td>
+                                            </tr>
+                                            </#if>
+                                            <tr>
+                                                <td style="text-align: right;width:50%;white-space:nowrap;" valign="top">Total:</td>
+                                                <td style="text-align: right;width:30%;" valign="top">${totalAmount?string(',##0.00')!}</td>
+                                                <td style="text-align: right;width:20%;" valign="top">${totalPV!}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        The above products are received in good condition<br>
+                                        Accounts Signature: ________________________________________________
+                                    </td>  
+                                </tr>
+                            </table>
+                        </#if>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="width:100%;text-align:center;"><h3>Sales Receipt<h3></div>
+                    <div style="width:100%;float:left;padding-left:0px;margin-top:-20px;">
+                        <table border="0" cellspacing="0">
+                            <tr>
+                                <td style="text-align:left;width:5%;white-space:nowrap;">Distributor Name:</td>
+                                <td style="width:350px;">${head.memberName!}</td>
+                                <td style="text-align:left;white-space:nowrap;width:5%;">Receipt No.:</td>
+                                <td style="text-align:left;">${head.invoiceNumber!}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left;white-space:nowrap;">Distributor No:</td>
+                                <td>${head.memberCode!}</td>
+                                <td style="text-align:left;white-space:nowrap;">Date:</td>
+                                <td style="text-align:left;">${head.orderDate?string("yyyy/MM/dd")}</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left;white-space:nowrap;width:5%;" valign="top">Remark:</td>
+                                <td style="word-break:break-all;text-align:left;" colspan="3"><div style="word-wrap:break-word;word-break:break-all;width:550px;">${head.remark!}</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="margin-top:0px;width:100%;float:left;height:73mm;">
+                        <table width="100%" style="border-collapse:collapse;table-layout:fixed;">
+                            <tr>
+                                <td class="bottom_line" style="text-align:left;width:18mm;" valign="bottom">Code No.</td>
+                                <td class="bottom_line" style="text-align:left;" valign="bottom">Description</td>
+                                <td class="bottom_line" style="text-align:right;width:10mm;" valign="bottom">PV</td>
+                                <td class="bottom_line" style="text-align:right;width:10mm" valign="bottom">Qty</td>
+                                <td class="bottom_line" style="text-align:right;width:20mm;" valign="bottom">Dist.Price</td>
+                                <td class="bottom_line" style="text-align:right;width:20mm;" valign="bottom">Amount</td>
+                                <td class="bottom_line" style="text-align:right;width:15mm;" valign="bottom">Total PV</td>
+                            </tr>
+                            <#list ln as line>
+                            <tr>
+                                <td style="text-align:left;">${line.itemNumber!}</td>
+                                <td style="text-align:left;" class="word">${line.itemName!}</td>
+                                <td style="text-align:right;">${line.pv!}</td>
+                                <td style="text-align:right;">${line.quantity!}</td>
+                                <td style="text-align:right;">${line.unitSellingPrice?string(',##0.00')}</td>
+                                <td style="text-align:right;">${line.amount?string(',##0.00')}</td>
+                                <td style="text-align:right;">#{line.pv * line.quantity}</td>
+                            </tr>
+                            </#list>
+                        </table>
+                    </div>
+                    <div style="width:100%;float:left;">
+                        <#if ln_index != lines?size -1>
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td class="top_line" style="text-align:left;width:1.25in;"></td>
+                                    <td class="top_line" style="text-align: left;" colspan="3"></td>
+                                    <td class="top_line" style="text-align:right;width:0.75in;"></td>
+                                    <td class="top_line" style="text-align:right;width:0.75in;white-space:nowrap;"></td>
+                                    <td class="top_line" style="text-align:right;width:0.75in;"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" rowspan="4" >
+                                        The above products are received in good condition<br>
+                                        Distributor Signature: ________________________________________________
+                                    </td>
+                                    
+                                    <td></td>
+                                    <td style="text-align: left;"></td>
+                                    <td style="text-align: right;"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="text-align: left;border-left:1px " valign="top"></td>
+                                    <td style="text-align: right;border-top:1px "></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td style="text-align: left;white-space:nowrap;"></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        <#else>
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td class="top_line" style="text-align:left;width:15mm;" valign="top">Payment:</td>
+                                    <td class="top_line" style="text-align: left;" colspan="3" valign="top"><#list paymentMethed as orderPayment>${orderPayment.paymentMethod!} ${orderPayment.paymethodAmtSum?string(',##0.00')!} </#list></td>
+                                    <td colspan="3" rowspan="2" class="top_line" valign="top">
+                                        <table width="100%" style="border-collapse:collapse;" class="tbword">
+                                        <#if salesVouchers != 0>
+                                            <tr>
+                                                <td style="text-align:right;width:55%;white-space:nowrap;" valign="top">Discount Amount:</td>
+                                                <td style="text-align:right;width:25%;" valign="top">${salesVouchers?string(',##0.00')!}</td>
+                                                <td style="text-align:right;"></td>
+                                            </tr>
+                                        </#if>
+                                        <#if salesAdjustment != 0>
+                                            <tr>
+                                                <td style="text-align: right;width:55%;" valign="top">Adjustment:</td>
+                                                <td style="text-align: right;width:25%;" valign="top">${salesAdjustment?string(',##0.00')!}</td>
+                                                <td style="text-align:right;"></td>
+                                            </tr>
+                                            </#if>
+                                            <#if SalesLogistics??>
+                                            <tr>
+                                                <td style="text-align: right;width:55%;" valign="top">Shipping Fee:</td>
+                                                <td style="text-align: right;width:25%;" valign="top">${SalesLogistics.shippingFee?string(',##0.00')!}</td>
+                                                <td style="text-align: right;"></td>
+                                            </tr>
+                                            </#if>
+                                            <tr>
+                                                <td style="text-align: right;width:55%;white-space:nowrap;" valign="top">Total:</td>
+                                                <td style="text-align: right;width:25%;" valign="top">${totalAmount?string(',##0.00')!}</td>
+                                                <td style="text-align: right;" valign="top">${totalPV!}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" >
+                                        The above products are received in good condition<br>
+                                        Distributor Signature: ________________________________________________
+                                    </td>
+                                </tr>
+                            </table>
+                        </#if>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        </div>
+    </#list>
+</body>

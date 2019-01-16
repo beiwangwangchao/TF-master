@@ -1,0 +1,742 @@
+<#include "/mws/include/header.html">
+<script src="${base.contextPath}/common/code?telAreaCode=SYS.TEL_COUNTRY_CODE" type="text/javascript"></script>
+<script>
+    //全局会员信息,用来取消编辑时还原和保存编辑时对比
+    var global_member = null;
+    var global_editFlag = false;
+    var phoneReg = /^[0-9]{11}$/;
+    var zipCodeReg = /^[0-9]{1,10}$/;
+    var emailReg = /^([\s\S]*)+@([\S\s]*)+(\.([\S\s]*)+)+$/;
+    //DOM Load完成时,请求数据初始化页面
+    $(function(){
+        //首先注册下拉框的change事件
+        $("select[name='countryCode']").change(function(e){
+            //这样的逻辑保证了如果query失败,后面两个select都不会轻举妄动
+            if($("select[name='countryCode']").val()){
+                queryState(function(){
+                    $("select[name='cityCode']").empty();
+                });
+            }else{
+                $("select[name='stateCode']").empty();
+                $("select[name='cityCode']").empty();
+            }
+        });
+        $("select[name='stateCode']").change(function(e){
+            if($("select[name='stateCode']").val()){
+                queryCity();
+            }else{
+                $("select[name='cityCode']").empty();
+            }
+        });
+        //请求填充页面
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : "${base.contextPath}/account/queryMemInfo",
+            data : {},
+            success : function(data) {
+                if(data.rows){
+                    //填充页面数据
+                    initData(data.rows[0]);
+                }
+            }
+        });
+    });
+
+    /*******************************************************/
+    /* 页面初始化 -                                             /
+    /*******************************************************/
+    function initData(member){
+        //处理收货地址和账单地址
+        var sites = member.memSites;
+        if(sites){
+            for(var i=0; i<sites.length; i++){
+                if("SHIP" == sites[i].siteUseCode){//是收货地址
+                    member.shipLocation = sites[i].attribute1+sites[i].attribute2+sites[i].attribute3+sites[i].spmLocation.addressLine1?sites[i].spmLocation.addressLine1:""+sites[i].spmLocation.addressLine2?sites[i].spmLocation.addressLine2:""+sites[i].spmLocation.addressLine3?sites[i].spmLocation.addressLine3:"";
+                    member.shipTo = sites[i].name;
+                }else if("BILL" == sites[i].siteUseCode){//是账单地址
+                    member.billLocation = sites[i].attribute1+sites[i].attribute2+sites[i].attribute3+sites[i].spmLocation.addressLine1?sites[i].spmLocation.addressLine1:""+sites[i].spmLocation.addressLine2?sites[i].spmLocation.addressLine2:""+sites[i].spmLocation.addressLine3?sites[i].spmLocation.addressLine3:"";
+                    member.billTo = sites[i].name;
+                }else if("CTACT" == sites[i].siteUseCode){//是联系地址
+                    member.ctactToken = sites[i]._token;
+                    member.contactLocation = sites[i].attribute1+sites[i].attribute2+sites[i].attribute3+sites[i].spmLocation.addressLine1?sites[i].spmLocation.addressLine1:""+sites[i].spmLocation.addressLine2?sites[i].spmLocation.addressLine2:""+sites[i].spmLocation.addressLine3?sites[i].spmLocation.addressLine3:"";
+                    member.locationId = sites[i].locationId;
+                    member.siteId = sites[i].siteId;
+                    member.sl_siteUseCode = sites[i].siteUseCode;
+                    member.sl_name = sites[i].name;
+                    member.sl_phone = sites[i].phone;
+                    member.sl_defaultFlag = sites[i].defaultFlag;
+                    member.countryCode = sites[i].spmLocation.countryCode;
+                    member.stateCode = sites[i].spmLocation.stateCode;
+                    member.cityCode = sites[i].spmLocation.cityCode;
+                    member.addressLine1 = sites[i].spmLocation.addressLine1;
+                    member.addressLine2 = sites[i].spmLocation.addressLine2;
+                    member.addressLine3 = sites[i].spmLocation.addressLine3;
+                    member.zipCode = sites[i].spmLocation.zipCode;
+                }
+            }
+        }
+        global_member = member;
+        //-----------------填充页面---------------------start
+        $("#editContactInfo input[name='_token']").val(member._token);
+        $("#editAddress input[name='_token']").val(member.ctactToken);
+        //基本资料
+        $("#chineseName span").text(member.chineseName?member.chineseName:"");
+        $("#englishName span").text(member.englishName?member.englishName:"");
+        if(member.gender == "M"){
+            $("#gender span").text("<@spring.message 'mws.accountinfo.male'/>");
+        }else if(member.gender == "F"){
+            $("#gender span").text("<@spring.message 'mws.accountinfo.female'/>");
+        }else{
+            $("#gender span").text("");
+        }
+        $("#dob span").text(member.dob?member.dob:"");
+        $("#exchangeBalance span").text(member.exchangeBalance?member.exchangeBalance:"");
+        $("#remainingBalance span").text(member.remainingBalance?member.remainingBalance:"");
+        $("#salesPoint span").text(member.salesPoint?member.salesPoint:"");
+        $("#currentPv span").text(member.currentPv?member.currentPv:"");
+        //联系方式-text展示
+        $("#phoneNo span").text("+"+(member.areaCode?member.areaCode:"")+" "+(member.phoneNo?member.phoneNo:""));
+        $("#othPhoneNo span").text((member.otherAreaCode?"+"+member.otherAreaCode:"")+" "+(member.othPhoneNo?member.othPhoneNo:""));
+        $("#email span").text(member.email?member.email:"");
+        $("#contactLocation span").text(member.contactLocation?member.contactLocation:"");
+        //联系方式-input展示
+        areaCodeSetData();
+        $("select[name='areaCode']").val(member.areaCode);
+        $("select[name='otherAreaCode']").val(member.otherAreaCode);
+        $("input[name='phoneNo']").val(member.phoneNo);
+        $("input[name='othPhoneNo']").val(member.othPhoneNo);
+        $("input[name='phoneNo']").val(member.phoneNo);
+        $("input[name='othPhoneNo']").val(member.othPhoneNo);
+        $("input[name='email']").val(member.email);
+        $("textarea[name='contactLocation']").val(member.contactLocation);
+        //地址管理
+        $("#shipLocation span").html($.escapeHtml((member.shipLocation?member.shipLocation:""))+"&nbsp;&nbsp;&nbsp;&nbsp;"+$.escapeHtml((member.shipTo?member.shipTo:"")));
+        $("#billLocation span").html($.escapeHtml((member.billLocation?member.billLocation:""))+"&nbsp;&nbsp;&nbsp;&nbsp;"+$.escapeHtml((member.billTo?member.billTo:"")));
+        //编辑界面
+        queryCountry(function(){
+            $("select[name='countryCode']").val(member.countryCode);
+            queryState(function(){
+                $("select[name='stateCode']").val(member.stateCode);
+                queryCity(function(){
+                    $("select[name='cityCode']").val(member.cityCode);
+                });
+            });
+        });
+        $("input[name='addressLine1']").val(member.addressLine1);
+        $("input[name='addressLine2']").val(member.addressLine2);
+        $("input[name='addressLine3']").val(member.addressLine3);
+        $("input[name='zipCode']").val(member.zipCode);
+        //-----------------填充页面---------------------end
+    }
+    //为下拉框areaCode设值
+    function areaCodeSetData(){
+        // areaCode
+        $("select[name='areaCode']").empty();
+        $("select[name='areaCode']").append("<option value='' selected></option>");
+        for(var i=0; i<telAreaCode.length; i++){
+            $("select[name='areaCode']").append("<option value='"+$.escapeHtml(telAreaCode[i].value)+"'>"+$.escapeHtml(telAreaCode[i].meaning)+"</option>");
+        }
+        // otherAreaCode
+        $("select[name='otherAreaCode']").empty();
+        $("select[name='otherAreaCode']").append("<option value='' selected></option>");
+        for(var i=0; i<telAreaCode.length; i++){
+            $("select[name='otherAreaCode']").append("<option value='"+$.escapeHtml(telAreaCode[i].value)+"'>"+$.escapeHtml(telAreaCode[i].meaning)+"</option>");
+        }
+    }
+    /*******************************************************/
+    /* 增删改 -                                                /
+    /*******************************************************/
+    //编辑联系方式
+    function editInfo(btn) {
+        $("#ContactInfo").hide();
+        $("#ContactInfoEditable").show();
+        $(btn).hide();
+    }
+    //保存编辑后的联系方式
+    function saveContactInfo() {
+        var needSaveFlag = false;
+        //ajax保存请求-刷新
+        //汇总两个form联系方式信息
+        var formData = mergeAndObjectify(
+                $("#editContactInfo").serializeArray(),
+                $("#editAddress").serializeArray(),
+                [{name:"contactLocation", value:$("textarea[name='contactLocation']").val()}]
+        );
+        //必输校验-两个字段全都不能为空-且格式正确
+        if(!(formData.phoneNo && formData.email)){
+            //处理报错信息
+            var errorMsg = "<@spring.message 'msg.error.mws.required_fields_is_empty'/>\n";
+            if(!formData.phoneNo){
+                errorMsg += "<@spring.message 'mws.accountinfo.phoneno'/>\n";
+            }
+            if(!formData.email){
+                errorMsg += "<@spring.message 'mws.accountinfo.email'/>";
+            }
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", errorMsg);
+            return;
+        }
+        //格式校验
+        if (phoneReg.test(formData.phoneNo) == false) {
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.phone.format.incorrect'/>");
+            return;
+        }
+        if (formData.othPhoneNo && phoneReg.test(formData.othPhoneNo) == false) {
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.othphone.format.incorrect'/>");
+            return;
+        }
+        if (emailReg.test(formData.email) == false) {
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.email.format.incorrect'/>");
+            return;
+        }
+        //拼出需要更新的member信息
+        var gonneSave = {_token:global_member._token,memberId:global_member.memberId};
+        //判断是否修改过字段
+        if(formData.areaCode != global_member.areaCode){
+            needSaveFlag = true;
+            gonneSave.areaCode = formData.areaCode;
+        }
+        if(formData.otherAreaCode != global_member.otherAreaCode){
+            needSaveFlag = true;
+            gonneSave.otherAreaCode = formData.otherAreaCode;
+        }
+        if(formData.phoneNo != global_member.phoneNo){
+            needSaveFlag = true;
+            gonneSave.phoneNo = formData.phoneNo;
+        }
+        if(formData.othPhoneNo != global_member.othPhoneNo){
+            needSaveFlag = true;
+            gonneSave.othPhoneNo = formData.othPhoneNo;
+        }
+        if(formData.email != global_member.email){
+            needSaveFlag = true;
+            gonneSave.email = formData.email;
+        }
+        if(formData.contactLocation != global_member.contactLocation || formData.zipCode != global_member.zipCode){
+            needSaveFlag = true;
+            gonneSave.memSites = new Array({
+                _token: global_member.ctactToken,
+                __status:status,
+                memberId:global_member.memberId,
+                siteUseCode:global_member.sl_siteUseCode?global_member.sl_siteUseCode:"CTACT",
+                locationId:global_member.locationId,
+                name:global_member.sl_name,
+                phone:global_member.sl_phone,
+                defaultFlag:global_member.sl_defaultFlag?global_member.sl_defaultFlag:"Y",
+                siteId : global_member.siteId,
+                spmLocation:{}
+            });
+            gonneSave.memSites[0].spmLocation = {
+                    name:global_member.sl_name,
+                    locationId : global_member.locationId,
+                    countryCode : formData.countryCode,
+                    stateCode : formData.stateCode,
+                    cityCode : formData.cityCode,
+                    addressLine1 : formData.addressLine1,
+                    addressLine2 : formData.addressLine2,
+                    addressLine3 : formData.addressLine3,
+                    zipCode : formData.zipCode
+            };
+        }
+        if(!needSaveFlag){
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.nothing_changed'/>");
+            return;
+        }
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            contentType : "application/json",
+            url : "${base.contextPath}/account/updateMemCtact",
+            data : JSON2.stringify(gonneSave),
+            success : function(data) {
+                if(data.success){
+                    $.dialog.success("<@spring.message 'mws.dialog.success'/>", "<@spring.message 'msg.error.mws.operation_succeed'/>",
+                            function(){
+                                location.reload(true);
+                            }
+                    );
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                }
+            }
+        });
+    }
+    //取消联系方式的编辑
+    function cancelEditContactInfo() {
+        if(global_editFlag){
+            $.dialog.confirm("<@spring.message 'mws.dialog.confirm'/>", "<@spring.message 'msg.error.mws.something_changed'/>",
+                    function(){
+                        $("#ContactInfo").show();
+                        $("#ContactInfoEditable").hide();
+                        $("#editInfo").show();
+                        //还原数据
+                        $("input[name='phoneNo']").val(global_member.phoneNo);
+                        $("input[name='othPhoneNo']").val(global_member.othPhoneNo);
+                        $("input[name='email']").val(global_member.email);
+                        $("textarea[name='contactLocation']").val(global_member.contactLocation);
+                        //还原模态框数据
+                        cancelEditAddress();
+                    }
+            );
+        }
+    }
+    //保存联系地址
+    function saveAddress(e){
+        var formData = mergeAndObjectify($("#editAddress").serializeArray());
+        //必输校验-5个字段不能为空
+        if(!(formData.countryCode && formData.stateCode && formData.cityCode && formData.addressLine1)){
+            //处理报错信息
+            var errorMsg = "<@spring.message 'msg.error.mws.required_fields_is_empty'/>\n";
+            if(!formData.countryCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.country'/>\n";
+            }
+            if(!formData.stateCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.state'/>\n";
+            }
+            if(!formData.cityCode){
+                errorMsg += "<@spring.message 'mws.accountinfo.city'/>\n";
+            }
+            if(!formData.addressLine1){
+                errorMsg += "<@spring.message 'mws.addressbook.address1'/>\n";
+            }
+            $.dialog.error("<@spring.message 'mws.dialog.error'/>", errorMsg);
+            e = e||window.event;
+            if(e.stopPropagation){
+                e.stopPropagation();
+            }else{
+                e.cancelBubble = true;
+            }
+            return;
+        }
+        //格式验证
+        if (formData.zipCode) {
+            if (zipCodeReg.test(formData.zipCode) == false) {
+                $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message 'msg.error.mws.zipcode.format.incorrect'/>");
+                e = e||window.event;
+                if(e.stopPropagation){
+                    e.stopPropagation();
+                }else{
+                    e.cancelBubble = true;
+                }
+                return;
+            }
+        }
+        //更新已编辑标识为true
+        global_editFlag = true;
+        //更新textarea的值为最新修改后的地址
+        var newAddress = $("select[name='countryCode']").find("option:selected").text()
+                +$("select[name='stateCode']").find("option:selected").text()
+                +$("select[name='cityCode']").find("option:selected").text()
+                +$("input[name='addressLine1']").val()+$("input[name='addressLine2']").val()+$("input[name='addressLine3']").val();
+        $("textarea[name='contactLocation']").val(newAddress);
+        //这里其实不做实际的保存
+    };
+    //取消编辑联系地址
+    function cancelEditAddress(){
+        //还原数据
+        queryCountry(function(){
+            $("select[name='countryCode']").val(global_member.countryCode);
+            queryState(function(){
+                $("select[name='stateCode']").val(global_member.stateCode);
+                queryCity(function(){
+                    $("select[name='cityCode']").val(global_member.cityCode);
+                });
+            });
+        });
+        $("input[name='addressLine1']").val(global_member.addressLine1);
+        $("input[name='addressLine2']").val(global_member.addressLine2);
+        $("input[name='addressLine3']").val(global_member.addressLine3);
+        $("input[name='zipCode']").val(global_member.zipCode);
+    }
+    
+    /*******************************************************/
+    /* 下拉框联动实现 -                                          /
+    /*******************************************************/
+    //查询country下拉框
+    function queryCountry(callback){//callback就是函数套函数而已~
+        $.ajax({
+            url: '${base.contextPath}/account/queryCountry',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+            data : {},
+            success : function(data) {
+                if(data.success){
+                    countrySetData(data.rows);
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                }
+                if(callback){
+                    callback();
+                }
+            },
+            error : function() {
+                //alert("获取country下拉框失败");
+            }
+        })
+    }
+    //查询state下拉框
+    function queryState(callback){
+        $.ajax({
+            url: '${base.contextPath}/account/queryState',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+            data : {countryCode:$("select[name='countryCode']").val()},
+            success : function(data) {
+                if(data.success){
+                    stateSetData(data.rows);
+                }else{
+                    $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                }
+                if(callback){
+                    callback();
+                }
+            },
+            error : function() {
+                //alert("获取state下拉框失败");
+            }
+        })
+    }
+    //查询city下拉框
+    function queryCity(callback){
+        $.ajax({
+            url: '${base.contextPath}/account/queryCity',
+            type:"GET",
+            dataType:"json",
+            contentType : "application/json",
+               data : {stateCode:$("select[name='stateCode']").val()},
+               success : function(data) {
+                   if(data.success){
+                       citySetData(data.rows);
+                   }else{
+                       $.dialog.error("<@spring.message 'mws.dialog.error'/>", "<@spring.message '"+data.message+"'/>");
+                   }
+                   if(callback) callback();
+               },
+               error : function() {
+                   //alert("获取city下拉框失败");
+               }
+        })
+    }
+    //为下拉框countryCode设值
+    function countrySetData(options){
+        $("select[name='countryCode']").empty();
+        $("select[name='countryCode']").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("select[name='countryCode']").append("<option value='"+$.escapeHtml(options[i].countryCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    //为下拉框stateCode设值
+    function stateSetData(options){
+        $("select[name='stateCode']").empty();
+        $("select[name='stateCode']").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("select[name='stateCode']").append("<option value='"+$.escapeHtml(options[i].stateCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    //为下拉框cityCode设值
+    function citySetData(options){
+        $("select[name='cityCode']").empty();
+        $("select[name='cityCode']").append("<option value='' selected></option>");
+        for(var i=0; i<options.length; i++){
+            $("select[name='cityCode']").append("<option value='"+$.escapeHtml(options[i].cityCode)+"'>"+$.escapeHtml(options[i].name)+"</option>");
+        }
+    }
+    
+    //工具函数-合并多个serialize数组为一个对象(Map)
+    function mergeAndObjectify(){
+        var argsLength = arguments.length;
+        if(argsLength < 1){
+            return null;
+        }
+        var obj = {};
+        for(var i=0; i<argsLength; i++){
+            for(var j=0; j<arguments[i].length; j++){
+                obj[arguments[i][j].name] = arguments[i][j].value;
+            }
+        }
+        return obj;
+    }
+    
+    //管理收货地址和账单地址跳转
+    function jumpToShipSite(){
+        window.location.href = '${base.contextPath}/account/account-ship-address.html';
+    }
+    function jumpToBillSite(){
+        window.location.href = '${base.contextPath}/account/account-bill-address.html';
+    }
+
+</script>
+<!-- ========== MENU END ========== -->
+
+<!-- ========== CONTENT START ========== -->
+
+<!-- 修改联系地址模态框 -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button onclick="cancelEditAddress()" type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="addressMyModalLabel"><@spring.message "mws.addressbook.editcontact"/></h4>
+            </div>
+            <div class="modal-body" class="col-sm-12">
+                <div class="row">
+                    <form id="editAddress">
+                        <input type="hidden" name="_token">
+                        <div class="row">
+                            <div class="col-sm-10 col-sm-offset-1 form-group">
+                                <label for="location"><@spring.message "mws.addressbook.location"/></label>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <select name="countryCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="国家">
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select name="stateCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="省">
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select name="cityCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="市">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-10 col-sm-offset-1 form-group">
+                                <label for="addressLine1"><@spring.message "mws.addressbook.address1"/></label>
+                                <input type="text" class="form-control" name="addressLine1" placeholder="<@spring.message 'mws.addressbook.address1'/>">
+                            </div>
+                            <div class="col-sm-10 col-sm-offset-1 form-group">
+                                <label for="addressLine2"><@spring.message "mws.addressbook.address2"/></label>
+                                <input type="text" class="form-control" name="addressLine2" placeholder="<@spring.message 'mws.addressbook.address2'/>">
+                            </div>
+                            <div class="col-sm-10 col-sm-offset-1 form-group">
+                                <label for="addressLine3"><@spring.message "mws.addressbook.address3"/></label>
+                                <input type="text" class="form-control" name="addressLine3" placeholder="<@spring.message 'mws.addressbook.address3'/>">
+                            </div>
+                            <div class="col-sm-10 col-sm-offset-1 form-group">
+                                <label for="zipCode"><@spring.message "mws.addressbook.zipcode"/></label>
+                                <input type="text" class="form-control" name="zipCode" placeholder="<@spring.message 'mws.addressbook.zipcode'/>">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="saveAddress(event)" type="button" class="btn btn-primary" data-dismiss="modal"><@spring.message "sys.hand.btn.save"/></button>
+                <button onclick="cancelEditAddress()" type="button" class="btn btn-default" data-dismiss="modal"><@spring.message "sys.hand.btn.cancel"/></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section id="content">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.menu.myaccount"/></li>
+        </ol>
+        
+        <div class="row">
+            <!-- Sidebar Start -->
+            <#include "../include/account-menu.html">
+            <!-- Sidebar End -->
+
+            <!-- Posts Start -->
+            <div class="col-sm-8 col-md-9">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><@spring.message "mws.myaccount.accountinfo"/></h3>
+                    </div>
+                    <div class="panel-body">
+                        <!-- 基本资料 -->
+                        <div class="row">
+                            <div class="col-sm-6 col-md-6">
+                                <h3 class="entry-title">
+                                    <span class="glyphicon glyphicon-user"></span><@spring.message "mws.myaccount.basicinfo"/>
+                                </h3>
+                            </div>
+                        </div>
+                        <!-- 基本信息 -->
+                        <div class="row">
+                            <div class="col-md-11 col-sm-11 col-sm-offset-1">
+                                <div id="chineseName" class="col-md-6 col-sm-6">
+                                    <label for="chineseName"><@spring.message "mws.accountinfo.chinesename"/>:</label>
+                                    <span></span>
+                                </div>
+                                <div id="englishName" class="col-md-6 col-sm-6">
+                                    <label for="englishName"><@spring.message "mws.accountinfo.englishname"/>:</label>
+                                    <span></span>
+                                </div>
+                                <div id="gender" class="col-md-6 col-sm-6">
+                                    <label for="gender"><@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.gender"/>:</label>
+                                    <span></span>
+                                </div>
+                                <div id="dob" class="col-md-6 col-sm-6">
+                                    <label for="dob"><@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.dob"/>:</label>
+                                    <span></span>
+                                </div>
+                                <!--<div id="exchangeBalance" class="col-md-6 col-sm-6">-->
+                                    <!--<label for="exchangeBalance"><@spring.message "type.com.lkkhpg.dsis.common.member.dto.accountingbalance.exchangebalance"/>:</label>-->
+                                    <!--<span>0</span>-->
+                                <!--</div>-->
+                                <!--<div id="remainingBalance" class="col-md-6 col-sm-6">-->
+                                    <!--<label for="remainingBalance"><@spring.message "type.com.lkkhpg.dsis.common.member.dto.accountingbalance.remainingbalance"/>:</label>-->
+                                    <!--<span>0</span>-->
+                                <!--</div>-->
+                                <!--<div id="salesPoint" class="col-md-6 col-sm-6">-->
+                                    <!--<label for="salesPoint"><@spring.message "type.com.lkkhpg.dsis.common.member.dto.accountingbalance.salespoint"/>:</label>-->
+                                    <!--<span>0</span>-->
+                                <!--</div>-->
+                                <!--<div id="currentPv" class="col-md-6 col-sm-6">-->
+                                    <!--modified by furong.tang-->
+                                    <!--<label for="currentPv"><@spring.message "mws.accountinfo.currentpv"/>:</label>
+                                    <span>0</span>-->
+                                <!--</div>-->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- List group -->
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <!-- 编辑按钮 -->
+                            <div class="row">
+                                <div class="col-md-2 col-sm-2 col-sm-offset-10">
+                                    <button id="editInfo" type="button" class="btn btn-default" onclick="editInfo(this)">
+                                        <span class="glyphicon glyphicon-edit"></span>
+                                    </button>
+                                </div>
+                            </div> <!-- 联系方式 -->
+                            <div class="row" id="ContactInfo">
+                                <div class="col-md-10 col-sm-10 col-sm-offset-1">
+                                    <div id="phoneNo" class="col-md-6 col-sm-6">
+                                        <label for="phoneNo"><@spring.message "mws.accountinfo.phoneno"/>:</label>
+                                        <span></span>
+                                    </div>
+                                    <div id="othPhoneNo" class="col-md-6 col-sm-6">
+                                        <label for="othPhoneNo"><@spring.message "mws.accountinfo.othphoneno"/>:</label>
+                                        <span></span>
+                                    </div>
+                                    <div id="email" class="col-md-12 col-sm-12 info">
+                                        <label for="email"><@spring.message "mws.accountinfo.email"/>:</label>
+                                        <span></span>
+                                    </div>
+                                    <div id="contactLocation" class="col-md-12 col-sm-12">
+                                        <label for="contactLocation"><@spring.message "mws.accountinfo.ctactaddress"/>:</label>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </div> <!-- 联系方式 可编辑-->
+                            <div class="row" id="ContactInfoEditable" style="display: none;">
+                                <div class="col-md-10 col-sm-10 col-sm-offset-1">
+                                    <form id="editContactInfo">
+                                        <input type="hidden" name="_token">
+                                        <div class="col-md-12 col-sm-12 form-group">
+                                            <label for="phoneNo"><@spring.message "mws.accountinfo.phoneno"/>:</label>
+                                            <div class="row">
+                                                <div class="col-sm-3">
+                                                    <select name="areaCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="areaCode">
+                                                    </select>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" name="phoneNo" placeholder="<@spring.message 'mws.addressbook.phone'/>">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 col-sm-12 form-group">
+                                            <label for="othPhoneNo"><@spring.message "mws.accountinfo.othphoneno"/>:</label>
+                                            <div class="row">
+                                                <div class="col-sm-3">
+                                                    <select name="otherAreaCode" class="form-control" data-live-search="true" data-width="100%" data-toggle="tooltip" title="areaCode">
+                                                    </select>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" name="othPhoneNo" placeholder="<@spring.message 'mws.addressbook.phone'/>">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 col-sm-12 form-group">
+                                            <label for="email"><@spring.message "mws.accountinfo.email"/>:</label>
+                                            <input type="text" name="email" class="form-control" value="">
+                                        </div>
+                                        <div class="col-md-12 col-sm-12 form-group">
+                                            <label for="contactLocation"><@spring.message "mws.accountinfo.ctactaddress"/>:</label>
+                                            <textarea disabled name="contactLocation" class="form-control" rows="3"></textarea>
+                                            <button type="button" data-toggle="modal" data-target="#addressModal" class="btn btn-default"><@spring.message "sys.hand.btn.edit"/></button>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-4 col-sm-4 col-md-offset-8 col-sm-offset-8 info">
+                                                <button type="button" class="btn btn-default" onclick="saveContactInfo()"><@spring.message "sys.hand.btn.save"/></button>
+                                                <button type="button" class="btn btn-default" onclick="cancelEditContactInfo()"><@spring.message "sys.hand.btn.cancel"/></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <!-- 地址管理 -->
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6">
+                                    <h3 class="entry-title" style="margin-top: 10px;">
+                                        <span class="glyphicon glyphicon-map-marker"></span><@spring.message "mws.myaccount.addressmanage"/>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10 col-sm-10 col-sm-offset-1">
+                                    <!-- 收货地址 -->
+                                    <div class="panel panel-default" style="margin-bottom: 0px;">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title"><@spring.message "mws.myaccount.deliveryaddress"/></h3>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div id="shipLocation" class="col-md-12 col-sm-12">
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="btn-group" style="margin-top: 5px; margin-bottom: 5px;">
+                                        <button onclick="jumpToShipSite()" type="button" class="btn btn-default"><@spring.message "mws.myaccount.maintaindelivery"/></button>
+                                    </div>
+                                    <!-- 账单地址 -->
+                                    <div class="panel panel-default" style="margin-bottom: 0px;">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title"><@spring.message "mws.myaccount.billingaddress"/></h3>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div id="billLocation" class="col-md-12 col-sm-12">
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="btn-group" style="margin-top: 5px; margin-bottom: 5px;">
+                                        <button onclick="jumpToBillSite()" type="button" class="btn btn-default"><@spring.message "mws.myaccount.maintainbilling"/></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Posts End -->
+                 
+        </div>
+    </div>
+<script>
+    //added by 13525 at 2018.03.09
+    /*$(function() {
+    var firstLoginFlag = JSON.parse(window.localStorage["firstLoginFlag"] || '{}');
+    if (firstLoginFlag=="Y") {
+        $.dialog.warning("<@spring.message 'mws.dialog.confirm'/>", "恭喜您注册成功，完善地址信息后，即可购物。");
+    }
+    window.localStorage["firstLoginFlag"] = JSON.stringify('');
+
+    });*/
+</script>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

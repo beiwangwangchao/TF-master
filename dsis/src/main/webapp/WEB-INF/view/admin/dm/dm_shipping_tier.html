@@ -1,0 +1,620 @@
+<#--
+ * description: 物流资料运费地点修改界面 
+ * version: 1.0 
+ * author: huangjiajing 
+ * Copyright LKK Health Products Group Limited. 
+ * 
+ -->
+<#include "../include/head.html">
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<body style="padding: 10px;">
+	<script
+		src="${base.contextPath}/common/code?calculationType=OM.TAX_CALCULATION_TYPE&includingDiscount=DM.INCLUDING_DISCOUNT"
+		type="text/javascript"></script>
+	<form id="shipping_form" method="post"
+		enctype="application/json;charset=UTF-8"></form>
+	<div id="navtab1" style="overflow: hidden; border: 1px solid #D3D3d3;"
+		class="liger-tab">
+		<div tabid="home" title='<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.dtl"/>' lselected="true">
+			<div id="shipping_tier_dtl_grid" style="margin: 0; padding: 0"></div>
+		</div>
+		<div title='<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.seg"/>' tabid="tab1">
+			<div id="shipping_tier_seg_grid" style="margin: 0; padding: 0"></div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+	function onSalesOrgIdSelected(requestData){	
+        Hap.ajax({
+            url: '${base.contextPath}/dm/shippingtier/getcurrency?salesOrgId='+requestData.value,
+            success: function(data) {
+            	var currencyCodeComponent = $.ligerui.get('currencyCode');
+            	currencyCodeComponent.setValue(data.rows[0]);
+            }
+        });		
+	}
+	
+	
+		<#assign isedit = (RequestParameters.isedit!'0')/> 
+    	var shipping_form;
+    		shipping_form=	window['shipping_form'] = $("#shipping_form").ligerForm({
+            fields : [
+                {name:'shippingTierId',id:'shippingTierId',type:'hidden'},
+                
+				<#if isedit == '1'>
+	                {name:'salesOrgId',type:'hidden'},
+	                { name : 'salesOrgName', label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.salesorgid"/>',
+	                    newline : false,
+	                    readonly: true,
+	                    validate : {
+	                        required : true
+	                    }                   
+	                },
+                <#else>
+                {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition"/>',
+                    newline:false, 
+                    name: 'salesOrgId',
+                    type : "combobox",
+                    options : {
+                        url: '${base.contextPath}/sys/salesOrg/queryOrg',
+                        value:_salesOrgId,
+                        valueField: "salesOrgId",
+                        textField: "name"
+                    },
+                    validate : {
+                        required : true
+                    }
+                },
+				</#if>
+                { name : 'calculationType', label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.calculationtype"/>', newline : false ,
+					type : 'select',
+					<#if accessService.access("DETAIL_EDITABLE") == false>
+                	readonly: true,
+                	</#if>
+					options : {
+	                	valueField : "value",
+						textField : "meaning",
+                 		data : calculationType
+                 	},
+                 	validate : {
+                        required : true
+                    }
+				},		
+	            { name : 'privilegeFlag', type : 'select', label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.privilegeflag"/>', newline : false,
+					<#if accessService.access("DETAIL_EDITABLE") == false>
+            			readonly: true,
+            		</#if>
+					options:{
+						valueField:"value",
+						textField:"meaning",
+						data:includingDiscount
+					},
+					validate : {
+	                    required : true
+	                }
+				},
+	            {
+	                name : 'shippingTierCode',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.shippingtiercode"/>',
+	                type : 'text',
+	                <#if accessService.access("DETAIL_EDITABLE") == false>
+                	readonly: true,
+                	</#if>
+	                validate : {
+	                    required : true
+	                }
+	            },
+	            {
+	                name : 'shippingTierName',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.shippingtiername"/>',
+	                type : 'text',
+	                newline : false,
+	                <#if accessService.access("DETAIL_EDITABLE") == false>
+                	readonly: true,
+                	</#if>
+	                validate : {
+	                    required : true
+	                }
+	            },
+	            {
+	                name : 'description',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.description"/>',
+	                type : 'text',
+	                <#if accessService.access("DETAIL_EDITABLE") == false>
+                	readonly: true,
+                	</#if>
+	                newline : false
+	            },
+	            {
+	                name : 'currencyCode',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.currencycode"/>',
+	                //type : 'text',
+	                newline : true,
+	                readonly : true
+	            },
+	            {
+	                name : 'startActiveDate',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.startactivedate"/>',
+	                type : 'date',
+	                format: 'yyyy-MM-dd',
+	                style : 'margin-top:0px;margin-bottom:0px;',
+	                newline : false,
+	                rightToken : ' ',
+	                <#if accessService.access("DETAIL_EDITABLE") == false>
+                	readonly: true,
+                	</#if>
+	                options:{
+		                onChangeDate  :function(date){
+		                	if($("input[name='endActiveDate']").val()<date){
+		                		if($("input[name='endActiveDate']").val()!=""){
+			                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "sys.hand.tip.info"/>');
+			                		$.ligerui.get("startActiveDate").setValue("");
+		                		}
+		                	}
+		                }
+	                },
+	                validate : {
+	                    required : true
+	                }
+	                
+	            },
+	            {
+	                name : 'endActiveDate',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.endactivedate"/>',
+	                type : 'date',
+	                format: 'yyyy-MM-dd',
+	                style : 'margin-top:0px;margin-bottom:0px;',
+	                newline : false,
+	                rightToken : ' ',
+	                <#if accessService.access("DETAIL_EDITABLE") == false>
+                	readonly: true,
+                	</#if>
+	                options:{
+		                onChangeDate : function(date){
+		                	if($("input[name='startActiveDate']").val()>date){
+		                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "sys.hand.tip.info"/>');
+		                		$.ligerui.get("endActiveDate").setValue("");
+		                	}
+		                }
+	                }
+	            },	           
+	            {
+	            	type:'none',
+	            	display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtieravail.applychneel" />',
+	            	//display: '应用渠道',
+	            	width: 1,
+	            	name: 'applychneel',
+	            	newline: true
+	            },
+	            {
+	                type: 'checkbox',
+	                display: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtieravail.dsis" />',
+	                name: 'dsis',
+	                width: 30,
+	                labelWidth: 50,
+	                options: {
+	                    checkValue: 'Y',
+	                    uncheckValue: 'N'
+	                },
+	                newline: false
+	            },
+	            {
+	                type: 'checkbox',
+	                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.availability.distributorWeb" />',
+	                name: 'agencyWeb',
+	                width: 30,
+	                labelWidth: 90,
+	                newline: false,
+	                options: {
+	                    checkValue: 'Y',
+	                    uncheckValue: 'N'
+	                }
+	            }
+//	            ,
+//	            {
+//	                type: 'checkbox',
+//	                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.availability.distributorApp" />',
+//	                name: 'agencyApp',
+//	                width: 30,
+//	                labelWidth: 90,
+//	                newline: false,
+//	                options: {
+//	                    checkValue: 'Y',
+//	                    uncheckValue: 'N'
+//	                }
+//	            }
+	        ] ,
+            buttons : [
+				{
+				    text : '<@spring.message "sys.hand.btn.save"/>',
+				    <#if accessService.access("SAVE_EDITABLE") == false>
+				    disabled : true,
+                	</#if>
+				    width : 60,
+				    click : f_save
+				}
+            ] 
+        } ); 
+
+    	//  只有在新建的时候可选择
+        <#if isedit != '1'>
+           liger.get('salesOrgId').setText(_salesOrgName);
+        </#if>
+        
+    	shipping_form.attr("action", "${base.contextPath}/dm/shippingtier/submit");
+        
+         var shipping_tier_dtl_grid;
+         shipping_tier_dtl_grid = window['shipping_tier_dtl_grid'] = $("#shipping_tier_dtl_grid").ligerGrid({
+            unSetValidateAttr : false,
+            columns : [
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.invamountfrom"/>',
+	                name : 'invAmountFrom',
+	                align : 'left',
+	                isSort : true,
+	                width : 100,
+	                editor :{
+	                	type:'float',
+	                	onChanged : function(e){
+		                	if(e.value<0){
+		                		Hap.showError('<@spring.message "msg.error.delivery.invamountfrom_lesszero"/>');
+		                	}
+		                }
+	                } ,validate: {
+	    				required: true
+	    			}   
+	                
+                },
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.invamountto"/>',
+	                name : 'invAmountTo',
+	                align : 'left',
+	                width : 200,
+	                editor :{ 
+	                	type:'float',
+	                	onChanged : function(e){
+		                	if(e.value<0){		                		
+		                		Hap.showError('<@spring.message "msg.error.delivery.invamountto_lesszero"/>');
+		                	}
+		                }		              
+	                },validate: {
+	    				required: true
+	                }
+	            },
+	            {
+	                name : 'shippingFee',
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierdtl.shippingfee"/>',
+	                align : 'left',
+	                width : 200,
+	                editor :{
+	                	type:'text',
+	                	onChanged : function(e){
+		                	if(e.value<0){		                		
+		                		Hap.showError('<@spring.message "msg.error.delivery.shippingfee_lesszero"/>');
+		                	}
+		                }
+	                },validate: {
+	    				required: true
+	    			}
+	            }
+            ],
+            <#if isedit == '1'>
+            url: '${base.contextPath}/dm/shippingTierDtl/query?shippingTierId=${RequestParameters.shippingTierId!}', 
+            </#if>
+            toolbar : {
+                items: [
+                    {
+                        text: '<@spring.message "sys.hand.btn.new"/>',
+                        <#if accessService.access("ADD_EDITABLE") == false>
+                        disable:true, 
+                        </#if> 
+                        click: function(){
+                        	var currencyCode = $.ligerui.get('currencyCode').getValue();
+                        	if(currencyCode==""){
+                        		Hap.showError('<@spring.message "msg.error.delivery.shipping_tier_org_currency_notexist"/>');
+                        		return;
+                        	}
+                        	shipping_tier_dtl_grid.addRow({});
+                        }, icon: 'add'
+                    },
+                    { line: true },
+                    { 
+                        text : '<@spring.message "sys.hand.btn.delete"/>',
+                        click : function(){
+                        	 Hap.gridDelete({
+                                 grid : shipping_tier_dtl_grid
+                             })
+                        }, 
+                        <#if accessService.access("DELETE_EDITABLE") == false>
+                        disable:true, 
+                        </#if> 
+                        icon : 'delete'
+                    }
+	            ]
+            },
+            <#if accessService.access("DETAIL_EDITABLE") == false>
+            enabledEdit : false,
+            <#else>
+            enabledEdit : true,
+            </#if>
+            checkbox: true,
+            width : '99%',
+            height :'98%',
+            rownumbers : true
+        });
+    
+    function f_save(){
+    		var shipTierDtlData=shipping_tier_dtl_grid.getData();
+    		if(shipTierDtlData[0].invAmountFrom != 0){
+    			$.ligerDialog.warn("<@spring.message "sys.error.dm.must_begin_with_zero"/>");
+    			return false;
+    		}
+    		if(shipTierDtlData[shipTierDtlData.length-1].invAmountTo != null){
+    			if(shipTierDtlData[shipTierDtlData.length-1].invAmountTo != 9999999){
+                    $.ligerDialog.warn("<@spring.message "sys.error.dm.must_end_with_the_number"/>");
+                    return false;
+                }
+            }
+    		var two = 0;
+    		var three = 0;
+    		for (var i = 0; i < shipTierDtlData.length - 1; i++) {
+    			two = shipTierDtlData[i].invAmountTo;
+    			three = shipTierDtlData[i+1].invAmountFrom;
+				if(three != two){
+					$.ligerDialog.warn("<@spring.message "sys.error.dm.must_equal_to_until_last_from"/>");
+					return false;
+				}
+			}
+    		var shipTierSegData = window.shipping_tier_seg_grid;
+    	    for(var i in shipTierDtlData){
+    	        if(!(shipTierDtlData[i].invAmountFrom!=null || shipTierDtlData[i].invAmountFrom != undefined || shipTierDtlData[i].invAmountFrom !="")  ){
+    	        	Hap.showError('<@spring.message "msg.error.delivery.invamountfrom_null"/>');
+    	            return false;
+    	        }
+    	        
+    	        if(Number(shipTierDtlData[i].invAmountFrom)<0){
+    	        	Hap.showError('<@spring.message "msg.error.delivery.invamountfrom_lesszero"/>');
+    	            return false;
+    	        }
+    	        
+    	        if(!(shipTierDtlData[i].invAmountTo !=null || shipTierDtlData[i].invAmountTo != undefined || shipTierDtlData[i].invAmountTo !="")){
+    	        	Hap.showError('<@spring.message "msg.error.delivery.invamountto_null"/>');
+    	            return false;
+    	        }
+    	        
+    	        if(Number(shipTierDtlData[i].invAmountTo)<0){
+    	        	Hap.showError('<@spring.message "msg.error.delivery.invamountto_lesszero"/>');
+    	            return false;
+    	        }
+    	        
+    	        if(Number(shipTierDtlData[i].invAmountFrom) >= Number(shipTierDtlData[i].invAmountTo)){
+    	        	Hap.showError('<@spring.message "msg.error.delivery.invamountfrom_invamountto"/>');
+    	            return false;
+    	        } 
+    	        
+//     	        if(!shipTierDtlData[i].shippingFee){
+//     	        	Hap.showError('<@spring.message "msg.error.delivery.shippingfee_null"/>');
+//     	            return false;
+//     	        }   
+    	        
+    	        if(Number(shipTierDtlData[i].shippingFee)<0){
+    	        	Hap.showError('<@spring.message "msg.error.delivery.shippingfee_lessz ero"/>');
+    	            return false;
+    	        }   	        
+    	        
+    	    }
+    	
+    	
+    		var grids = [shipping_tier_dtl_grid],gridNames = ['shippingTierDtls'];
+    		if(window.shipping_tier_seg_grid.type == '$.ligerui.controls.Grid'){
+    			grids.push(window.shipping_tier_seg_grid);
+    			gridNames.push('shippingTierSegs')
+    		}
+    		Hap.submitForm({
+	    		form:shipping_form,
+	    		grid:grids,
+	            gridName:gridNames,
+	    		url:'${base.contextPath}/dm/shippingtier/submit',
+	    		success:function(json,opt){
+	                $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+	                 	 var shippingTierCodeComponent = $.ligerui.get('shippingTierCode');
+	                 	 shippingTierCodeComponent.setDisabled(true);
+	                 	self.location = 'dm_shipping_tier.html?isedit=1&shippingTierId=' +json.rows[0].shippingTierId +'&salesOrgId='+ json.rows[0].salesOrgId;
+	                });	                
+	            }	
+	    	})
+     }    
+    <#if isedit == '1'>
+		Hap.loadForm({form:shipping_form,url:'${base.contextPath}/dm/shippingTier/query',para:{shippingTierId:${RequestParameters.shippingTierId},salesOrgId:${RequestParameters.salesOrgId}},
+			callback : function(){
+				var salesOrgId=shipping_form.getData().salesOrgId;
+				var dsis=shipping_form.getData().dsis;
+				var agencyWeb=shipping_form.getData().agencyWeb;
+				var agencyApp=shipping_form.getData().agencyApp;
+		        Hap.ajax({
+		            url: '${base.contextPath}/dm/shippingtier/getcurrency?salesOrgId='+salesOrgId,
+		            success: function(data) {
+		            	var currencyCodeComponent = $.ligerui.get('currencyCode');
+		            	currencyCodeComponent.setValue(data.rows[0]);
+		            	if(dsis == 'Y'){
+		            		$.ligerui.get('dsis').setValue(true);
+		            	}
+		            	if(agencyWeb == 'Y'){
+			            	$.ligerui.get('agencyWeb').setValue(true);
+			            }
+		            	if(agencyApp == 'Y'){
+			            	$.ligerui.get('agencyApp').setValue(true);
+			            }
+		            }
+		        });					
+			}
+		});
+     	var shippingTierCodeComponent = $.ligerui.get('shippingTierCode');
+     	shippingTierCodeComponent.setDisabled(true);
+     	
+     	
+     	
+    <#else>
+    Hap.ajax({
+        url: '${base.contextPath}/dm/shippingtier/getsalesorg',
+        success: function(data) {
+        	var salesOrgNameComponent = $.ligerui.get('salesOrgName');
+        	var currencyCodeComponent = $.ligerui.get('currencyCode');
+        	currencyCodeComponent.setValue(data.rows[0].currencyCode);
+        	//salesOrgNameComponent.setValue(data.rows[0].salesOrgName);
+        }
+    });
+	</#if>
+</script>
+
+	<script type="text/javascript">
+	
+		/*获取国家*/
+		var countryCode;
+		Hap.ajax({
+			url : '${base.contextPath}/spm/country/query',
+			success : function(json) {
+				countryCode = json;
+			}
+		});
+		
+           var navtab=$("#navtab1").ligerTab();
+            navtab.bind('afterSelectTabItem',
+            	    function(tabid) {
+		                if (tabid) {
+		                	if(tabid="tab1"){
+		                		window['shipping_tier_seg_grid'] = $("#shipping_tier_seg_grid").ligerGrid({
+		                	       unSetValidateAttr : false,
+		                	       onBeforeSubmitEdit : function(e) {
+		                	    	   var rs = shipping_tier_seg_grid.rows;
+		                	    	   if(e.column.columnname == "cityCode"){
+                                           if (e.value == null || e.value == "") {
+                                               return true;
+                                           }
+                                           for(var i=0;i<rs.length;i++){
+                                               if(rs[i].cityCode == e.value && e.rowindex != i){
+                                            	   Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.seg.error"/>');
+                                            	   return false;
+                                               }
+                                           }
+                                       }
+		                	       },
+		                	       columns : [{
+		                		                display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierseg.countryname"/>',
+		                		                name : 'countryCode',
+		                		                textField:'countryName',
+		                		                align : 'left',
+		                		                width : 150,
+		                		                editor : {
+		                		                        type: 'select',
+		                		                        valueField : 'countryCode',
+		                		                        textField:'name',
+		                		                        url:'${base.contextPath}/spm/country/query',
+		                		                        onChangeValue : function() {
+		                		                        	shipping_tier_seg_grid.updateRow(this.options.host_grid_row,{
+		                		                    			'stateCode':'',
+		                		                    			'stateName':'',
+		                		                    			'cityCode':'',
+		                		                                'cityName':''
+		                		                    		});
+		                		                        }
+		                		                },
+		                		                validate : {
+		                		                    required : true
+		                		                }
+		                		        },
+		                	           {
+		                	               display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierseg.statename"/>',
+		                	               name : 'stateCode',
+		                	               align : 'left',
+		                	               width : 150,
+		                	               textField : 'stateName',
+		                	               editor : {
+		                	                   type: 'select',
+		                	                   valueField : 'stateCode',
+		                	                   textField : 'name',
+		                	                   url : '${base.contextPath}/spm/state/query',
+		                	                   staticOptions : function(e){
+		                	                       e.column.editor.parms = {
+		                	                               countryCode : e.record.countryCode
+		                	                       }
+		                	                   },
+		                	                   onChangeValue:function(){
+		                	                	   shipping_tier_seg_grid.updateRow(this.options.host_grid_row,{
+		                	                           'cityCode':'',
+		                	                           'cityName':''
+		                	                       });
+		                	                   }
+		                	               }
+		                	           },
+		                	           {
+		                	               display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtierseg.cityname"/>',
+		                	               name : 'cityCode',
+		                	               align : 'left',
+		                	               width : 150,
+		                	               textField : 'cityName',
+		                	               editor : {
+		                	                   type: 'select',
+		                	                   valueField : 'cityCode',
+		                	                   textField:'name',
+		                	                   url:'${base.contextPath}/spm/city/query',
+		                	                   staticOptions : function(e){
+		                	                       e.column.editor.parms = {
+		                	                               stateCode : e.record.stateCode
+		                	                       }
+		                	                   }
+		                	              }
+		                	           }
+		                	       ],
+		                	       <#if isedit == '1'>
+		                	       url: '${base.contextPath}/dm/shippingTierSeg/query?shippingTierId=${RequestParameters.shippingTierId!}', 
+		                	       </#if>
+		                	       toolbar : {
+		                	           items: [
+		                	               {
+		                	                   text: '<@spring.message "sys.hand.btn.new"/>',
+		                	                   <#if accessService.access("ADD_EDITABLE") == false>
+		       		                           disable:true, 
+		       		                           </#if>
+		                	                   click: function(){
+		                                       	var currencyCode = $.ligerui.get('currencyCode').getValue();
+		                                    	if(currencyCode==""){
+		                                    		Hap.showError('<@spring.message "msg.error.delivery.shipping_tier_org_currency_notexist"/>');
+		                                    		return;
+		                                    	}
+		                	                   	shipping_tier_seg_grid.addRow({})
+		                	                   }, icon: 'add'
+		                	               },
+		                	               { line: true },
+		                	               { 
+		                	                   text : '<@spring.message "sys.hand.btn.delete"/>',
+		                	                   click : function(){
+		                	                   	 Hap.gridDelete({
+		                	                            grid : shipping_tier_seg_grid,
+		                	                            url : '${base.contextPath}/dm/shippingTierSeg/remove'
+		                	                        })
+		                	                   }, 
+		                	                   <#if accessService.access("DELETE_EDITABLE") == false>
+		       		                           disable:true, 
+		       		                           </#if> 
+		                	                   icon : 'delete'
+		                	               }
+		                	           ]
+		                	       },
+		                	       <#if accessService.access("DETAIL_EDITABLE") == false>
+		                           enabledEdit : false,
+		                           <#else>
+		                           enabledEdit : true,
+		                           </#if>
+		                	       checkbox: true,
+		                	       width : '99%',
+		                	       height : '98%',
+		                	       rownumbers : true
+		                	   });
+		                	}
+		                }
+                });
+    </script>
+</body>
+</html>

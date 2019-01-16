@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>天府电商</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <!-- Bootstrap -->
+  <link href="${base.contextPath}/resources/css/bootstrap${resource_suffix!}.css" rel="stylesheet">
+  <link href="${base.contextPath}/resources/css/style${resource_suffix!}.css" rel="stylesheet">
+  <link href="${base.contextPath}/resources/css/config${resource_suffix!}.css" rel="stylesheet">
+  <link href="${base.contextPath}/resources/css/font-awesome${resource_suffix!}.css" rel="stylesheet" type="text/css" />
+  <script src="${base.contextPath}/lib/jquery/jquery-1.9.0${resource_suffix!}.js" type="text/javascript"></script>
+  <!--[if lt IE 9]>
+    <script src="${base.contextPath}/resources/js/html5shiv.js"></script>
+  <![endif]-->
+<style>
+/*.page-footer-fixed{*/
+    /*position: fixed;*/
+    /*left: 0;*/
+    /*right: 0;*/
+    /*z-index: 10000;*/
+    /*bottom: 0;*/
+/*}*/
+
+
+/*@media(max-width:768px){*/
+    /*.page-footer-fixed {*/
+        /*position:static;*/
+    /*}*/
+/*}*/
+#head-bar {
+    height:25px;
+    background-color:#bc2826;
+}
+.alert-error{
+    color: red;
+    margin: -10px 0px 0px 0px;
+    text-align:center;
+    height: 30px;
+}
+</style>
+<script type="text/javascript">
+    function changeImg() {
+        var imgSrc = $("#imgObj");
+        var src = imgSrc.attr("src");
+        imgSrc.attr("src", chgUrl(src));
+    }
+    //时间戳   
+    //为了使每次生成图片不一致，即不让浏览器读缓存，所以需要加上时间戳   
+    function chgUrl(url) {
+        var timestamp = (new Date()).valueOf();
+        url = url.substring(0, 17);
+        if ((url.indexOf("&") >= 0)) {
+            url = url + "&timestamp=" + timestamp;
+        } else {
+            url = url + "?timestamp=" + timestamp;
+        }
+        return url;
+    }
+    
+    function changeLang(){
+        var lang=$("#lang").val();
+        var urlString=window.location.protocol+"//"+window.location.host+window.location.pathname+"?lang="+lang;
+        window.location.href=urlString;     
+        
+    }
+</script>
+</head>
+<body>
+<!-- ========== CONTENT START ========== -->
+<header>
+    <div id="head-bar"></div>
+</header>
+  <div class="container">
+<form action="${base.contextPath}/login" method="post" autocomplete="off">
+    <h1 class="page-title" style="margin-bottom: 5px; margin-top: 10px">
+        <img src="${base.contextPath}/resources/img/logo.png" />
+    </h1>
+    <div class="gap-10"></div>
+
+    <div class="row">
+      <div class="col-sm-7" style="margin-bottom:10px;">
+        <img src="${base.contextPath}/resources/img/login-left.jpg" height="400" class="img-responsive pull-right"/>
+        <span style="color: blue;"><@spring.message "mws.accountinfo.notice"/></span>
+      </div>
+      <div class="col-sm-5">        
+        <div class="pull-left"><h2><@spring.message "sys.hand.btn.login"/></h2></div>
+        <div class="pull-right">
+          <select class="form-control" name="lang" id="lang" tabindex="1" onchange="changeLang()">
+             <#list languages as l>
+                  <option value="${l.langCode}" <#if base.getLocale() == l.langCode>selected</#if> >${l.description}</option>
+             </#list>
+          </select>
+        </div>
+        <div class="gap-20"></div>
+        <div id="message"></div>
+                <div class="alert-error">
+        <#if msg??>
+                    <span>${msg}</span>
+        </#if>
+                </div>
+          <div class="form-group">
+            <label><@spring.message "mws.myaccount.accountinfo.account"/></label> 
+            <a class="pull-right" tabindex="-1" href="${base.contextPath}/user/retrieve_user.html"><@spring.message "mws.myaccount.accountinfo.forget_account"/></a>
+            <input id="loginName" type="text" class="form-control input-lg" placeholder="" name="loginName" <#if _loginName??>value="${_loginName}"</#if>>
+          </div>
+          <div class="form-group" style="margin-top: 20px;">
+            <label><@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.password"/></label> 
+            <a class="pull-right" tabindex="-1" href="${base.contextPath}/user/retrieve_password_before.html"><@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.password.forget"/></a>
+            <input type="password" class="form-control input-lg" placeholder="" name="password" <#if _password??>value="${_password}"</#if>>
+          </div>
+          <div class="form-group" style="margin-top: 20px;">
+            <label><@spring.message "type.com.lkkhpg.dsis.platform.dto.system.user.verifycode"/></label>
+            <div class="row">
+                <div class="col-xs-5"><input type="text" class="form-control input-lg" placeholder="" name="verifiCode" style="float: left;"></div>
+                    <div class="input-icon left">
+                        <i class="icon-lock"></i>
+                        <i class="fa fa-refresh" title="<@spring.message 'type.com.lkkhpg.dsis.platform.dto.system.user.verifycode.refresh'/>" style="cursor:pointer;color:#999;position: static !important;border: 1px solid #ccc;height:32px; line-height:32px;padding:0px 6px;margin-top: 7px;margin-left: 5px;" onclick="changeImg()"></i>
+                        <img id="imgObj" src="${base.contextPath}/verifiCode" style="border:none;float: left;margin-top: 6px;" onclick="changeImg()"/>
+                    </div>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 37px;">
+                <button type="submit" class="btn btn-lg btn-block btn-col-lg-6" style="background-color: #BC2826;"><@spring.message "sys.hand.btn.login"/></button>
+          </div>
+         <div class="checkbox pull-left">
+            <label>
+              <input type="checkbox"><@spring.message "mws.myaccount.accountinfo.remember_account"/>
+            </label>
+          </div>
+          <!--<a href="${base.contextPath}/user/reg.html" class="pull-right" style="margin-top:10px"><@spring.message "mws.myaccount.accountinfo.create_account"/></a>-->
+        
+        <div class="gap-30"></div>
+
+      </div>
+    </div>
+<script>
+    /* added by 13525 2018.03.06 */
+
+    var loginName = JSON.parse(window.localStorage["loginName"] || '');
+    $("#loginName").val(loginName)
+    window.localStorage["loginName"] = JSON.stringify('');
+
+    var dialogHtml=
+        '<div class="modal in" tabindex="-1" data-backdrop="static" data-keyboard="false" style="background-color: rgb(0,0,0,0.5);display: block; padding-right: 17px;">'+
+        '<div class="modal-dialog" role="document">'+
+        '<div class="modal-content">'+
+        '<div class="modal-header">'+
+        '<h4 class="modal-title">提示</h4></div>'+
+        '<div class="modal-body">'+
+        '<div class="modal-dialog-image modal-dialog-image-donne"></div>'+
+        '<div class="modal-dialog-content" id="dialogContent">恭喜您注册成功，请重新登录！</div>'+
+        '</div>'+
+        '<div class="modal-footer">'+
+        '<button data-dismiss="modal" class="btn btn-primary" onclick="dialogBtn()">确定</button>'+
+        '</div>'+
+        '</div>'+
+        '</div>'+
+        '</div>';
+
+    //$("#dialog").append(dialogHtml);
+    window.localStorage["N"] = JSON.stringify('N');
+    var regSuc = JSON.parse(window.localStorage["regSuc"] || window.localStorage["N"]);
+    if( regSuc == "Y" ){
+        $("#dialog").append(dialogHtml);
+    }
+    function dialogBtn() {
+        $("#dialog").remove();
+        window.localStorage["regSuc"] = JSON.stringify('N');
+    }
+//window.localStorage["accountFlag"] = JSON.stringify("Y");
+    var accountFlag = JSON.parse(window.localStorage["accountFlag"] || window.localStorage["N"]);
+    if(accountFlag == "Y"){
+        var loginName = JSON.parse(window.localStorage["loginName"]);
+        window.localStorage["loginName"] = JSON.stringify('');
+        $("#loginName").val(loginName)
+    }
+    window.localStorage["accountFlag"] = JSON.stringify("N");
+
+</script>
+</form>
+  </div>
+<footer id="footer" class="page-footer-fixed">
+  <div id="copyright">
+    <div class="container">&copy; Copyright TianFu 2018 | All Rights Reserved.</div>
+  </div>
+</footer>
+</body>
+</html>

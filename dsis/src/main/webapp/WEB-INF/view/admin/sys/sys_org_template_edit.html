@@ -1,0 +1,310 @@
+<#-- 
+* description: 配置组织模板 
+* version: 1.0 
+* author: runbai.chen 
+* Copyright LKK Health Products Group Limited.
+* --> 
+<#include "../include/head.html">
+<body style="padding: 15px">
+    <script
+        src="${base.contextPath}/common/code?yes_no=SYS.YES_NO&organizationTypeData=SYS.ORGANIZATION_TYPE"
+        type="text/javascript"></script>
+    <form id="mainform" method="post"
+        enctype="application/json;charset=UTF-8">
+        <input type="hidden" name="orgTemplateDtls" id="orgTemplateDtls"
+            value="" />
+    </form>
+    <div id="orgTemplateDtlsGrid"
+        style="margin-left: 2px; margin-top: 2px;"></div>
+    <script type="text/javascript">
+        <#assign isedit = (RequestParameters.isedit!'0')/> 
+        //表单底部按钮 
+        Hap.setFormDefaultBtn(f_cancel, f_save);
+        
+        var mainform = $("#mainform");
+		mainform.attr("action", "${base.contextPath}/sys/orgtemplate/submit");
+		var gridDatas;
+		//lov_template_salesOrg
+		//lov_sales_organization
+        var salesEditor = $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_template_salesOrg")}, {
+        	onSelect : function(selectData) {
+        		if(gridDatas != ''){
+        			for (var i=0; i<gridDatas.length; i++) {
+        				if (gridDatas[i].assignType == 'SALES' && gridDatas[i].assignValue == selectData.value) {
+        					Hap.showError("<@spring.message 'msg.error.config.sales_org_is_repeat' />");
+        					return false;
+        				}
+        			}
+        		}
+        	}
+        });
+		//lov_template_invOrg
+		//im_org_id_autocomplete
+        var invEditor = $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_template_invOrg")}, {
+        	onSelect : function(selectData) {
+        		if(gridDatas != ''){
+        			for (var i=0; i<gridDatas.length; i++) {
+        				if (gridDatas[i].assignType == 'INV' && gridDatas[i].assignValue == selectData.value) {
+        					Hap.showError("<@spring.message 'msg.error.config.inv_org_is_repeat' />");
+        					return false;
+        				}
+        			}
+        		}
+        	}
+        });
+        
+        var form  = mainform.ligerForm({
+            inputWidth : 280,
+            fields : [{
+                name:'orgTemplateId',
+                type:'hidden'
+            },{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.orgtemplate.templatecode"/>',
+                name : "templateCode",
+                type : "text",
+                width:150,
+                validate : {
+                    required : true
+                }
+            }, {
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.prompt.description"/>',
+                name : "remark",
+                type : "text",
+                validate : {
+                    required : true
+                }
+            }]
+        });
+    
+        orgTemplateDtlsGrid = $("#orgTemplateDtlsGrid").ligerGrid({
+            columns : [{
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.orgtemplatedtl.assigntype"/>',
+                name : 'assignType',
+                width : 150,
+                align : 'left',
+                valueField : 'value',
+                textField : 'meaning',
+                validate : {
+                    required : true
+                },
+                editor : {
+                    type : 'select',
+                    data : organizationTypeData,
+                    valueField : 'value',
+                    textField : 'meaning'
+                },
+                render : function(item) {
+                    for (var i = 0; i < organizationTypeData.length; i++) {
+                        if (organizationTypeData[i]['value'] == item.assignType)
+                            return organizationTypeData[i]['meaning']
+                    }
+                    return item.assignType;
+                }
+            },{
+                display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.orgtemplatedtl.assignvalue"/>',
+                name : 'assignValue',
+                id : 'assignValue',
+                textField : 'assignMeaning',
+                validate : {
+                    required : true
+                },
+                editor  : salesEditor,
+                render : function(item) {
+                	if (item.__status != 'add') {
+	                    return item.assignValueName;
+                    } else {
+                    	return item.assignMeaning;
+                    }
+                }
+            },{ 
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.defaultflag"/>',
+                name: 'defaultFlag', align: 'left', width: '80',
+                validate : {
+                    required : true
+                },
+                editor : {
+                    type : 'select',
+                    data : yes_no,
+                    valueField : 'value',
+                    textField : 'meaning'
+                },
+                render : function(item) {
+                    for (var i = 0; i < yes_no.length; i++) {
+                        if (yes_no[i]['value'] == item.defaultFlag)
+                            return yes_no[i]['meaning']
+                    }
+                    return item.defaultFlag;
+                }
+            }],
+            showToggleColBtn : false,
+            onAfterEdit : f_onAfterEdit,
+            width : '100%',
+            height : '94%',
+            rowHeight : 24,
+            columnWidth : 100,
+            root: 'rows',
+            record: 'total',
+            usePager : true,
+            mouseoverRowCssClass : null,
+            enabledEdit : true,
+            checkbox : true,
+            onBeforeEdit: f_onBeforeEdit,
+            <#if isedit == '1'>
+             url: '${base.contextPath}/sys/orgtemplatedtl/query?orgTemplateId=${RequestParameters.orgTemplateId!}', 
+            </#if>
+            toolbar : {
+                items : [ {
+                    text : '<@spring.message "sys.hand.btn.new"/>',
+                    disable : false,
+                    click : function() {
+                    	gridDatas = orgTemplateDtlsGrid.getData();
+                        orgTemplateDtlsGrid.addRow({})
+                    },
+                    icon : 'add'
+                }, {
+                    line : true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click : function() {
+                    	Hap.gridDelete({
+                    		grid : orgTemplateDtlsGrid
+                    	})
+                    },
+                    icon : 'delete'
+                } ]
+            }
+        });
+        <#if isedit == '1'>
+        Hap.loadForm({form:form,url:'${base.contextPath}/sys/orgtemplate/query',para:{orgTemplateId:${RequestParameters.orgTemplateId}}})
+       </#if>
+        
+        //控制默认值只能有一个Y
+        function f_onAfterEdit(rowdata){
+            var id = rowdata.record.__index;
+            if(rowdata.record.assignType == 'SALES'){
+                var defaultf = rowdata.record.defaultFlag;
+                var allRow = orgTemplateDtlsGrid.getData();
+                for(var i = 0;i<allRow.length;i++){
+                    if(allRow[i].assignType == 'SALES' && i != id && defaultf == 'Y'){
+                        orgTemplateDtlsGrid.updateRow(orgTemplateDtlsGrid.getRow(i),{
+                        	defaultFlag : 'N'
+                        });
+                    }
+                }
+            }else if(rowdata.record.assignType == 'INV'){
+                var defaultf = rowdata.record.defaultFlag;
+                var allRow = orgTemplateDtlsGrid.getData();
+                for(var i = 0;i<allRow.length;i++){
+                    if(allRow[i].assignType == 'INV' && i != id && defaultf == 'Y'){
+                        orgTemplateDtlsGrid.updateRow(orgTemplateDtlsGrid.getRow(i),{
+                        	defaultFlag : 'N'
+                        });
+                    }
+                }
+            }
+        	if (rowdata.column.columnname == 'assignType') {
+                orgTemplateDtlsGrid.updateRow(orgTemplateDtlsGrid.getRow(id),{
+                	assignValue : '',
+                	assignMeaning : ''
+                });
+        	}
+        }
+        
+        function f_onBeforeEdit(rowdata){
+        	if (rowdata.column.name == "defaultFlag") {
+        		return true;
+        	}
+            if(rowdata.record.__status != 'add'){
+                return false;
+            }
+            //如果在分配值上点击，则根据分配类型更改LOV
+            if(rowdata.column.name == "assignValue"){
+                var assignType = rowdata.record.assignType;
+                if(assignType == null || assignType == ""){
+                    return false;
+                } 
+                //销售组织
+                if(rowdata.record.assignType == 'SALES'){
+                    rowdata.column.editor = salesEditor;
+                    orgTemplateDtlsGrid.setCellEditing(rowdata.record, rowdata.column, true);
+                }
+                //库存组织
+                else if(rowdata.record.assignType == 'INV'){
+                    rowdata.column.editor = invEditor;
+                    orgTemplateDtlsGrid.setCellEditing(rowdata.record, rowdata.column, true);
+                }
+            }
+            return true;
+        }
+        /*保存*/
+        function f_save() {
+        	if (!f_validator()) {
+        		return false;
+        	}
+            Hap.submitForm({
+                form:form,
+                grid:orgTemplateDtlsGrid,
+                gridName:'orgTemplateDtls',
+                url:'${base.contextPath}/sys/orgtemplate/submit',
+                success:function(json,opt){
+                    $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+                        orgTemplateDtlsGrid.reload();
+                        f_cancel();
+                    });
+                }
+            });
+        }
+        /*关闭弹框*/
+        function f_cancel() {
+            var dialog = frameElement.dialog;
+            dialog.close();
+        }
+        /*校验模板代码是否重复*/
+        function f_validator() {
+        	var dialog = frameElement.dialog;
+        	var fromData = dialog.get("data").gridData;
+        	var orgTemplateId = $("#orgTemplateId").val();
+        	var templateCode = liger.get("templateCode").getValue();
+            for (var i=0; i<fromData.length; i++) {
+            	if (fromData[i].templateCode == templateCode && fromData[i].orgTemplateId != orgTemplateId) {
+            		Hap.showError("<@spring.message 'msg.error.sys_temp_code_repeat' />");
+            		return false;
+            	}
+            }
+            var salesNum = 0;
+        	var invNum = 0;
+        	var salesTypeNum = 0;
+        	var invTypeNum = 0;
+            var data = orgTemplateDtlsGrid.rows;
+            if (data.length == 0) {
+            	Hap.showError("<@spring.message 'msg.error.spm.choice_one_org_type' />");
+            	return false;
+            }
+            for (var i = 0; i < data.length; i++) {
+            	if (orgTemplateDtlsGrid.getRow(i).assignType == 'SALES') {
+            		salesTypeNum ++;
+            		if (orgTemplateDtlsGrid.getRow(i).defaultFlag == "Y") {
+                    	salesNum ++;
+                    }
+            	}
+            	if (orgTemplateDtlsGrid.getRow(i).assignType == 'INV') {
+            		invTypeNum ++;
+            		if (orgTemplateDtlsGrid.getRow(i).defaultFlag == "Y") {
+                    	invNum ++;
+                    }
+            	}
+            }
+            if (salesNum != 1 && salesTypeNum > 0) {
+            	Hap.showError("<@spring.message 'msg.error.config.sales_org_has_one_defalut' />");
+       	   		return false;
+            }
+            if (invNum != 1 && invTypeNum > 0) {
+            	Hap.showError("<@spring.message 'msg.error.config.inv_org_has_one_defalut' />");
+       	   		return false;
+            }
+            return true;
+        }
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<#--
+        * description: 付款配置界面
+        * version: 1.0
+        * author:mclin
+        * Copyright LKK Health Products Group Limited
+        -->
+    <#include "../include/head.html">
+        <body style="padding: 5px">
+        <div id="TF_PAY_Grid" style="margin-left: 2px; margin-top: 2px; margin-bottom: 25px;"></div>
+        <div id="TF_DOWN_ACCOUNT_Grid" style="margin-left: 2px; margin-bottom: 25px;"></div>
+        <!--<div id="migsGrid" style="margin-left: 2px; margin-top: 2px; margin-bottom: 25px;"></div>-->
+        <!--<div id="unionGrid" style="margin-left: 2px; margin-bottom: 25px;"></div>-->
+        <!--<div id="nonUnionGrid" style="margin-left: 2px;"></div>-->
+        <script type="text/javascript">
+            //        function migs_save() {
+            //        	Hap.gridSave({
+            //                grid: migsGrid,
+            //                url:'${base.contextPath}/sys/payment/submit'
+            //            });
+            //        }
+            //
+            //        function unions_save() {
+            //        	Hap.gridSave({
+            //                grid: unionsGrid,
+            //                url:'${base.contextPath}/sys/payment/submit'
+            //            });
+            //        }
+            //
+            //        function nonUnions_save() {
+            //        	Hap.gridSave({
+            //                grid: nonUnionsGrid,
+            //                url:'${base.contextPath}/sys/payment/submit'
+            //            });
+            //        }
+            //        migsGrid = $("#migsGrid").ligerGrid({
+            //            columns : [
+            //            	{
+            //                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.key"/>',
+            //                    name: "key", align:"left", width:200,
+            //                },
+            //                {
+            //                	display:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.value"/>',
+            //                	name: "value", align:"left", width:400,
+            //                    editor : {
+            //                        type : 'text'
+            //                    }
+            //				}
+            //			],
+            //            width : '99%',
+            //            height : 215,
+            //            usePager : false,
+            //            enabledEdit : true,
+            //            checkbox : false,
+            //            url: '${base.contextPath}/sys/payment/queryMigs',
+            //            toolbar : {
+            //                items : [{
+            //                    text : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.migs"/>',
+            //                    disable : true,
+            //                }, {
+            //                    text : '<@spring.message "sys.hand.btn.save"/>',
+            //                    disable : false,
+            //                    click : function() {
+            //                    	migs_save();
+            //                    },
+            //                    icon : 'save'
+            //                }]
+            //            }
+            //        });
+            //
+            //        unionsGrid = $("#unionGrid").ligerGrid({
+            //            columns : [{
+            //                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.key"/>',
+            //                    name: "key", align:"left", width:200,
+            //                },
+            //                {
+            //                	display:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.value"/>',
+            //                	name: "value", align:"left", width:400,
+            //                    editor : {
+            //                        type : 'text'
+            //                    }
+            //				}
+            //			],
+            //            width : '99%',
+            //            height : 215,
+            //            usePager : false,
+            //            enabledEdit : true,
+            //            checkbox : false,
+            //            url: '${base.contextPath}/sys/payment/queryUnions',
+            //            toolbar : {
+            //                items : [{
+            //	                text : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.union"/>',
+            //	                disable : true,
+            //            	}, {
+            //                    text : '<@spring.message "sys.hand.btn.save"/>',
+            //                    disable : false,
+            //                    click : function() {
+            //                    	unions_save();
+            //                    },
+            //                    icon : 'save'
+            //                }]
+            //            }
+            //        });
+            //
+            //        nonUnionsGrid = $("#nonUnionGrid").ligerGrid({
+            //            columns : [
+            //            	{
+            //                    display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.key"/>',
+            //                    name: "key", align:"left", width:200,
+            //                },
+            //                {
+            //                	display:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.value"/>',
+            //                	name: "value", align:"left", width:400,
+            //                    editor : {
+            //                        type : 'text'
+            //                    }
+            //				}
+            //			],
+            //            width : '99%',
+            //            height : 215,
+            //            usePager : false,
+            //            enabledEdit : true,
+            //            checkbox : false,
+            //            url: '${base.contextPath}/sys/payment/queryNonUnions',
+            //            toolbar : {
+            //                items : [{
+            //                    text : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.nonunion"/>',
+            //                    disable : true,
+            //                }, {
+            //                    text : '<@spring.message "sys.hand.btn.save"/>',
+            //                    disable : false,
+            //                    click : function() {
+            //                    	nonUnions_save();
+            //                    },
+            //                    icon : 'save'
+            //                }]
+            //            }
+            //        });
+
+            function tfpay_save() {
+                Hap.gridSave({
+                    grid: TF_PAY_Grid,
+                    url:'${base.contextPath}/sys/payment/submit'
+                });
+            }
+
+            function download_account_save() {
+                Hap.gridSave({
+                    grid: TF_DOWN_ACCOUNT_Grid,
+                    url:'${base.contextPath}/sys/payment/submit'
+                });
+            }
+
+         TF_PAY_Grid = $("#TF_PAY_Grid").ligerGrid({
+                columns : [
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.key"/>',
+                        name: "key", align:"left", width:200,
+                    },
+
+                    {
+                        display:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.value"/>',
+                        name: "value", align:"left", width:400,
+                        editor : {
+                            type : 'text'
+                        }
+                    }
+                ],
+                width : '99%',
+                height : 315,
+                usePager : false,
+                enabledEdit : true,
+                checkbox : false,
+                url: '${base.contextPath}/sys/payment/queryTFPAY',
+                toolbar : {
+                    items : [{
+                        text : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.tfPayment"/>',
+                        disable : true,
+                    },
+                        {
+                        text : '<@spring.message "sys.hand.btn.save"/>',
+                        disable : false,
+                        click : function() {
+                            tfpay_save();
+                        },
+                        icon : 'save'
+                    }]
+                }
+            });
+
+
+
+          TF_DOWN_ACCOUNT_Grid = $("#TF_DOWN_ACCOUNT_Grid").ligerGrid({
+                columns : [
+                    {
+                        display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.key"/>',
+                        name: "key", align:"left", width:200,
+                    },
+
+                    {
+                        display:'<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.value"/>',
+                        name: "value", align:"left", width:400,
+                        editor : {
+                            type : 'text'
+                        }
+                    }
+                ],
+                width : '99%',
+                height : 300,
+                usePager : false,
+                enabledEdit : true,
+                checkbox : false,
+                url: '${base.contextPath}/sys/payment/queryDownLoad',
+                toolbar : {
+                    items : [{
+                        text : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.payment.downloadAccount"/>',
+                        disable : true,
+                    }, {
+                        text : '<@spring.message "sys.hand.btn.save"/>',
+                        disable : false,
+                        click : function() {
+                            download_account_save();
+                        },
+                        icon : 'save'
+                    }]
+                }
+            });
+        </script>
+        </body>
+        </html>

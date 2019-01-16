@@ -1,0 +1,206 @@
+<#--
+ * description: 税率查询界面
+ * version: 1.0
+ * author: shenqiubin
+ * Copyright LKK Health Products Group Limited. 
+ *
+-->
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?taxTypes=SPM.TAX_TYPE" type="text/javascript"></script>
+<body style="padding: 10px;">
+    <form id="spm_tax_form" ></form>
+    <div id="spm_tax_grid"></div>
+    <script type="text/javascript">
+    $(function(){
+        window['spm_tax_form'] = $("#spm_tax_form").ligerForm({
+            fields: [
+                     {
+                         label :'<@spring.message "type.com.lkkhpg.dsis.common.config.dto.tax.code"/>',
+                         name : "taxCode",type : "text",newline : false
+                     },
+                     {
+                         label : '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.tax.name"/>',
+                         name : "taxName",type : "text",newline : false
+                     }
+                 ],
+                 buttons: [
+                           { 
+                               text: '<@spring.message "sys.hand.btn.query"/>',
+                               disabled:false, 
+                               width: 60, 
+                               click: function(){
+                                   Hap.gridQuery({
+                                       form:spm_tax_form,
+                                       grid:spm_tax_grid
+                                   })
+                               }
+                           },
+                           {
+                               text: '<@spring.message "sys.hand.btn.save"/>',
+                               disabled: false,
+                               width: 60,
+                               click: function(){
+                                   if(Hap.validateGrid(spm_tax_grid)){
+                                       var gridData = spm_tax_grid.rows;
+                                       if(gridData.length >0){
+                                    	   $.ajax({
+                                               type : "POST",
+                                               url : '${base.contextPath}/spm/tax/save',
+                                               contentType : "application/json",
+                                               data : JSON2.stringify(gridData),
+                                               dataType : "json",
+                                               success : function(data) {
+                                                   if (data.success) {
+                                                       Hap.showSuccess($l('sys.hand.tip.success'),
+                                                       function() {
+                                                           location.reload();
+                                                       });
+                                                   }
+                                               }
+                                           }); 
+                                       }
+                                   }
+                               }
+                           }
+                       ]
+        });
+
+        window['spm_tax_grid'] = $("#spm_tax_grid").ligerGrid({
+        	onBeforeEdit : function(e){
+        		if(e.record.__status == 'add'){
+        			return true;
+        		}else if(e.column.name == 'taxCode'){
+        			return false;            
+        		}else if(e.column.name == 'taxName'){
+        			return true;            
+        		}else if(e.column.name == 'taxType'){
+        			return true;            
+        		}else if(e.column.name == 'taxPercent'){
+            	 return true;            
+        		}else if(e.column.name == 'endActiveDate'){
+        			return true;            
+        		}else if(e.column.name == 'description'){
+        			return true;            
+        		}else{
+        			return false;
+        		}
+        	},
+            onBeforeSubmitEdit : function(e) {
+                var rs = spm_tax_grid.rows;
+                if (e.column.columnname == "endActiveDate") {
+                    if (e.value == null || e.value == "") {
+                        return true;
+                    }
+                    now = new Date() ;
+                    if (e.value < new Date(now.getFullYear(),now.getMonth(),now.getDate())) {
+                    	Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.config.spmoperatingunit.expiration.date"/>');
+                        return false;
+                    }
+                }
+                //币种编码必须唯一
+                if(e.column.columnname == "taxCode"){
+                    if (e.value == null || e.value == "") {
+                        return true;
+                    }
+                    for(var i=0;i<rs.length;i++){
+                        if(rs[i].taxCode == e.value){
+                        	Hap.showError('<@spring.message "type.taxcode.error"/>');
+                            return false;
+                        }
+                    }
+                }
+            },
+            columns: [
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.tax.code"/>',
+                          name: 'taxCode', align: 'left', width: '150',
+                          editor : {
+                              type:'text'
+                          },
+                          validate: {
+                              required: true
+                          }
+                      },
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.tax.name"/>',
+                          name: 'taxName', align: 'left', width: '150',
+                          editor : {
+                              type:'text'
+                          },
+                          validate: {
+                              required: true
+                          }
+                      },
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.common.config.dto.tax.type"/>',
+                          name: 'taxType', align: 'left', width: '150',
+                          editor : {
+                              type : 'combobox',
+                              data : taxTypes,
+                              valueField: 'value',
+                              textField: 'meaning',
+                          },
+                          render : function(item) {
+                              for (var i = 0; i < taxTypes.length; i++) {
+                                  if (taxTypes[i]['value'] == item.orgType)
+                                      return taxTypes[i]['meaning']
+                              }
+                              return item.taxType;
+                          },
+                          validate: {
+                              required: true
+                          }
+                      },
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.taxrate"/>(%)',
+                          name: 'taxPercent', align: 'left', width: '150',
+                          editor : {
+                              type:'text',
+                              onChangeValue:function(data){
+                            	  if(!/^\d+(\.\d+)?$/.test(data)){
+                            		  $(this.element).val("");
+                            	  }
+                              }
+                          },
+                          validate: {
+                              required: true
+                          }
+                      },
+                      {
+                          display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.endActiveDate"/>',
+                          name: 'endActiveDate', align: 'left', width: '150',
+                          format: 'yyyy-MM-dd',
+                          type: 'date',
+                          editor : {
+                              type:'date'
+                          }
+                      },
+                      {
+                          display: '<@spring.message "sys.hand.common.comment"/>',
+                          name: 'description', align: 'left', width: '150',
+                          editor : {
+                              type:'text'
+                          }
+                      }
+                      ],
+                      url:'${base.contextPath}/spm/tax/query',
+                      toolbar: {
+                          items: [
+                                  {
+                                      id : 'member_grid_add',
+                                       text : '<@spring.message "sys.hand.btn.new"/>',
+                                       disabled : true,
+                                       click : function() {
+                                           spm_tax_grid.addRow({})
+                                       },
+                                       icon : 'add'
+                                  }
+                                  ]
+                      },
+                      enabledEdit : true,
+                      width : '99%',
+                      height : '98%'
+        });
+    });
+    </script>
+</body>

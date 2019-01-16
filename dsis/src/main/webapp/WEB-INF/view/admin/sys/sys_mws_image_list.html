@@ -1,0 +1,329 @@
+<#--
+ * description: MWS图片维护
+ * version: 1.0 
+ * author:njq.niu@hand-china.com
+ * Copyright LKK Health Products Group Limited 
+ * 
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+<style>
+.panel {
+    margin-bottom:20px; 
+}
+.panel-title {
+    font-size:16px;
+    line-height:20px;
+    padding:5px;
+    background-color:#f4f4f4;
+} 
+</style>
+    <form id="attForm" style="margin:0px;"></form> 
+    <div class="panel">
+        <div class="panel-title"><@spring.message "com.lkkhpg.dsis.common.system.dto.mwimages.carousel"/></div>
+        <div id="MWS_SITE_CAROUSEL" style="margin-top: 10px; padding: 0"></div>
+    </div>
+    <div class="panel">
+        <div class="panel-title"><@spring.message "com.lkkhpg.dsis.common.system.dto.mwimages.main_adv"/></div>
+        <div id="MWS_SITE_MAIN" style="margin-top: 10px; padding: 0"></div>
+    </div>
+    <div class="panel">
+        <div class="panel-title"><@spring.message "com.lkkhpg.dsis.common.system.dto.mwimages.banner"/></div>
+        <div id="MWS_SITE_BANNER" style="margin-top: 10px; padding: 0"></div>
+    </div> 
+    <script type="text/javascript">
+    function openUploadDialog(imageId,code){
+        $.ligerDialog.open({
+            height: 150,
+            width: 280,
+            url:'sys_mws_image_upload.html?sourceKey='+imageId+'&sourceType='+code  
+        });
+    }
+    
+    
+    function showImage(code,id, fid){
+        var grid = $.ligerui.get($('#'+code)),r;
+        for(var i=0;i<grid.rows.length;i++){
+            if(grid.rows[i].imageId == id){
+                r = grid.rows[i];
+                break; 
+            }
+        }
+        
+        grid.updateRow(r,{fileId:fid}); 
+    }
+    
+    
+    window['attForm'] = $("#attForm").ligerForm({
+        fields : [{
+            display : "", 
+            name : "marketId", 
+            type : "hidden", 
+            options:{
+                value:'${Session._marketId!}'
+            }
+        }]
+    });
+    
+
+    window['carouselGrid'] = $("#MWS_SITE_CAROUSEL").ligerGrid({
+        columns : [ {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.image"/>',
+            name : 'fileId',
+            align : 'center',
+            width : 200,
+            render:function(item){
+                if(item.fileId) 
+                	return '<a target="_blank"  href="${base.contextPath}/sys/attach/file/view?fileId='+item.fileId+'"><img style="height:28px;width:auto " src="${base.contextPath}/sys/attach/file/view?fileId='+item.fileId+'&_r='+Math.random()+'"></img></a>'
+            }
+            
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.url"/>',
+            name : 'url',
+            width : 450,
+            align:'left',
+            editor:{
+                type:'text'
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.upload"/>', 
+            name : 'fileId',
+            align : 'center',
+            width : 100,
+            render: function(item){
+                if(item.imageId) {
+                    return '<a href="javascript:openUploadDialog('+item.imageId+',\'MWS_SITE_CAROUSEL\')"><@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.upload"/></a>'
+                }
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.sort_number"/>',  
+            name : 'sortNumber',
+            width : 100, 
+            align:'right',
+            editor : {
+                type : 'int',
+                sign:false
+            }
+        }],
+        url : '${base.contextPath}/mws/images/query?moduleType=MWS_SITE_CAROUSEL',
+        toolbar : {
+            items : [ {
+                text : '<@spring.message "sys.hand.btn.new"/>',
+                disable : false,
+                click : function() {
+                    $.ligerDialog.open({
+                        height: 300, 
+                        width: 600, 
+                        title:'upload',
+                        url:'sys_mws_image_create.html?sourceType=MWS_SITE_CAROUSEL&moduleCode=MWS_SITE_CAROUSEL&moduleType=MWS_SITE_CAROUSEL'
+                    });
+                    //carouselGrid.addRow({marketId:'${Session._marketId!}',moduleCode:'MWS_SITE_CAROUSEL',moduleType:'MWS_SITE_CAROUSEL'})
+                },
+                icon : 'add'
+            }, {
+                line : true
+            },{
+                text : '<@spring.message "sys.hand.btn.delete"/>',
+                click : function() {
+                    Hap.gridDelete({
+                        url : '${base.contextPath}/mws/images/batchDelete',
+                        grid : carouselGrid
+                    })
+
+                },
+                icon : 'delete'
+            }, {
+                line : true
+            }, {
+                text : '<@spring.message "sys.hand.btn.save"/>',
+                click : function() {
+                    Hap.gridSave({
+                        grid : carouselGrid,
+                        url : '${base.contextPath}/mws/images/batchSubmit'
+                    })
+                },
+                icon : 'save'
+            } ]
+        },
+        delayLoad:true,
+        enabledEdit : true, 
+        width : '99%',
+        height : 250,
+        usePager : false,
+        checkbox : true
+    });
+
+    
+    
+
+    window['mainGrid'] = $("#MWS_SITE_MAIN").ligerGrid({
+        columns : [ {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.image"/> ',
+            name : 'fileId',
+            align : 'center',
+            width : 200,
+            render:function(item){
+                if(item.fileId) 
+                	return '<a target="_blank"  href="${base.contextPath}/sys/attach/file/view?fileId='+item.fileId+'"><img style="height:28px;width:auto " src="${base.contextPath}/sys/attach/file/view?fileId='+item.fileId+'&_r='+Math.random()+'"></img></a>'
+            }
+            
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.url"/>',
+            name : 'url',
+            width : 450,
+            align:'left',
+            editor:{
+                type:'text'
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.upload"/>',
+            name : 'fileId',
+            align : 'center',
+            width : 100,
+            render: function(item){
+                if(item.imageId) {
+                    return '<a href="javascript:openUploadDialog('+item.imageId+',\'MWS_SITE_MAIN\')"><@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.upload"/></a>'
+                }
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.sort_number"/>', 
+            name : 'sortNumber',
+            width : 100, 
+            align:'right',
+            editor : {
+                type : 'int',
+                sign:false
+            }
+        }],
+        url : '${base.contextPath}/mws/images/query?moduleType=MWS_SITE_MAIN',
+        toolbar : {
+            items : [ {
+                text : '<@spring.message "sys.hand.btn.save"/>',
+                disable : false,
+                click : function() {
+                    Hap.gridSave({
+                        grid : mainGrid,
+                        url : '${base.contextPath}/mws/images/batchSubmit'
+                    })
+                },
+                icon : 'save'
+            }]
+        },
+        delayLoad:true,
+        enabledEdit : true,  
+        width : '99%',
+        height : 250, 
+        usePager : false ,
+        rownumbers:true 
+    });
+    
+    window['bannerGrid'] = $("#MWS_SITE_BANNER").ligerGrid({
+        columns : [{
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.moduleCode"/>',
+            name : 'moduleCode',
+            width : 150, 
+            align:'left',
+            typeCase:'uppercase', 
+            editor:{
+                type:'text'
+            },
+            validate: {
+                required:true
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.image"/> ',
+            name : 'fileId',
+            align : 'center',
+            width : 200,
+            render:function(item){
+                if(item.fileId) 
+                	return '<a target="_blank"  href="${base.contextPath}/sys/attach/file/view?fileId='+item.fileId+'"><img style="height:28px;width:auto " src="${base.contextPath}/sys/attach/file/view?fileId='+item.fileId+'&_r='+Math.random()+'"></img></a>'
+            }
+            
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.url"/>',
+            name : 'url',
+            width : 450,
+            align:'left',
+            editor:{
+                type:'text' 
+            }
+        }, {
+            display : '<@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.upload"/>',
+            name : 'fileId',
+            align : 'center',
+            width : 100,
+            render: function(item){
+                if(item.imageId) {
+                    return '<a href="javascript:openUploadDialog('+item.imageId+',\'MWS_SITE_BANNER\')"><@spring.message "type.com.lkkhpg.dsis.common.system.dto.mwimages.upload"/></a>'
+                }
+            }
+        }],
+        url : '${base.contextPath}/mws/images/query?moduleType=MWS_SITE_BANNER',
+        toolbar : {
+            items : [{
+                text : '<@spring.message "sys.hand.btn.new"/>',
+                disable : false,
+                click : function() {
+                    $.ligerDialog.open({
+                        height: 300, 
+                        width: 600, 
+                        title:'upload',
+                        url:'sys_mws_image_create.html?sourceType=MWS_SITE_BANNER&moduleType=MWS_SITE_BANNER'
+                    });
+                	//bannerGrid.addRow({marketId:'${Session._marketId!}',moduleType:'MWS_SITE_BANNER'});
+                },
+                icon : 'add'
+            }, {
+                line : true
+            },{
+                text : '<@spring.message "sys.hand.btn.delete"/>',
+                click : function() {
+                    Hap.gridDelete({
+                        url : '${base.contextPath}/mws/images/batchDelete',
+                        grid : bannerGrid 
+                    })
+
+                },
+                icon : 'delete'
+            }, {
+                line : true
+            }, {
+                text : '<@spring.message "sys.hand.btn.save"/>',
+                click : function() {
+                    Hap.gridSave({
+                        grid : bannerGrid,
+                        url : '${base.contextPath}/mws/images/batchSubmit'
+                    })
+                },
+                icon : 'save'
+            }]
+        },
+        delayLoad:true,
+        enabledEdit : true,  
+        width : '99%',
+        height : 250, 
+        usePager : false ,
+        checkbox : true   
+    });
+    
+    
+    function initData(){
+        Hap.gridQuery({
+            form : attForm,
+            grid : carouselGrid
+        });
+        Hap.gridQuery({
+            form : attForm,
+            grid : mainGrid
+        })
+        Hap.gridQuery({
+            form : attForm,
+            grid : bannerGrid
+        })
+    }
+    initData(); 
+    
+    </script>
+</body>
+</html>

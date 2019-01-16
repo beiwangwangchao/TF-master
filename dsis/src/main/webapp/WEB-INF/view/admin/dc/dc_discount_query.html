@@ -1,0 +1,234 @@
+<#--
+ * description: 查询出入库记录界面
+ * version: 1.0
+ * author: mclin
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+	<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+	<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+	<script src="${base.contextPath}/common/code?adjustmentType=INV.ADJUSTMENT_TYPE&stockIoStatus=INV.STOCK_IN_OUT_STATUS"></script>
+	<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+	<form id="stock_query_form" method="post"></form>
+    <div id="stock_grid" style="margin: 0; padding: 0"></div>
+    <script type="text/javascript">
+
+        function getCookie(cookie_name) {
+            var allcookies = document.cookie;
+            var cookie_pos = allcookies.indexOf(cookie_name);//索引的长度
+
+            if (cookie_pos != -1) {
+                // 把cookie_pos放在值的开始，只要给值加1即可。
+                cookie_pos += cookie_name.length + 1;
+                var cookie_end = allcookies.indexOf(";", cookie_pos);
+                if (cookie_end == -1) {
+                    cookie_end = allcookies.length;
+                }
+                var value = unescape(allcookies.substring(cookie_pos, cookie_end));
+            }
+            return value;
+        }
+
+	    $(function() {
+	        $.ajax({
+	            url: '${base.contextPath}/spm/org/get',
+	            async: false,
+	            type: "POST",
+	            dataType: "json",
+	            contentType: "application/json",
+	            success: function(json) {
+	                window.orgSel = json.rows;
+	            },
+	            error: function() {
+	                return;
+	            }
+	        });
+	        window['stock_query_form'] = $("#stock_query_form").ligerForm({
+	        	inputWidth: 280,
+				space: 15,
+	        	fields: [
+	            {
+                    label: '<@spring.message "type.com.lkkhpg.dsis.common.discount.prompt.salesorgname"/>',
+                    type: 'select',
+                    newline: false,
+                    name: 'salesOrgId',
+                    //style: 'color: red',
+                    options: {
+                        cancelable: false,
+                        textField: 'name',
+                        valueField: 'salesOrgId',
+                        url: '${base.contextPath}/spm/salesOrg/querySalesOrgByRole',
+                        onSelected: function(newKey, newValue){
+                            //清空查询结果
+                            if (stock_grid.currentData != null && stock_grid.currentData.rows.length > 0) {
+                                var rows = stock_grid.currentData.rows;
+                                rows.splice(0, rows.length);
+                                stock_grid.reRender();
+                            }
+                        }
+                    }
+	            },
+	            {
+	                label: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.menberid"/>',
+	                newline: false,
+                    name : "memberCode",
+                    textField:'memberCode',
+                    type : "popup",
+                    editor : $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_memberdiscount")},{
+                        onLoadData:function(){
+                            var marketId ;
+                            // var salesOrgId = liger.get("salesOrgId").getValue();
+                            // var datas = liger.get("salesOrgId").data;
+                            // for(var t = 0 ; t< datas.length;t++){
+                            //     if(datas[t].salesOrgId == salesOrgId){
+                            //         marketId = datas[t].market.marketId;
+                            //     }
+                            // }
+                            marketId = getCookie("marketId");
+                            console.log(marketId);
+                            this.setParm('marketId',marketId)
+                        }
+                    })
+	            },
+	            {
+	                label: '<@spring.message "com.lkkhpg.dsis.common.member.dto.discountamtfrom"/>',
+	                type: 'text',
+	                newline: true,
+	                name: 'discountAmtFrom'
+	            },
+	            {
+	                label: '<@spring.message "com.lkkhpg.dsis.common.member.dto.discountamtto"/>',
+	                type: 'text',
+	                newline: false,
+	                name: 'discountAmtTo'
+	            }],
+	            buttons: [{
+                    text: '<@spring.message "sys.hand.btn.query"/>',
+                    disabled: false,
+                    width: 60,
+                    click: function () {
+                        Hap.gridQuery({
+                            form: stock_query_form,
+                            grid: stock_grid
+                        });
+                    }
+                }]
+	        });
+	        // liger.get('marketId').setValue(_invOrgId);
+            // liger.get('marketId').setText(_invOrgName);
+
+	        window['stock_grid'] = $("#stock_grid").ligerGrid({
+	            columns: [{
+	                display: '',
+	                name: 'trxId',
+	                align: 'center',
+	                width: 100,
+	                hide: true
+	            }, {
+	                display: '<@spring.message "com.lkkhpg.dsis.common.member.dto.discount.memebercode"/>',
+	                name: 'memberCode',
+	                align: 'center',
+	                width: 160,
+	                isSort: true
+	            },
+	            {
+	                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.markettext.membername"/>',
+	                name: 'memberName',
+	                align: 'center',
+	                width: 100
+	            },
+	            {
+	                display: '<@spring.message "com.lkkhpg.dsis.common.member.dto.discount"/>',
+	                type: 'text',
+	                name: 'discount',
+	                align: 'center',
+	                readonly: true,
+	                width:200
+	            },
+	            {
+	                display: '<@spring.message "com.lkkhpg.dsis.common.member.dto.discountamt"/>',
+	                name: 'discountAmt',
+	                align: 'center',
+	                isSort: true,
+	                width: 160
+	            },
+	            {
+	                display: '<@spring.message "com.lkkhpg.dsis.common.member.dto.freezediscount"/>',
+	                name: 'freezeDiscount',
+	                align: 'center',
+	                isSort: true,
+	                width: 160
+	            },
+	            {
+	                display: '<@spring.message "com.lkkhpg.dsis.common.member.dto.availablediscount"/>',
+	                name: 'availableDiscount',
+	                align: 'center',
+	                width: 160
+	            }],
+	            // url: '${base.contextPath}/im/stocktrx/query',
+                url: '${base.contextPath}/mm/member/queryDiscount',
+
+	            toolbar: {
+	                items: [
+	                    {
+	                        text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+	                        menu:{ width: 120, items:
+		                            [
+			                 			{
+			                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+			                 			    click:   function () {exportSelected("stock_query_form","stock_grid",{"status":stockIoStatus,"trxType":adjustmentType},_basePath);}
+			                 			},
+			                 			{ line: true },
+			                 			{
+			                 			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+			                 			    click: function (){exportAll("stock_query_form","stock_grid",{"status":stockIoStatus,"trxType":adjustmentType},_basePath);}
+
+			                 			}
+		                          ]
+	                     	}
+	                    },
+	                    { line: true }
+	                ]
+	            },
+
+	            enabledEdit: false,
+	            width: '99%',
+	            height: '98%',
+	            checkbox: true,
+	            delayLoad: true,
+	            onSelectRow: function() {
+	                if (this.getSelectedRows().length == 0) {
+	                    $.ligerui.get('deleteBtn').set('disabled', true);
+	                } else {
+	                	var rows = this.getSelectedRows();
+	                	var size = rows.length;
+	                	for (var i = 0; i < size; i++){
+	                		if(rows[i].status == 'COMP') {
+	                			$.ligerui.get('deleteBtn').set('disabled', true);
+	                			return;
+	                		}
+	                	}
+	                    $.ligerui.get('deleteBtn').set('disabled', false);
+	                }
+	            },
+	            onUnSelectRow: function() {
+	                if (this.getSelectedRows().length == 0) {
+	                    $.ligerui.get('deleteBtn').set('disabled', true);
+	                } else {
+	                	var rows = this.getSelectedRows();
+	                	var size = rows.length;
+	                	for (var i = 0; i < size; i++){
+	                		if(rows[i].status == 'COMP') {
+	                			$.ligerui.get('deleteBtn').set('disabled', true);
+	                			return;
+	                		}
+	                	}
+	                    $.ligerui.get('deleteBtn').set('disabled', false);
+	                }
+	            }
+	        });
+	    });
+
+    </script>
+</body>
+</html>

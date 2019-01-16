@@ -1,0 +1,196 @@
+<#-- 
+ * description: 单位维护界面
+ * version: 1.0 
+ * author:min.hou
+ * Copyright LKK Health Products Group Limited.
+ * 
+-->
+<#include "../include/head.html">
+
+<script type="text/javascript">
+
+	$(function(){
+		/*单位查询条件Form*/
+		var unit_query_form = window['unit_query_form'] = $("#unit_query_form").ligerForm({
+			inputWidth : 150,
+			space : 40,
+			fields : [{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.unit.uomcode" />',
+				type : 'text',
+				name : 'uomCode',
+				newline : false
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.uomname" />',
+				type : 'text',
+				name : 'name',
+				newline : false,
+				//options : ${lovService.getLov(base.contextPath,base.locale,"lov_uom_name_unitmanage")}
+			}],
+			buttons : [{
+				text : '<@spring.message "sys.hand.btn.query" />',
+				width : 60,
+				click : function() {
+					Hap.gridQuery({
+						form : unit_query_form,
+						grid : unit_manage_grid
+					});
+					unit_manage_grid.set({
+						url : '${base.contextPath}/spm/unit/queryUnitNamesOfUomManage',		//查询单位信息Url
+					});
+				}
+			}]
+		});
+		/*单位信息管理Grid*/
+		var unit_manage_grid = window['unit_manage_grid'] = $("#unit_manage_grid").ligerGrid({
+			unSetValidateAttr : false,
+			columns : [{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.unit.uomcode" />',
+				name : 'uomCode',
+				type : 'text',
+				align : 'center',
+				editor : {
+					type : 'text',
+					maxLength : 3
+				},
+                validate : {
+                    required : true
+                }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.uomname" />',
+				name : 'name',
+				align : 'center',
+				editor : {
+					type : 'tl',
+					idField : 'uomCode',
+					dto : 'com.lkkhpg.dsis.common.product.dto.InvUnitOfMeasureB'
+				},
+                validate : {
+                    required : true
+                }
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.code.description" />',
+				name : 'description',
+				align : 'center',
+				editor : {
+					type : 'tl',
+					idField : 'uomCode',
+					dto : 'com.lkkhpg.dsis.common.product.dto.InvUnitOfMeasureB'
+				}
+			}/*,{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.config.spmcity.endactivedate" />',
+				name : 'endActiveDate',
+				type : 'date',
+				align : 'center',
+				format: 'yyyy-MM-dd',
+				editor : {
+					type : 'date'
+				}
+			}*/],
+			url : '${base.contextPath}/spm/unit/queryUnitNamesOfUomManage',
+			toolbar : {
+				items : [{
+					text : '<@spring.message "sys.hand.btn.new" />',
+					click : function() {
+						unit_manage_grid.addRow({
+							description: "",
+							endActiveDate: "",
+							name: "",
+							uomCode: ""
+						});
+					},
+					icon : 'add'
+				},{
+	                line : true
+	            },{
+	            	text : '<@spring.message "sys.hand.btn.save" />',
+	            	click : function() {
+	            		var unitGridData = unit_manage_grid.getData();
+	            		for (var i=0; i<unitGridData.length; i++) {
+	            			if (unitGridData[i].__status != 'nochanged') {
+	            				if (unitGridData[i].uomCode.len() > 5) {
+	            					$.ligerDialog.warn("<@spring.message 'msg.error.config.unit_code_larger_length' />");
+	            					return false;
+	            				}
+	            			}
+	            		}
+	            		Hap.gridSave({
+	            			grid : unit_manage_grid,
+	            			url : '${base.contextPath}/spm/unit/batchUpdateUoms'
+	            		})
+	            	},
+	            	icon : 'save'
+	            }]
+			},
+			onBeforeEdit : function(e) {
+				if (e.column.columnname == "uomCode") {
+					if (e.record.__status != "add") {
+						return false;
+					}
+				}
+				return true;
+			},
+			onBeforeSubmitEdit : function(e) {
+				if (e.column.columnname == "endActiveDate") {
+					if (e.value == null || e.value == "") {
+						return true;
+					}
+					now = new Date();
+					if (e.value < new Date(now.getFullYear(),now.getMonth(),now.getDate())) {
+						$.ligerDialog.warn("<@spring.message 'msg.error.spm.country.dateinvalid' />");
+						return false;
+					}
+				}
+			},
+			width : '99%',
+			height : '98%',
+			isSort : false,
+			enabledEdit : true,
+			clickToEdit : true
+		});
+	});
+	
+/**
+ * 校验日期
+ * @param obj 每个日期字段值
+ */
+function valiDate(obj) {
+	
+	var currentDate = new Date();
+	var year = currentDate.getYear();
+	var month = currentDate.getMonth() +1;
+	var day = currentDate.getDate();
+	
+	var dateSplit = new Array(); 
+	dateSplit =	obj.split("-");
+	
+	if (dateSplit[0] < year) {
+		return false;
+	} else if (dateSplit[0] == year) {
+		if (dateSplit[1] < month) {
+			return false
+		} else if (dateSplit[1] == month) {
+			if (dateSplit[2] < day) {
+				return false;
+			}
+		}
+	}
+}
+
+/**
+ * 单位中文处理(1个中文字符=3个字节).
+ */
+String.prototype.len = function() { 
+    return this.replace(/[^\x00-\xff]/g, 'xxx').length;
+};
+
+</script>
+
+<body style="padding-top: 10px;">
+	
+	<div id="unitQuery">
+		<form id="unit_query_form"></form>
+	</div>
+	
+	<div id="unit_manage_grid"></div>
+	
+</body>

@@ -1,0 +1,478 @@
+<#--
+        * description: 优惠券规则参数设置页面
+        * version: 1.0
+        * author: zhangzw
+        * Copyright LKK Health Products Group Limited.
+        *
+        -->
+    <#include "../include/head.html">
+        <body style="padding: 10px;">
+        <script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+        <script src="${base.contextPath}/common/code"></script>
+        <form id="coupon_param_edit_form"></form>
+        <script type="text/javascript">
+            window['coupon_param_edit_form'] = $("#coupon_param_edit_form").ligerForm({
+            });
+
+            var baseFields = [];
+            var formFields = [];
+            var paramFields = [];
+            var lovOptions;
+            var ruleParams = frameElement.dialog.get('data').ruleParams;
+            var paramStr = frameElement.dialog.get('data').paramStr;
+            var marketId = frameElement.dialog.get('data').marketId;
+
+            if(ruleParams){
+                setParamForm(ruleParams);
+                setParamDefaultValue(ruleParams);
+                setParamLink(ruleParams);
+            }
+            if(paramStr && paramStr != 'undefined'){
+                var paramArray = f_getParamArray(paramStr);
+                f_renderDialog(paramArray);
+            }
+
+            function setParamForm(ruleParams){
+                for (var i in ruleParams){
+                    if(ruleParams[i].isHide == 'Y'){
+                        continue;
+                    }
+                    var fieldType = ruleParams[i].fieldType;
+                    var paramName = ruleParams[i].paramName;
+                    var display = ruleParams[i].display;
+                    var fieldSequence = ruleParams[i].fieldSequence;
+                    var fieldSelectSource = ruleParams[i].fieldSelectSource;
+                    var fieldSelectCode = ruleParams[i].fieldSelectCode;
+                    var fieldSelectUrl = ruleParams[i].fieldSelectUrl;
+                    var fieldSelectVf = ruleParams[i].fieldSelectVf;
+                    var fieldSelectTf = ruleParams[i].fieldSelectTf;
+                    var fieldTextfield = ruleParams[i].fieldTextfield;
+                    var fieldLovCode = ruleParams[i].fieldLovCode;
+                    var require;
+                    var requireFlag = ruleParams[i].requireFlag;
+                    if(requireFlag == 'Y'){
+                        require = true;
+                    }else{
+                        require = false;
+                    }
+                    var isMultiSelect;
+                    var fieldSelectMulti = ruleParams[i].fieldSelectMulti;
+                    if(fieldSelectMulti == 'Y'){
+                        isMultiSelect = true;
+                    }else{
+                        isMultiSelect = false;
+                    }
+                    var fieldDateFormat = ruleParams[i].fieldDateFormat;
+                    if('text' == fieldType || 'int' == fieldType || 'number' == fieldType){
+                        var textField = {
+                            label: display,
+                            name: paramName,
+                            newline: true,
+                            type: fieldType,
+                            validate:{
+                                required: require
+                            }
+                        };
+                        paramFields[fieldSequence-1] = textField;
+                    }
+                    if('date' == fieldType){
+                        var dateField = {
+                            label: display,
+                            name: paramName,
+                            newline: true,
+                            type: fieldType,
+                            options: {
+                                format: fieldDateFormat
+                            },
+                            validate:{
+                                required: require
+                            }
+                        };
+                        paramFields[fieldSequence-1] = dateField;
+                    }
+                    if('select' == fieldType && 'url' == fieldSelectSource){
+                        var selectField1 = {};
+                        if(isMultiSelect==true){
+                            selectField1 = {
+                                label: display,
+                                name: paramName,
+                                newline: true,
+                                type: fieldType,
+                                options: {
+                                    valueField: fieldSelectVf,
+                                    textField: fieldSelectTf,
+                                    url: _basePath + fieldSelectUrl,
+                                    isMultiSelect: isMultiSelect,
+                                    addRowButton: '<@spring.message "mws.shopcart.checkall"/>',
+                                    onSuccess:function(){
+
+                                        $('.l-table-checkbox').bind("mouseover",function(){
+                                            $('.l-table-checkbox span').bind("mouseover",function(){
+                                                $(event.target).css({'color':'red'});
+                                                $(event.target).css({'cursor':'pointer'});
+                                            });
+                                            $('.l-table-checkbox span').bind("mouseout",function(){
+                                                $(event.target).css({'color':'black'});
+                                                $(event.target).css({'cursor':'default'});
+                                            });
+                                        });
+
+                                        $('.l-table-checkbox').bind("click",function(){
+                                                var target = {};
+                                                var str = '';
+                                                // 调整全选按钮时，可有其他的原因导致无法显示全选
+                                                var index = $(event.target).parent().parent().parent().parent().parent().parent().index();
+                                                for(var i=0; i<=index; i++){
+                                                    if(formFields[i] && formFields[i].name){
+                                                        target = liger.get(formFields[i].name);
+                                                    }
+                                                }
+                                                //设置多选框选中
+                                                if(!$(event.target).parent().parent().find('.l-checkbox').hasClass('l-checkbox-checked')){
+                                                    $(event.target).parent().parent().find('.l-checkbox').removeClass('l-checkbox-checked');
+                                                    var strArray = target.getValue().split(',');
+                                                    $(strArray).each(function(i,o){
+                                                        if(o.toString() == $(event.target).parent().attr('value')){
+                                                            strArray.splice(i,1);
+                                                        }
+                                                    })
+                                                    str = strArray.toString();
+                                                }else{
+                                                    $(event.target).parent().parent().find('.l-checkbox').addClass('l-checkbox-checked');
+                                                    if(target.getValue() != ''){
+                                                        if($(event.target).parent().attr('value')){
+                                                            str = target.getValue() + "," + $(event.target).parent().attr('value');
+                                                        }else{
+                                                            str = target.getValue();
+                                                        }
+                                                    }else{
+                                                        if($(event.target).parent().attr('value')){
+                                                            str = $(event.target).parent().attr('value');
+                                                        }
+                                                    }
+                                                }
+                                                //设置值
+                                                target.setValue(str);
+                                            }
+                                        )
+                                    },
+                                    addRowButtonClick: function (event)  //新增事件
+                                    {
+                                        var valueStr = '';
+                                        var textStr = '';
+                                        //设置多选框全选
+                                        $("input[type='CheckBox']").each(function(){this.checked=true;});
+                                        $(":checkbox").parent().find("a").addClass("l-checkbox-checked");
+                                        //获取选中的值
+                                        $(event.target).parent().parent().find('td').each(function(index,element){
+                                            if($(element).next().attr('index') == $(element).attr('index'))
+                                                valueStr += $(element).attr('value')+",";
+                                        })
+                                        if (valueStr.length > 0) valueStr = valueStr.substr(0, valueStr.length - 1);
+                                        // 调整全选按钮时，可有其他的原因导致无法显示全选
+                                        var index = $(event.target).parent().parent().index();
+                                        for(var i=0; i<=index; i++){
+                                            if(formFields[i] && formFields[i].name){
+                                                liger.get(formFields[i].name).setValue(valueStr);
+                                            }
+                                        }
+                                    },
+                                    split: ','
+                                },
+                                validate:{
+                                    required: require
+                                }
+                            };
+                        }else{
+                            selectField1 = {
+                                label: display,
+                                name: paramName,
+                                newline: true,
+                                type: fieldType,
+                                options: {
+                                    valueField: fieldSelectVf,
+                                    textField: fieldSelectTf,
+                                    url: _basePath + fieldSelectUrl,
+                                    isMultiSelect: isMultiSelect,
+                                    split: ','
+                                },
+                                validate:{
+                                    required: require
+                                }
+                            };
+                        }
+
+                        paramFields[fieldSequence-1] = selectField1;
+                    }
+                    if('select' == fieldType && 'code' == fieldSelectSource){
+                        $.ajax({
+                            type: "GET",
+                            async: false,
+                            url: "${base.contextPath}/common/code?selResult="+fieldSelectCode,
+                        });
+                        var selectField2 = {};
+                        if(isMultiSelect==true){
+                            selectField2 = {
+                                label: display,
+                                name: paramName,
+                                newline: true,
+                                type: fieldType,
+                                options: {
+                                    valueField: 'value',
+                                    textField: 'meaning',
+                                    data: selResult,
+                                    isMultiSelect: isMultiSelect,
+                                    addRowButton: '<@spring.message "mws.shopcart.checkall"/>',
+                                    onSuccess:function(){
+
+                                        $('.l-table-checkbox').bind("mouseover",function(){
+                                            $('.l-table-checkbox span').bind("mouseover",function(){
+                                                $(event.target).css({'color':'red'});
+                                                $(event.target).css({'cursor':'pointer'});
+                                            });
+                                            $('.l-table-checkbox span').bind("mouseout",function(){
+                                                $(event.target).css({'color':'black'});
+                                                $(event.target).css({'cursor':'default'});
+                                            });
+                                        });
+
+                                        $('.l-table-checkbox').bind("click",function(){
+                                                var target = {};
+                                                var str = '';
+                                                // 调整全选按钮时，可有其他的原因导致无法显示全选
+                                                var index = $(event.target).parent().parent().parent().parent().parent().parent().index();
+                                                for(var i=0; i<=index; i++){
+                                                    if(formFields[i] && formFields[i].name){
+                                                        target = liger.get(formFields[i].name);
+                                                    }
+                                                }
+                                                //设置多选框选中
+                                                if($(event.target).parent().parent().find('.l-checkbox').hasClass('l-checkbox-checked')){
+                                                    $(event.target).parent().parent().find('.l-checkbox').removeClass('l-checkbox-checked');
+                                                    var strArray = target.getValue().split(',');
+                                                    $(strArray).each(function(i,o){
+                                                        if(o.toString() == $(event.target).parent().attr('value')){
+                                                            strArray.splice(i,1);
+                                                        }
+                                                    })
+                                                    str = strArray.toString();
+                                                }else{
+                                                    $(event.target).parent().parent().find('.l-checkbox').addClass('l-checkbox-checked');
+                                                    if(target.getValue() != ''){
+                                                        if($(event.target).parent().attr('value')){
+                                                            str = target.getValue() + "," + $(event.target).parent().attr('value');
+                                                        }else{
+                                                            str = target.getValue();
+                                                        }
+                                                    }else{
+                                                        if($(event.target).parent().attr('value')){
+                                                            str = $(event.target).parent().attr('value');
+                                                        }
+                                                    }
+                                                }
+                                                //设置值
+                                                target.setValue(str);
+                                            }
+                                        )
+                                    },
+                                    addRowButtonClick: function (event)  //新增事件
+                                    {
+                                        var valueStr = '';
+                                        var textStr = '';
+                                        //设置多选框全选
+                                        $("input[type='CheckBox']").each(function(){this.checked=true;});
+                                        $(":checkbox").parent().find("a").addClass("l-checkbox-checked");
+                                        //获取选中的值
+                                        $(event.target).parent().parent().find('td').each(function(index,element){
+                                            if($(element).next().attr('index') == $(element).attr('index'))
+                                                valueStr += $(element).attr('value')+",";
+                                        })
+                                        if (valueStr.length > 0) valueStr = valueStr.substr(0, valueStr.length - 1);
+                                        // 调整全选按钮时，可有其他的原因导致无法显示全选
+                                        var index = $(event.target).parent().parent().index();
+                                        for(var i=0; i<index; i++){
+                                            if(formFields[i] && formFields[i].name){
+                                                liger.get(formFields[i].name).setValue(valueStr);
+                                            }
+                                        }
+                                    },
+                                    split: ','
+                                },
+                                validate:{
+                                    required: require
+                                }
+                            }
+                        }else{
+                            selectField2 = {
+                                label: display,
+                                name: paramName,
+                                newline: true,
+                                type: fieldType,
+                                options: {
+                                    valueField: 'value',
+                                    textField: 'meaning',
+                                    data: selResult,
+                                    isMultiSelect: isMultiSelect,
+                                    split: ','
+                                },
+                                validate:{
+                                    required: require
+                                }
+                            }
+                        }
+                        paramFields[fieldSequence-1] = selectField2;
+                    }
+                }
+                //添加lov
+            <#if ruleParams??>
+            <#list ruleParams as param>
+                var requireLov = false;
+                var isCheck = false;
+                var singleCheck = true;
+            <#if '${param.fieldType}' == 'popup'>
+                <#if '${param.requireFlag}' == 'Y'>
+                requireLov = true;
+            </#if>
+            <#if '${param.fieldSelectMulti}' == 'Y'>
+                isCheck = true;
+                singleCheck = false;
+            </#if>
+                var fieldSequence = ${param.fieldSequence};
+                var options = $.extend(${lovService.getLov(base.contextPath, base.locale, '${param.fieldLovCode}')},{
+                split: ',',
+                    onLoadData: function(){
+                    this.setParm('marketId',marketId);
+                    this.setParm('applyType','ASSIGN');
+                }
+            });
+            options.grid.checkbox = isCheck;
+            options.grid.isSingleCheck = singleCheck;
+            var lovData = {
+                label: '${param.display}',
+                name:'${param.paramName}',
+                textField : '${param.fieldTextfield}',
+                options : options,
+                type: 'popup',
+                newline: true,
+                validate:{
+                    required: requireLov
+                }
+            }
+            paramFields[fieldSequence-1] = lovData;
+            </#if>
+            </#list>
+            </#if>
+            //删除数组中的空值
+            for(var i in paramFields){
+                if(!paramFields[i]){
+                    paramFields.splice(i, 1);
+                }
+            }
+            formFields = [].concat(baseFields).concat(paramFields);
+            coupon_param_edit_form._setFields(formFields);
+            }
+
+            // 设置默认值
+            function setParamDefaultValue(ruleParams){
+                for (var i in ruleParams){
+                    var fieldType = ruleParams[i].fieldType;
+                    var paramName = ruleParams[i].paramName;
+                    var fieldDefaultValue = ruleParams[i].fieldDefaultValue;
+                    if(fieldDefaultValue !=null){
+                        if(fieldType == 'date' && fieldDefaultValue == 'sysdate'){
+                            $.ligerui.get(paramName).setValue(new Date());
+                        }
+                        else{
+                            $.ligerui.get(paramName).setValue(fieldDefaultValue);
+                        }
+                    }
+                }
+            }
+
+            // 获取TextField
+            function f_getTextField(fieldType, paramName){
+                var result = '';
+                if('text' == fieldType || 'int' == fieldType || 'number' == fieldType){
+                    result = liger.get(paramName).getValue();
+                }else{
+                    result = liger.get(paramName).getText();
+                }
+                return result;
+            }
+
+            //获取ValueField
+            function f_getValueField(fieldType, paramName){
+                return liger.get(paramName).getValue();
+            }
+
+            //获取参数数组
+            function f_getParamArray(paramStr){
+                var paramArray = [];
+                var array = paramStr.split(';');
+                for (var i=0; i<array.length; i++){
+                    var obj = new Object();
+                    var tempArray = array[i].split(':');
+                    obj['fieldType'] = tempArray[0];
+                    obj['paramName'] = tempArray[1];
+                    obj['textField'] = tempArray[2];
+                    obj['valueField'] = tempArray[3];
+                    paramArray.push(obj);
+                }
+                return paramArray;
+            }
+
+            //根据已有的值渲染Dialog
+            function f_renderDialog(paramArray){
+                for (var i in paramArray){
+                    var fieldType = paramArray[i].fieldType;
+                    var paramName = paramArray[i].paramName;
+                    var textField = paramArray[i].textField;
+                    var valueField = paramArray[i].valueField;
+                    if(liger.get(paramName)){
+                        liger.get(paramName).setValue(valueField);
+                        if('text' != fieldType && 'int' != fieldType && 'number' != fieldType){
+                            liger.get(paramName).setText(textField);
+                        }
+                    }
+                }
+            }
+
+            //联动事件绑定
+            function setParamLink(ruleParams){
+            <#if ruleParams??>
+            <#list ruleParams as param>
+                <#if (param.fieldLinkEvent)?? && (param.fieldLinkRule)??>
+            <#if '${param.fieldType}' == 'popup'>
+                $.ligerui.get('${param.paramName}').options.${param.fieldLinkEvent} = ${param.fieldLinkRule};
+            <#elseif '${param.fieldType}' == 'select' && '${param.fieldLinkEvent}' == 'change'>
+                $($.ligerui.get('${param.paramName}').element).bind('${param.fieldLinkEvent}',${param.fieldLinkRule});
+            <#else>
+                $.ligerui.get('${param.paramName}').bind('${param.fieldLinkEvent}',${param.fieldLinkRule});
+            </#if>
+            </#if>
+            </#list>
+                </#if>
+            }
+
+            //错误提示
+            function f_showError(promptCode){
+                if(promptCode && _locale){
+                    $.ajax({
+                        url : '${base.contextPath}/sys/prompt/query',
+                        type : "POST",
+                        sync : true,
+                        data : {
+                            promptCode : promptCode,
+                            lang : _locale
+                        },
+                        success : function(json) {
+                            if(json.rows && json.rows[0] && json.rows[0].description){
+                                Hap.showError(json.rows[0].description);
+                            }
+                        }
+                    });
+                }
+            }
+        </script>
+        </body>
+        </html>

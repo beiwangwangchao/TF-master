@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.delivery.mapper.ShippingTierDtlMapper">
+    <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.delivery.dto.ShippingTierDtl">
+        <id column="TIER_DTL_ID" property="tierDtlId" jdbcType="DECIMAL" />
+        <result column="SHIPPING_TIER_ID" property="shippingTierId" jdbcType="DECIMAL" />
+        <result column="CURRENCY_CODE" property="currencyCode" jdbcType="VARCHAR" />
+        <result column="INV_AMOUNT_FROM" property="invAmountFrom" jdbcType="DECIMAL" />
+        <result column="INV_AMOUNT_TO" property="invAmountTo" jdbcType="DECIMAL" />
+        <result column="SHIPPING_FEE" property="shippingFee" jdbcType="DECIMAL" />
+        <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+        <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+        <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+        <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+        <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE13" property="attribute13" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE14" property="attribute14" jdbcType="VARCHAR" />
+        <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
+        <result column="DSIS" property="dsis" jdbcType="VARCHAR" />
+        <result column="AGENCY_WEB" property="agencyWeb" jdbcType="VARCHAR" />
+        <result column="AGENCY_APP" property="agencyApp" jdbcType="VARCHAR" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        dstd.TIER_DTL_ID, dstd.SHIPPING_TIER_ID, dstd.CURRENCY_CODE,
+        dstd.INV_AMOUNT_FROM, dstd.INV_AMOUNT_TO,
+        dstd.SHIPPING_FEE,
+        dstd.OBJECT_VERSION_NUMBER,
+        dstd.REQUEST_ID, dstd.PROGRAM_ID, dstd.CREATION_DATE,
+        dstd.CREATED_BY, dstd.LAST_UPDATED_BY,
+        dstd.LAST_UPDATE_DATE, dstd.LAST_UPDATE_LOGIN, dstd.ATTRIBUTE_CATEGORY,
+        dstd.ATTRIBUTE1,
+        dstd.ATTRIBUTE2,
+        dstd.ATTRIBUTE3, dstd.ATTRIBUTE4, dstd.ATTRIBUTE5, dstd.ATTRIBUTE6,
+        dstd.ATTRIBUTE7,
+        dstd.ATTRIBUTE8,
+        dstd.ATTRIBUTE9,
+        dstd.ATTRIBUTE10, dstd.ATTRIBUTE11, dstd.ATTRIBUTE12,
+        dstd.ATTRIBUTE13, dstd.ATTRIBUTE14, dstd.ATTRIBUTE15
+    </sql>
+
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from DM_SHIPPING_TIER_DTL
+        where TIER_DTL_ID =
+        #{tierDtlId,jdbcType=DECIMAL}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierDtl">
+        delete from
+        DM_SHIPPING_TIER_DTL
+        where TIER_DTL_ID =
+        #{tierDtlId,jdbcType=DECIMAL}
+    </delete>
+    <insert id="insert" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierDtl">
+        <selectKey resultType="java.lang.Long" keyProperty="tierDtlId" order="BEFORE">
+            SELECT
+            DM_SHIPPING_TIER_DTL_S.NEXTVAL FROM DUAL
+        </selectKey>
+        insert into DM_SHIPPING_TIER_DTL (TIER_DTL_ID, SHIPPING_TIER_ID, CURRENCY_CODE,
+        INV_AMOUNT_FROM, INV_AMOUNT_TO,
+        SHIPPING_FEE,
+        REQUEST_ID, PROGRAM_ID,
+        CREATION_DATE, CREATED_BY, LAST_UPDATED_BY,
+        LAST_UPDATE_DATE,
+        LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY,
+        ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3,
+        ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6,
+        ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9,
+        ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12,
+        ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15
+        )
+        values (#{tierDtlId,jdbcType=DECIMAL}, #{shippingTierId,jdbcType=DECIMAL}, #{currencyCode,jdbcType=VARCHAR},
+        #{invAmountFrom,jdbcType=DECIMAL}, #{invAmountTo,jdbcType=DECIMAL}, #{shippingFee,jdbcType=DECIMAL},
+        #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL},
+        current_timestamp, #{createdBy,jdbcType=DECIMAL},
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+        current_timestamp, #{lastUpdateLogin,jdbcType=DECIMAL},
+        #{attributeCategory,jdbcType=VARCHAR},
+        #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR},
+        #{attribute3,jdbcType=VARCHAR},
+        #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR},
+        #{attribute6,jdbcType=VARCHAR},
+        #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR},
+        #{attribute9,jdbcType=VARCHAR},
+        #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR},
+        #{attribute12,jdbcType=VARCHAR},
+        #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR},
+        #{attribute15,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierDtl">
+        update DM_SHIPPING_TIER_DTL
+        set
+        OBJECT_VERSION_NUMBER =
+        OBJECT_VERSION_NUMBER + 1,
+        SHIPPING_TIER_ID = #{shippingTierId,jdbcType=DECIMAL},
+        CURRENCY_CODE =
+        #{currencyCode,jdbcType=VARCHAR},
+        INV_AMOUNT_FROM = #{invAmountFrom,jdbcType=DECIMAL},
+        INV_AMOUNT_TO =
+        #{invAmountTo,jdbcType=DECIMAL},
+        SHIPPING_FEE = #{shippingFee,jdbcType=DECIMAL},
+        REQUEST_ID =
+        #{requestId,jdbcType=DECIMAL},
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+        CREATION_DATE = current_timestamp,
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+        LAST_UPDATE_DATE
+        = current_timestamp,
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+        ATTRIBUTE_CATEGORY =
+        #{attributeCategory,jdbcType=VARCHAR},
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+        ATTRIBUTE2 =
+        #{attribute2,jdbcType=VARCHAR},
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+        ATTRIBUTE4 =
+        #{attribute4,jdbcType=VARCHAR},
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+        ATTRIBUTE6 =
+        #{attribute6,jdbcType=VARCHAR},
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+        ATTRIBUTE8 =
+        #{attribute8,jdbcType=VARCHAR},
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+        ATTRIBUTE10 =
+        #{attribute10,jdbcType=VARCHAR},
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+        ATTRIBUTE12 =
+        #{attribute12,jdbcType=VARCHAR},
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+        ATTRIBUTE14 =
+        #{attribute14,jdbcType=VARCHAR},
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR}
+        where TIER_DTL_ID =
+        #{tierDtlId,jdbcType=DECIMAL}
+    </update>
+
+    <select id="selectShippingTierDtls" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierDtl">
+        select
+        (select dsta.enabled_flag from DM_SHIPPING_TIER_AVAIL dsta where dsta.function_area='DSIS' and dsta.SHIPPING_TIER_ID = dstd.SHIPPING_TIER_ID) DSIS,
+        (select dsta.enabled_flag from DM_SHIPPING_TIER_AVAIL dsta where dsta.function_area='WEB' and dsta.SHIPPING_TIER_ID = dstd.SHIPPING_TIER_ID) AGENCY_WEB,
+        (select dsta.enabled_flag from DM_SHIPPING_TIER_AVAIL dsta where dsta.function_area='APP' and dsta.SHIPPING_TIER_ID = dstd.SHIPPING_TIER_ID) AGENCY_APP,
+        <include refid="Base_Column_List" />
+        from DM_SHIPPING_TIER_DTL dstd
+        left outer join
+        DM_SHIPPING_TIER dst
+        on (dstd.SHIPPING_TIER_ID=dst.SHIPPING_TIER_ID)
+        <where>
+            <if test="shippingTierId != null">
+                dstd.SHIPPING_TIER_ID= #{shippingTierId,jdbcType=DECIMAL}
+            </if>
+        </where>
+        order by dstd.INV_AMOUNT_FROM asc
+    </select>
+
+
+    <select id="queryCount" parameterType="com.lkkhpg.dsis.common.delivery.dto.ShippingTierDtl" resultType="java.lang.Integer">
+        select count(1) from dm_shipping_tier_dtl t
+        <where>
+            t.shipping_tier_id = #{shippingTierId,jdbcType=DECIMAL}
+            <if test="tierDtlId  != null">
+                and t.tier_dtl_id != #{tierDtlId,jdbcType=DECIMAL}
+            </if>
+<![CDATA[   AND ((#{invAmountFrom,jdbcType=DECIMAL} >= t.inv_amount_from AND #{invAmountFrom,jdbcType=DECIMAL} < t.inv_amount_to  ) OR ]]>
+<![CDATA[       ( #{invAmountTo,jdbcType=DECIMAL}   >  t.inv_amount_from AND #{invAmountTo,jdbcType=DECIMAL}   <= t.inv_amount_to ) OR]]>
+<![CDATA[       ( t.inv_amount_from >= #{invAmountFrom,jdbcType=DECIMAL} AND t.inv_amount_from < #{invAmountTo,jdbcType=DECIMAL}  ) OR ]]>
+<![CDATA[       ( t.inv_amount_to   >  #{invAmountFrom,jdbcType=DECIMAL} AND t.inv_amount_to   <= #{invAmountTo,jdbcType=DECIMAL} ) )]]>
+
+        </where>
+    </select>
+
+</mapper>

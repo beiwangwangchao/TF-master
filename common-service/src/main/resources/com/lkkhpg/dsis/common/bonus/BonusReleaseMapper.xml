@@ -1,0 +1,913 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.bonus.mapper.BonusReleaseMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.bonus.dto.BonusRelease" >
+     <id column="BONUS_ID" jdbcType="DECIMAL" property="bonusId" />
+    <result column="PERIOD_ID" jdbcType="DECIMAL" property="periodId" />
+    <result column="MEMBER_ID" jdbcType="DECIMAL" property="memberId" />
+    <result column="CURRENCY_CODE" jdbcType="VARCHAR" property="currencyCode" />
+    <result column="PRE_TAX_AMT_ADJUST" jdbcType="DECIMAL" property="preTaxAmtAdjust" />
+    <result column="PRE_TAX_AMT" jdbcType="DECIMAL" property="preTaxAmt" />
+    <result column="TAX_CODE_01" jdbcType="VARCHAR" property="taxCode01" />
+    <result column="TAX_AMT_01" jdbcType="DECIMAL" property="taxAmt01" />
+    <result column="TAX_CODE_02" jdbcType="VARCHAR" property="taxCode02" />
+    <result column="TAX_AMT_02" jdbcType="DECIMAL" property="taxAmt02" />
+    <result column="AFTER_TAX_AMT" jdbcType="DECIMAL" property="afterTaxAmt" />
+    <result column="CLEAR_TAX_CODE_03" jdbcType="VARCHAR" property="clearTaxCode03" />
+    <result column="CLEAR_TAX_AMT_03" jdbcType="DECIMAL" property="clearTaxAmt03" />
+    <result column="COMMENTS" jdbcType="VARCHAR" property="comments" />
+    <result column="FINAL_BONUS_ID" jdbcType="DECIMAL" property="finalBonusId" />
+    <result column="MARKET_ID" jdbcType="DECIMAL" property="marketId" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="OBJECT_VERSION_NUMBER" jdbcType="DECIMAL" property="objectVersionNumber" />
+    <result column="REQUEST_ID" jdbcType="DECIMAL" property="requestId" />
+    <result column="PROGRAM_ID" jdbcType="DECIMAL" property="programId" />
+    <result column="WITHHOLDING_TAX_AMT" jdbcType="DECIMAL" property="withholdingTaxAmt" />
+    <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+    <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+    <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="LAST_UPDATE_LOGIN" jdbcType="DECIMAL" property="lastUpdateLogin" />
+    <result column="ATTRIBUTE_CATEGORY" jdbcType="VARCHAR" property="attributeCategory" />
+    <result column="ATTRIBUTE1" jdbcType="VARCHAR" property="attribute1" />
+    <result column="ATTRIBUTE2" jdbcType="VARCHAR" property="attribute2" />
+    <result column="ATTRIBUTE3" jdbcType="VARCHAR" property="attribute3" />
+    <result column="ATTRIBUTE4" jdbcType="VARCHAR" property="attribute4" />
+    <result column="ATTRIBUTE5" jdbcType="VARCHAR" property="attribute5" />
+    <result column="ATTRIBUTE6" jdbcType="VARCHAR" property="attribute6" />
+    <result column="ATTRIBUTE7" jdbcType="VARCHAR" property="attribute7" />
+    <result column="ATTRIBUTE8" jdbcType="VARCHAR" property="attribute8" />
+    <result column="ATTRIBUTE9" jdbcType="VARCHAR" property="attribute9" />
+    <result column="ATTRIBUTE10" jdbcType="VARCHAR" property="attribute10" />
+    <result column="ATTRIBUTE11" jdbcType="VARCHAR" property="attribute11" />
+    <result column="ATTRIBUTE12" jdbcType="VARCHAR" property="attribute12" />
+    <result column="ATTRIBUTE13" jdbcType="VARCHAR" property="attribute13" />
+    <result column="ATTRIBUTE14" jdbcType="VARCHAR" property="attribute14" />
+    <result column="ATTRIBUTE15" jdbcType="VARCHAR" property="attribute15" />
+    <result column="BONUS_CODE" jdbcType="VARCHAR" property="bonusCode" />
+    <result column="BONUS_TYPE" jdbcType="VARCHAR" property="bonusType" />
+    <result column="DELIVER_AMT" property="deliverAmt" jdbcType="DECIMAL" />
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR"/>
+    <result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR"/>
+    <result column="MARKET_NAME" property="marketName" jdbcType="VARCHAR"/>
+    <result column="COMPANY_NAME" property="companyName" jdbcType="VARCHAR"/>
+    <result column="PERIOD_NAME" property="periodName" jdbcType="VARCHAR"/>
+     
+  </resultMap> 
+  <sql id="Base_Column_List" >
+    BONUS_ID, PERIOD_ID, MEMBER_ID, CURRENCY_CODE, PRE_TAX_AMT_ADJUST, PRE_TAX_AMT, TAX_CODE_01, 
+    TAX_AMT_01, TAX_CODE_02, TAX_AMT_02, AFTER_TAX_AMT, CLEAR_TAX_CODE_03, CLEAR_TAX_AMT_03, 
+    COMMENTS, FINAL_BONUS_ID, MARKET_ID, STATUS, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
+    WITHHOLDING_TAX_AMT, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+    LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+    ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, 
+    ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, BONUS_CODE, BONUS_TYPE, DELIVER_AMT
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from BM_BONUS_RELEASE
+    where BONUS_ID = #{bonusId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from BM_BONUS_RELEASE
+    where BONUS_ID = #{bonusId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusRelease" >
+    insert into BM_BONUS_RELEASE (BONUS_ID, PERIOD_ID, MEMBER_ID, 
+      CURRENCY_CODE, PRE_TAX_AMT_ADJUST, PRE_TAX_AMT, 
+      TAX_CODE_01, TAX_AMT_01, TAX_CODE_02, 
+      TAX_AMT_02, AFTER_TAX_AMT, CLEAR_TAX_CODE_03, 
+      CLEAR_TAX_AMT_03, COMMENTS, FINAL_BONUS_ID, 
+      MARKET_ID, STATUS, OBJECT_VERSION_NUMBER, 
+      REQUEST_ID, PROGRAM_ID, WITHHOLDING_TAX_AMT, 
+      CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, 
+      LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+      ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, 
+      ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
+      ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, 
+      ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, 
+      ATTRIBUTE13, ATTRIBUTE14, ATTRIBUTE15, 
+      BONUS_CODE, BONUS_TYPE, DELIVER_AMT
+      )
+    values (#{bonusId,jdbcType=DECIMAL}, #{periodId,jdbcType=DECIMAL}, #{memberId,jdbcType=DECIMAL}, 
+      #{currencyCode,jdbcType=VARCHAR}, #{preTaxAmtAdjust,jdbcType=DECIMAL}, #{preTaxAmt,jdbcType=DECIMAL}, 
+      #{taxCode01,jdbcType=VARCHAR}, #{taxAmt01,jdbcType=DECIMAL}, #{taxCode02,jdbcType=VARCHAR}, 
+      #{taxAmt02,jdbcType=DECIMAL}, #{afterTaxAmt,jdbcType=DECIMAL}, #{clearTaxCode03,jdbcType=VARCHAR}, 
+      #{clearTaxAmt03,jdbcType=DECIMAL}, #{comments,jdbcType=VARCHAR}, #{finalBonusId,jdbcType=DECIMAL}, 
+      #{marketId,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{objectVersionNumber,jdbcType=DECIMAL}, 
+      #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, #{withholdingTaxAmt,jdbcType=DECIMAL}, 
+      #{creationDate,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, 
+      #{lastUpdateDate,jdbcType=TIMESTAMP}, #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, 
+      #{attribute1,jdbcType=VARCHAR}, #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, 
+      #{attribute4,jdbcType=VARCHAR}, #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, 
+      #{attribute7,jdbcType=VARCHAR}, #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, 
+      #{attribute10,jdbcType=VARCHAR}, #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, 
+      #{attribute13,jdbcType=VARCHAR}, #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, 
+      #{bonusCode,jdbcType=VARCHAR}, #{bonusType,jdbcType=VARCHAR}, #{deliverAmt,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusRelease" >
+    insert into BM_BONUS_RELEASE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bonusId != null" >
+        BONUS_ID,
+      </if>
+      <if test="periodId != null" >
+        PERIOD_ID,
+      </if>
+      <if test="memberId != null" >
+        MEMBER_ID,
+      </if>
+      <if test="currencyCode != null" >
+        CURRENCY_CODE,
+      </if>
+      <if test="preTaxAmtAdjust != null" >
+        PRE_TAX_AMT_ADJUST,
+      </if>
+      <if test="preTaxAmt != null" >
+        PRE_TAX_AMT,
+      </if>
+      <if test="taxCode01 != null" >
+        TAX_CODE_01,
+      </if>
+      <if test="taxAmt01 != null" >
+        TAX_AMT_01,
+      </if>
+      <if test="taxCode02 != null" >
+        TAX_CODE_02,
+      </if>
+      <if test="taxAmt02 != null" >
+        TAX_AMT_02,
+      </if>
+      <if test="afterTaxAmt != null" >
+        AFTER_TAX_AMT,
+      </if>
+      <if test="clearTaxCode03 != null" >
+        CLEAR_TAX_CODE_03,
+      </if>
+      <if test="clearTaxAmt03 != null" >
+        CLEAR_TAX_AMT_03,
+      </if>
+      <if test="comments != null" >
+        COMMENTS,
+      </if>
+      <if test="finalBonusId != null" >
+        FINAL_BONUS_ID,
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER,
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if>
+      <if test="withholdingTaxAmt != null" >
+        WITHHOLDING_TAX_AMT,
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE,
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE,
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13,
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14,
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15,
+      </if>
+      <if test="bonusCode != null" >
+        BONUS_CODE,
+      </if>
+      <if test="bonusType != null" >
+        BONUS_TYPE,
+      </if>
+      <if test="deliverAmt != null" >
+        DELIVER_AMT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bonusId != null" >
+        #{bonusId,jdbcType=DECIMAL},
+      </if>
+      <if test="periodId != null" >
+        #{periodId,jdbcType=DECIMAL},
+      </if>
+      <if test="memberId != null" >
+        #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="currencyCode != null" >
+        #{currencyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="preTaxAmtAdjust != null" >
+        #{preTaxAmtAdjust,jdbcType=DECIMAL},
+      </if>
+      <if test="preTaxAmt != null" >
+        #{preTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="taxCode01 != null" >
+        #{taxCode01,jdbcType=VARCHAR},
+      </if>
+      <if test="taxAmt01 != null" >
+        #{taxAmt01,jdbcType=DECIMAL},
+      </if>
+      <if test="taxCode02 != null" >
+        #{taxCode02,jdbcType=VARCHAR},
+      </if>
+      <if test="taxAmt02 != null" >
+        #{taxAmt02,jdbcType=DECIMAL},
+      </if>
+      <if test="afterTaxAmt != null" >
+        #{afterTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="clearTaxCode03 != null" >
+        #{clearTaxCode03,jdbcType=VARCHAR},
+      </if>
+      <if test="clearTaxAmt03 != null" >
+        #{clearTaxAmt03,jdbcType=DECIMAL},
+      </if>
+      <if test="comments != null" >
+        #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="finalBonusId != null" >
+        #{finalBonusId,jdbcType=DECIMAL},
+      </if>
+      <if test="marketId != null" >
+        #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="objectVersionNumber != null" >
+        #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="withholdingTaxAmt != null" >
+        #{withholdingTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="bonusCode != null" >
+        #{bonusCode,jdbcType=VARCHAR},
+      </if>
+      <if test="bonusType != null" >
+        #{bonusType,jdbcType=VARCHAR},
+      </if>
+      <if test="deliverAmt != null" >
+        #{deliverAmt,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusRelease" >
+    update BM_BONUS_RELEASE
+    <set >
+      <if test="periodId != null" >
+        PERIOD_ID = #{periodId,jdbcType=DECIMAL},
+      </if>
+      <if test="memberId != null" >
+        MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      </if>
+      <if test="currencyCode != null" >
+        CURRENCY_CODE = #{currencyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="preTaxAmtAdjust != null" >
+        PRE_TAX_AMT_ADJUST = #{preTaxAmtAdjust,jdbcType=DECIMAL},
+      </if>
+      <if test="preTaxAmt != null" >
+        PRE_TAX_AMT = #{preTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="taxCode01 != null" >
+        TAX_CODE_01 = #{taxCode01,jdbcType=VARCHAR},
+      </if>
+      <if test="taxAmt01 != null" >
+        TAX_AMT_01 = #{taxAmt01,jdbcType=DECIMAL},
+      </if>
+      <if test="taxCode02 != null" >
+        TAX_CODE_02 = #{taxCode02,jdbcType=VARCHAR},
+      </if>
+      <if test="taxAmt02 != null" >
+        TAX_AMT_02 = #{taxAmt02,jdbcType=DECIMAL},
+      </if>
+      <if test="afterTaxAmt != null" >
+        AFTER_TAX_AMT = #{afterTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="clearTaxCode03 != null" >
+        CLEAR_TAX_CODE_03 = #{clearTaxCode03,jdbcType=VARCHAR},
+      </if>
+      <if test="clearTaxAmt03 != null" >
+        CLEAR_TAX_AMT_03 = #{clearTaxAmt03,jdbcType=DECIMAL},
+      </if>
+      <if test="comments != null" >
+        COMMENTS = #{comments,jdbcType=VARCHAR},
+      </if>
+      <if test="finalBonusId != null" >
+        FINAL_BONUS_ID = #{finalBonusId,jdbcType=DECIMAL},
+      </if>
+      <if test="marketId != null" >
+        MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="objectVersionNumber != null" >
+        OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="withholdingTaxAmt != null" >
+        WITHHOLDING_TAX_AMT = #{withholdingTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="creationDate != null" >
+        CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateDate != null" >
+        LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute13 != null" >
+        ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute14 != null" >
+        ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute15 != null" >
+        ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      </if>
+      <if test="bonusCode != null" >
+        BONUS_CODE = #{bonusCode,jdbcType=VARCHAR},
+      </if>
+      <if test="bonusType != null" >
+        BONUS_TYPE = #{bonusType,jdbcType=VARCHAR},
+      </if>
+      <if test="deliverAmt != null" >
+        DELIVER_AMT = #{deliverAmt,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where BONUS_ID = #{bonusId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusRelease" >
+    update BM_BONUS_RELEASE
+    set PERIOD_ID = #{periodId,jdbcType=DECIMAL},
+      MEMBER_ID = #{memberId,jdbcType=DECIMAL},
+      CURRENCY_CODE = #{currencyCode,jdbcType=VARCHAR},
+      PRE_TAX_AMT_ADJUST = #{preTaxAmtAdjust,jdbcType=DECIMAL},
+      PRE_TAX_AMT = #{preTaxAmt,jdbcType=DECIMAL},
+      TAX_CODE_01 = #{taxCode01,jdbcType=VARCHAR},
+      TAX_AMT_01 = #{taxAmt01,jdbcType=DECIMAL},
+      TAX_CODE_02 = #{taxCode02,jdbcType=VARCHAR},
+      TAX_AMT_02 = #{taxAmt02,jdbcType=DECIMAL},
+      AFTER_TAX_AMT = #{afterTaxAmt,jdbcType=DECIMAL},
+      CLEAR_TAX_CODE_03 = #{clearTaxCode03,jdbcType=VARCHAR},
+      CLEAR_TAX_AMT_03 = #{clearTaxAmt03,jdbcType=DECIMAL},
+      COMMENTS = #{comments,jdbcType=VARCHAR},
+      FINAL_BONUS_ID = #{finalBonusId,jdbcType=DECIMAL},
+      MARKET_ID = #{marketId,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = #{objectVersionNumber,jdbcType=DECIMAL},
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      WITHHOLDING_TAX_AMT = #{withholdingTaxAmt,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = #{lastUpdateDate,jdbcType=TIMESTAMP},
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      BONUS_CODE = #{bonusCode,jdbcType=VARCHAR},
+      BONUS_TYPE = #{bonusType,jdbcType=VARCHAR},
+      DELIVER_AMT = #{deliverAmt,jdbcType=DECIMAL}
+    where BONUS_ID = #{bonusId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="countBonusRelease" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusRelease" resultType="java.lang.Integer">
+  select count(1) from BM_BONUS_RELEASE
+  WHERE 1 =1 
+  <if test="periodId != null">
+    AND PERIOD_ID = #{periodId,jdbcType=DECIMAL} 
+  </if>
+  <if test="marketId != null">
+    AND MARKET_ID = #{marketId,jdbcType=DECIMAL}
+  </if>
+  <if test="status != null">
+    AND STATUS =#{status,jdbcType=VARCHAR}
+  </if>
+  <if test="bonusType != null">
+    AND BONUS_TYPE =#{bonusType,jdbcType=VARCHAR}
+  </if>
+  </select>
+  
+  <update id="updateReleaseStatus" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusReleaseCombine">
+  update BM_BONUS_RELEASE s set status = #{releaseStatus,jdbcType=VARCHAR},
+  s.final_bonus_id =
+       (select bbf.bonus_id
+          from bm_bonus_final bbf
+         where bbf.member_id = s.member_id
+         and bbf.market_id =  #{marketId, jdbcType = DECIMAL}
+         and bbf.period_id = #{periodId,jdbcType=DECIMAL}
+         and bbf.bonus_type = #{bonusType,jdbcType = VARCHAR})
+  where s.market_id = #{marketId, jdbcType = DECIMAL}
+  and s.period_id = #{periodId,jdbcType=DECIMAL}
+  and s.bonus_type =#{bonusType,jdbcType = VARCHAR}
+  </update>
+  
+  <select id="selectBonusRelease" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusRelease" >
+   select BBR.BONUS_ID,
+       BBR.PERIOD_ID,
+       BBR.MEMBER_ID,
+       BBR.CURRENCY_CODE,
+       BBR.PRE_TAX_AMT_ADJUST,
+       BBR.PRE_TAX_AMT,
+       BBR.TAX_CODE_01,
+       BBR.TAX_AMT_01,
+       BBR.TAX_CODE_02,
+       BBR.TAX_AMT_02,
+       BBR.AFTER_TAX_AMT,
+       BBR.CLEAR_TAX_CODE_03,
+       BBR.CLEAR_TAX_AMT_03,
+       BBR.COMMENTS,
+       BBR.FINAL_BONUS_ID,
+       BBR.MARKET_ID,
+       BBR.STATUS,
+       BBR.DELIVER_AMT,
+       BBR.WITHHOLDING_TAX_AMT,
+       BBR.BONUS_CODE,
+       BBR.BONUS_TYPE,
+       SCT.NAME AS COMPANY_NAME,
+       MM.MEMBER_CODE,
+       (CASE MM.MEMBER_TYPE  WHEN  'COMP' THEN  
+       COALESCE(CASE
+                WHEN MM.REF_COMPANY IS NULL THEN
+                MM.REF_COMPANY_EN
+                ELSE
+                MM.REF_COMPANY
+                END ,'')
+            ELSE
+       CONCAT(CASE
+                WHEN MM.ENGLISH_NAME IS NULL THEN
+                 ''
+                WHEN MM.CHINESE_NAME IS NULL THEN
+                 MM.ENGLISH_NAME
+                ELSE
+                 CONCAT(MM.ENGLISH_NAME, '/')
+              END,
+              MM.CHINESE_NAME)  END )AS MEMBER_NAME,
+       SMT.NAME AS MARKET_NAME,
+       SP.PERIOD_NAME
+  from BM_BONUS_RELEASE BBR,
+       MM_MEMBER_V           MM,
+       SPM_PERIOD          SP,
+       SPM_COMPANY_B       SCB
+  LEFT OUTER JOIN SPM_COMPANY_TL SCT
+    ON (SCB.COMPANY_ID = SCT.COMPANY_ID AND SCT.LANG =#{request.locale,jdbcType=VARCHAR}), SPM_MARKET_B SMB
+  LEFT OUTER JOIN SPM_MARKET_TL SMT
+    ON (SMB.MARKET_ID = SMT.MARKET_ID AND SMT.LANG =#{request.locale,jdbcType=VARCHAR})
+ WHERE MM.MEMBER_ID = BBR.MEMBER_ID
+   AND MM.COMPANY_ID = SCB.COMPANY_ID
+   AND SMB.MARKET_ID = BBR.MARKET_ID
+   AND SP.PERIOD_ID = BBR.PERIOD_ID
+   <if test="marketId != null">
+        AND BBR.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+   </if>
+   <if test="marketId == null">
+        AND BBR.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}
+   </if>
+   <if test="memberId != null">
+        AND BBR.MEMBER_ID = #{memberId,jdbcType=DECIMAL}
+   </if>
+   <if test="periodId != null">
+        AND BBR.PERIOD_ID = #{periodId ,jdbcType=DECIMAL}
+   </if>
+   <if test="bonusType != null">
+        AND BBR.BONUS_TYPE = #{bonusType ,jdbcType=VARCHAR}
+   </if>
+   <if test="status != null">
+        AND BBR.STATUS =#{status,jdbcType=VARCHAR}
+   </if>
+      <if test="memberCode != null">
+        AND MM.member_code like concat('%',concat(#{memberCode,jdbcType=VARCHAR},'%'))
+   </if>
+  </select>
+  
+  <resultMap id="YearRelease" type="com.lkkhpg.dsis.common.bonus.dto.BonusRelease">
+  	<result column="PERIOD_YEAR" property="periodYear" jdbcType="DECIMAL"/>
+  	<result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR"/>
+    <result column="MARKET_NAME" property="marketName" jdbcType="VARCHAR"/>
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR"/>
+    <result column="PRE_TAX_AMT" jdbcType="DECIMAL" property="preTaxAmt" />
+  </resultMap>
+  
+  <select id="queryYearRelease" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusRelease" resultMap="YearRelease">
+  SELECT
+    sumbn.PERIOD_YEAR PERIOD_YEAR,
+    SMT.NAME AS MARKET_NAME,
+    MM.MEMBER_CODE,
+    (
+        CASE MM.MEMBER_TYPE
+            WHEN 'COMP'
+            THEN COALESCE(CASE
+                WHEN MM.REF_COMPANY IS NULL THEN
+                MM.REF_COMPANY_EN
+                ELSE
+                MM.REF_COMPANY
+                END ,'')
+            ELSE CONCAT(
+                    CASE
+                        WHEN MM.ENGLISH_NAME IS NULL
+                        THEN ''
+                        WHEN MM.CHINESE_NAME IS NULL
+                        THEN MM.ENGLISH_NAME
+                        ELSE CONCAT(MM.ENGLISH_NAME, '/')
+                    END, MM.CHINESE_NAME)
+        END )AS MEMBER_NAME,
+    sumbn.PRE_TAX_AMT
+    FROM
+    (
+        SELECT
+            sp.period_year,
+            bbr.market_id,
+            bbr.member_id,
+            SUM(bbr.pre_tax_amt) pre_tax_amt
+        FROM
+            bm_bonus_release bbr,
+            spm_period sp
+        WHERE
+            bbr.period_id = sp.period_id
+            <if test="periodYear != null" >
+        		and sp.period_year = #{periodYear,jdbcType=DECIMAL}
+      		</if>
+        GROUP BY
+            sp.period_year,
+            bbr.market_id,
+            bbr.member_id
+        <if test="minBonusAmt != null" >
+        	having SUM(bbr.pre_tax_amt) &gt;= #{minBonusAmt,jdbcType=DECIMAL}
+      	</if>
+        ) sumbn,
+        MM_MEMBER_V MM,
+        SPM_COMPANY_B SCB
+    LEFT OUTER JOIN
+        SPM_COMPANY_TL SCT
+    ON
+    (
+        SCB.COMPANY_ID = SCT.COMPANY_ID
+	    AND SCT.LANG =#{request.locale,jdbcType=VARCHAR}),
+	    SPM_MARKET_B SMB
+	LEFT OUTER JOIN
+	    SPM_MARKET_TL SMT
+	ON
+	    (
+	        SMB.MARKET_ID = SMT.MARKET_ID
+	    AND SMT.LANG =#{request.locale,jdbcType=VARCHAR})
+	WHERE
+	    MM.MEMBER_ID = sumbn.MEMBER_ID
+	AND MM.COMPANY_ID = SCB.COMPANY_ID
+	AND SMB.MARKET_ID = sumbn.MARKET_ID
+	<if test="marketId != null">
+	AND sumbn.MARKET_ID = #{marketId,jdbcType=DECIMAL}
+	</if>
+	<if test="marketId == null">
+	AND sumbn.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}
+	</if>
+	<if test="memberCode != null">
+        AND MM.member_code like concat('%',concat(#{memberCode,jdbcType=VARCHAR},'%'))
+    </if>
+  </select>
+  
+  <resultMap id="MonthTWRelease" type="com.lkkhpg.dsis.common.bonus.dto.BonusRelease">
+    <result column="MEMBER_CODE" property="memberCode" jdbcType="VARCHAR"/>
+  	<result column="MEMBER_NAME" property="memberName" jdbcType="VARCHAR"/>
+    <result column="ID_NUMBER" property="idNumber" jdbcType="VARCHAR"/>
+  	<result column="PERIOD_NAME" property="periodName" jdbcType="VARCHAR"/>
+  	<result column="BONUS_TYPE" jdbcType="VARCHAR" property="bonusType" />
+    <result column="PRE_TAX_AMT" jdbcType="DECIMAL" property="preTaxAmt" />
+    <result column="CLEAR_TAX_AMT_03" jdbcType="DECIMAL" property="clearTaxAmt03" />
+    <result column="MONTH_TAX_TYPE" jdbcType="VARCHAR" property="monthTaxType" />
+    <result column="MONTH_TAX_STATUS" jdbcType="VARCHAR" property="monthTaxStatus" />
+  </resultMap>
+  
+  <select id = "queryMonthTWRelease" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusRelease" resultMap="MonthTWRelease">
+  select 
+       BBR.PRE_TAX_AMT,      
+       ABS(BBR.CLEAR_TAX_AMT_03) CLEAR_TAX_AMT_03,       
+       BBR.BONUS_TYPE,      
+       MM.MEMBER_CODE,
+       coalesce(null,'INC') MONTH_TAX_TYPE,
+       coalesce(bbr.ATTRIBUTE1,'I') MONTH_TAX_STATUS,
+       (CASE MM.MEMBER_TYPE  WHEN  'COMP' THEN 
+       COALESCE(CASE
+                WHEN MM.REF_COMPANY IS NULL THEN
+                MM.REF_COMPANY_EN
+                ELSE
+                MM.REF_COMPANY
+                END ,'')
+            ELSE
+       CONCAT(CASE
+                WHEN MM.ENGLISH_NAME IS NULL THEN
+                 ''
+                WHEN MM.CHINESE_NAME IS NULL THEN
+                 MM.ENGLISH_NAME
+                ELSE
+                 CONCAT(MM.ENGLISH_NAME, '/')
+              END,
+              MM.CHINESE_NAME)  END )AS MEMBER_NAME,
+       SMT.NAME AS MARKET_NAME,
+       SP.PERIOD_NAME,
+       (
+        CASE MM.MEMBER_TYPE
+            WHEN 'COMP'
+            THEN mm.BR_NUMBER
+            ELSE mm.ID_NUMBER
+        END) AS ID_NUMBER
+   from BM_BONUS_RELEASE BBR,
+       MM_MEMBER_V           MM,
+       SPM_PERIOD          SP,
+       SPM_COMPANY_B       SCB
+   LEFT OUTER JOIN SPM_COMPANY_TL SCT
+    ON (SCB.COMPANY_ID = SCT.COMPANY_ID AND SCT.LANG =#{request.locale,jdbcType=VARCHAR}), SPM_MARKET_B SMB
+   LEFT OUTER JOIN SPM_MARKET_TL SMT
+    ON (SMB.MARKET_ID = SMT.MARKET_ID AND SMT.LANG =#{request.locale,jdbcType=VARCHAR})  
+   WHERE MM.MEMBER_ID = BBR.MEMBER_ID
+   AND MM.COMPANY_ID = SCB.COMPANY_ID
+   AND SMB.MARKET_ID = BBR.MARKET_ID
+   AND SP.PERIOD_ID = BBR.PERIOD_ID
+   and smb.CODE = 'TW'
+   and bbr.CLEAR_TAX_AMT_03 &lt;&gt; 0
+   and bbr.market_id = #{request.marketId,jdbcType=DECIMAL}
+   <if test="memberCode != null">
+        AND MM.member_code like concat('%',concat(#{memberCode,jdbcType=VARCHAR},'%'))
+   </if>
+   <if test="periodName != null">
+		AND bbr.bonus_id in (
+		    SELECT 
+            bbr1.BONUS_ID
+            FROM bm_bonus_release bbr1
+            WHERE bbr1.CLEAR_TAX_AMT_03 &lt;&gt; 0
+            and bbr1.final_bonus_id IN
+  (
+    select bbf1.BONUS_ID from bm_bonus_final bbf1  
+    LEFT OUTER JOIN SPM_PERIOD sp1 on sp1.PERIOD_ID = bbf1.PERIOD_ID 
+    LEFT OUTER JOIN SPM_MARKET_B SMB on bbf1.MARKET_ID = smb.MARKET_ID
+    where  (
+    (SP1.PERIOD_NAME = TO_CHAR(ADD_MONTHS(TO_DATE(#{periodName ,jdbcType=VARCHAR}, 'yyyyMM'), -1),'yyyyMM') AND bbf1.BONUS_TYPE = 'LOCAL')
+     OR
+    (SP1.PERIOD_NAME = TO_CHAR(ADD_MONTHS(TO_DATE(#{periodName ,jdbcType=VARCHAR}, 'yyyyMM'), -2),'yyyyMM') AND bbf1.BONUS_TYPE = 'INTER')
+    )
+    and smb.CODE = 'TW'
+    and bbf1.REMIT_FLAG = 'Y'
+  )
+  UNION
+  
+  SELECT
+  bbr1.BONUS_ID
+  FROM bm_bonus_release bbr1
+  WHERE bbr1.CLEAR_TAX_AMT_03 &lt;&gt; 0 and bbr1.final_bonus_id IN
+       (SELECT t.child_bonus_id
+          FROM bm_bonus_final bbf,
+               (SELECT connect_by_root(bonus_id) child_bonus_id,
+                       connect_by_root(final_bonus_id) parent_bonus_id,
+                       bbr.final_bonus_id root_bonus_id,
+                       LEVEL
+                  FROM bm_bonus_retransfer bbr
+                CONNECT BY PRIOR bbr.final_bonus_id = bbr.bonus_id) t
+           WHERE bbf.bonus_id = t.root_bonus_id
+           AND bbf.bonus_id IN
+    (
+    select bbf1.BONUS_ID from bm_bonus_final bbf1  
+    LEFT OUTER JOIN SPM_PERIOD sp1 on sp1.PERIOD_ID = bbf1.PERIOD_ID 
+    LEFT OUTER JOIN SPM_MARKET_B SMB on bbf1.MARKET_ID = smb.MARKET_ID
+    where  (
+    (SP1.PERIOD_NAME = TO_CHAR(ADD_MONTHS(TO_DATE(#{periodName ,jdbcType=VARCHAR}, 'yyyyMM'), -1),'yyyyMM') AND bbf1.BONUS_TYPE = 'LOCAL')
+     OR
+    (SP1.PERIOD_NAME = TO_CHAR(ADD_MONTHS(TO_DATE(#{periodName ,jdbcType=VARCHAR}, 'yyyyMM'), -2),'yyyyMM') AND bbf1.BONUS_TYPE = 'INTER')
+    )
+    and smb.CODE = 'TW'
+    and bbf1.REMIT_FLAG = 'Y'
+    )
+    )
+    )
+   </if>
+   
+  </select>
+  
+  <select id="queryDetailByFinal" parameterType="com.lkkhpg.dsis.common.bonus.dto.BonusFinal" resultMap="BaseResultMap">
+  SELECT 
+  bbr.*,
+  mm.MEMBER_CODE,
+  sp.PERIOD_NAME
+  FROM bm_bonus_release bbr
+  LEFT OUTER JOIN MM_MEMBER_V mm ON bbr.MEMBER_ID = mm.MEMBER_ID
+  LEFT OUTER JOIN SPM_PERIOD sp on sp.PERIOD_ID = bbr.PERIOD_ID
+  WHERE bbr.final_bonus_id = #{bonusId,jdbcType=DECIMAL}
+  UNION
+  SELECT bbr.*,
+  mm.MEMBER_CODE,
+  sp.PERIOD_NAME
+  FROM bm_bonus_release bbr
+  LEFT OUTER JOIN MM_MEMBER_V mm ON bbr.MEMBER_ID = mm.MEMBER_ID
+  LEFT OUTER JOIN SPM_PERIOD sp on sp.PERIOD_ID = bbr.PERIOD_ID
+  WHERE bbr.final_bonus_id IN
+       (SELECT t.child_bonus_id
+          FROM bm_bonus_final bbf,
+               (SELECT connect_by_root(bonus_id) child_bonus_id,
+                       connect_by_root(final_bonus_id) parent_bonus_id,
+                       bbr.final_bonus_id root_bonus_id,
+                       LEVEL
+                  FROM bm_bonus_retransfer bbr
+                CONNECT BY PRIOR bbr.final_bonus_id = bbr.bonus_id) t
+           WHERE bbf.bonus_id = t.root_bonus_id
+           AND bbf.bonus_id = #{bonusId,jdbcType=DECIMAL}
+        )
+  </select>
+</mapper>

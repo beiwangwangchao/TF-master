@@ -1,0 +1,35 @@
+<#--
+* description: 报表程序运行界面
+* version: 1.0
+* author: wangc
+* .
+*
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+<script
+        src="${base.contextPath}/common/code?exportTypeData=SYS.REPORT_EXPORT_TYPE&paramEvent=SYS.REPORT_PARAM_EVENT"></script>
+
+
+<div id="report_run_grid" style="margin: 0; padding: 0"></div>
+<!--target="_blank"-->
+<form action="${base.contextPath}/bill/get" method="post" id="bill_form" name="bill_form" style="font-size: 16px;">
+
+    <div id="div_for_form" class="form-group" style="margin-left: 50px ; margin-top: 30px">
+
+        <label for="order_date" style="margin-top: 10px">请选择查询日期: </label><br>
+        <input style="margin-top: 10px;margin-bottom: 10px" id="order_date" type="date" name="order_date"
+               class="form-control col-md-6"><br>
+        <label style="margin-top: 30px;">请选择你要查找的单据类型: </label><br>
+        <input name="order_type" type="radio" value="001" style="margin-top: 10px"> 当日所有订单&nbsp;&nbsp;&nbsp;
+        <input name="order_type" type="radio" value="002" style="margin-top: 10px;"> 当日成功支付的订单&nbsp;&nbsp;&nbsp;
+        <input name="order_type" type="radio" value="003" style="margin-top: 10px"> 当日退款的订单&nbsp;&nbsp;&nbsp;
+
+    </div>
+    <div id="div_for_button" class="form-group" style="margin-left: 50px; margin-top: 20px">
+        <button type="button" onclick="submit()">提交</button>
+    </div>
+
+</form>
+</body>
+</html>

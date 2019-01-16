@@ -1,0 +1,142 @@
+<#include "/mws/include/header.html">
+
+<!-- ========== MENU END ========== -->
+
+<!-- ========== CONTENT START ========== -->
+<style>
+<!--
+.center { MARGIN-RIGHT: auto !important; MARGIN-LEFT: auto !important; }
+-->
+</style>
+<script type="text/javascript">var _basePath = "${base.contextPath}";</script>
+<script type="text/javascript">
+    function f_button(){
+    	var oldPwd = $("#oldPwd").val(),newPwd = $("#newPwd").val(),againPwd = $("#againPwd").val();
+    	if(oldPwd == ""){
+    		$("#prompt").html('<@spring.message"msg.error.um.current_password_not_empty"/>');
+            return;
+    	}
+    	if(newPwd == ""){
+            $("#prompt").html('<@spring.message"msg.error.um.new_password_not_empty"/>');
+            return;
+        }
+        //新密码格式校验
+        var regNewPwd = /^(?![^a-zA-Z]+$)(?!\D+$)[a-zA-Z0-9._`~!@#$%^&*()+-={}:;<>?,\\\"\'\[\]]{8,}$/;
+        if(regNewPwd.test(newPwd) == false){
+            $("#prompt").html('<@spring.message"msg.error.um.password_format_error"/>');
+            $("#newPwd").val("");
+            return;
+        }
+        $("#prompt").html("");
+        if(againPwd == ""){
+            $("#prompt").html('<@spring.message"msg.error.um.again_password_not_empty"/>');
+            return;
+        }else if(againPwd != newPwd){
+            $("#prompt").html('<@spring.message "msg.error.um.two_password_not_match"/>');
+            $("#againPwd").val("");
+            return;
+        }
+    	$.ajax({
+            type: "POST",
+            url: "${base.contextPath}/account/member/updatePassword",
+            data: {
+            	oldPwd: oldPwd,
+            	newPwd : newPwd,
+            	againPwd : againPwd
+            },
+            async:false,
+            dataType: "json",
+            success: function(data){
+            	if(data.success){
+            		logout();
+            	}else{
+            		$("#prompt").html(data.message);
+            	}
+            }
+    	});
+    }
+    
+    //登出
+    function logout() {
+        //var r=confirm("请重新登录");
+       $.dialog.confirm('<@spring.message "mws.dialog.confirm"/>','<@spring.message "msg.info.password.new_password_modify_done"/>',function(){
+            location.href = _basePath + "/logout";
+        },function(){
+        	//取消--无操作
+        });
+    }
+</script>
+<section id="content">
+	<div class="container">
+
+		<ol class="breadcrumb">
+            <li><a href="${base.contextPath}/index.html"><@spring.message "mws.menu.home"/></a></li>
+            <li><@spring.message "mws.menu.changepassword"/></li>
+        </ol>
+
+		<div class="row">
+			<!-- Sidebar Start -->
+	        <#include "../include/account-menu.html">
+			<!-- Sidebar End -->
+			<!-- Posts Start -->
+			<div class="col-sm-8 col-md-9">
+			     <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><@spring.message "mws.menu.changepassword"/></h3>
+                    </div>
+				<article class="account-details-wrap">
+					
+					<div class="account-details-wrap">
+						<div class="gap-30"></div>
+						<!-- <form role="form" action="${base.contextPath}/account/member/updatePassword" method="POST" class="details-form"> -->
+						    <div class="form-group" style="color: red;">
+			                  <label for="prompt" class="col-sm-2 control-label"></label>
+			                  <div class="col-md-7" id="prompt" style="text-align: center;height: 30px;">
+			                </div>
+			              </div>
+							<div class="row" style="margin-top: 15px;">
+								<div class="form-group center">
+					              <label for="oldPwd" class="col-sm-2 col-md-offset-2 text-right" style="white-space:nowrap;"><@spring.message "type.com.lkkhpg.dsis.common.user.current_password"/></label>
+					              <div class="col-sm-3">
+					                <input class="form-control input" type="password" placeholder="" id="oldPwd" name="oldPwd" />
+					              </div>
+					            </div>
+							</div>
+							<div class="row" style="margin-top: 15px;">
+								<div class="form-group center">
+                                  <label for="newPwd" class="col-sm-2 col-md-offset-2 text-right" style="white-space:nowrap;"><@spring.message "type.com.lkkhpg.dsis.common.user.new_password"/></label>
+                                  <div class="col-sm-3">
+                                    <input class="form-control input" type="password" placeholder="" id="newPwd" name="newPwd" />
+                                  </div>
+                                </div>
+							</div>
+							<div class="row" style="margin-top: 15px;">
+								<div class="form-group center">
+                                  <label for="againPwd" class="col-sm-2 col-md-offset-2 text-right" style="white-space:nowrap;"><@spring.message "type.com.lkkhpg.dsis.common.user.again_new_password"/></label>
+                                  <div class="col-sm-3">
+                                    <input class="form-control input" type="password" placeholder="" id="againPwd" name="againPwd" />
+                                  </div>
+                                </div>
+							</div>
+							<div class="row" style="margin-top: 15px;padding-bottom: 60px;">
+								<div class="form-group center">
+				                  <label for="inputPassword3" class="col-sm-2 control-label"></label>
+				                    <div class="col-sm-3 col-md-offset-2">
+				                      <button  type="button" class="btn btn-info input" style="width: 100%;" onclick="f_button()"><@spring.message "sys.hand.btn.ok"/></button>
+				                    </div>
+				                </div>
+							</div>
+						<!-- </form> -->
+					</div>
+				</article>
+			</div>
+			<!-- Posts End -->
+            </div>
+		</div>
+	</div>
+</section>
+
+<!-- ========== CONTENT END ========== -->
+
+<!-- ========== FOOTER START ========== -->
+<#include "/mws/include/footer.html">

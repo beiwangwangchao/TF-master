@@ -1,0 +1,563 @@
+<#-- 
+ * description: 自动订货单查询页面
+ * version: 1.0 
+ * author:huangjiajing
+ * author:liuxiawang
+ * .
+ * 
+--> 
+<#include "../include/head.html">
+<body style="padding: 3px; overflow: hidden;">
+	<script
+		src="${base.contextPath}/common/code?autoshipStatuss=OM.AUTOSHIP_STATUS&executeTypes=OM.EXECUTE_TYPE&executeStatuss=OM.AUTO_EXECUTE_STATUS"
+		type="text/javascript"></script>
+	<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161107" type="text/javascript"></script>
+	<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+	<form id="d_sm_002_form"></form>
+	<form id="downCSV" method="POST" target="_blank"></form>
+	<div id="d_sm_002_grid" style="margin: 0; padding: 0"></div>
+	<script type="text/javascript">
+    $(function() {
+        window['d_sm_002_form'] = $("#d_sm_002_form").ligerForm({
+            fields : [
+                /* {  type : 'select',
+                   label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+                   name : 'marketId',
+                   newline : false ,
+                   options : {
+						value : _marketId,
+						valueField : 'marketId',
+						textField : 'name',
+					 
+						url :'${base.contextPath}/spm/market/queryMarketsByRole',
+					    readonly : false ,
+					    cancelable : false ,
+					    autocomplete:false
+	            	}       
+				}, */
+				 {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.salesOrg"/>',
+                    name : "salesOrgId",
+                    newline : false,
+                    type : "combobox",
+                    textField: 'name',
+                    options : {
+                        valueField : 'salesOrgId',
+                        textField : 'name',
+                        url : '${base.contextPath}/sys/salesOrg/queryOrg',
+                        isShowCheckBox: false,
+                        isMultiSelect: false,
+                        cancelable : false,
+                        onChangeValue :function (value,text){
+                        	Hap.gridQuery({
+                                form:d_sm_002_form,
+                                grid:d_sm_002_grid
+                            })
+                        }
+                    },
+                    validate : {
+                        required : true
+                    }
+                    /* readonly:true */
+                },
+	            { name : 'autoshipNumber', type : 'text', label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.autoshipnumber"/>', newline : false },
+	            {
+	                name : 'autoshipStatus',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.autoshipstatus"/>',
+	                newline : false,
+	                textField: 'text',
+                 	valueField : 'id',
+                 	 space : 30,
+                 	rightToken : ' ',
+                 	type:'select',
+	                options : {
+	                	valueField : "value",
+						textField : "meaning",
+                 		data : autoshipStatuss,
+	            		isMultiSelect: true
+                 		}
+	            },
+	            {
+	                name : 'memberId',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+	                textField:'memberCode', 
+                    newline : true,
+                    type : "popup",
+                    editor : $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{ 
+                        onLoadData:function(){
+                            var marketId ;
+                            var salesOrgId = liger.get("salesOrgId").getValue();
+                            var datas = liger.get("salesOrgId").data;
+                            for(var t = 0 ; t< datas.length;t++){
+                                if(datas[t].salesOrgId == salesOrgId){
+                                    marketId = datas[t].market.marketId;
+                                }
+                            }
+                            this.setParm('marketId',marketId)   
+                        }
+                    })
+	            },
+	            {
+	                name : 'memberName',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.membername"/>',
+	                type : 'text',
+	                newline : false
+	            },
+	            {
+                    name : 'executeStatus',
+                    label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.executestatus"/>',
+                    newline : false,
+                    type:'select',
+                    options : {
+                        valueField : "value",
+                        textField : "meaning",
+                        data : executeStatuss
+                        }
+                },
+	            {
+	                name : 'autoshipCreateDateForm',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.creationdate"/>',
+	                type : 'date',
+	                format: 'yyyy-MM-dd',
+	                newline : true,
+	                options:{
+		                onChangeDate  :function(date){
+		                	if($("input[name='autoshipCreateDateTo']").val()<date){
+		                		if($("input[name='autoshipCreateDateTo']").val()!=""){
+			                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>', '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.lov.placeholder"/>');
+		                		}
+		                	}
+		                }
+	                }
+	            },
+	            {
+	                name : 'autoshipCreateDateTo',
+	                label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.querytimeend"/>',
+	                type : 'date',
+	                format: 'yyyy-MM-dd',
+	                newline : false,
+	                options:{
+		                onChangeDate : function(date){
+		                	if($("input[name='autoshipCreateDateForm']").val()>date){
+		                		$.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.twodate"/>', '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.autoship.onedate"/>');
+		                	}
+		                }
+	                }
+	            }
+            ],
+            buttons : [
+                {
+	                text : '<@spring.message "sys.hand.btn.query"/>',
+	                disabled : false,
+	                width : 60,
+	                click : queryForm
+	            },{
+	            	text: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.construction"/>',	            	
+                    <#if accessService.access("CREATE_EDITABLE") == false>
+	            	disabled: true,
+                    </#if>	            	
+	            	width :60,
+	            	click : function(){
+	            		window.top.f_addTab( null,'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.automatically.create.orders"/>',
+	        					'${base.contextPath}/om/om_autoship_create.html');
+	            	}
+	            },{
+	            	text: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.execute"/>',
+                    <#if accessService.access("EXECUTE_EDITABLE") == false>
+	            	disabled: true,
+                    </#if> 
+	            	id : 'executeBtn',
+	            	width :60,
+
+	            	click : popConfirm 
+	            },{
+                    text: '<@spring.message "type.com.lkkhpg.dsis.common.order.download"/>',
+                    <#if accessService.access("DOWNLOAD_EDITABLE") == false>
+	            	disabled: true, 
+                    </#if>
+                    id : 'downLoadBtn',
+                    width :60,
+                    click : downLoadpopConfirm 
+                },{
+                    text: '<@spring.message "type.com.lkkhpg.dsis.common.order.upload"/>',
+                    <#if accessService.access("UPLOAD_EDITABLE") == false>
+	            	disabled: true,
+                    </#if>
+                    id : 'upLoadBtn',
+                    width :60,
+                    click : upLoadpopConfirm 
+                },{
+                    text: '<@spring.message "type.com.lkkhpg.dsis.common.order.cardcheck"/>',
+                    id : 'cardCheck',
+                    width :80,
+                    click : cardCheck 
+                }
+            ]
+        });
+        var d_sm_002_grid;
+        d_sm_002_grid = window['d_sm_002_grid'] = $("#d_sm_002_grid").ligerGrid({
+            unSetValidateAttr : false,
+            columns : [
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.autoshipnumber"/>',
+	                name : 'autoshipNumber',
+	                width : 200,
+	                isSort: true,
+	                align : "center",
+	                type : 'text',
+	                render : function(item) {
+						return "<a href='#' onclick='orderInfo("+item.autoshipId+")'>"+item.autoshipNumber+"</a>";
+					}
+                },
+                {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+	                name : 'memberNumber',
+	                width : 150,
+	                align : "center",
+	                type : 'text'	
+	            },
+	            {
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusfinal.membername"/>',
+	                name : 'memberName',
+	                width : 200,
+	                align : "center",
+	                type : 'text'	
+	            },
+	            {
+	                name : 'salesScore',
+	                display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.AutoshipOrder.salesScore"/>',
+	                width : 100,
+                    type : 'text'
+	            },
+               /*  {
+                    name : 'executeType',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.AutoshipOrder.executeType"/>',
+                    width : 100,
+                    render : function(item) {
+                        for (var i = 0; i < executeTypes.length; i++) {
+                            if (executeTypes[i]['value'] == item.executeType)
+                                return executeTypes[i]['meaning']
+                        }
+                        return item.executeType;
+                    }
+                }, */
+                {                	
+                    name : 'autoshipStatus',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.status"/>',
+                    width : 100,
+                    render : function(item) {
+                        for (var i = 0; i < autoshipStatuss.length; i++) {
+                            if (autoshipStatuss[i]['value'] == item.autoshipStatus)
+                                return autoshipStatuss[i]['meaning']
+                        }
+                        return item.autoshipStatus;
+                    }
+                },
+                {                	
+                    name : 'lastUpdatedName',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.last_update_member"/>',
+                    width : 100,
+                    type : 'text'
+                },
+                {                	
+                    name : 'lastUpdateDate',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.last_update_date"/>',
+                    type : 'date',
+                    width : 100,
+                    isSort: true,
+                    format : "yyyy-MM-dd"
+                },
+                {                	
+                    name : 'pvSum',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.pvValue"/>',
+                    width : 50,
+                    type : 'text'
+                },
+                {                	
+                    name : 'orderAmt',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.AutoshipOrder.autoshipAmt"/>',
+                    width : 80,
+                    type : 'text'
+                },
+                {                	
+                    name : 'creationDate',
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.TransferTrx.createDate"/>',
+                    type : 'date',
+                    width : 100,
+                    isSort: true,
+                    format : "yyyy-MM-dd"
+                },
+                {                	
+                    name : 'userName',
+                    display :'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.createuserid"/>',
+                    type : 'text',
+                    width : 100
+                },
+                {                	
+                    name : 'lastOrderNumber',
+                    display :'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.last_sales_order_number"/>',
+                    type : 'text',
+                    width : 160,
+                    render : function(item) {
+                    	if(item.lastOrderNumber == null){
+                    		return "";
+                    	}
+						return "<a href='#' onclick='lastOrderInfo("+item.lastOrderId+")'>"+item.lastOrderNumber+"</a>";
+					}
+                },
+                {                	
+                    name : 'latestExecuteDate',
+                    display :'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.last_executedate"/>',
+                    type : 'text',
+                    width : 100
+                },
+                
+                {                	
+                    name : 'latestBatchNumber',
+                    display :'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.batchnumber"/>',
+                    type : 'text',
+                    width : 100
+                },
+                {
+                    name : 'executeStatus',
+                    display :'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.executestatus"/>',
+                    type : 'text',
+                    width : 100,
+                    render : function(rowdata, index, value) {
+                        for (var i = 0; i < executeStatuss.length; i++) {
+                            if (executeStatuss[i]['value'] == value)
+                                return executeStatuss[i]['meaning']
+                        }
+                        return value;
+                    }
+                }
+                
+            ],
+            url : '${base.contextPath}/om/autoship/query',
+            toolbar: {
+                items: [
+                { line: true },
+                {                  
+                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                    menu:{ width: 120, items:
+                            [
+                                {                   
+                                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                    click:   function (){exportSelected("d_sm_002_form","d_sm_002_grid",{"autoshipStatus":autoshipStatuss,"executeType":executeTypes,"executeStatus":executeStatuss},_basePath);}
+                                },
+                                { line: true },
+                                {                   
+                                    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                    click: function (){exportAll("d_sm_002_form","d_sm_002_grid",{"autoshipStatus":autoshipStatuss,"executeType":executeTypes,"executeStatus":executeStatuss},_basePath);}
+                                    
+                                }
+                          ]
+                    }                        
+                }
+                ]
+            },
+            enabledEdit : true,
+            checkbox: true,
+            width : '100%',
+            height : '99%',
+            rownumbers : true,
+            sortName: 'autoshipNumber',
+			sortOrder: 'desc',
+            onSelectRow : selectRows,
+            onUnSelectRow : selectRows
+
+        });
+        
+        liger.get("salesOrgId").setValue(_salesOrgId);
+        /* liger.get("marketId").setText(_marketName); */
+        liger.get("salesOrgId").setText(_salesOrgName);
+    });
+    <#--
+    * description: 自动订货单查询
+   -->
+    function queryForm() {
+    	var datas = d_sm_002_form.getData();
+    	var is_empty = true;
+    	for(var data in datas){
+    		if(datas[data] != '' && datas[data] != null){
+    			is_empty = false;
+    			break;
+    		}
+    	}
+    	if(is_empty){
+    		$.ligerDialog.error('<@spring.message "msg.error.system.no_search_criteria"/>');
+    	}else{
+            Hap.gridQuery({
+                form:d_sm_002_form,
+                grid:d_sm_002_grid
+            })
+        }
+     }
+    
+    function popConfirm(){
+    	var datas = d_sm_002_grid.getSelectedRows();
+    	if(datas.length > 0){
+    		for(var i = 0; i<datas.length ;i++){
+    			if(datas[i].autoshipStatus == 'TER' || datas[i].autoshipStatus == 'SUS'){
+    				Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.order.dto.the_order_of_the_termination_status_is_not_allowed_to_execute"/>');
+    				return;
+    			}
+    		}
+    	}
+    	var message='<@spring.message "type.com.lkkhpg.dsis.common.order.dto.will.generate"/>'+ datas.length +'<@spring.message "type.com.lkkhpg.dsis.common.order.dto.order.to.be.paid"/>';
+    	$.ligerDefaults.DialogString.yes = '<@spring.message "sys.hand.btn.ok"/>';
+    	$.ligerDefaults.DialogString.no = '<@spring.message "sys.hand.btn.cancel"/>';    	
+    	$.ligerDialog.confirm(message, 
+   			function (result) {  
+   				if(result) {
+   					executeAutoshipOrders(datas); 
+   				}	
+			}
+    	);    	
+    }
+    
+    function downLoadpopConfirm(){
+    	var message='<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.download_file"/>';
+        $.ligerDefaults.DialogString.yes = '<@spring.message "sys.hand.btn.ok"/>';
+        $.ligerDefaults.DialogString.no = '<@spring.message "sys.hand.btn.cancel"/>';       
+        $.ligerDialog.prompt(message, 
+            function (result,value) {  
+                if(result) {
+                	if ($.trim(value) =="" || value == null) {
+                		return;
+                	}
+                    $("#downCSV").attr("action","${base.contextPath}/om/autoship/downcsv?batchNumber=" + value + "&salesOrgId=" + liger.get('salesOrgId').selectedValue).submit();
+                }   
+            }
+        );
+    }
+    
+    function upLoadpopConfirm(){
+    	window.popWin = $.ligerDialog.open({
+
+            width : 300,
+            height : 200,
+            title : 'CSVFile UpLoad',
+            url : 'om_autoship_csvupload.html',
+            showMax : false,
+            showToggle : true,
+            showMin : false,
+            isResize : true,
+            slide : false
+        });
+    }
+    
+    function cardCheck(){
+    	//TODU:
+    	$.ligerDialog.open({
+            title: '<@spring.message "type.com.lkkhpg.dsis.report.type.choosing"/>',
+            width:400,
+            height:200,
+            slide: false,
+            url: "${base.contextPath}/sys/report/sys_report_type_dialog.html",
+            buttons: [{
+                text: $l("sys.hand.btn.ok" ),
+                onclick: function(i, d) {
+                    var form = d.frame.report_type_form;
+                    var docType= form.getData().docType;
+                    if (form.valid()) {
+                        d.close();
+                        window.open('${base.contextPath}/report/run?docType='+ docType +'&reportProgramCode=RPT-Expired_Card_List');
+                    }
+                }
+            },
+            {
+                text: $l("sys.hand.btn.cancel"),
+                onclick: function(i, d) {
+                    d.hide();
+                }
+            }]
+        });
+    }
+    
+    function executeAutoshipOrders(datas){
+		//alert(JSON2.stringify(datas));
+		Hap.ajax( {url:"${base.contextPath}/om/autoship/execute" , data:datas,success : showDowloadDialog});
+    }
+    
+    function showDowloadDialog(json){
+    	if(json.success){
+    		var result =json.rows[0].batchNumber;
+    		var resultArr = new Array;
+    		resultArr = result.split(":");
+    		var message='<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.download_file_success"/>' + resultArr[0] + "<br/>"
+    		+ "<@spring.messageArgs 'type.com.lkkhpg.dsis.common.order.dto.autoshiporder.excute.result' ,['" + resultArr[1] + "','" + resultArr[2] + "']/>";
+    		$.ligerDefaults.DialogString.yes = '<@spring.message "type.com.lkkhpg.dsis.common.order.download"/>';
+    		$.ligerDefaults.DialogString.no = '<@spring.message "type.com.lkkhpg.dsis.common.event.btn.close"/>';
+        	$.ligerDialog.confirm(
+        		message,
+        		function (result) {  
+					if(result) {
+						$("#downCSV").attr("action","${base.contextPath}/om/autoship/downcsv?batchNumber=" + resultArr[0] + "&salesOrgId=" + liger.get('salesOrgId').selectedValue).submit();
+
+
+					}	
+				}
+        	);     		
+    	}   	
+    }    
+    
+    <#--
+    * description: 生效，失效按钮事件
+   -->
+ 	function selectRows(rowdata, rowid, rowobj){
+    	var datas = d_sm_002_grid.getSelectedRows();
+    	var isActive = true; 
+    	for(var i = 0; i < datas.length; i++){
+    		if(datas[i].autoshipStatus != 'ACV'){
+    			isActive = false;
+    		}
+    	}
+    	//获取按钮，如果不全激活，则失效按钮；如果全激活，则生效按钮
+    	var executeBtn = $.ligerui.get('executeBtn'); 
+        <#if accessService.access("EXECUTE_EDITABLE") == false>
+
+    	if (isActive && datas.length > 0) {    		
+    		executeBtn.setEnabled(true);
+    	} else {
+    		executeBtn.setDisabled(true);
+    	}
+
+        </#if> 
+	} 
+ 	
+ 	function orderInfo(autoshipId){
+ 		window.top.f_removeTab('autoOrder_info');
+ 		window.top.f_addTab('autoOrder_info', '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshiporder.autoshiporderdetails"/>',
+				'${base.contextPath}/om/om_autoship_create.html?autoshipId=' + autoshipId);
+ 	}
+ 	
+ 	function lastOrderInfo(headerId) {
+ 		$.ajax({
+            url: "${base.contextPath}/om/om_order_info?orderId=" + headerId,
+            type:"POST",
+            success : function(data) {
+                if(data){
+                    if ("ORDER_CREATE" == data.tabId && window.top.tab.isTabItemExist('ORDER_CREATE')) {
+                        $.ligerDialog.warn('<@spring.message "msg.warn.om.order_tab_exists"/>',function(){
+                            window.top.tab.selectTabItem('ORDER_CREATE');
+                        });
+                        return;
+                    } else if ("ORDER_INFO" == data.tabId){
+                        window.top.f_removeTab('ORDER_INFO');
+                    }
+                    window.top.f_addTab(data.tabId, data.title, '${base.contextPath}' + data.url);
+                }
+            }
+        });
+		/* <#if accessService.access("DETAIL_EDITABLE") == false>
+			window.top.f_removeTab('ORDER_INFO');
+			window.top.f_addTab('ORDER_INFO', '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.queryorder.orderinfo"/>', '${base.contextPath}/om/om_order_detail.html?orderId=' + headerId);
+		<#else> */
+			
+		/* </#if> */
+        
+	}
+</script>
+</body>
+</html>

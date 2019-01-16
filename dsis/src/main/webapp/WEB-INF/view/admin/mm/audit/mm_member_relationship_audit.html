@@ -1,0 +1,107 @@
+<#--
+ * description: 会员相关人审计
+ * version: 1.0
+ * author: xiawang.liu
+ * .
+ *
+-->
+<#include "../../include/head.html">
+
+<body style="padding: 10px; overflow: hidden;">
+<style>
+    .audit_update {
+        height: 30px;
+        width: 100%;
+        background: yellow;
+        text-align: center;
+    }
+</style>
+<div id="site_audit_grid">
+</div>
+<script>
+
+    function markRender(item, index, value, col) {
+	    // TODO: 针对文本的效果,无法体现在空字符串上
+        value = value == undefined ? "" : value;
+        if (!item.__changes || item.__changes.indexOf(col.columnname) < 0)
+            return value;
+        return "<div class='audit_update'>" + value + "</div>";
+    }
+
+    window['site_audit_grid'] = $("#site_audit_grid").ligerGrid({
+        columns   : [
+            {
+                display: '<@spring.message "sys.hand.common.audittimestamp"/>',
+                name   : 'auditTimestamp',
+                width  : 90,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "sys.hand.common.auditby"/>',
+                name   : 'auditBy',
+                width  : 70,
+                frozen : true
+            },
+            {
+                display: 'Id(test)',
+                name   : 'auditSessionId',
+                width  : 72,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "sys.hand.common.audittype"/>',
+                name   : 'auditTransactionType',
+                width  : 65,
+                frozen : true
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.member.reltype"/>',
+                name   : 'relType_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.englishname"/>',
+                name   : 'englishName',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.chinesename"/>',
+                name   : 'chineseName',
+                width  : 80,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.dob"/>',
+                name   : 'dob',
+                width  : 70,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.idtype"/>',
+                name   : 'idType_',
+                width  : 60,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.id"/>',
+                name   : 'idNumber',
+                width  : 100,
+                render : markRender
+            },
+            {
+                display: '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.specificrelation"/>',
+                name   : 'relDesc',
+                width  : 60
+            }
+        ],
+        url       : '${base.contextPath}/mm/member/relationship/audit?auditSessionId=${RequestParameters.auditSessionId!0}',
+        width     : '99%',
+        height    : '98%',
+        usePager  : false,
+        rownumbers: true
+    });
+</script>
+</body>
+</html>

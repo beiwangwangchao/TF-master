@@ -1,0 +1,791 @@
+<#--
+        * description: 订单挑库发放界面
+        * version: 1.0
+        * author: guanghui.liu
+        * Copyright LKK Health Products Group Limited.
+        *
+        -->
+    <#include "../include/head.html">
+        <style>
+            /* #form_title {
+                margin: 0;
+                padding: 0;
+                width:99%;
+                height:29px;
+                background-color:#F0F0F0;
+                border:1px solid #D6D6D6;
+            }
+            #form_title p {
+                padding-left: 25px;
+                font-size: 12px;
+                font-weight: bold;
+            } */
+        </style>
+        <body style="padding: 10px;">
+        <script src="${base.contextPath}/common/code?deliveryTypeData=DM.DELIVERY_TYPE&orderType=OM.ORDER_TYPE&salesStatus=OM.SALES_STATUS " type="text/javascript"></script>
+        <script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+        <div id="form_title">
+            <!-- <p><@spring.message "sys.hand.btn.query"/></p> -->
+        </div>
+        <form id="d_dm_007_form" autocomplete="off"></form>
+        <div id="d_dm_007_grid_1" style="margin: 0; padding: 0"></div>
+        <div id="d_dm_007_grid_2" style="margin: 10px 0px 0px 0px; padding: 0"></div>
+        <form id="d_dm_007_btn_form" style="margin-left:20px;"></form>
+
+        <script type="text/javascript">
+            //供货组织取�?�范�?--全局变量
+            var invOrgData = null;
+            var grid = null;
+
+            //下拉框取值范�?
+            function selectQry(itemId){
+
+            }
+
+            /*     //点击查询按钮,调用该方�?
+             function query() {
+             //从输入框取�??
+             var orderNumber = $("input[ligeruiid='orderNumber'][type='text']").val();
+             //以防用户不是从select或�?�popupGrid选中的�?�，�?以给隐藏input赋�??
+             $("#orderNumber").val(orderNumber);//这个隐藏input的�?�将会在gridQuery时自动使�?
+             if(!orderNumber){
+             $.ligerDialog.error('<@spring.message "msg.error.delivery.pickrelease.enter.valid.ordernumber"/>', $l("sys.hand.tip.info"));
+             return
+             }
+             //由于表格d_dm_007_grid_2的供货组织下拉框会因搜索内容不同而变�?
+             //�?以先在每次查询之前先查好下拉框的取�?�范�?
+             Hap.gridQuery({
+             form : d_dm_007_form,
+             grid : d_dm_007_grid_1
+             });
+             Hap.gridQuery({
+             form : d_dm_007_form,
+             grid : d_dm_007_grid_2
+             });
+             } */
+
+            //grid2-编辑前事�?
+            function beforeEdit(e){
+                // 若挑库单存在父行则不允许编辑
+                if(e.record.parentLineId !=null){
+                    return false;
+                }
+                //更新库存组织data
+                if(e.column.columnname == "invOrgId"){
+                    var data;
+                    if(d_dm_007_grid_1.getSelectedRow()){
+                        data = d_dm_007_grid_1.getSelectedRow();
+                    }
+                    else{
+                        var griddata = d_dm_007_grid_1.getData();
+                        data = griddata[0];
+                    }
+                    if(!data || !e.record.itemId){
+                        return;
+                    }
+                    data.itemId = e.record.itemId;
+                    delete data.payDate;
+                    delete data.payDateFrom;
+                    delete data.payDateTo;
+                    $.ajax({
+                        type : "POST",
+                        dataType : "json",
+                        url : "${base.contextPath}/dm/delivery/selectInvOrg",
+                        data : data,
+                        success : function(data) {
+                            if(data.success){
+                                e.column.editor.data = data.rows;
+                            }
+                        }
+                    });
+                }
+            }
+
+            //grid2-编辑后事�?
+            function afterEdit(e){
+                //修改挑库数量
+                if(e.column.columnname == "pickQuantity"){
+                    //挑库数量不可大于库存量和未挑库数�?
+                    if(e.value > e.record.surplusQty || e.value > e.record.inventory){//挑库数量不可大于未挑库数�?
+                        e.record.pickQuantity = e.record.surplusQty < e.record.inventory ? e.record.surplusQty : e.record.inventory;
+                        d_dm_007_grid_2.update(e.record);
+                    }
+                    var curData=e.record;
+                    var itemType = curData.itemType;
+                    var allDatas = d_dm_007_grid_2.getData();
+                    if(itemType == 'VN'|| itemType == 'VY'){
+                        //按照比例更新包下面的数量
+                        var childrens = curData.children;
+                        if(childrens != null){
+                            for(var i=0;i<childrens.length;i++){
+
+                                d_dm_007_grid_2.updateRow(childrens[i],{
+                                    pickQuantity:curData.pickQuantity* (childrens[i].quantity/curData.quantity)
+                                });
+                            }
+                        }
+                        /*///
+                         for(var i = 0 ; i < allDatas.length; i++){
+                         if(allDatas[i].parentLineId == curData.lineId ){
+                         var q=curData.pickQuantity* (allDatas[i].quantity/curData.quantity);
+                         allDatas[i].pickQuantity =  q;
+                         d_dm_007_grid_2.updateRow(allDatas[i]);
+                         }
+                         }*/
+                    }
+                }
+                else if(e.column.columnname == "invOrgId"){
+                    //库存组织发生变化�?,改变 库存�?
+                    if(e.value == ""){//如果没有选择供货组织,则清空库存量
+                        e.record.inventory = 0;
+                        e.record.pickQuantity = 0;
+                        d_dm_007_grid_2.updateRow( e.record );
+                        return;
+                    }
+                    var curData=e.record;
+                    var itemType = curData.itemType;
+                    var allDatas = d_dm_007_grid_2.getData();
+                    var invOrgId = typeof e.value == "string" ? parseInt(e.value) : e.value;
+                    // 虚拟商品包，不计算库存，将库存量设置�?9999999
+                    if(itemType == 'VN'){
+                        curData.inventory = 999999999;
+                        curData.pickQuantity = curData.surplusQty;
+                        d_dm_007_grid_2.updateRow( curData );
+                        var childrens = curData.children;
+                        if(childrens != null){
+                            for(var i=0;i<childrens.length;i++){
+
+                                d_dm_007_grid_2.updateRow( childrens[i],{
+                                    inventory : 999999999,
+                                    pickQuantity : childrens[i].surplusQty,
+                                    invOrgId : curData.invOrgId,
+                                    invOrgName : curData.invOrgName,
+                                    name : curData.name});
+                            }
+                        }
+
+                        /*   for(var i = 0 ; i < allDatas.length; i++){
+                         if(allDatas[i].parentLineId == curData.lineId ){
+                         allDatas[i].inventory = 999999999;
+                         allDatas[i].pickQuantity = allDatas[i].surplusQty;
+                         allDatas[i].invOrgId = curData.invOrgId;
+                         allDatas[i].invOrgName = curData.invOrgName;
+                         allDatas[i].name = curData.name;
+                         d_dm_007_grid_2.updateRow( allDatas[i]);
+                         }
+                         }  */
+                    }
+                    //虚拟商品计算单个商品库存
+                    else if (itemType == 'VY'){
+                        updateVYItem(e);
+                    }
+                    //商品�?
+                    else if (itemType == 'PKG' || itemType == 'ITEM'){
+                        var array = [];
+                        array.push(curData);
+                        liger.win.mask($('body'));
+                        $.ajax({
+                            type : "POST",
+                            dataType : "json",
+                            url : "${base.contextPath}/dm/delivery/queryInventory",
+                            data : JSON2.stringify(array),
+                            contentType : "application/json",
+                            success : function(data) {
+                                liger.win.unmask($('body'));
+                                e.record.inventory = data[0].inventory;
+                                if(e.record.inventory < e.record.surplusQty) {
+                                    e.record.pickQuantity = e.record.inventory;
+                                } else {
+                                    e.record.pickQuantity = e.record.surplusQty;
+                                }
+                                d_dm_007_grid_2.updateRow( e.record);
+                            },
+                            error:function(){
+                                liger.win.unmask($('body'));
+                            }
+                        });
+                    }
+
+                }
+            }
+            //
+            function  updateVYItem(e){
+                var curData = e.record;
+                var itemType = curData.itemType;
+                var allDatas = d_dm_007_grid_2.getData();
+                var children = curData.children;
+                var array = [];
+                for(var i=0 ; i < children.length; i++){
+                    var child = children[i];
+                    if(child.itemType == 'ITEM'){
+                        child.invOrgId = curData.invOrgId;
+                        array.push(child);
+                    }
+                }
+                liger.win.mask($('body'));
+                $.ajax({
+                    type : "POST",
+                    dataType : "json",
+                    url : "${base.contextPath}/dm/delivery/queryInventory",
+                    data : JSON2.stringify(array),
+                    contentType : "application/json",
+                    success : function(data) {
+                        // 计算curData 库存
+                        var curInventory =999999999;
+                        for(var i=0;i<data.length ; i++){
+                            var inv = parseInt(data[i].inventory/(data[i].quantity/curData.quantity));
+                            if(curInventory == null ){
+                                curInventory = inv;
+                            }else if(curInventory > inv){
+                                curInventory = inv;
+                            }
+                        }
+                        curData.inventory = curInventory;
+                        if(curInventory < curData.surplusQty) {
+                            curData.pickQuantity = curInventory;
+                        } else {
+                            curData.pickQuantity = curData.surplusQty;
+                        }
+                        d_dm_007_grid_2.updateRow( curData );
+
+                        var inventory;
+                        //更新子行库存
+                        for(var i=0;i<children.length;i++){
+                            if(children[i].itemType == 'ITEM' ){
+                                for(var j=0;j<data.length ; j++){
+                                    if( data[j].lineId ==  children[i].lineId){
+                                        inventory = data[j].inventory;
+                                    }
+                                }
+                            }
+                            else{
+                                inventory = 999999999;
+                            }
+
+                            var pickQuantity =  curData.pickQuantity*(children[i].quantity/curData.quantity);
+
+                            d_dm_007_grid_2.updateRow( children[i],{
+                                inventory : inventory,
+                                pickQuantity : pickQuantity,
+                                invOrgId : curData.invOrgId,
+                                invOrgName : curData.invOrgName,
+                                name : curData.name});
+                        }
+
+                        /* for(var i = 0 ; i < allDatas.length; i++){
+                         if(allDatas[i].parentLineId == curData.lineId ){
+                         if(allDatas[i].itemType == 'ITEM' ){
+                         for(var j = 0;j<data.length ; j++){
+                         if( data[j].lineId ==  allDatas[i].lineId){
+                         allDatas[i].inventory = data[j].inventory;
+                         }
+                         }
+                         }
+                         else{
+                         allDatas[i].inventory = 999999999;
+                         }
+                         allDatas[i].pickQuantity = curData.pickQuantity* (allDatas[i].quantity/curData.quantity);
+
+                         allDatas[i].invOrgId = curData.invOrgId;
+                         allDatas[i].invOrgName = curData.invOrgName;
+                         allDatas[i].name = curData.name;
+                         d_dm_007_grid_2.updateRow( allDatas[i]);
+                         }
+                         }  */
+                        liger.win.unmask($('body'));
+                    },
+                    error:function(){
+                        liger.win.unmask($('body'));
+                    }
+                });
+            }
+            //确认发放
+            function release(){
+                //如果选择了订单行
+                if(d_dm_007_grid_2.selected.length != 0){
+                    //$.ligerui.get("release").setDisabled(true);
+                    var arr = d_dm_007_grid_2.selected;
+                    var selectGrid1 = d_dm_007_grid_1.selected[0];
+                    var obj = { orderId : arr[0].headerId };
+                    var lines = [];
+                    for(var i=0; i<arr.length; i++){
+                        if(arr[i].pickQuantity <= 0){//如果有记录的挑库数量�?0,则发放失�?
+                            $.ligerui.get("release").setEnabled(true);
+                            $.ligerDialog.error('<@spring.message "msg.error.delivery.pickrelease.failto.pickrelease.pickqty.zero"/>', $l("sys.hand.tip.info"));
+                            return
+                        }
+                        /*  var one = {
+                         orderLineId : arr[i].lineId,
+                         pickQuantity : arr[i].pickQuantity,
+                         invOrgId : arr[i].invOrgId,
+                         surplusQty : arr[i].surplusQty,
+                         inventory : arr[i].inventory
+                         }; */
+                        //debugger
+                        var one = arr[i];
+                        one.orderLineId =  arr[i].lineId;
+                        lines.push(one);
+                    }
+                    obj.lines=lines;
+                    $.ajax({
+                        type : "POST",
+                        dataType : "json",
+                        contentType : "application/json",
+                        url : "${base.contextPath}/dm/delivery/insert",
+                        data : JSON2.stringify(obj),
+                        success : function(data) {
+                            if(data.success){
+                                //if(confirm('<@spring.message "msg.info.delivery.pickrelease.release.success"/>')){ }
+                                // 2017-02-20 修改发放成功提示 strat.
+                                $.ligerDialog.success('<@spring.message "msg.info.delivery.pickrelease.release.success"/>', '<@spring.message "sys.hand.tip.info"/>',
+                                    function (yes) {
+                                        d_dm_007_grid_1.select(selectGrid1);
+                                    },{allowClose:false});
+                                //end.
+                                //window.location.href = "${base.contextPath}/dm/dm_delivery_pick_release.html?orderNumber=" + $.ligerui.get("orderNumber").getValue();
+                            }
+                        }
+                    });
+                }else{//如果未�?�择订单�?,则报提醒
+                    $.ligerDialog.error('<@spring.message "msg.error.delivery.pickrelease.select.orderrow"/>', $l("sys.hand.tip.info"));
+                }
+            }
+
+            $(function() {
+                window['d_dm_007_form'] = $("#d_dm_007_form").ligerForm({
+                    fields : [
+                        {
+                            name : 'orderNumber',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.ordernumber"/>',
+                            //style : 'margin-left:50px;margin-top:10px;margin-bottom:10px;',
+                            type : 'text',
+                            newline : false
+                            //options:${lovService.getLov(base.contextPath, base.locale, "pick_release_inquiry")}
+                            /* afterContent: '<div style="float:left;">'+
+                             '<span style="color:red;">*</span>'+
+                             '<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>'+
+                             '<button id="queryOrder" type="button" onclick="query()" class="l-button"><@spring.message "sys.hand.btn.query"/></button>'+
+                             '</div>' */
+                        },
+                        {
+                            name : 'deliveryType',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliverytype"/>',
+                            newline : false,
+                            type: "combobox",
+                            editor: {
+                                valueField: 'value',
+                                textField: 'meaning',
+                                data: deliveryTypeData
+                            }
+
+                        },
+                        {
+                            name : 'invoiceNumber',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.invoicenumber"/>',
+                            type : 'text',
+                            newline : false
+                        },
+                        {
+                            name : 'orderType',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.ordertype"/>',
+                            newline : true,
+                            type: "combobox",
+                            editor: {
+                                valueField: 'value',
+                                textField: 'meaning',
+                                data: orderType
+                            }
+                        },
+                        {   //#PE20-42 2016-12-15 09:47 BEGIN
+                            name : 'memberNumber',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+                            //textField:'memberCode',
+                            newline : false,
+                            type : "text"
+                            //type : "popup",
+                            //editor : $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member_pick")},{
+
+                            //})
+                            //#PE20-42 2016-12-15 09:47 END
+                        },
+                        {
+                            name : 'memberName',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.mem.name"/>',
+                            type : 'text',
+                            newline : false
+                        },
+                        /* {
+                         name : 'transactionDocument',
+                         display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.transactionnumber"/>',
+                         type : 'text',
+                         newline : true
+                         }, */
+                        {
+                            name : 'payDateFrom',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.report.paydate.from"/>',
+                            newline : true,
+                            type : "date",
+                            format : "yyyy-MM-dd"
+                        },
+                        {
+                            name : 'payDateTo',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.report.paydate.to"/>',
+                            newline : false,
+                            type : "date",
+                            format : "yyyy-MM-dd"
+                        },
+                    ],
+                    buttons: [{
+                        text: '<@spring.message "sys.hand.btn.query"/>',
+                        disabled: false,
+                        width: 60,
+                        click: function() {
+                            Hap.gridQuery({
+                                form : d_dm_007_form,
+                                grid : d_dm_007_grid_1
+                            })
+                        }
+                    }]
+                });
+                //由于button是自己定义的,�?以要同时自定义回车事�?,并阻止事件冒泡和浏览器默认行�?
+                /* $("input[ligeruiid='orderNumber']").bind("keypress", function (e){
+                 if(e.keyCode == 13){//回车触发查询按钮
+                 $("#queryOrder").click();
+                 e.preventDefault();
+                 }
+                 }); */
+
+                //订单grid
+                grid = window['d_dm_007_grid_1'] = $("#d_dm_007_grid_1").ligerGrid({
+                    //title : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.order"/>',
+                    columns : [
+                        {
+                            name : 'name',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.info.salesorganizaition"/>',
+                            align : 'center',
+                            width : 105
+                        },
+                        {
+                            name : 'orderNumber',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.ordernumber"/>',
+                            align : 'center',
+                            width : 160
+                        },
+                        {
+                            name : 'orderStatus',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.orderstatus"/>',
+                            align : 'center',
+                            width : 160,
+                            render : function (item){
+                                for (var i = 0; i < salesStatus.length; i++){
+                                    if (salesStatus[i]['value'] == item.orderStatus){
+                                        return salesStatus[i]['meaning'];
+                                    }
+                                }
+                                return item.orderStatus;
+                            }
+                        },
+                        {
+                            name : 'deliveryType',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliverytype"/>',
+                            align : 'center',
+                            width : 90,
+                            render : function (item){
+                                for (var i = 0; i < deliveryTypeData.length; i++){
+                                    if (deliveryTypeData[i]['value'] == item.deliveryType){
+                                        return deliveryTypeData[i]['meaning'];
+                                    }
+                                }
+                                return item.deliveryType;
+                            }
+                        },
+                        {
+                            name : 'address',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.deliveryaddress"/>',
+                            align : 'center',
+                            width : 350
+                        },
+                        {
+                            name : 'userName',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.receiver"/>',
+                            align : 'center',
+                            width : 100
+                        },
+                        {
+                            name : 'phone',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.phone"/>',
+                            align : 'center',
+                            width : 110
+                        },
+
+                        {
+                            name : 'payDate',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.paydate"/>',
+                            align : 'center',
+                            width : 100
+                        },
+                        {
+                            name : 'orderType',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.ordertype"/>',
+                            align : 'center',
+                            width : 90,
+                            render : function (item){
+                                for (var i = 0; i < orderType.length; i++){
+                                    if (orderType[i]['value'] == item.orderType){
+                                        return orderType[i]['meaning'];
+                                    }
+                                }
+                                return item.deliveryType;
+                            }
+                        },
+                        {
+                            name : 'memberNumber',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.marketchange.memberid"/>',
+                            align : 'center',
+                            width : 90
+                        },
+                        {
+                            name : 'memberName',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.event.dto.mem.name"/>',
+                            align : 'center',
+                            width : 140
+                        },
+                        {
+                            name : 'invoiceNumber',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.invoicenumber"/>',
+                            align : 'center',
+                            width : 160
+                        }/* ,
+                         {
+                         name : 'transactionDocument',
+                         display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.transactionnumber"/>',
+                         align : 'center',
+                         width : 150
+                         } */
+                    ],
+                    url : '${base.contextPath}/dm/delivery/selectOrder',
+                    width : '99%',
+                    height : 366,
+                    delayLoad: true,
+                    checkbox: true,
+                    rownumbers: true,
+                    toolbar : {
+                        items : [
+//                            {
+//                                text : '<@spring.message "sys.hand.btn.export"/>',
+//                                click : function(){
+//                                    var selectrows = d_dm_007_grid_1.getSelectedRows();
+//                                    if(selectrows.length == 0){
+//                                        return;
+//                                    }
+//                                    f_printOrderList(selectrows);
+//                                },
+//                                icon : 'print'
+//                            }
+                            { line: true },
+                            {
+                                text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+                                menu:{ width: 120, items:
+                                    [
+                                        {
+                                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+                                            click:   function (){exportSelected("d_dm_007_form","d_dm_007_grid_1",{"deliveryType":deliveryTypeData,"orderStatus":salesStatus},_basePath);}
+                                        },
+                                        { line: true },
+                                        {
+                                            text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+                                            click: function (){exportDirectAll("d_dm_007_form","d_dm_007_grid_1",{"deliveryType":deliveryTypeData,"orderStatus":salesStatus},_basePath);}
+                                        }
+                                    ]
+                                }
+                            }
+
+
+                        ]
+                    }
+
+                });
+
+
+
+                //订单行grid
+                window['d_dm_007_grid_2'] = $("#d_dm_007_grid_2").ligerGrid({
+                    //title : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.orderrow"/>',
+                    //delayLoad: true,
+                    //1.在每次编辑之�?,更新下拉框的取�?�范�?
+                    onBeforeEdit: function(e){
+                        return beforeEdit(e);
+                    },
+                    onAfterEdit: function(e){
+                        return afterEdit(e);
+                    },
+                    onBeforeCheckRow : function(checked, data, rowid, rowdata){
+                        if(data.parentLineId){
+                            return false;
+                        }else{
+                            return true;
+                        }
+                    },
+                    columns : [
+                        {
+                            name : 'lineId',
+                            type : 'text',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.orderrow"/>',
+                            align : 'center'
+                        },{
+                            name : 'itemNumber',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.itemid"/>',
+                            align : 'center'
+                        },{
+                            name : 'itemName',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.itemname"/>',
+                            align : 'center'
+                        },{
+                            name : 'uomCode',
+                            textField : 'uomName',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.uomcode"/>',
+                            align : 'center'
+                        },{
+                            name : 'quantity',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.ordernum"/>',
+                            align : 'center'
+                        },{
+                            name : 'pickedQty',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.pickrelease.pickedqty"/>',
+                            align : 'center'
+                        },{
+                            name : 'surplusQty',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.pickrelease.surplusqty"/>',
+                            align : 'center'
+                        },{
+                            name : 'pickQuantity',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.pickrelease.pickqty"/>',
+                            align : 'center',
+                            editor: {
+                                type: 'int'
+                            }
+                        },
+                        {
+                            name : 'invOrgId',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.pickrelease.invorgid"/>',
+                            textField:'invOrgName',
+                            align : 'center',
+                            editor: {
+                                type: 'select',
+                                valueField: 'invOrgId',
+                                textField: 'name',
+                                data: invOrgData
+                            },//为了初始值暂将编辑器设为text(后面会保证每次启用编辑时是select)
+                            /* render: function (item){
+                             return item.invOrgName;
+                             } */
+                        },{
+                            name : 'inventory',
+                            display : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.deliverydetail.storage"/>',
+                            align : 'center'
+                        }
+                    ],
+                    enabledEdit : true,
+                    width : '99%',
+                    height : 366,
+                    checkbox : true,
+                    usePager: false,
+                    alternatingRow: false,
+                    tree: {
+                        columnName: 'lineId',
+                        idField: 'lineId',
+                        parentIDField: 'parentLineId'
+                    }
+                });
+
+                grid.bind('selectRow', function(orderData){
+                    $.ajax({
+                        type : "POST",
+                        dataType : "json",
+                        url : "${base.contextPath}/dm/delivery/selectOrderLine",
+                        data : {orderNumber:orderData.orderNumber},
+                        success : function(data) {
+                            if(data.success){
+                                d_dm_007_grid_2.set('data',data);
+                            }
+                        }
+                    });
+                })
+
+                window['d_dm_007_btn_form'] = $("#d_dm_007_btn_form").ligerForm({
+                    buttons: [
+                        {
+                            id: "release",
+                            text: '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.pickrelease.release"/>',
+                            disabled:false, width: 60,
+                            click: function(){
+                                release();
+                            }
+                        }
+                    ]
+                });
+
+                //提取url参数--传�?�到后台
+                var orderNumber = "${RequestParameters.orderNumber!''}";
+                if(orderNumber){
+                    $("input[ligeruiid='orderNumber'][type='text']").val(orderNumber);
+                    Hap.gridQuery({
+                        form : d_dm_007_form,
+                        grid : d_dm_007_grid_1
+                    })
+                    //d_dm_007_grid_2.select(0);
+                    $.ajax({
+                        type : "POST",
+                        dataType : "json",
+                        url : "${base.contextPath}/dm/delivery/selectOrderLine",
+                        data : {orderNumber:orderNumber},
+                        success : function(data) {
+                            if(data.success){
+                                d_dm_007_grid_2.set('data',data);
+                            }
+                        }
+                    });
+                }
+            });
+            /**
+             * 打印订单
+             */
+            function f_printOrderList(rows){
+                $.ligerDialog.open({
+                    title: '<@spring.message "type.com.lkkhpg.dsis.report.type.choosing"/>',
+                    width:400,
+                    height:300,
+                    slide: false,
+                    url: _basePath + "/sys/report/sys_report_type_dialog.html",
+                    buttons: [{
+                        text: $l("sys.hand.btn.ok" ),
+                        onclick: function(i, d) {
+                            var form = d.frame.report_type_form;
+                            var docType= form.getData().docType;
+                            if (form.valid()) {
+                                d.close();
+                                var orderNumbers = ''
+                                for(var t=0; t<rows.length; t++){
+                                    if(t< rows.length - 1){
+                                        orderNumbers += rows[t].orderNumber + ",";
+                                    }else{
+                                        orderNumbers += rows[t].orderNumber;
+                                    }
+
+                                }
+                                window.open(_basePath+'/report/run?docType='+ docType +'&reportProgramCode=RPT-00205'+'&OrderNumber='+orderNumbers);
+
+                            }
+                        }
+                    },
+                        {
+                            text: $l("sys.hand.btn.cancel"),
+                            onclick: function(i, d) {
+                                d.hide();
+                            }
+                        }]
+                });
+            }
+        </script>
+        </body>
+        </html>

@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.config.mapper.SpmCompanyMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.config.dto.SpmCompany" >
+    <id column="COMPANY_ID" property="companyId" jdbcType="DECIMAL" />
+
+    <result column="CODE" property="code" jdbcType="VARCHAR" />
+    <result column="NAME" property="name" jdbcType="VARCHAR" />
+    <result column="COMPANY_TYPE" property="companyType" jdbcType="VARCHAR" />
+    <result column="SHORT_NAME" property="shortName" jdbcType="VARCHAR" />
+    <result column="CONTACTS" property="contacts" jdbcType="VARCHAR" />
+    <result column="PHONE" property="phone" jdbcType="VARCHAR" />
+    <result column="FAX" property="fax" jdbcType="VARCHAR" />
+    <result column="EMAIL" property="email" jdbcType="VARCHAR" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="LOCATION_ID" property="locationId" jdbcType="DECIMAL" />
+    <result column="ENABLED_FLAG" property="enabledFlag" jdbcType="VARCHAR" />
+    <result column="START_ACTIVE_DATE" property="startActiveDate" jdbcType="TIMESTAMP" />
+    <result column="END_ACTIVE_DATE" property="endActiveDate" jdbcType="TIMESTAMP" />
+    <result column="OBJECT_VERSION_NUMBER" property="objectVersionNumber" jdbcType="DECIMAL" />
+    <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+    <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+    <result column="CREATION_DATE" property="creationDate" jdbcType="TIMESTAMP" />
+    <result column="CREATED_BY" property="createdBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATED_BY" property="lastUpdatedBy" jdbcType="DECIMAL" />
+    <result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATE_LOGIN" property="lastUpdateLogin" jdbcType="DECIMAL" />
+    <result column="ATTRIBUTE_CATEGORY" property="attributeCategory" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE1" property="attribute1" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE2" property="attribute2" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE3" property="attribute3" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE4" property="attribute4" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE5" property="attribute5" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE6" property="attribute6" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE7" property="attribute7" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE8" property="attribute8" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE9" property="attribute9" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE10" property="attribute10" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE11" property="attribute11" jdbcType="VARCHAR" />
+    <result column="ATTRIBUTE12" property="attribute12" jdbcType="VARCHAR" />
+    <result column="PRIVATESUBPARTER" property="privateSubparter" jdbcType="VARCHAR" />
+    <result column="PARTER" property="parter" jdbcType="VARCHAR" />
+    <result column="PUBLICSUBPARTER" property="publicSubparter" jdbcType="VARCHAR" />
+    <!-- 公司名称别名 -->
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <result column="AREA_CODE" property="areaCode" jdbcType="VARCHAR"/>
+    <result column="BR_NO" property="brNo" jdbcType="VARCHAR"/>
+    <result column="GST_ID" property="gstId" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    COMPANY_ID, CODE, NAME, COMPANY_TYPE, SHORT_NAME, CONTACTS, PHONE, FAX, REMARK, EMAIL, LOCATION_ID, ENABLED_FLAG, START_ACTIVE_DATE, 
+    END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, CREATED_BY, 
+    LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+    ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, 
+    ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, PRIVATESUBPARTER, PARTER, PUBLICSUBPARTER,AREA_CODE,BR_NO,GST_ID
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from SPM_COMPANY_B
+    where COMPANY_ID = #{companyId,jdbcType=DECIMAL}
+  </select>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany" >
+    <selectKey resultType="java.lang.Long" keyProperty="companyId" order="BEFORE" >
+      SELECT SPM_COMPANY_B_S.nextval from dual
+    </selectKey>
+    insert into SPM_COMPANY_B
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      COMPANY_ID,
+      <if test="code != null" >
+        CODE,
+      </if>
+      <if test="areaCode != null" >
+        AREA_CODE,
+      </if>
+      <if test="name != null" >
+        NAME,
+      </if>
+      <if test="companyType != null" >
+        COMPANY_TYPE,
+      </if>
+      <if test="shortName != null" >
+        SHORT_NAME,
+      </if>
+      <if test="contacts != null" >
+        CONTACTS,
+      </if>
+      <if test="phone != null" >
+        PHONE,
+      </if>
+      <if test="fax != null" >
+        FAX,
+      </if>
+      <if test="email != null" >
+        EMAIL,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="locationId != null" >
+        LOCATION_ID,
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG,
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE,
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE,
+      </if> 
+      <if test="requestId != null" >
+        REQUEST_ID,
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID,
+      </if> 
+      CREATION_DATE,
+      <if test="createdBy != null" >
+        CREATED_BY,
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY,
+      </if> 
+      LAST_UPDATE_DATE,
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN,
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY,
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1,
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2,
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3,
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4,
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5,
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6,
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7,
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8,
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9,
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10,
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11,
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12,
+      </if>
+      <if test="privateSubparter != null" >
+        PRIVATESUBPARTER,
+      </if>
+      <if test="parter != null" >
+        PARTER,
+      </if>
+      <if test="publicSubparter != null" >
+        PUBLICSUBPARTER,
+      </if>
+      <if test="brNo != null" >
+        BR_NO,
+      </if>
+      <if test="gstId != null" >
+        GST_ID
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+        #{companyId,jdbcType=DECIMAL},
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="areaCode != null" >
+        #{areaCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="companyType != null" >
+        #{companyType,jdbcType=VARCHAR},
+      </if>
+      <if test="shortName != null" >
+        #{shortName,jdbcType=VARCHAR},
+      </if>
+      <if test="contacts != null" >
+        #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null" >
+        #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="locationId != null" >
+        #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="enabledFlag != null" >
+        #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        CURRENT_TIMESTAMP,
+      </if>
+      <if test="endActiveDate != null" >
+        #{endActiveDate,jdbcType=TIMESTAMP},
+      </if> 
+      <if test="requestId != null" >
+        #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        #{programId,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+        CURRENT_TIMESTAMP,
+      <if test="lastUpdateLogin != null" >
+        #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="privateSubparter != null" >
+        #{privateSubparter,jdbcType=VARCHAR},
+      </if>
+      <if test="parter != null" >
+        #{parter,jdbcType=VARCHAR},
+      </if>
+      <if test="publicSubparter != null" >
+        #{publicSubparter,jdbcType=VARCHAR},
+      </if>
+      <if test="brNo != null" >
+        #{brNo,jdbcType=VARCHAR},
+      </if>
+      <if test="gstId != null" >
+        #{gstId,jdbcType=VARCHAR}
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany" >
+    update SPM_COMPANY_B
+    <set>
+        OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER+1,
+        LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      <if test="code != null" >
+        CODE = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="areaCode != null" >
+        AREA_CODE = #{areaCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        NAME = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="companyType != null" >
+        COMPANY_TYPE = #{companyType,jdbcType=VARCHAR},
+      </if>
+      <if test="shortName != null" >
+        SHORT_NAME = #{shortName,jdbcType=VARCHAR},
+      </if>
+      <if test="contacts != null" >
+        CONTACTS = #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        PHONE = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null" >
+        FAX = #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        EMAIL = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="locationId != null" >
+        LOCATION_ID = #{locationId,jdbcType=DECIMAL},
+      </if>
+      <if test="enabledFlag != null" >
+        ENABLED_FLAG = #{enabledFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="startActiveDate != null" >
+        START_ACTIVE_DATE = CURRENT_TIMESTAMP,
+      </if>
+      <if test="endActiveDate != null" >
+        END_ACTIVE_DATE = #{endActiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="requestId != null" >
+        REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      </if>
+      <if test="programId != null" >
+        PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdatedBy != null" >
+        LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      </if>
+      <if test="lastUpdateLogin != null" >
+        LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      </if>
+      <if test="attributeCategory != null" >
+        ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute1 != null" >
+        ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute2 != null" >
+        ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute3 != null" >
+        ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute4 != null" >
+        ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute5 != null" >
+        ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute6 != null" >
+        ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute7 != null" >
+        ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute8 != null" >
+        ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute9 != null" >
+        ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute10 != null" >
+        ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute11 != null" >
+        ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      </if>
+      <if test="attribute12 != null" >
+        ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      </if>
+      <if test="privateSubparter != null" >
+        PRIVATESUBPARTER = #{privateSubparter,jdbcType=VARCHAR},
+      </if>
+      <if test="parter != null" >
+        PARTER = #{parter,jdbcType=VARCHAR},
+      </if>
+      <if test="publicSubparter != null" >
+        PUBLICSUBPARTER = #{publicSubparter,jdbcType=VARCHAR},
+      </if>
+      <if test="brNo != null" >
+        BR_NO = #{brNo,jdbcType=VARCHAR},
+      </if>
+      <if test="gstId != null" >
+        GST_ID = #{gstId,jdbcType=VARCHAR}
+      </if>
+    </set>
+        where COMPANY_ID = #{companyId,jdbcType=DECIMAL}
+  </update>
+<!--市场所针对的公司以及该公司对应的子公司能查询出来-->
+  <select id="queryCompanyByMarketId" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany">
+    select
+    scb.COMPANY_ID,
+    scb.CODE,
+    sct.NAME,
+    scb.COMPANY_TYPE,
+    sct.SHORT_NAME,
+    scb.CONTACTS,
+    scb.PHONE,
+    scb.FAX,
+    sct.REMARK,
+    scb.EMAIL,
+    scb.LOCATION_ID,
+    scb.AREA_CODE,
+    scb.BR_NO,
+    scb.PRIVATESUBPARTER,
+    scb.PARTER,
+    scb.PUBLICSUBPARTER,
+    scb.GST_ID,
+    scb.ATTRIBUTE1,
+    scb.ATTRIBUTE2
+    from SPM_COMPANY_B scb
+    left join SPM_COMPANY_TL sct on (sct.COMPANY_ID = scb.COMPANY_ID AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+      1=1
+      <if test="companyId != null">
+        AND scb.COMPANY_ID = #{companyId,jdbcType=DECIMAL}
+      </if>
+      AND (SCB.COMPANY_ID = (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+      OR SCB.GST_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL}))
+      <if test="code != null">
+        AND Upper(scb.CODE） like concat('%',concat( Upper( #{code,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="name != null">
+        AND Upper(sct.NAME) like concat('%',concat( Upper( #{name,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="companyType != null">
+        and scb.COMPANY_TYPE = #{companyType,jdbcType=VARCHAR}
+      </if>
+    </where>
+    <if test="sortname != null">
+      <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+      ORDER BY ${_colName} ${sortorder}
+    </if>
+  </select>
+
+
+  <!--市场所针对的公司所属公司查询-->
+  <select id="queryHeadCompany" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany">
+    select
+    scb.COMPANY_ID,
+    scb.CODE,
+    sct.NAME,
+    sct.SHORT_NAME,
+    scb.CONTACTS,
+    scb.PHONE,
+    scb.FAX,
+    sct.REMARK,
+    scb.EMAIL,
+    scb.LOCATION_ID,
+    scb.AREA_CODE,
+    scb.BR_NO,
+    scb.PRIVATESUBPARTER,
+    scb.PARTER,
+    scb.PUBLICSUBPARTER,
+    scb.GST_ID,
+    scb.ATTRIBUTE1,
+    scb.ATTRIBUTE2,
+    scb.ATTRIBUTE3
+    from SPM_COMPANY_B scb
+    left join SPM_COMPANY_TL sct on (sct.COMPANY_ID = scb.COMPANY_ID AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+      1=1
+      <if test="companyId != null">
+        AND scb.COMPANY_ID = #{companyId,jdbcType=DECIMAL}
+      </if>
+      AND (SCB.COMPANY_ID = (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+      OR SCB.COMPANY_ID=(SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+      (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+      )
+      AND  scb.COMPANY_TYPE='HDQTR'
+      <if test="code != null">
+        AND Upper(scb.CODE） like concat('%',concat( Upper( #{code,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="name != null">
+        AND Upper(sct.NAME) like concat('%',concat( Upper( #{name,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="companyType != null">
+        and scb.COMPANY_TYPE = #{companyType,jdbcType=VARCHAR}
+      </if>
+    </where>
+    <if test="sortname != null">
+      <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+      ORDER BY ${_colName} ${sortorder}
+    </if>
+  </select>
+
+  <select id="queryCompany" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany">
+    select
+        scb.COMPANY_ID,
+        scb.CODE,
+        sct.NAME,
+        scb.COMPANY_TYPE,
+        sct.SHORT_NAME,
+        scb.CONTACTS,
+        scb.PHONE,
+        scb.FAX,
+        sct.REMARK,
+        scb.EMAIL,
+        scb.LOCATION_ID,
+        scb.AREA_CODE,
+        scb.BR_NO,
+        scb.PRIVATESUBPARTER,
+        scb.PARTER,
+        scb.PUBLICSUBPARTER,
+        scb.GST_ID,
+        scb.ATTRIBUTE1,
+        scb.ATTRIBUTE2,
+        scb.ATTRIBUTE3
+        from SPM_COMPANY_B scb
+        left join SPM_COMPANY_TL sct on (sct.COMPANY_ID = scb.COMPANY_ID AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+        <if test="companyId != null">
+        AND scb.COMPANY_ID = #{companyId,jdbcType=DECIMAL}
+        </if>
+        <if test="code != null">
+        AND Upper(scb.CODE） like concat('%',concat( Upper( #{code,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="name != null">
+        AND Upper(sct.NAME) like concat('%',concat( Upper( #{name,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="companyType != null">
+        and scb.COMPANY_TYPE = #{companyType,jdbcType=VARCHAR}
+        </if>
+    </where>
+     <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+     </if>
+    
+  </select>
+
+  <select id="queryCompany2" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany">
+    select
+    scb.COMPANY_ID,
+    scb.CODE,
+    sct.NAME,
+    scb.COMPANY_TYPE,
+    sct.SHORT_NAME,
+    scb.CONTACTS,
+    scb.PHONE,
+    scb.FAX,
+    sct.REMARK,
+    scb.EMAIL,
+    scb.LOCATION_ID,
+    scb.AREA_CODE,
+    scb.BR_NO,
+    scb.PRIVATESUBPARTER,
+    scb.PARTER,
+    scb.PUBLICSUBPARTER,
+    scb.GST_ID,
+    scb.ATTRIBUTE1,
+    scb.ATTRIBUTE2,
+    scb.ATTRIBUTE3
+    from SPM_COMPANY_B scb
+    left join SPM_COMPANY_TL sct on (sct.COMPANY_ID = scb.COMPANY_ID AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+      1=1
+      <if test="companyId != null">
+        AND scb.COMPANY_ID = #{companyId,jdbcType=DECIMAL}
+      </if>
+      AND (SCB.COMPANY_ID = (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+           OR SCB.GST_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{request.marketId,jdbcType=DECIMAL})
+           OR SCB.COMPANY_ID=(SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+                (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
+           OR SCB.GST_ID=(SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
+                (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL})))
+      <if test="code != null">
+        AND Upper(scb.CODE） like concat('%',concat( Upper( #{code,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="name != null">
+        AND Upper(sct.NAME) like concat('%',concat( Upper( #{name,jdbcType=VARCHAR}),'%'))
+      </if>
+      <if test="companyType != null">
+        and scb.COMPANY_TYPE = #{companyType,jdbcType=VARCHAR}
+      </if>
+    </where>
+    <if test="sortname != null">
+      <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+      ORDER BY ${_colName} ${sortorder}
+    </if>
+  </select>
+
+  <select id="queryparentCompany" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany">
+    select
+    scb.COMPANY_ID GST_ID,
+    scb.CODE,
+    sct.NAME company_name,
+    scb.COMPANY_TYPE,
+    sct.SHORT_NAME,
+    scb.CONTACTS,
+    scb.PHONE,
+    scb.FAX,
+    sct.REMARK,
+    scb.EMAIL,
+    scb.LOCATION_ID,
+    scb.AREA_CODE,
+    scb.BR_NO,
+    scb.PRIVATESUBPARTER,
+    scb.PARTER,
+    scb.PUBLICSUBPARTER
+    from SPM_COMPANY_B scb
+    left join SPM_COMPANY_TL sct on (sct.COMPANY_ID = scb.COMPANY_ID AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+      scb.COMPANY_TYPE='HDQTR'
+      <if test="sortname != null">
+        <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+        ORDER BY ${_colName} ${sortorder}
+      </if>
+    </where>
+
+  </select>
+
+  <select id="queryParentName" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany">
+    select scb.COMPANY_ID,
+    sct.NAME company_name
+    from SPM_COMPANY_B scb
+    left join SPM_COMPANY_TL sct on (sct.COMPANY_ID = scb.COMPANY_ID AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+      <if test="companyId != null">
+      AND scb.COMPANY_ID = #{companyId,jdbcType=DECIMAL}
+      </if>
+    </where>
+    <if test="sortname != null">
+      <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+      ORDER BY ${_colName} ${sortorder}
+    </if>
+
+  </select>
+
+
+  <select id="queryCompanyName" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany">
+    select <include refid="Base_Column_List"></include> from SPM_COMPANY_B SP
+        <where>
+            <if test="name != null">
+                 SP.NAME like concat('%',concat(#{name,jdbcType=VARCHAR},'%'))
+            </if>
+        </where>
+         <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+
+  </select>
+  
+  <select id="getUniqueCount" resultType="java.lang.Integer" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany">
+    select count(1)
+      from SPM_COMPANY_B scb
+      left join SPM_COMPANY_TL sct on (sct.COMPANY_ID = scb.COMPANY_ID AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+     <if test="code != null">
+        AND scb.CODE = #{code,jdbcType=VARCHAR}
+        </if>
+        <if test="name != null">
+        AND sct.NAME = #{name,jdbcType=VARCHAR}
+        </if>
+    </where>
+  </select>
+  
+  <!-- 公司查询使用别名用于避免和业务实体name冲突 -->
+  <select id="queryName" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany">
+    select
+        scb.COMPANY_ID,
+        scb.CODE,
+        sct.NAME company_name,
+        scb.COMPANY_TYPE,
+        sct.SHORT_NAME,
+        scb.CONTACTS,
+        scb.PHONE,
+        scb.FAX,
+        sct.REMARK,
+        scb.EMAIL,
+        scb.LOCATION_ID,
+        scb.BR_NO,
+    scb.PRIVATESUBPARTER,
+    scb.PARTER,
+    scb.PUBLICSUBPARTER,
+        scb.GST_ID
+        from SPM_COMPANY_B scb
+        left join SPM_COMPANY_TL sct on (sct.COMPANY_ID = scb.COMPANY_ID AND sct.lang = #{request.locale,jdbcType=VARCHAR})
+    <where>
+        <if test="code != null">
+        AND Upper(scb.CODE） like concat('%',concat( Upper( #{code,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="companyName != null">
+          AND Upper(sct.NAME) like concat('%',concat( Upper( #{companyName,jdbcType=VARCHAR}),'%'))
+        </if>
+        <if test="companyType != null">
+        and scb.COMPANY_TYPE = #{companyType,jdbcType=VARCHAR}
+        </if>
+    </where>
+     <if test="sortname != null">
+            <bind name = '_colName' value='@com.lkkhpg.dsis.platform.util.CommonUtils@toColumnName(sortname)'/>
+             ORDER BY ${_colName} ${sortorder}
+        </if>
+    
+  </select>
+  <!-- 查询二级商户号-->
+  <select id="queryNo"  resultMap="BaseResultMap"  parameterType="com.lkkhpg.dsis.common.config.dto.SpmCompany">
+SELECT
+	s.*
+FROM
+	SPM_COMPANY_B s
+WHERE
+	s.COMPANY_ID =#{companyId,jdbcType=DECIMAL}
+  </select>
+
+<!--//查詢公司特約商戶號 updated by 2018/1/22-->
+  <select id="queryPartner"  resultType="java.lang.String">
+    SELECT DISTINCT
+    s.PARTER
+    FROM
+    SPM_COMPANY_B s
+  </select>
+<!-- 退款查询商户号  -->
+  <select id="selectPartner" resultMap="BaseResultMap"  parameterType="java.lang.Long">
+    SELECT
+	b.*
+    FROM
+	SPM_COMPANY_B b
+    WHERE
+	b.COMPANY_ID =(
+		SELECT DISTINCT
+			M .COMPANY_ID
+		FROM
+			SPM_MARKET_B M
+		WHERE
+			M .MARKET_ID = #{marketId,jdbcType=DECIMAL}
+	)
+  </select>
+</mapper>

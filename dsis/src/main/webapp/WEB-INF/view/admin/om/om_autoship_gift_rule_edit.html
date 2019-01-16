@@ -1,0 +1,423 @@
+<#-- 
+ * description: 自动订货赠品维护页 
+ * version: 1.0 
+ * author:hanrui.huang@hand-china.com
+ * .
+ * 
+--> 
+<#include "../include/head.html">
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/mm/mm.min.js" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?rulestatus=OM.AUTO_GIFT_RULE_STATUS&types=OM.AUTO_GIFT_CALCULATE_TYPE" type="text/javascript"></script>
+<body style="padding: 10px;">
+<form id="autoShip_form"></form>
+<div id="autoShip_grid"></div>
+<div id="btns"></div>
+<script type="text/javascript">
+<#assign isedit = (RequestParameters.isedit!'0')/>
+var checkedCustomer = [];
+    $(function() {
+    	<!-- 自动订货赠品维护 -->
+    	window['autoShip_form'] = $("#autoShip_form").ligerForm({
+    		fields: [
+    		         {name : "__status",type : "hidden",options:{value:"<#if isedit =='1'>update<#else>add</#if>"},newline : false},
+    		         {name: 'marketId', type:'hidden',options:{value:_marketId}},
+    		         {name: 'ruleId', type:'hidden'},
+    		         {
+    		        	 label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.messageaccount.market"/>',
+    		        	 type : 'text', name : 'narketName', newline : false,
+    		        	 readonly : true,
+    		        	 options : {
+    		        		 value : _marketName
+    		        	 }
+    		         },{
+    		        	 type: 'date',
+    		        	 label: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transfertrx.createdate"/>',
+    		        	 newline: false,
+    		        	 readonly : true,
+    		        	 name: 'creationDate',
+    		        	 options: {
+    		        		 format: 'yyyy-MM-dd',
+    		        		 value : new Date(${.now?long})
+    		        	 }
+    		         },{
+    		        	 type: 'select',
+    		        	 label: '<@spring.message "type.com.lkkhpg.dsis.common.inventory.stockio.status"/>',
+    		        	 name: 'status',
+    		        	 newline: false,
+    		        	 options: {
+    		        		 valueField: 'value',
+    		        		 textField: 'meaning',
+    		        		 data: rulestatus,
+    		        	 },
+    		        	 validate: {
+    		        		 required: true
+    		        	 }
+    		         },{
+    		        	 label: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshipgiftrule.rule.code"/>',
+    		        	 type: 'text',
+    		        	 newline: true,
+    		        	 name: 'ruleCode',
+    		        	 options:{
+    		        		 onChangeValue : function(data) {
+    		        			 if(data.length > 40){
+    		        				 Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshipgiftrule.rule.code.error"/>');
+    		        				 liger.get('ruleCode').setValue('');
+    		        			 }
+    		        		 }
+    		        	 },
+    		        	 validate: {
+    		        		 required: true
+    		        	 }
+    		         },{
+    		        	 label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshipgiftrule.rule.name"/>',
+    		        	 type : 'text',
+    		        	 newline : false,
+    		        	 name : 'ruleName',
+    		        	 options:{
+    		        		 onChangeValue : function(data) {
+    		        			 if(data.length > 40){
+    		        				 Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshipgiftrule.rule.name.error"/>');
+    		        				 liger.get('ruleName').setValue('');
+    		        			 }
+    		        		 }
+    		        	 },
+    		        	 validate: {
+    		        		 required: true
+    		        	 }
+    		         },{
+    		        	 label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshipgiftrule.activemonth"/>',
+    		        	 name : 'activeMonth',
+    		        	 newline : false,
+    		        	 type: 'date',
+    		        	 options : {
+    		        		 format : 'yyyyMM',
+    		        		 onChangeDate : function(data) {
+    		        			 liger.get('activeMonth').setValue(data);
+    		        		 }
+    		        	 },
+    		        	 validate: {
+    		        		 required: true
+    		        	 }
+    		         },{
+    		        	 label : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshipgiftrule.month"/>',
+    		        	 type : 'int',
+    		        	 newline : true,
+    		        	 name : 'month',
+    		        	 options:{
+    		        		 onChangeValue : function(data) {
+    		        			 if(data<0 || data >12){
+    		        				 Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshipgiftrule.rule.month.error"/>');
+    		        				 liger.get('month').setValue('');
+    		        			 }
+    		        		 }
+    		        	 },
+    		        	 validate: {
+    		        		 required: true
+    		        	 }
+    		         },{
+    		        	 label : '<@spring.message "type.com.lkkhpg.dsis.common.delivery.dto.shippingtier.calculationtype"/>',
+    		        	 type : 'select',
+    		        	 name : 'calculationType',
+    		        	 newline : false,
+    		        	 options: {
+    		        		 valueField: 'value',
+    		        		 textField: 'meaning',
+    		        		 data: types
+    		        	 },
+    		        	 validate: {
+    		        		 required: true
+    		        	 }
+    		         },{
+    		        	 label : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.codevalue.value"/>',
+    		        	 type : 'int',
+    		        	 newline : false,
+    		        	 name : 'calculationValue',
+    		        	 validate: {
+    		        		 required: true
+    		        	 },
+    		        	 options : {
+    		        		 onChangeValue : function(data) {
+    		        			 if(data < 0){
+    		        				 Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshipgiftrule.rule.value.error"/>');
+    		        			 }
+    		        		 }
+    		        	 }
+    		         }]
+    	});
+        <!--自动订货赠品规则表-->
+        window['autoShip_grid'] = $("#autoShip_grid").ligerGrid({
+        	unSetValidateAttr: false,
+        	onBeforeSubmitEdit : function (e)  {
+        		var testData = e.record;
+        		if(e.column.columnname == 'quantity'){
+        			if(e.value <= 0){
+        				Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.order.dto.autoshipgiftrule.rule.quantity.error"/>');
+        				return false;
+        			}
+        		}
+        		if (e.column.columnname == "startActiveDate") {
+                    if (e.value == null || e.value == "") {
+                        return true;
+                    }
+                    now = new Date() ;
+                    if (e.value < new Date(now.getFullYear(),now.getMonth(),now.getDate())) {
+                        $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.inv.item.dto.tip.datelesssystime"/>');
+                        return false;
+                    }
+                }
+        		if (e.column.columnname == "endActiveDate") {
+                    if (e.value == null || e.value == "") {
+                        return true;
+                    }
+                    now = new Date(testData.startActiveDate)
+                    if (e.value <  new Date(now.getFullYear(),now.getMonth(),now.getDate())) {
+                        $.ligerDialog.warn('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.date.error"/>');
+                        return false;
+                    }
+                }
+        	},
+        	columns: [{
+        		display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemnumber"/>',
+        		name: 'itemNumber',isSort : true,
+        		align: 'left',
+        		width: 150
+        		
+        	},{
+                
+        		display: '<@spring.message "type.com.lkkhpg.dsis.common.inv.dto.transaction.itemname"/>',
+        		name: 'itemName',
+        		align: 'left',
+        		width: 150
+        	},{
+        		display: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.orderpayment.quantity"/>',
+        		name: 'quantity',
+        		align: 'left',
+        		width: 150,
+        		editor : {
+        			type:'int',
+        			sign:false
+        		},
+        		validate: {
+        			required: true
+        		}
+        		
+        	},{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validatefrom"/>',
+                type : 'date',
+                name : 'startActiveDate',
+                align : 'left',
+                width : 150,
+                format: 'yyyy-MM-dd',
+                editor : {
+                    type:'date'  
+                },
+                
+                validate: {
+                    required: true
+                }
+                
+            },{
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.inv.item.validateto"/>',
+                name: 'endActiveDate',
+                type : 'date',
+                format: 'yyyy-MM-dd',
+                align: 'left',
+                width: 150,
+                editor : {
+                    type:'date'
+                },
+                validate: {
+                    required: true
+                }
+                
+            }],
+        	<#if isedit == '1'>
+        	url: '${base.contextPath}/om/autoshipGifts/query',
+        	</#if>
+        	toolbar: {
+        		items: [{
+        			text: '<@spring.message "sys.hand.btn.new"/>',
+        			disable: false,
+        			click: function() {
+        				f_item_province();
+        			},
+        			icon: 'add'
+        		},
+        		{
+        			line: true
+        		},
+        		{
+        			text: '<@spring.message "sys.hand.btn.delete"/>',
+        			disable: false,
+        			click: function() {
+        				Hap.gridDelete({
+                            grid : autoShip_grid
+                        })
+        			},
+        			icon: 'delete'
+        		},
+        		{
+        			line: true
+        		}]
+        	},
+        	enabledEdit: true,
+        	width: '99%',
+        	height: '90%',
+        	checkbox: true
+        });
+        //保存按钮
+        window['btns'] = $('#btns').ligerForm({
+        	buttons : [
+        	           {
+        	        	   text: '<@spring.message "sys.hand.btn.save"/>',
+        	        	   id: 'save_btn',
+        	        	   disabled: false,
+        	        	   width: 80,
+        	        	   click: function() {
+        	        		   Hap.submitForm({
+        	        			   form:autoShip_form,
+        	        			   grid:autoShip_grid,
+        	        			   gridName:"autoshipGifts",
+        	        			   url:'${base.contextPath}/om/autoshipGiftRule/save',
+        	        			   success:function(json,opt){
+        	        				   $.ligerDialog.success("<@spring.message "sys.hand.tip.success"/>", '<@spring.message "sys.hand.tip.info"/>', function(){
+        	        					   self.location = 'om_autoship_gift_rule_edit.html?isedit=1&ruleId=' +json.rows[0].ruleId;
+        	        				   }); 
+        	        			   }
+        	        		   })
+        	        	   }
+        	           }
+        	           ],
+        	           enabledEdit: false,
+        	           width: '99%', 
+        	           height: '98%'
+        });
+        
+        <#if isedit == '1'>
+        Hap.loadForm({form:autoShip_form,url:'${base.contextPath}/om/autoshipgiftrule/query',
+        	para:{ruleId:${RequestParameters.ruleId}},
+        	callback : function(data){
+        		liger.get("ruleCode").setDisabled(true);
+        		Hap.gridQuery({
+                    form:autoShip_form,
+                    grid:autoShip_grid
+                })
+        	}
+        });
+        </#if>
+    });
+    
+    function f_item_province() {
+    	var options = ${lovService.getLov(base.contextPath,base.locale, "lov_item_order")};
+    	options.grid.checkbox = true;
+    	options.grid.isSingleCheck = false;
+    	options.grid.isChecked = f_isChecked; 
+    	options.grid.onCheckRow = f_onCheckRow; 
+    	options.grid.onCheckAllRow = f_onCheckAllRow;
+    	options.grid.onLoadData = function(){
+    		this.options.isChecked = this.isChecked = f_isChecked;
+    	}
+    	options.condition.fields.push({
+    		name: 'salesOrgId',
+    		type : "text",
+    		style : 'display:none',
+    		options : {
+    			value:_salesOrgId
+    		}
+    	},{
+    		name: 'channel',
+            type : "text",
+            style : 'display:none',
+            options : {
+                value:'AUTOS'
+            }
+    	},{
+    		name: 'isActive',
+            type : "text",
+            style : 'display:none',
+            options : {
+                value:'Y'
+            }
+    	});
+    	options.grid.delayLoad = true;
+    	var fn = $.ligerui.getPopupFn({
+    		onSelect : function(e){
+    			f_select_item(e);
+    		},
+    		condition: options.condition,
+    		grid: options.grid,
+    		title: options.title,
+    		delayLoad : true,
+    	});
+    	fn();
+    }
+
+    function f_select_item(e){
+    	var selectRows;
+    	if(e.data.length == 1){
+    		selectRows = e.data;
+    	}else{
+    		selectRows = checkedCustomer;
+    	}
+    	var gridRows = autoShip_grid.getData();
+    	if(gridRows.length > 0){
+    		for(var i = 0; i< selectRows.length; i++){
+    			var marketCodeSel = selectRows[i].itemNumber;
+    			for(var j=0;j<gridRows.length;j++){
+    				var marketCodeGrid = gridRows[j].itemNumber;
+    				if(marketCodeSel == marketCodeGrid){
+    					Hap.showError('<@spring.message "type.com.lkkhpg.dsis.common.promotion.dto.voucher.item.error"/>');
+    					return;
+    				}
+    			}
+    		}
+    	}
+    	if(e.data.length == 1){
+    		autoShip_grid.addRows(e.data);
+    	}else{
+    		autoShip_grid.addRows(checkedCustomer);
+    	}
+    	checkedCustomer = [];
+    }
+    function f_onCheckAllRow(checked){
+    	for (var rowid in this.records){
+    		if(checked)
+    			addCheckedCustomer(this.records[rowid]);
+    		else
+    			removeCheckedCustomer(this.records[rowid]);
+    	}
+    }
+    
+    /*
+    该例子实现 表单分页多选
+    即利用onCheckRow将选中的行记忆下来，并利用isChecked将记忆下来的行初始化选中
+    */
+    
+    function findCheckedCustomer(itemNumber){
+    	for(var i =0;i<checkedCustomer.length;i++){
+    		if(checkedCustomer[i] == itemNumber) return i;
+    	}
+    	return -1;
+    }
+    function addCheckedCustomer(itemNumber){
+    	if(findCheckedCustomer(itemNumber) == -1)
+    		checkedCustomer.push(itemNumber);
+    }
+    function removeCheckedCustomer(itemNumber){
+    	var i = findCheckedCustomer(itemNumber);
+    	if(i==-1) return;
+    	checkedCustomer.splice(i,1);
+    }
+    function f_isChecked(rowdata){
+    	if (findCheckedCustomer(rowdata.itemNumber) == -1)
+    		return false;
+    	return true;
+    }
+    
+    function f_onCheckRow(checked, data){
+    	if (checked) addCheckedCustomer(data);
+    	else removeCheckedCustomer(data);
+    }
+</script>
+</body>

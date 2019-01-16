@@ -1,0 +1,248 @@
+<#--
+ * description: 查询Re_transfer.
+ * version: 1.0
+ * author: li.peng 
+ * Copyright LKK Health Products Group Limited.
+ *
+-->
+<#include "../include/head.html">
+<style>
+</style>
+<script
+	src="${base.contextPath}/common/code?retransferstatus=BM.RE_TRANSFER_STATUS"
+	type="text/javascript"></script>
+<script type="text/javascript" src="${base.contextPath}/sys/org/current"></script>
+<script src="${base.contextPath}/resources/js/export/export2Excel.js?v=20161026" type="text/javascript"></script>
+<body style="padding: 10px;">
+	<form id="d_bm_004_form"></form>
+	<div id="d_bm_004_grid"></div>
+	
+	<script type="text/javascript">
+	var marketId = _marketId;
+    //原值保存
+    var oldValue = null;
+	function initForm(){
+		window['d_bm_004_form'] = $("#d_bm_004_form").ligerForm({
+	        fields : [ {
+	        	display : '<@spring.message "type.com.lkkhpg.dsis.common.member.dto.memberdetails.belongmarket"/>',
+		    	name : "marketId",
+		    	newline : false,
+		    	type : "combobox",
+		    	options : {
+		        	value : marketId,
+	                valueField : 'marketId',
+	                textField : 'name',
+	                url : '${base.contextPath}/spm/market/queryMarketsByRole',
+	                isShowCheckBox: false,
+	                isMultiSelect: false,
+	                cancelable : false,
+	                onSuccess : function(){
+	                	this.setValue(marketId);
+	                },
+	                onBeforeSelect : function(){ //该事件用于将初次加载标志置false,记录原值以及将重复标记置为true
+	                	oldValue = $.ligerui.get('marketId').getValue();
+	                },
+	                onSelected :function (value,text){
+	                	if (!value) {
+	                		return false;
+	                	}
+	                	if (marketId != value) {
+	                		$.ligerDialog.confirm( '<@spring.message "dsis.lkkhpg.tip.refresh_page"/>', $l('sys.hand.tip.info'),function(yes) {
+	                            if(yes){
+	                                var newMarketId = $.ligerui.get('marketId').getValue();
+	                                var tabid = window.top.tab.selectedTabId;
+	              			    	var tabname = $(window.top.tab.tab).find('.l-selected').find('a').text();
+	                                window.top.f_removeTab(tabid);
+	                                parent.f_addTab(tabid,tabname,"${base.contextPath}/bm/bm_retransfer_query.html?marketId="+newMarketId);
+	                            }else { //选择否则重置为原值,并重置标记置false防止重复调用该方法
+	                                $.ligerui.get('marketId').setValue(oldValue);
+	                            }
+	                        });
+	                	}
+	                }
+	            },
+	            validate : {
+	                required : true
+	            }
+		    },{
+	            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.memberid"/>',
+	            name : "memberCode",
+	            newline: true,
+	            type : "popup",
+	            textField:'memberCode',
+	            options: $.extend(${lovService.getLov(base.contextPath,base.locale, "lov_member")},{
+	             	onLoadData: function(){
+	                this.setParm('marketId', marketId)
+	            } ,
+	              	onChangeValue: function(){
+	                this.setParm('marketId', marketId)
+	            }  
+	        	},{parms:{"marketId" : marketId}})
+	        }, {
+	            display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.status"/>',
+	            name : "status",
+	            newline: false,
+	            type : "select",
+	            options : {
+	                valueField : 'value',
+	                textField : 'meaning',
+	                data : retransferstatus
+	            }
+	        },{
+	            display :'<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.period"/>',
+	            name : "periodId",
+	            newline: false,
+	            type : 'select',
+	            options : {
+	                valueField : 'periodId',
+	                textField : 'periodName',
+	                url : '${base.contextPath}/bm/bonusfinal/getPeriod?marketId=' + marketId
+	            }
+	        } , ],
+	        buttons : [ {
+	            text : '<@spring.message "sys.hand.btn.query"/>',
+	            disabled : false,
+	            width : 60,
+	            click : function() {
+	            	 Hap.gridQuery({
+	                     form : d_bm_004_form,
+	                     grid : d_bm_004_grid
+	                 })
+	            }
+	        }]
+	    });
+	}
+    
+    function initGrid(){
+    	window['d_bm_004_grid'] = $("#d_bm_004_grid").ligerGrid({
+            columns : [{
+            	   display:'<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.retranscode"/>',
+            	   name:"retransCode",
+            	   width : 150
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.bonusid"/>',
+                    name : 'bonusCode',
+                    width : 150,
+                    render:function(rowdata, index, value){
+                    	if(rowdata.bonusCode != null){
+                        return '<a href="javascript:void(0);" onclick = "bonusDetail('+rowdata.bonusId+')">'+rowdata.bonusCode+'</a>';
+                    	}
+                    }
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.finalbonusid"/>',
+                    name : 'finalBonusCode',
+                    width : 150,
+
+                    render:function(rowdata, index, value){
+                    	if(rowdata.finalBonusCode != null){
+                        return '<a href="javascript:void(0);" onclick = "bonusDetail('+rowdata.finalBonusId+')">'+rowdata.finalBonusCode+'</a>';
+                    	}
+                    }
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.memberid"/>',
+                    name : 'memberCode',
+                    width : 150
+
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.membername"/>',
+                    name : 'memberName',
+                    width : 180
+
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.companyname"/>',
+                    name : 'companyName',
+                    width : 200
+
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.marketname"/>',
+                    name : 'marketName',
+                    width : 100
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.period"/>',
+                    name : 'periodName',
+                    width : 80
+
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.retransamt"/>',
+                    name : 'retransAmt',
+                    align : 'right',
+                    width : 100
+                    
+                },
+                {
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.status"/>',
+                    name : 'status',
+                    width : 100,
+                    render: function(item) {
+                        for (var i = 0; i < retransferstatus.length; i++) {
+                            if (retransferstatus[i].value == item.status) {
+                                return retransferstatus[i].meaning;
+                            }
+                        }
+                    }
+                },{
+                    display : '<@spring.message "type.com.lkkhpg.dsis.common.bonus.dto.bonusretransfer.creationdate"/>',
+                    name : 'creationDate',
+                    width : 100,
+
+                    type :"date",
+                    format:"yyyy-MM-dd"
+                }
+            ],
+            url : '${base.contextPath}/bm/retransfer/query',
+            enabledEdit : false,
+            delayLoad :true,
+            width : '100%',
+            height : '99%',
+            pageSize :20,
+            checkbox: true,
+            toolbar : {
+            	items : [
+				{ line: true },
+				{                	
+				    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel"/>',
+				    menu:{ width: 120, items:
+				            [
+				     			{                	
+				     			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.selecetd"/>',id:'export',icon:'print', name:"export",
+				     			    click:   function (){exportSelected("d_bm_004_form","d_bm_004_grid",{"status":retransferstatus},_basePath);}
+				     			},
+				     			{ line: true },
+				     			{                	
+				     			    text: '<@spring.message "type.com.lkkhpg.dsis.admin.export.excel.all"/>',id:'export',icon:'print', name:"export",
+				     			    click: function (){exportDirectAll("d_bm_004_form","d_bm_004_grid",{"status":retransferstatus},_basePath);}
+				     			    
+				     			}
+				          ]
+				 	}                        
+				}
+            	]
+            	         
+            }
+        });
+    }
+    
+    
+    function bonusDetail(id) {
+	    window.top.f_removeTab('BONUS_FINAL');
+	    window.top.f_addTab('BONUS_FINAL', '<@spring.message "sys.hand.tab.finalbonus"/>', '${base.contextPath}/bm/bm_final_bonus.html?bonusId=' + id + '&marketId=' + marketId); 
+	}
+    
+    $(function(){
+    	marketId = ${RequestParameters.marketId!_marketId};
+		initForm();
+		/* liger.get("marketId").setValue(_marketId);
+        liger.get("marketId").setText(_marketName); */
+		initGrid();
+	});
+	
+</script>
+</html>

@@ -1,0 +1,271 @@
+<#--
+ * description: 接口数据查询界面
+ * version: 1.0
+ * author: frank.li
+ * Copyright LKK Health Products Group Limited.  
+ *
+-->
+<#include "../include/head.html">
+<body class="padding: 10px;">
+<form id="intDataForm"></form>
+<div id="intDataGrid"></div>
+<script src="${base.contextPath}/common/code?intTables=ISG.INTERFACE_TABLE" type="text/javascript"></script>
+<script>
+    
+    $(function () {
+        var processStatus = [
+            {"processStatus": 'S'},
+            {"processStatus": 'E'},
+            {"processStatus": 'P'}];
+
+        window['intDataForm'] = $("#intDataForm").ligerForm({
+            fields : [
+                {
+                    label   : 'Table Name',
+                    labelWidth : 120,
+                    name    : "tableName",
+                    type    : 'select',
+                    width   : 200,
+                    newline : false,
+                    validate: {
+                        required: true
+                    },
+                    options : {
+                        data      : intTables,
+                        valueField: 'value',
+                        textField : 'meaning',
+                        onSelected : function(newKey, newValue) {
+                            $.ligerui.get('tableDesc').setValue(newKey);
+                        }
+                    }
+                },
+                {
+                    label   : 'Table',
+                    labelWidth : 120,
+                    name    : "tableDesc",
+                    type    : 'text',
+                    width   : 200,
+                    readonly : true,
+                    newline : false
+                },
+                {
+                    label   : 'procesStatus',
+                    labelWidth : 120,
+                    name    : "processStatus",
+                    type    : 'select',
+                    width   : 100,
+                    newline : false,
+                    options : {
+                        valueField : 'processStatus',
+                        textField: 'processStatus',
+                        data : processStatus
+                    }
+                },
+                {
+                    label   : 'Process Date From',
+                    labelWidth : 120,
+                    newline : true,
+                    name    : "processDateFrom",
+                    type: 'date',
+                    width   : 200,
+                    options: {
+                        format: 'yyyy-MM-dd hh:mm:ss',
+                        showTime : true,
+                    },
+                    validate: {
+                        required: true
+                    }
+                },
+                {
+                    label   : 'Process Date To',
+                    labelWidth : 120,
+                    newline : false,
+                    name    : "processDateTo",
+                    type: 'date',
+                    width   : 200,
+                    options: {
+                        format: 'yyyy-MM-dd hh:mm:ss',
+                        showTime : true,
+                    }
+                },
+                {
+                    label   : 'Advise No',
+                    labelWidth : 120,
+                    name    : "adviseNo",
+                    type    : 'text',
+                    width   : 100,
+                    readonly : false,
+                    newline : false
+                },
+                {
+                    label   : 'Interface Datas',
+                    labelWidth : 120,
+                    width : 800,
+                    name    : 'response',
+                    type    : 'textarea',
+                    newline : true,
+                    options : {
+                        height   : 80,
+                    }
+                }
+            ],
+            buttons: [{
+                text    : 'Submit',
+                disabled: false,
+                width   : 60,
+                click   : function () {
+                    if (!intDataForm.valid()) {
+                        return;
+                    }
+                    var manager = $.ligerDialog.waitting('<@spring.message "sys.hand.tip.processing"/>');
+                    var intDataFormData = intDataForm.getData();
+                    
+                    if (intDataFormData.processStatus == "") {
+                        intDataFormData.processStatus = null;
+                    }
+                    
+                    intDataFormData.response = "";
+                    
+                    $.ajax({
+                        type    : 'POST',
+                        dataType : "json",
+                        contentType : "application/json",
+                        url     : '${base.contextPath}/integration/intefaceData/query',
+                        data    : JSON2.stringify(intDataFormData),
+                        success : function (jsonObj) {
+                            intDataFormData.response = JSON2.stringify(jsonObj);
+                            intDataForm.setData(intDataFormData);
+                            
+                            initInterfaceDataGrid(jsonObj);
+                            
+                            manager.close();
+                        },
+                        error   : function (args) {
+                            $.ligerDialog.error(args.responseText);
+                            manager.close();
+                        },
+                        complete: function () {
+                            manager.close();
+                        }
+                    });
+                }
+            }]
+        });
+        
+        $.ligerui.get('tableName').selectValue('ISG_DIFF_CHECK');
+        $.ligerui.get('processDateFrom').setValue(new Date());
+    });
+    
+    
+    function initInterfaceDataGrid(jsonObj) {
+      var intData = {};
+      intData.rows = [];
+      
+      for (var i in jsonObj.rows) {
+        var rowObject = jsonObj.rows[i];
+        var rowData = null;
+        var index = 0;
+        
+        var columnText = [];
+        
+        rowData = '"interfaceId" : "' + (jsonObj.rows[i].interfaceId||'') + 
+                  '" , "adviseNo" : "' + (jsonObj.rows[i].adviseNo||'') +
+                  '" , "processStatus" : "' + (jsonObj.rows[i].processStatus||'') +
+                  '" , "processDate" : "' + (jsonObj.rows[i].processDate||'') +
+                  '" , "processMessage" : "' + (jsonObj.rows[i].processMessage||'') + '"';
+        
+        for(var j in rowObject) {
+            if (j == '_token' || j == '__id' || j.indexOf('attribute') == 0 ||
+                j == 'interfaceId' || j == 'adviseNo' || j == 'processStatus' || j == 'processDate' || j == 'processMessage') {
+                //附加字段不显示，固定字段跳过
+            } else {
+                index += 1;
+                rowData += ',"' +  ('column' + index) + '": "' + (rowObject[j]||'') + '"'; 
+                
+                //列标题
+                columnText.push({'column' : ('column' + index), 'text' : j});
+            }
+        } //遍历数据
+        
+        rowData = JSON2.parse('{' + rowData + '}');
+        intData.rows.push(rowData);
+        
+        //intDataGrid.add({ 'processDate': '2016-05-04', 'adviseNo': "adviseNo1"});
+      }
+      
+      //console.log("intData: " + intData);
+      
+      window['intDataGrid'] = $("#intDataGrid").ligerGrid({
+          columns : [ 
+              {
+                  type : 'text',
+                  display : 'interfaceId',
+                  name : 'interfaceId',
+                  align : 'left',
+                  width : 100
+              },{
+                  type : 'text',
+                  display : 'adviseNo',
+                  name : 'adviseNo',
+                  align : 'left',
+                  width : 150
+              },{
+                  type : 'date',
+                  display : 'processDate',
+                  name : 'processDate',
+                  align : 'left',
+                  width : 100,
+                  options: {
+                      format: 'yyyy-MM-dd hh:mm:ss',
+                      showTime : true
+                  }
+              },{
+                  type : 'text',
+                  display : 'processStatus',
+                  name : 'processStatus',
+                  align : 'left',
+                  width : 100
+              },{
+                  type : 'text',
+                  display : 'processMessage',
+                  name : 'processMessage',
+                  align : 'left',
+                  width : 200
+              },
+              {type:'text',width:150,hide:true,display:'column1',name:'column1'},{type:'text',width:150,hide:true,display:'column2',name:'column2'},{type:'text',width:150,hide:true,display:'column3',name:'column3'},
+              {type:'text',width:150,hide:true,display:'column4',name:'column4'},{type:'text',width:150,hide:true,display:'column5',name:'column5'},{type:'text',width:150,hide:true,display:'column6',name:'column6'},
+              {type:'text',width:150,hide:true,display:'column7',name:'column7'},{type:'text',width:150,hide:true,display:'column8',name:'column8'},{type:'text',width:150,hide:true,display:'column9',name:'column9'},
+              {type:'text',width:150,hide:true,display:'column10',name:'column10'},{type:'text',width:150,hide:true,display:'column11',name:'column11'},{type:'text',width:150,hide:true,display:'column12',name:'column12'},
+              {type:'text',width:150,hide:true,display:'column13',name:'column13'},{type:'text',width:150,hide:true,display:'column14',name:'column14'},{type:'text',width:150,hide:true,display:'column15',name:'column15'},
+              {type:'text',width:150,hide:true,display:'column16',name:'column16'},{type:'text',width:150,hide:true,display:'column17',name:'column17'},{type:'text',width:150,hide:true,display:'column18',name:'column18'},
+              {type:'text',width:150,hide:true,display:'column19',name:'column19'},{type:'text',width:150,hide:true,display:'column20',name:'column20'},{type:'text',width:150,hide:true,display:'column21',name:'column21'},
+              {type:'text',width:150,hide:true,display:'column22',name:'column22'},{type:'text',width:150,hide:true,display:'column23',name:'column23'},{type:'text',width:150,hide:true,display:'column24',name:'column24'},
+              {type:'text',width:150,hide:true,display:'column25',name:'column25'},{type:'text',width:150,hide:true,display:'column26',name:'column26'},{type:'text',width:150,hide:true,display:'column27',name:'column27'},
+              {type:'text',width:150,hide:true,display:'column28',name:'column28'},{type:'text',width:150,hide:true,display:'column29',name:'column29'},{type:'text',width:150,hide:true,display:'column30',name:'column30'},
+              {type:'text',width:150,hide:true,display:'column31',name:'column31'},{type:'text',width:150,hide:true,display:'column32',name:'column32'},{type:'text',width:150,hide:true,display:'column33',name:'column33'},
+              {type:'text',width:150,hide:true,display:'column34',name:'column34'},{type:'text',width:150,hide:true,display:'column35',name:'column35'},{type:'text',width:150,hide:true,display:'column36',name:'column36'},
+              {type:'text',width:150,hide:true,display:'column37',name:'column37'},{type:'text',width:150,hide:true,display:'column38',name:'column38'},{type:'text',width:150,hide:true,display:'column39',name:'column39'},
+              {type:'text',width:150,hide:true,display:'column40',name:'column40'},{type:'text',width:150,hide:true,display:'column41',name:'column41'},{type:'text',width:150,hide:true,display:'column42',name:'column42'},
+              {type:'text',width:150,hide:true,display:'column43',name:'column43'},{type:'text',width:150,hide:true,display:'column44',name:'column44'},{type:'text',width:150,hide:true,display:'column45',name:'column45'},
+              {type:'text',width:150,hide:true,display:'column46',name:'column46'},{type:'text',width:150,hide:true,display:'column47',name:'column47'},{type:'text',width:150,hide:true,display:'column48',name:'column48'},
+              {type:'text',width:150,hide:true,display:'column49',name:'column49'},{type:'text',width:150,hide:true,display:'column50',name:'column50'}
+              ],
+          data : intData,
+          rownumbers : true,
+          //usePager : true,
+          enabledEdit : false,
+          width: '99%',
+          height : '365px'
+      });
+      
+      //根据查询结果的字段名称设置表头 文本
+      for(var i in columnText) {
+          intDataGrid.changeHeaderText(columnText[i].column, columnText[i].text);
+          intDataGrid.toggleCol(columnText[i].column, true);
+      }
+      
+      //intDataGrid.set({ data: intData });
+    }
+</script>
+</body>
+</html>

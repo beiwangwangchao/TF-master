@@ -1,0 +1,122 @@
+<#--
+ * description: 角色界面
+ * version: 1.0 
+ * author:njq.niu@hand-china.com
+ * Copyright LKK Health Products Group Limited 
+ * 
+-->
+<#include "../include/head.html">
+<body style="padding: 10px;">
+<form id="langForm"></form>
+<div id="langGrid" style="margin: 0; padding: 0"></div>
+<script type="text/javascript">
+    $(function () {
+        window['langForm'] = $("#langForm").ligerForm({
+            fields : [{
+                type : 'text',
+                label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.language.langcode"/>',
+                name : 'langCode'
+            }, {
+                type   : 'text',
+                label  : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.language.baselang"/>',
+                name   : 'baseLang',
+                newline: false
+            }, {
+                type : 'text',
+                label: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.language.description"/>',
+                name : 'description'
+            }],
+            buttons: [{
+                text    : '<@spring.message "sys.hand.btn.query"/>',
+                disabled: false,
+                width   : 60,
+                click   : function () {
+                    Hap.gridQuery({
+                        form: langForm,
+                        grid: langGrid
+                    })
+                }
+            },
+                {
+                    text    : '<@spring.message "sys.hand.btn.reset"/>',
+                    disabled: false,
+                    width   : 60,
+                    click   : function () {
+                        langForm.reset();
+                    }
+                }]
+        });
+
+        window['langGrid'] = $("#langGrid").ligerGrid({
+            unSetValidateAttr: false,
+            columns          : [{
+                display : '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.language.langcode"/>',
+                name    : 'langCode',
+                align   : 'left',
+                width   : 120,
+                editor  : {
+                    type: 'text'
+                },
+                validate: {
+                    required: true
+                }
+            }, {
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.language.baselang"/>',
+                name   : 'baseLang',
+                align  : 'left',
+                width  : 150,
+                editor : {
+                    type: 'text'
+                }
+            }, {
+                display: '<@spring.message "type.com.lkkhpg.dsis.platform.dto.system.language.description"/>',
+                name   : 'description',
+                align  : 'left',
+                width  : 300,
+                editor : {
+                    type: 'text'
+                }
+            }],
+            url              : '${base.contextPath}/sys/language/query',
+            toolbar          : {
+                items: [{
+                    text   : '<@spring.message "sys.hand.btn.new"/>',
+                    disable: false,
+                    click  : function () {
+                        langGrid.addRow({})
+                    },
+                    icon   : 'add'
+                }, {
+                    line: true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.delete"/>',
+                    click: function () {
+                        Hap.gridDelete({
+                            grid: langGrid,
+                            url : '${base.contextPath}/sys/language/delete'
+                        })
+
+                    },
+                    icon : 'delete'
+                }, {
+                    line: true
+                }, {
+                    text : '<@spring.message "sys.hand.btn.save"/>',
+                    click: function () {
+                        Hap.gridSave({
+                            grid: langGrid,
+                            url : '${base.contextPath}/sys/language/submit'
+                        })
+                    },
+                    icon : 'save'
+                }]
+            },
+            enabledEdit      : true,
+            width            : '99%',
+            height           : '98%',
+            checkbox         : true
+        });
+    });
+</script>
+</body>
+</html>

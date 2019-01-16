@@ -1,0 +1,82 @@
+<#-- 
+ * description: 订单支付接口测试界面
+ * version: 1.0 
+ * author:zhenyang.he
+ * Copyright LKK Health Products Group Limited.
+ * 
+--> 
+<#include "../include/head.html">
+<script src="${base.contextPath}/common/code?marketChangeApprovalStatus=SYS.REVIEW_STATUS" type="text/javascript"></script>
+<script src="${base.contextPath}/common/code?marketChangeApproveDate=mm.market_change_approve_date" type="text/javascript"></script>
+<body style="padding: 10px;">
+	<form id="order_payment_form"></form>
+	<script type="text/javascript">
+		window['order_payment_form'] = $("#order_payment_form").ligerForm({
+			fields : [{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.market.code"/>',
+				name : 'market',
+				align : 'middle',
+				width : 130,
+				editor : {
+					type : 'text'
+				},
+			},{
+				display : '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.salesorder.ordernumber"/>',
+				name : 'orderNo',
+				align : 'middle',
+				width : 130,
+				editor : {
+					type : 'text'
+				}
+			},{
+				display : 'authCode',
+				name : 'authCode',
+				align : 'middle',
+				width : 130,
+				editor : {
+					type : 'int'
+				}
+			},{
+				display : 'authDate',
+				name : 'authDate',
+				align : 'middle',
+				width : 130,
+				editor : {
+					type : 'text'
+				}
+			},{
+				display : 'lastFourDigitPAN',
+				name : 'lastFourDigitPAN',
+				align : 'middle',
+				width : 130,
+				editor : {
+					type : 'text'
+				}
+			},{
+				display : 'result',
+				name : 'result',
+				align : 'middle',
+				width : 130,
+				editor : {
+					type : 'int'
+				}
+			}
+			] , buttons : [
+			               { text: '<@spring.message "type.com.lkkhpg.dsis.common.order.dto.submit"/>', disabled:false,width: 60, click: function(){
+			            	   var datas = order_payment_form.getData();
+			            	   $.ajax({
+			            		   url:"${base.contextPath}/api/vl/settleOrder",
+			            		   type:"POST",
+			            		   dataType:"application/json",
+			            		   data : datas,
+			            		   success: function(json){
+			            			   return json.message;
+			            		   }
+			            	   })
+			               }
+				
+			}]
+		});
+	</script>
+</body>
+</html>

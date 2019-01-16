@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lkkhpg.dsis.common.system.mapper.SysReportParamsMapper" >
+  <resultMap id="BaseResultMap" type="com.lkkhpg.dsis.common.system.dto.SysReportParams" >
+    <id column="REPORT_PARAMS_ID" jdbcType="DECIMAL" property="reportParamsId" />
+    <result column="REPORT_PROGRAM_ID" jdbcType="DECIMAL" property="reportProgramId" />
+    <result column="PARAM_NAME" jdbcType="VARCHAR" property="paramName" />
+    <result column="DISPLAY" jdbcType="VARCHAR" property="display" />
+    <result column="FIELD_SEQUENCE" jdbcType="VARCHAR" property="fieldSequence" />
+    <result column="FIELD_TYPE" jdbcType="VARCHAR" property="fieldType" />
+    <result column="FIELD_SELECT_SOURCE" jdbcType="VARCHAR" property="fieldSelectSource" />
+    <result column="FIELD_SELECT_CODE" jdbcType="VARCHAR" property="fieldSelectCode" />
+    <result column="FIELD_SELECT_URL" jdbcType="VARCHAR" property="fieldSelectUrl" />
+    <result column="FIELD_SELECT_VF" jdbcType="VARCHAR" property="fieldSelectVf" />
+    <result column="FIELD_SELECT_TF" jdbcType="VARCHAR" property="fieldSelectTf" />
+    <result column="FIELD_TEXTFIELD" jdbcType="VARCHAR" property="fieldTextfield" />
+    <result column="FIELD_LOV_CODE" jdbcType="VARCHAR" property="fieldLovCode" />
+    <result column="REQUIRE_FLAG" jdbcType="VARCHAR" property="requireFlag" />
+    <result column="OBJECT_VERSION_NUMBER" jdbcType="DECIMAL" property="objectVersionNumber" />
+    <result column="REQUEST_ID" jdbcType="DECIMAL" property="requestId" />
+    <result column="PROGRAM_ID" jdbcType="DECIMAL" property="programId" />
+    <result column="CREATION_DATE" jdbcType="TIMESTAMP" property="creationDate" />
+    <result column="CREATED_BY" jdbcType="DECIMAL" property="createdBy" />
+    <result column="LAST_UPDATED_BY" jdbcType="DECIMAL" property="lastUpdatedBy" />
+    <result column="LAST_UPDATE_DATE" jdbcType="TIMESTAMP" property="lastUpdateDate" />
+    <result column="LAST_UPDATE_LOGIN" jdbcType="DECIMAL" property="lastUpdateLogin" />
+    <result column="ATTRIBUTE_CATEGORY" jdbcType="VARCHAR" property="attributeCategory" />
+    <result column="ATTRIBUTE1" jdbcType="VARCHAR" property="attribute1" />
+    <result column="ATTRIBUTE2" jdbcType="VARCHAR" property="attribute2" />
+    <result column="ATTRIBUTE3" jdbcType="VARCHAR" property="attribute3" />
+    <result column="ATTRIBUTE4" jdbcType="VARCHAR" property="attribute4" />
+    <result column="ATTRIBUTE5" jdbcType="VARCHAR" property="attribute5" />
+    <result column="ATTRIBUTE6" jdbcType="VARCHAR" property="attribute6" />
+    <result column="ATTRIBUTE7" jdbcType="VARCHAR" property="attribute7" />
+    <result column="ATTRIBUTE8" jdbcType="VARCHAR" property="attribute8" />
+    <result column="ATTRIBUTE9" jdbcType="VARCHAR" property="attribute9" />
+    <result column="ATTRIBUTE10" jdbcType="VARCHAR" property="attribute10" />
+    <result column="ATTRIBUTE11" jdbcType="VARCHAR" property="attribute11" />
+    <result column="ATTRIBUTE12" jdbcType="VARCHAR" property="attribute12" />
+    <result column="ATTRIBUTE13" jdbcType="VARCHAR" property="attribute13" />
+    <result column="ATTRIBUTE14" jdbcType="VARCHAR" property="attribute14" />
+    <result column="ATTRIBUTE15" jdbcType="VARCHAR" property="attribute15" />
+    <result column="FIELD_SELECT_MULTI" jdbcType="VARCHAR" property="fieldSelectMulti" />
+    <result column="FIELD_DATE_FORMAT" jdbcType="VARCHAR" property="fieldDateFormat" />
+    <result column="FIELD_DEFAULT_VALUE" jdbcType="VARCHAR" property="fieldDefaultValue" />
+    <result column="FIELD_LINK_EVENT" jdbcType="VARCHAR" property="fieldLinkEvent" />
+    <result column="FIELD_LINK_RULE" jdbcType="VARCHAR" property="fieldLinkRule" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    REPORT_PARAMS_ID, REPORT_PROGRAM_ID, PARAM_NAME, DISPLAY, FIELD_SEQUENCE, FIELD_TYPE, FIELD_SELECT_SOURCE, 
+    FIELD_SELECT_CODE, FIELD_SELECT_URL, FIELD_SELECT_VF, FIELD_SELECT_TF, FIELD_TEXTFIELD, FIELD_LOV_CODE, REQUIRE_FLAG
+    OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+    CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, 
+    ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+    ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, ATTRIBUTE14, 
+    ATTRIBUTE15,FIELD_SELECT_MULTI,FIELD_DATE_FORMAT,FIELD_DEFAULT_VALUE,FIELD_LINK_EVENT,FIELD_LINK_RULE
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from SYS_REPORT_PARAMS
+    where REPORT_PARAMS_ID = #{reportParamsId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SYS_REPORT_PARAMS
+    where REPORT_PARAMS_ID = #{reportParamsId,jdbcType=DECIMAL}
+  </delete>
+  <insert id="insert" parameterType="com.lkkhpg.dsis.common.system.dto.SysReportParams" >
+    <selectKey resultType="java.lang.Long" keyProperty="reportParamsId" order="BEFORE" >
+      select SYS_REPORT_PARAMS_S.nextval from dual
+    </selectKey>
+    insert into SYS_REPORT_PARAMS (REPORT_PARAMS_ID, REPORT_PROGRAM_ID, PARAM_NAME, DISPLAY, FIELD_SEQUENCE, FIELD_TYPE, FIELD_SELECT_SOURCE, 
+      FIELD_SELECT_CODE, FIELD_SELECT_URL, FIELD_SELECT_VF, FIELD_SELECT_TF, FIELD_TEXTFIELD, FIELD_LOV_CODE, REQUIRE_FLAG,
+      OBJECT_VERSION_NUMBER, 
+      REQUEST_ID, PROGRAM_ID, CREATION_DATE, 
+      CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, 
+      LAST_UPDATE_LOGIN, ATTRIBUTE_CATEGORY, ATTRIBUTE1, 
+      ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, 
+      ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, 
+      ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, 
+      ATTRIBUTE11, ATTRIBUTE12, ATTRIBUTE13, 
+      ATTRIBUTE14, ATTRIBUTE15, FIELD_SELECT_MULTI, FIELD_DATE_FORMAT, 
+      FIELD_DEFAULT_VALUE,FIELD_LINK_EVENT,FIELD_LINK_RULE)
+    values (#{reportParamsId,jdbcType=DECIMAL}, #{reportProgramId,jdbcType=DECIMAL}, #{paramName,jdbcType=VARCHAR}, 
+      #{display,jdbcType=VARCHAR}, #{fieldSequence,jdbcType=VARCHAR}, #{fieldType,jdbcType=VARCHAR}, 
+      #{fieldSelectSource,jdbcType=VARCHAR}, #{fieldSelectCode,jdbcType=VARCHAR}, #{fieldSelectUrl,jdbcType=VARCHAR},
+      #{fieldSelectVf,jdbcType=VARCHAR},#{fieldSelectTf,jdbcType=VARCHAR},#{fieldTextfield,jdbcType=VARCHAR},
+      #{fieldLovCode,jdbcType=VARCHAR},#{requireFlag,jdbcType=VARCHAR},
+      1, #{requestId,jdbcType=DECIMAL}, #{programId,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{createdBy,jdbcType=DECIMAL}, #{lastUpdatedBy,jdbcType=DECIMAL}, CURRENT_TIMESTAMP, 
+      #{lastUpdateLogin,jdbcType=DECIMAL}, #{attributeCategory,jdbcType=VARCHAR}, #{attribute1,jdbcType=VARCHAR}, 
+      #{attribute2,jdbcType=VARCHAR}, #{attribute3,jdbcType=VARCHAR}, #{attribute4,jdbcType=VARCHAR}, 
+      #{attribute5,jdbcType=VARCHAR}, #{attribute6,jdbcType=VARCHAR}, #{attribute7,jdbcType=VARCHAR}, 
+      #{attribute8,jdbcType=VARCHAR}, #{attribute9,jdbcType=VARCHAR}, #{attribute10,jdbcType=VARCHAR}, 
+      #{attribute11,jdbcType=VARCHAR}, #{attribute12,jdbcType=VARCHAR}, #{attribute13,jdbcType=VARCHAR}, 
+      #{attribute14,jdbcType=VARCHAR}, #{attribute15,jdbcType=VARCHAR}, #{fieldSelectMulti,jdbcType=VARCHAR},
+      #{fieldDateFormat,jdbcType=VARCHAR},#{fieldDefaultValue,jdbcType=VARCHAR},#{fieldLinkEvent,jdbcType=VARCHAR},
+      #{fieldLinkRule,jdbcType=VARCHAR})
+  </insert>
+  
+  <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.system.dto.SysReportParams" >
+    update SYS_REPORT_PARAMS
+    set REPORT_PROGRAM_ID = #{reportProgramId,jdbcType=DECIMAL},
+      PARAM_NAME = #{paramName,jdbcType=VARCHAR},
+      DISPLAY = #{display,jdbcType=VARCHAR},
+      FIELD_SEQUENCE = #{fieldSequence,jdbcType=VARCHAR},
+      FIELD_TYPE = #{fieldType,jdbcType=VARCHAR},
+      FIELD_SELECT_SOURCE = #{fieldSelectSource,jdbcType=VARCHAR}, 
+      FIELD_SELECT_CODE = #{fieldSelectCode,jdbcType=VARCHAR},
+      FIELD_SELECT_URL = #{fieldSelectUrl,jdbcType=VARCHAR},
+      FIELD_SELECT_VF = #{fieldSelectVf,jdbcType=VARCHAR},
+      FIELD_SELECT_TF = #{fieldSelectTf,jdbcType=VARCHAR},
+      FIELD_TEXTFIELD = #{fieldTextfield,jdbcType=VARCHAR},
+      FIELD_LOV_CODE = #{fieldLovCode,jdbcType=VARCHAR},
+      REQUIRE_FLAG = #{requireFlag,jdbcType=VARCHAR},
+      OBJECT_VERSION_NUMBER = OBJECT_VERSION_NUMBER + 1,
+      REQUEST_ID = #{requestId,jdbcType=DECIMAL},
+      PROGRAM_ID = #{programId,jdbcType=DECIMAL},
+      CREATION_DATE = #{creationDate,jdbcType=TIMESTAMP},
+      CREATED_BY = #{createdBy,jdbcType=DECIMAL},
+      LAST_UPDATED_BY = #{lastUpdatedBy,jdbcType=DECIMAL},
+      LAST_UPDATE_DATE = CURRENT_TIMESTAMP,
+      LAST_UPDATE_LOGIN = #{lastUpdateLogin,jdbcType=DECIMAL},
+      ATTRIBUTE_CATEGORY = #{attributeCategory,jdbcType=VARCHAR},
+      ATTRIBUTE1 = #{attribute1,jdbcType=VARCHAR},
+      ATTRIBUTE2 = #{attribute2,jdbcType=VARCHAR},
+      ATTRIBUTE3 = #{attribute3,jdbcType=VARCHAR},
+      ATTRIBUTE4 = #{attribute4,jdbcType=VARCHAR},
+      ATTRIBUTE5 = #{attribute5,jdbcType=VARCHAR},
+      ATTRIBUTE6 = #{attribute6,jdbcType=VARCHAR},
+      ATTRIBUTE7 = #{attribute7,jdbcType=VARCHAR},
+      ATTRIBUTE8 = #{attribute8,jdbcType=VARCHAR},
+      ATTRIBUTE9 = #{attribute9,jdbcType=VARCHAR},
+      ATTRIBUTE10 = #{attribute10,jdbcType=VARCHAR},
+      ATTRIBUTE11 = #{attribute11,jdbcType=VARCHAR},
+      ATTRIBUTE12 = #{attribute12,jdbcType=VARCHAR},
+      ATTRIBUTE13 = #{attribute13,jdbcType=VARCHAR},
+      ATTRIBUTE14 = #{attribute14,jdbcType=VARCHAR},
+      ATTRIBUTE15 = #{attribute15,jdbcType=VARCHAR},
+      FIELD_SELECT_MULTI = #{fieldSelectMulti,jdbcType=VARCHAR},
+      FIELD_DATE_FORMAT = #{fieldDateFormat,jdbcType=VARCHAR},
+      FIELD_DEFAULT_VALUE = #{fieldDefaultValue,jdbcType=VARCHAR},
+      FIELD_LINK_EVENT = #{fieldLinkEvent,jdbcType=VARCHAR},
+      FIELD_LINK_RULE = #{fieldLinkRule,jdbcType=VARCHAR}
+    where REPORT_PARAMS_ID = #{reportParamsId,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="queryByReportProgramId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    select 
+    REPORT_PARAMS_ID, REPORT_PROGRAM_ID, PARAM_NAME, DISPLAY, FIELD_SEQUENCE, FIELD_TYPE, FIELD_SELECT_SOURCE, 
+    FIELD_SELECT_CODE, FIELD_SELECT_URL, FIELD_SELECT_VF, FIELD_SELECT_TF, FIELD_TEXTFIELD, FIELD_LOV_CODE, 
+    REQUIRE_FLAG, FIELD_SELECT_MULTI, FIELD_DATE_FORMAT, FIELD_DEFAULT_VALUE, FIELD_LINK_EVENT, FIELD_LINK_RULE
+    from SYS_REPORT_PARAMS
+    where REPORT_PROGRAM_ID = #{reportProgramId,jdbcType=DECIMAL}
+  </select>
+</mapper>
