@@ -634,15 +634,25 @@
   </select>
 
   <select id="querySameCompanySalesOrgId" parameterType="java.lang.Long" resultType="java.lang.Long">
-    SELECT b.SALES_ORG_ID
-    FROM SPM_ORG_DEFINATION_B b
-    where b.COMPANY_ID=(SELECT b.COMPANY_ID FROM SPM_MARKET_B b
-              WHERE b.MARKET_ID =#{request.marketId,jdbcType=VARCHAR})
-    INTERSECT
-    SELECT sura.ASSIGN_VALUE from SYS_USER_ROLE_ASSIGN sura
-    where sura.USER_ID = #{request.userId,jdbcType=VARCHAR}
-    AND sura.ROLE_ID = #{request.roleId,jdbcType=VARCHAR}
-    AND sura.ASSIGN_TYPE = 'SALES'
+SELECT
+	b.SALES_ORG_ID
+FROM
+	SPM_ORG_DEFINATION_B b
+WHERE
+	b.COMPANY_ID = ( SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID =#{ request.marketId, jdbcType = VARCHAR } )
+	AND EXISTS (
+SELECT
+	1
+FROM
+	SYS_USER_ROLE_ASSIGN sura
+WHERE
+	sura.USER_ID = #{ request.userId,
+	jdbcType = VARCHAR }
+	AND sura.ROLE_ID = #{ request.roleId,
+	jdbcType = VARCHAR }
+	AND sura.ASSIGN_TYPE = 'SALES'
+	AND sura.ASSIGN_VALUE = b.SALES_ORG_ID
+	)
   </select>
   
 </mapper>

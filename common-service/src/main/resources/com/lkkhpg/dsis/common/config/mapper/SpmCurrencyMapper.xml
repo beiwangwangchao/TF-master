@@ -37,7 +37,7 @@
     <result column="ATTRIBUTE15" property="attribute15" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    CURRENCY_CODE, PRECISION, EXTENDED_PRECISION, CURRENCY_NAME, DESCRIPTION, SYMBOL,
+    CURRENCY_CODE, `PRECISION`, EXTENDED_PRECISION, CURRENCY_NAME, DESCRIPTION, SYMBOL,
     ENABLED_FLAG, START_ACTIVE_DATE, END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, 
     PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
     ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
@@ -55,7 +55,7 @@
     where CURRENCY_CODE = #{currencyCode,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCurrency" >
-    insert into SPM_CURRENCY (CURRENCY_CODE, PRECISION, EXTENDED_PRECISION,
+    insert into SPM_CURRENCY (CURRENCY_CODE, `PRECISION`, EXTENDED_PRECISION,
       CURRENCY_NAME, DESCRIPTION, SYMBOL, 
       ENABLED_FLAG, START_ACTIVE_DATE, END_ACTIVE_DATE, 
       OBJECT_VERSION_NUMBER, REQUEST_ID, PROGRAM_ID, 
@@ -85,7 +85,7 @@
     <trim prefix="(" suffix=")" suffixOverrides="," >
       CURRENCY_CODE,
       <if test="precision != null" >
-        PRECISION,
+        `PRECISION`,
       </if>
       <if test="extendedPrecision != null" >
         EXTENDED_PRECISION,
@@ -281,7 +281,7 @@
     update SPM_CURRENCY
     <set >
       <if test="precision != null" >
-        PRECISION = #{precision,jdbcType=DECIMAL},
+        `PRECISION` = #{precision,jdbcType=DECIMAL},
       </if>
       <if test="extendedPrecision != null" >
         EXTENDED_PRECISION = #{extendedPrecision,jdbcType=DECIMAL},
@@ -377,7 +377,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCurrency" >
     update SPM_CURRENCY
-    set PRECISION = #{precision,jdbcType=DECIMAL},
+    set `PRECISION` = #{precision,jdbcType=DECIMAL},
       EXTENDED_PRECISION = #{extendedPrecision,jdbcType=DECIMAL},
       CURRENCY_NAME = #{currencyName,jdbcType=VARCHAR},
       DESCRIPTION = #{description,jdbcType=VARCHAR},
@@ -435,7 +435,7 @@
   <!-- 查询币种 author: hanrui.huang -->
   <select id="querySpmCurrency" resultMap="BaseResultMap" parameterType="com.lkkhpg.dsis.common.config.dto.SpmCurrency">
   select
-    CURRENCY_CODE, PRECISION, EXTENDED_PRECISION, CURRENCY_NAME, DESCRIPTION, SYMBOL,
+    CURRENCY_CODE, `PRECISION`, EXTENDED_PRECISION, CURRENCY_NAME, DESCRIPTION, SYMBOL,
     ENABLED_FLAG, START_ACTIVE_DATE, END_ACTIVE_DATE, OBJECT_VERSION_NUMBER, REQUEST_ID, 
     PROGRAM_ID, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, 
     ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, 
