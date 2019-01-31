@@ -51,6 +51,10 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
                 } else if("/loginSysOthUsers".equals(path)){
                     request.getRequestDispatcher("/loginSomethingOtherUsers").forward(request, response);
                 }else {
+                    System.out.println(contextPath);
+                    if(contextPath.equals("/mws"))
+                    response.sendRedirect(contextPath + defaultPageManager.getPageIndex());
+                    else
                     response.sendRedirect(contextPath + defaultPageManager.getPageLogin());
                 }
                 // response.sendRedirect(contextPath + "/timeout.html");

@@ -94,9 +94,10 @@ public class DefaultLoginAdaptor implements ILoginAdaptor {
     public ModelAndView doLogin(Account account, HttpServletRequest request, HttpServletResponse response) {
         ModelAndView view = new ModelAndView();
         Locale locale = RequestContextUtils.getLocale(request);
-
         view.setViewName(getLoginView(request));
         fillContextLanguagesData(view);
+        System.out.println("Default Adapter");
+        System.out.println(view.toString());
 
         // 记录用户输入的用户名，登录失败刷新页面时，不需要重新输入
         try {
@@ -253,6 +254,7 @@ public class DefaultLoginAdaptor implements ILoginAdaptor {
         Cookie cookie = new Cookie(Account.FIELD_LOGIN_NAME, account.getLoginName());
         cookie.setPath(StringUtils.defaultIfEmpty(request.getContextPath(), "/"));
         cookie.setMaxAge(-1);
+        System.out.println("parent after login");
         response.addCookie(cookie);
     }
 
