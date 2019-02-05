@@ -45,6 +45,7 @@ public class LoginController extends BaseController {
     @RequestMapping(value = {"/login","/loginHJF"}, method = RequestMethod.POST)
     public ModelAndView login(final Account account, final HttpServletRequest request,
                               final HttpServletResponse response) {
+        System.out.println("this is the login");
         return getLoginAdaptor().doLogin(account, request, response);
     }
 

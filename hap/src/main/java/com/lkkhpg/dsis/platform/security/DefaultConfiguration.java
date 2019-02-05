@@ -11,12 +11,20 @@ package com.lkkhpg.dsis.platform.security;
 public class DefaultConfiguration {
     
     private String pageLogin = "/login.html";
+    private String pageIndex = "/index.html";
     private String page404 = "/404.html";
     private String page403 = "/403.html";
     private String page500 = "/500.html";
     private String defaultViewPath = "admin";
 
-    
+    public String getPageIndex() {
+        return pageIndex;
+    }
+
+    public void setPageIndex(String pageIndex) {
+        this.pageIndex = pageIndex;
+    }
+
     public String getDefaultViewPath() {
         return defaultViewPath;
     }

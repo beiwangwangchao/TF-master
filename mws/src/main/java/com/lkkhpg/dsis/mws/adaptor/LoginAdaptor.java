@@ -94,7 +94,7 @@ public class LoginAdaptor extends DefaultLoginAdaptor {
         Locale locale = RequestContextUtils.getLocale(request);
         String message = null;
         Member member = loginMemberService.selectByMemberCode(account);
-
+        System.out.println("after login");
         //SpmSalesOrganization so = loginMemberService.selectByMarketId(member.getMarketId());
         if (member != null && session != null) {
             //view.clear();
@@ -170,6 +170,7 @@ public class LoginAdaptor extends DefaultLoginAdaptor {
     @Override
     protected void beforeLogin(ModelAndView view, Account account, HttpServletRequest request,
                                HttpServletResponse response) throws AccountException {
+        System.out.println("befor login");
         String key = ACCOUNT_LOCK_PREFIX + account.getLoginName();
         HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
         String tryTimes = (String) hash.get(key, ACCOUNT_LOCK_TRY_TIMES);
