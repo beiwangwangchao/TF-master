@@ -71,15 +71,18 @@
       select count(*)
       from INV_CATEGORY_B b
       <where>
+          1=1
           <if test="categoryName != null">
           and b.category_name = #{categoryName, jdbcType=VARCHAR}
           </if>
+          <!--
           and (b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
               or b.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
                      (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
               or b.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
                      (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
               )
+              -->
       </where>
     </select>
 
@@ -467,12 +470,13 @@
         ON B.CATEGORY_ID = T.CATEGORY_ID
         AND T.LANG = #{request.locale,jdbcType=VARCHAR}
         <where>
-            (b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
+            1=1
+          <!--  (b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
               or b.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
                 (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
               or b.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
                 (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
-            )
+            ) -->
             <if test="categoryName != null and categoryName != ''">
                 AND T.CATEGORY_NAME like concat('%',concat(#{categoryName,jdbcType=VARCHAR},'%'))
             </if>
@@ -493,12 +497,13 @@
         ON B.CATEGORY_ID = T.CATEGORY_ID
         AND T.LANG = #{request.locale,jdbcType=VARCHAR}
         <where>
-            (b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
+           <!-- (b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
               or b.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
                  (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
               or b.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
                  (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
-            )
+            )-->
+            1=1
             <if test="categoryId !=null and categoryId != '' ">
                 AND B.CATEGORY_ID = #{categoryId,jdbcType=DECIMAL}
             </if>
@@ -534,12 +539,15 @@
         ON B.CATEGORY_ID = T.CATEGORY_ID
         AND T.LANG = #{request.locale,jdbcType=VARCHAR}
         <where>
+            1=1
+            <!--
             (b.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
                or b.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
                   (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
                or b.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
                   (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
             )
+            -->
             <if test="categoryId != null">
                 and B.PARENT_CATEGORY_ID = #{categoryId,jdbcType=INTEGER}
             </if>
@@ -588,12 +596,14 @@
       from INV_CATEGORY_B icb LEFT OUTER JOIN INV_CATEGORY_TL icbt
     on (icb.CATEGORY_ID = icbt.CATEGORY_ID AND icbt.LANG = #{request.locale,jdbcType=VARCHAR})
     where icb.ENABLED_FLAG = 'Y'
+    <!--
     and (icb.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
               or icb.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
                      (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
               or icb.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
                      (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
               )
+              -->
       and (icb.END_ACTIVE_DATE >= CURRENT_TIMESTAMP or icb.END_ACTIVE_DATE is null)
       and LEAF_FLAG = 'Y'
          order by sort_num
@@ -606,12 +616,17 @@
         from INV_CATEGORY_B icb LEFT OUTER JOIN INV_CATEGORY_TL icbt
         on (icb.CATEGORY_ID = icbt.CATEGORY_ID AND icbt.LANG = #{request.locale,jdbcType=VARCHAR})
         where icb.ENABLED_FLAG = 'Y'
-        and (icb.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
+
+        <!-- update by wenchao  20190211  ,保证所有平台使有一个类目-->
+        <!--
+        and
+        (icb.attribute2 = (select company_id from spm_market_b where market_id = #{request.marketId, jdbcType=VARCHAR})
         or icb.attribute2 = (SELECT SCB.GST_ID FROM SPM_COMPANY_B scb WHERE SCB.COMPANY_ID =
         (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
         or icb.attribute2 IN (SELECT scb.COMPANY_ID from SPM_COMPANY_B scb where scb.GST_ID=
         (SELECT b.COMPANY_ID FROM SPM_MARKET_B b WHERE b.MARKET_ID = #{request.marketId,jdbcType=DECIMAL}))
-        )
+        )-->
+
         and (icb.END_ACTIVE_DATE >= CURRENT_TIMESTAMP or icb.END_ACTIVE_DATE is null)
     </select>
 
