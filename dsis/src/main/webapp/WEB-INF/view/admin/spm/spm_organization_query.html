@@ -268,7 +268,29 @@
                             validate: {
                                 required:true
                             }
-                        }],
+                        }
+            <#if  userId==1>
+                    ,
+                {
+                    display: '<@spring.message "type.com.lkkhpg.dsis.common.config.orgdefination.defaultsource" />',
+                        name: 'attribute1',
+                    width: 50,
+                    editor: {
+                    type: 'select',
+                        valueField: 'value',
+                        textField: 'meaning',
+                        data: yesno
+                },
+                    render: function(item) {
+                        for (var i = 0; i < yesno.length; i++) {
+                            if (yesno[i].value == item.attribute1) {
+                                return yesno[i].meaning;
+                            }
+                        }
+                    }
+                }
+                    </#if>
+                    ],
                     url: _basePath + '/spm/organization/queryAll',
                     toolbar: {
                         items: [{
