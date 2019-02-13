@@ -277,16 +277,22 @@ public class ProductServiceImpl implements IProductService {
         String priceType = requestContext.getAttribute(MemberConstants.FIELD_MEMBER_ROLE);
         Long memberId = requestContext.getAttribute(Member.FIELD_MEMBER_ID);
         Member member = commMemberService.getMember(requestContext, memberId);
-        SpmCompany spmCompany = spmCompanyMapper.selectByPrimaryKey(member.getCompanyId());
-        String isCheck = spmCompany.getAttribute3() == null ? "N" : spmCompany.getAttribute3();
+       // SpmCompany spmCompany = spmCompanyMapper.selectByPrimaryKey(member.getCompanyId());
+       // String isCheck = spmCompany.getAttribute3() == null ? "N" : spmCompany.getAttribute3();
+        String isCheck ="N";
         List<String> currencyCodes = paramService.getSalesParamValues(requestContext,
                 ProductConstants.CURRENCY_CODE_PARAM, requestContext.getAttribute(SystemProfileConstants.SALES_ORG_ID));
-        product.setCurrencyCode(currencyCodes.get(ProductConstants.INDEX));
+      //  product.setCurrencyCode(currencyCodes.get(ProductConstants.INDEX));
+        product.setCurrencyCode("CNY");
 
         /*
          * 将会员类型为直营店的商品价格设为经销商价格
          * updated by 15750 at 2017/12/20
          * */
+        if(priceType == null)
+        {
+            priceType ="DIS";
+        }
         if (priceType.equals("DSS")) {
             priceType = new String("DIS");
         }
@@ -366,8 +372,9 @@ public class ProductServiceImpl implements IProductService {
      */
     public List<Product> getProdects(IRequest requestContext, List<Product> pro_list) {
         // 根据币种符号获得进度
-        String currencyCode = paramService.getSalesParamValues(requestContext,
-                ProductConstants.CURRENCY_CODE_PARAM, requestContext.getAttribute(SystemProfileConstants.SALES_ORG_ID)).get(ProductConstants.INDEX);
+        /*String currencyCode = paramService.getSalesParamValues(requestContext,
+                ProductConstants.CURRENCY_CODE_PARAM, requestContext.getAttribute(SystemProfileConstants.SALES_ORG_ID)).get(ProductConstants.INDEX);*/
+        String currencyCode = "CNY";
         SpmCurrency spmCurrency = new SpmCurrency();
         spmCurrency.setCurrencyCode(currencyCode);
         SpmCurrency SpmCurrency = spmCurrencyMapper.querySpmCurrency(spmCurrency).get(ProductConstants.INDEX);
