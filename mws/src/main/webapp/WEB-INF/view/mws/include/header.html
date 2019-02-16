@@ -149,45 +149,7 @@ $.unescapeHtml = function(str){
             //取消-无操作
         });
     }
-    //获得店铺
-    function getOrgName(){
-        var code = "${Session._marketCode}";
-    	var igiCode = "";
-    	for(var i=0;i<igiMapping.length;i++){
-    		if(code == igiMapping[i]['value']){
-    			igiCode = igiMapping[i]['meaning']
-                //console.log(igiCode);
-    			break;
-    		}
-    	}
-    	var  memberId= ${Session.memberId};
-        var marketId = ${Session._marketId};
-    	$.ajax({
-            type : "POST",
-            url:"${base.contextPath}/account/selectByMarketName",
-            data:{memberId:memberId,igiCode:igiCode},
-            dataType : "json",
-            success : function(data) {
-                if(data.success){
-                	var html = [];
-                    var data = data.rows;
-                    if(data.length>0){
-                        //for(var i=0;i<data.length;i++){
-                        $.each(data, function(index, item) {
-                            //var item = data[i];
-                            html.push("<tr>\
-                            		   <td style='width:160px;' id='"+ item.salesOrgId +"' onclick='selectShop("+ item.salesOrgId +",\""+ item.name +"\")'><span title='"+ item.name +"'>"+ item.name +"</span></td>\
-                                 </tr>");
-                        //}
-                        });
-                        $("#showShopTbody").html(html.join(''));
-                    }
-                    click_span();
-                }
-            }
-        });
-    }
-    
+
     function selectShop(val,name){
     	$.ajax({
             type : "POST",
@@ -202,22 +164,7 @@ $.unescapeHtml = function(str){
             }
     	});
     }
-    
-    function click_span(){
-        $("#${Session._salesOrgId}").addClass("hover");
-        $("#showShopTbody td").hover(
-                  function () {
-                    $(this).addClass("hover");
-                  },
-                  function () {
-                    $(this).removeClass("hover");
-                  }
-        );
-        $("#showShopTbody td").on("click",function(){
-            $("td").css({ "color": "", "background": ""});
-            $(this).addClass("hover");
-        });
-    }
+
 
     var bootsnav = {
         initialize: function() {
@@ -804,10 +751,7 @@ $.unescapeHtml = function(str){
 
 
         // 市场为台湾时，则隐藏钱包信息
-    	var marketCode = '${Session._marketCode}';
-    	if("TW" == marketCode){
-    		$("#walletMessage").hide();
-    	}
+
     	//加载页面时获得产品下拉框
         $.ajax({
             type : "POST",
@@ -836,7 +780,7 @@ $.unescapeHtml = function(str){
                             $("#market_li").text(item.name);
                         }
                     }
-                    getOrgName();
+              //      getOrgName();
                 }
             }
         });
@@ -957,30 +901,16 @@ $.unescapeHtml = function(str){
                     </div>
                     <div class="collapse navbar-collapse top-nav">
                         <ul class="nav navbar-nav">
-                            <li style="font-weight: 900;"><a href="#">${Session.memberName}</a></li>
+                            <li style="font-weight: 900;"><a href="#"><#if Session.memberName??>${Session.memberName}<#else><a href="${base.contextPath}/login.html">登录</a></#if></a></li>
+                            <#if Session.memberName??>
                             <li class="dropdown"><a
                                 href="${base.contextPath}/account/account-info.html"><@spring.message "mws.menu.myaccount"/>
                             </a></li>
-                            <li style="cursor: pointer;">
-                                <a data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><@spring.message "mws.myaccount.accountinfo.language_selection"/><span class="caret"></span></a>
-                                <ul class="dropdown-menu" id="lang">
-                                    <#list languages as l>
-                                        <li name="lang" onclick="changeLang('${l.langCode}')" value="${l.langCode}" style="width: 100%;margin-left: 0;" <#if base.getLocale() == l.langCode>selected</#if> ><span style="margin-left: 15px;">${l.description}</span></li>
-                                    </#list>
-                                </ul>
-                            </li>
-                            <li style="cursor: pointer;">
-                                    <a data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="margin-top : -2px;"><span id="shopName">${Session._salesOrgName}</span><span class="caret"></span></a>
-                                    <!-- <a data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">切换店铺<span class="caret"></span></a> -->
-                                <table class="dropdown-menu showShopTable">
-                                    <thead>
-	                                    <tr><td id="market_li" style="text-align: center;width:160px;"></td></tr>
-	                                    <tr><td style="height:2px;margin-top: 30px; position:absolute;width:160px;top:0;bottom:0;background:-webkit-gradient(linear, center top, center bottom, from(#fff), color-stop(0.45, #ccc),color-stop(0.55, #ccc), to(#fff));"></td></tr>
-                                    </thead>
-                                    <tbody id="showShopTbody" style="text-align: center;"></tbody>
-                                </table>
-                            </li>
+                            </#if>
+                        <#if Session.memberName??>
                             <li><a href="javascript:logout()"><@spring.message "sys.hand.btn.logout"/></a></li>
+                        </#if>
+                        <#if Session.accountId??>
                             <li>
                             	<a href="${base.contextPath}/account/account-messagebox.html"> 
    									<i class="glyphicon glyphicon-envelope"></i> 消息
@@ -994,6 +924,8 @@ $.unescapeHtml = function(str){
                                     </span>
 								</a>
                             </li>
+                        </#if>
+                        <#if Session.memberId??>
                             <li>
                                 <a href="${base.contextPath}/order/shopping-cart.html"> 
                        				<i class="fa fa-shopping-cart fa-lg"></i> 购物车
@@ -1003,6 +935,7 @@ $.unescapeHtml = function(str){
                     				</span>
                     			</a>
                             </li>
+                            </#if>
 
                             <!--<li class="dropdown"  id="count">-->
                                 <!--<label for="count">该页面被访问了：</label>-->
@@ -1050,7 +983,6 @@ $.unescapeHtml = function(str){
                                           </ul>
                                     </li>
 
-                                    <li><a href="${base.contextPath}/order/fast-shopping.html"><@spring.message "mws.nav.quickbuy"/></a></li>
                                 </ul>
 
                             </div>

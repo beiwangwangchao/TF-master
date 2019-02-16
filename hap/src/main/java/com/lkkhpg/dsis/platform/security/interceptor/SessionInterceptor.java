@@ -39,9 +39,7 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
         request.setAttribute(SESSION_INTERCEPTOR_TOKEN, true);
         HttpSession session = request.getSession(false);
         String contextPath = request.getContextPath();
-        System.out.println("截取开始");
-        System.out.println(contextPath);
-        if (session == null&&contextPath.equals("/dsis")) {
+        if (session == null) {
             if (RequestUtil.isAjaxRequest(request)) {
                 try (Writer writer = response.getWriter()) {
                     writer.write(DEFAULT_AJAX_RESPONSE);
@@ -53,31 +51,16 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
                 } else if("/loginSysOthUsers".equals(path)){
                     request.getRequestDispatcher("/loginSomethingOtherUsers").forward(request, response);
                 }else {
-/*                    System.out.println(contextPath);
+                    System.out.println(contextPath);
                     if(contextPath.equals("/mws"))
                     response.sendRedirect(contextPath + defaultPageManager.getPageIndex());
-                    else*/
+                    else
                     response.sendRedirect(contextPath + defaultPageManager.getPageLogin());
                 }
                 // response.sendRedirect(contextPath + "/timeout.html");
             }
             return false;
         } else {
-            if(session ==null&&contextPath.equals("/mws"))
-            {
-                System.out.println("mws");
-                 session = request.getSession();
-                session.setAttribute("timeZone","GMT+0800");
-                session.setAttribute("accountId",(long)999999999);
-                session.setAttribute("_marketCode","0000");
-                session.setAttribute("memberId",(long)999999999);
-                session.setAttribute("_marketId",(long)999999999);
-                session.setAttribute("_salesOrgId",(long)999999999);
-                session.setAttribute("memberName","未登录");
-                session.setAttribute("_salesOrgName","无");
-
-
-            }
             String tz = (String) session.getAttribute(BaseConstants.TIME_ZONE);
             if (StringUtils.isNotEmpty(tz)) {
                 TimeZoneUtil.setTimeZone(TimeZone.getTimeZone(tz));
