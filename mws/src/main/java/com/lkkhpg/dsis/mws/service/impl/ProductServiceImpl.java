@@ -308,12 +308,12 @@ public class ProductServiceImpl implements IProductService {
 
         SpmSupply spmSupply = new SpmSupply();
         spmSupply.setSalesOrgId(requestContext.getAttribute(SystemProfileConstants.SALES_ORG_ID));
-        List<SpmSupply> spmSupplyList = spmSupplyMapper.queryInvOrgBySpmSupply(spmSupply);
-        if (null == spmSupplyList || spmSupplyList.size() == 0) {
+   //     List<SpmSupply> spmSupplyList = spmSupplyMapper.queryInvOrgBySpmSupply(spmSupply);
+ /*       if (null == spmSupplyList || spmSupplyList.size() == 0) {
             product.setAttribute2(requestContext.getAttribute(SystemProfileConstants.SALES_ORG_ID).toString());
         } else {
             product.setAttribute2(spmSupplyList.get(0).getInvOrgId().toString());
-        }
+        }*/
 
         if (pagesize != -1) {
             PageHelper.startPage(page, pagesize);

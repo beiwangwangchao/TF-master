@@ -47,6 +47,9 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
             } else {
                 String path = request.getRequestURI().substring(contextPath.length());
                 if ("".equals(path) || "/".equals(path)) {
+                    if(contextPath.equals("/mws"))
+                        //response.sendRedirect(contextPath + defaultPageManager.getPageIndex());
+                    request.getRequestDispatcher("/index").forward(request, response);
                     request.getRequestDispatcher("/login").forward(request, response);
                 } else if("/loginSysOthUsers".equals(path)){
                     request.getRequestDispatcher("/loginSomethingOtherUsers").forward(request, response);

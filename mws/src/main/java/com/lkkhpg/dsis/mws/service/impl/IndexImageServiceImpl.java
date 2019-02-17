@@ -48,9 +48,9 @@ public class IndexImageServiceImpl implements IIndexImageService {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
                 .getRequest();
         HttpSession session = request.getSession(false);
-        Long marketId = (Long) session.getAttribute(ProductConstants.MARKET_ID);
+     //   Long marketId = (Long) session.getAttribute(ProductConstants.MARKET_ID);
         IndexImage indexImage = new IndexImage();
-        indexImage.setMarketId(marketId);
+      //  indexImage.setMarketId(marketId);
         indexImage.setModuleCode(moduleCode);
         Long fileId = indexImageMapper.getHeadersImageId(indexImage);
         if (fileId == null) {
@@ -64,9 +64,9 @@ public class IndexImageServiceImpl implements IIndexImageService {
     	 HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
                  .getRequest();
          HttpSession session = request.getSession(false);
-         Long marketId = (Long) session.getAttribute(ProductConstants.MARKET_ID);
+       //  Long marketId = (Long) session.getAttribute(ProductConstants.MARKET_ID);
          IndexImage indexImage = new IndexImage();
-         indexImage.setMarketId(marketId);
+       //  indexImage.setMarketId(marketId);
          indexImage.setModuleCode(moduleCode);
          String url = indexImageMapper.getHeadersImageUrl(indexImage);
          if (url == null) {

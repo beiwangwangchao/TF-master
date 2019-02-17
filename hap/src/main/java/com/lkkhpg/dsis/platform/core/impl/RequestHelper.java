@@ -94,13 +94,14 @@ public final class RequestHelper {
     public static IRequest createServiceRequest(HttpServletRequest httpServletRequest) {
         IRequest requestContext = requestListener.newInstance();
         HttpSession session = httpServletRequest.getSession(false);
+        Locale locale = RequestContextUtils.getLocale(httpServletRequest);
+        if (locale != null) {
+            requestContext.setLocale(locale.toString());
+        }
         if (session != null) {
             requestContext.setAccountId((Long) session.getAttribute(IRequest.FIELD_ACCOUNTID));
             requestContext.setRoleId((Long) session.getAttribute(Role.FIELD_ROLE_ID));
-            Locale locale = RequestContextUtils.getLocale(httpServletRequest);
-            if (locale != null) {
-                requestContext.setLocale(locale.toString());
-            }
+
         }
         Map<String, String> mdcMap = MDC.getCopyOfContextMap();
         if (mdcMap != null) {
