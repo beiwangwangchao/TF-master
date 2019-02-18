@@ -392,7 +392,7 @@ public class ProductServiceImpl implements IProductService {
         }
         List<String> taxCode = paramService.getSalesParamValues(requestContext, ProductConstants.TAX_CODE_PARAM,
                 requestContext.getAttribute(SystemProfileConstants.SALES_ORG_ID));
-        if (taxCode.isEmpty() || taxCode == null) {
+        if (taxCode == null||taxCode.isEmpty()) {
             for (Product pro : pro_list) {
                 pro.setSign("N");
             }
